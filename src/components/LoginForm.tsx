@@ -49,8 +49,8 @@ export default function LoginForm() {
     >
       <div>
         <img
-          src="/Logo.svg"
-          className="w-40 h-40 absolute top-5 left-10 drop-shadow-lg"
+          src="/logo_texto_dittravel_blanco.png"
+          className="h-20 w-auto absolute top-5 left-10 drop-shadow-lg"
         />
       </div>
       <div className="relative w-[407px] h-[455px] bg-white/10 border border-white/30 backdrop-blur-md rounded-lg shadow-lg flex justify-center items-center">

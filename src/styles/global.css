@@ -3,6 +3,8 @@
 
 @theme {
   /* Neutral */
+  --color-neutral-0: #FFFFFF;
+  --color-neutral-25: #E4E4E4;
   --color-neutral-50: #D6D8DE;
   --color-neutral-100: #CED1D7;
   --color-neutral-200: #C5C9D1;
@@ -10,12 +12,12 @@
   --color-neutral-400: #A2A8B4;
   --color-neutral-500: #878E9E;
   /* Primary */
-  --color-primary-50: #82C0EF;
-  --color-primary-100: #69B3EC;
-  --color-primary-200: #50A7E9;
-  --color-primary-300: #379AE6;
-  --color-primary-400: #1C89DE;
-  --color-primary-500: #1876BE;
+  --color-primary-50: #E6EDFE;
+  --color-primary-100: #B9CDFD;
+  --color-primary-200: #8DACFC;
+  --color-primary-300: #336BFA;
+  --color-primary-400: #053ECC;
+  --color-primary-500: #03226F;
   /* Secondary */
   --color-secondary-50: #A4B5EE;
   --color-secondary-100: #8DA3EA;
@@ -37,6 +39,12 @@
   --color-warning-300: #DE3840;
   --color-warning-400: #D22329;
   --color-warning-500: #B41E23;
+  /* Alert */
+  --color-alert-50: #FFF3E0;
+  --color-alert-100: #FFE0B2;
+  --color-alert-200: #FFCC80;
+  --color-alert-300: #FFB74D;
+  --color-alert-400: #FFA726;
   
   /* Fonts */
   --font-family: 'Roboto', sans-serif;
