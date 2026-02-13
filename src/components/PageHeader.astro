@@ -27,6 +27,8 @@ const isCurrentRoute = Astro.url.pathname === "/perfil-usuario";
       class="h-15 w-auto rounded drop-shadow-lg cursor-pointer"
       onmouseover="this.classList.add('hover:scale-101')"
       onclick="if(confirm('¿Volver al dashboard?')) window.location.href = '/dashboard'"
+      title="Volver al dashboard"
+      alt="Logo Dittravel"
     />
   </div>
 
@@ -36,7 +38,11 @@ const isCurrentRoute = Astro.url.pathname === "/perfil-usuario";
     <!-- Buttons -->
     <div class="flex items-center gap-2">
       <button
-        class="bg-primary-500 rounded-lg p-2.5 h-10 w-10 flex justify-center items-center cursor-pointer transition-colors duration-200 hover:bg-primary-300"
+        class="bg-primary-500 rounded-lg p-2.5 h-10 w-10
+              flex justify-center items-center
+              cursor-pointer transition-colors duration-200
+              hover:bg-primary-300"
+        title="Cambiar tema"
       >
         <MaterialIcon icon="dark_mode" />
       </button>

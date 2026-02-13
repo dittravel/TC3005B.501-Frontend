@@ -19,7 +19,7 @@ const getClasses = ({
   color,
   customSizeClass = "",
 }: Required<Pick<ButtonProps, 'variant' | 'size' | 'color' | 'customSizeClass'>>) => {
-  const base = "rounded font-medium";
+  const base = "rounded font-medium cursor-pointer";
   const sizeMap = {
     small: "px-2 py-1 text-sm",
     medium: "px-4 py-2 text-base",
@@ -27,10 +27,10 @@ const getClasses = ({
     custom: customSizeClass,
   };
   const colorMap = {
-    primary: "bg-blue-500 hover:bg-blue-600 text-white",
-    success: "bg-green-500 hover:bg-green-600 text-white",
-    warning: "bg-red-500 hover:bg-red-600 text-white",
-    secondary: "bg-gray-500 hover:bg-gray-600 text-white",
+    primary: "bg-primary-300 hover:bg-primary-400 text-white",
+    success: "bg-success-300 hover:bg-success-400 text-white",
+    warning: "bg-warning-300 hover:bg-warning-400 text-white",
+    secondary: "bg-gray-400 hover:bg-gray-500 text-white",
   };
   return `${base} ${sizeMap[size]} ${colorMap[color]}`;
 };

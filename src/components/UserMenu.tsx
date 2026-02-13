@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { apiRequest } from "@utils/apiClient";
+import Button from "@components/Button";
 
 interface UserMenuProps {
   children?: React.ReactNode;
@@ -39,27 +40,26 @@ export default function UserMenu({ children }: UserMenuProps) {
     <div className="relative inline-block" ref={menuRef}>
       <button
         onClick={() => setShowMenu(!showMenu)}
-        className="flex items-center gap-2 bg-white text-primary-500 py-1 px-4 rounded-full font-bold text-sm cursor-pointer transition-all duration-200 hover:bg-primary-100"
-      >
+        className="flex items-center gap-2 bg-white text-primary-500 py-1 px-4
+                  rounded-full font-bold text-sm cursor-pointer
+                  transition-all duration-200
+                  hover:bg-primary-100"
+        title="Menú de usuario"> {/* Tooltip */}
         {children}
       </button>
       
       {/* Dropdown Menu */}
       {showMenu && (
-        <div className="absolute top-full right-0 mt-2 w-56 bg-white shadow-xl rounded-lg p-4 z-100 border border-gray-200">
+        <div className="absolute top-full right-0 mt-2 w-56
+                       bg-white shadow-xl rounded-lg p-4 z-100
+                       border border-gray-200">
           <div className="flex flex-col gap-2">
-            <button
-              onClick={handleSettings}
-              className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
-            >
+            <Button onClick={handleSettings} color="primary" className="w-full">
               Ajustes de Usuario
-            </button>
-            <button
-              onClick={handleLogout}
-              className="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition-colors font-semibold"
-            >
+            </Button>
+            <Button onClick={handleLogout} color="warning" className="w-full">
               Cerrar Sesión
-            </button>
+            </Button>
           </div>
         </div>
       )}
