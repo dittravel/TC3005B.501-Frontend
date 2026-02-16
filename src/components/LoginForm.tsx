@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import Button from "@components/Button";
 import { apiRequest } from "@utils/apiClient";
 
+const inputStyle = `peer w-full h-[50px]
+  border border-gray-400 rounded outline-none
+  text-black text-sm px-3 placeholder-gray-400`;
+
 export default function LoginForm() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -12,7 +16,6 @@ export default function LoginForm() {
     await apiRequest("/user/logout", {
       method: "GET",
     });
-
 
     try {
 
@@ -77,19 +80,10 @@ export default function LoginForm() {
               required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="peer w-full h-[50px] border border-gray-400
-                        rounded-l outline-none
-                        text-black px-3 placeholder-transparent"
+              className={inputStyle}
               placeholder="Usuario"
+              autoComplete="username"
             />
-            <label
-              htmlFor="username"
-              className="absolute left-3 text-sm text-gray-400 transition-all duration-200
-                        peer-placeholder-shown:top-1/2 peer-placeholder-shown:translate-y-[-50%] bg-white
-                        peer-focus:top-0 peer-focus:text-xs peer-focus:text-black"
-            >
-              Usuario
-            </label>
           </div>
 
           {/* Password Field */}
@@ -100,19 +94,10 @@ export default function LoginForm() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="peer w-full h-[50px] border border-gray-400
-                        rounded-l outline-none
-                        text-black px-3 placeholder-transparent"
+              className={inputStyle}
               placeholder="Contraseña"
+              autoComplete="current-password"
             />
-            <label
-              htmlFor="password"
-              className="absolute left-3 text-sm text-gray-400 transition-all duration-200
-                        peer-placeholder-shown:top-6.5 peer-placeholder-shown:translate-y-[-50%] bg-white
-                        peer-focus:top-0 peer-focus:text-xs peer-focus:text-black"
-            >
-              Contraseña
-            </label>
           </div>
 
           {/* Submit Button */}
@@ -133,9 +118,9 @@ export default function LoginForm() {
 
           {/* Error Message */}
           {errorMessage && (
-            <p className="mt-4 text-center text-sm text-black-400">
-              {errorMessage}
-            </p>
+              <p className="text-center text-sm text-red-600">
+                {errorMessage}
+              </p>
           )}
         </form>
       </div>
