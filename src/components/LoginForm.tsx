@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import Button from "@components/Button";
 import { apiRequest } from "@utils/apiClient";
 
+const inputStyle = `peer w-full h-[50px]
+  border border-gray-400 rounded outline-none
+  text-black text-sm px-3 placeholder-gray-400`;
+
 export default function LoginForm() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -12,7 +16,6 @@ export default function LoginForm() {
     await apiRequest("/user/logout", {
       method: "GET",
     });
-
 
     try {
 
@@ -41,76 +44,83 @@ export default function LoginForm() {
 
   return (
     <div
-      className="flex justify-center items-center min-h-screen w-full bg-gradient-to-br from-purple-700 via-indigo-800 to-black bg-cover bg-center relative"
-      // style={{
-      //   backgroundImage:
-      //     "url('')",
-      // }}
+      className="flex justify-center items-center
+                h-screen w-full bg-primary-50"
     >
-      <div>
-        <img
-          src="/Logo.svg"
-          className="w-40 h-40 absolute top-5 left-10 drop-shadow-lg"
-        />
-      </div>
-      <div className="relative w-[407px] h-[455px] bg-white/10 border border-white/30 backdrop-blur-md rounded-lg shadow-lg flex justify-center items-center">
-        <form onSubmit={handleSubmit} className="w-[310px] text-white">
-          <h2 className="text-2xl text-center font-semibold mb-8">Login</h2>
+      {/* Logo */}
+      <img
+        src="/logo_texto_dittravel_color.png"
+        className="h-20 w-auto drop-shadow-lg absolute top-5 left-10"
+      />
 
-          <div className="relative mb-8 border-b border-white">
+      {/* Login Form Container */}
+      <div className="px-10 py-10
+                      bg-white flex flex-col justify-center items-center
+                      rounded-xl shadow-lg gap-10
+                      border-gray-400 border-1"
+      >
+        {/* Login Title */}
+        <div className="w-full flex flex-col justify-center items-left">
+          <h2 className="text-3xl font-bold text-black p-0 m-0">
+            Iniciar Sesión
+          </h2>
+          <p className="text-sm text-gray-600">
+            Ingresa tus credenciales para continuar
+          </p>
+        </div>
+
+        {/* Login Form */}
+        <form onSubmit={handleSubmit} className="w-[310px] text-white flex flex-col gap-6">
+
+          {/* Username Field */}
+          <div className="relative">
             <input
               id="username"
               type="text"
               required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="peer w-full h-[50px] bg-transparent border-none outline-none text-white px-1 placeholder-transparent"
+              className={inputStyle}
               placeholder="Usuario"
+              autoComplete="username"
             />
-            <label
-              htmlFor="username"
-              className="absolute left-1 text-sm text-white transition-all duration-200
-                        peer-placeholder-shown:top-1/2 peer-placeholder-shown:translate-y-[-50%]
-                        peer-focus:top-0 peer-focus:text-xs peer-focus:text-white"
-            >
-              Usuario
-            </label>
           </div>
 
-          <div className="relative mb-6 border-b border-white">
+          {/* Password Field */}
+          <div className="relative">
             <input
               id="password"
               type="password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="peer w-full h-[50px] bg-transparent border-none outline-none text-white px-1 placeholder-transparent"
+              className={inputStyle}
               placeholder="Contraseña"
+              autoComplete="current-password"
             />
-            <label
-              htmlFor="password"
-              className="absolute left-1 text-sm text-white transition-all duration-200
-                        peer-placeholder-shown:top-1/2 peer-placeholder-shown:translate-y-[-50%]
-                        peer-focus:top-0 peer-focus:text-xs peer-focus:text-white"
-            >
-              Contraseña
-            </label>
           </div>
 
+          {/* Submit Button */}
           <Button
             type="submit"
             variant="filled"
             color="primary"
             size="medium"
-            className="w-full rounded-full"
           >
             Login
           </Button>
 
+          <div className="w-full border-t border-gray-200"></div>
+
+          <p className="text-sm text-gray-400">
+            ¿Olvidaste tu contraseña? Contacta a un administrador para restablecerla.
+          </p>
+
+          {/* Error Message */}
           {errorMessage && (
-            <p className="mt-4 text-center text-sm text-black-400">
-              {errorMessage}
-            </p>
+              <p className="text-center text-sm text-red-600">
+                {errorMessage}
+              </p>
           )}
         </form>
       </div>
