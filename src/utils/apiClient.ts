@@ -39,13 +39,16 @@ interface ApiOptions {
   cookies?: import("astro").APIContext["cookies"];
 }
 
+const BASE_URL = import.meta.env.PUBLIC_API_BASE_URL || 'https://localhost:3000/api';
+
 export async function apiRequest<T = any>(
   path: string,
   options: ApiOptions = {}
 ): Promise<T> {
-  const baseUrl = import.meta.env.PUBLIC_API_BASE_URL;
-  const { method = 'GET', data, headers = {}, cookies } = options;
+  const { method = 'GET', data, headers, cookies } = options;
 
+  const url = `${BASE_URL}${path}`;
+  
   let token = "";
   try {
     const session = getSession(cookies); 
@@ -68,17 +71,33 @@ export async function apiRequest<T = any>(
   try {
     // For Node.js in development, the NODE_TLS_REJECT_UNAUTHORIZED env var handles this
     // For browsers, we can't directly modify SSL validation behavior
-    const res = await fetch(`${baseUrl}${path}`, config);
+    // ^eso que?
+    const res = await fetch(url, config);
 
     if (!res.ok) {
-      const errorJson = await res.json().catch(() => null);
+      let errorResponse;
+      try {
+        const text = await res.text();
+        try {
+          errorResponse = JSON.parse(text);
+        } catch {
+          errorResponse = { error: text };
+        }
+      } catch {
+        errorResponse = { error: 'Failed to read error response' };
+      }
       throw {
         status: res.status,
-        response: errorJson || await res.text()
+        response: errorResponse
       };
     }
 
-    return await res.json();
+    const text = await res.text();
+    try {
+      return JSON.parse(text);
+    } catch {
+      return text as any;
+    }
   } catch (error) {
     console.error("API request failed:", error);
     throw {
