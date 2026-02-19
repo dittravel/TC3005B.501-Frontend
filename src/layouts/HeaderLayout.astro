@@ -18,25 +18,51 @@ const { title, data } = Astro.props
   <head>
     <meta charset="utf-8" />
     <meta name="description" content="Astro description" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
   </head>
-  <body>
-    <div id="app">
-		<header id="page-header">
-			<PageHeader userName={data.userName} buttonLabel={data.buttonLabel} />
-		</header>
 
-		<section id="content">
-      <div class="flex flex-col p-12 h-full">
-        <slot />
-      </div>
-		</section>
+  <body>
+    <div id="app" class="grid grid-rows-[auto_1fr] h-screen">
+      
+      <!-- Header -->
+      <header id="page-header">
+        <PageHeader userName={data.userName} buttonLabel={data.buttonLabel} />
+      </header>
+
+      <!-- Main content -->
+      <section id="content" class="overflow-y-auto">
+        <div class="flex flex-col p-12 h-full">
+          <slot />
+        </div>
+      </section>
     </div>
 
+    <!-- Dark mode toggle script -->
+    <script>
+      // Guardar preferencia en localStorage opcional
+      const html = document.documentElement;
+      const saved = localStorage.getItem('theme');
+      if (saved === 'dark') html.classList.add('dark');
+
+      window.toggleDarkMode = () => {
+        html.classList.toggle('dark');
+        localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+      }
+    </script>
+
     <style>
+      /* Grid layout */
+      #page-header {
+        grid-area: header;
+      }
+
+      #content {
+        grid-area: content;
+      }
+
       #app {
         display: grid;
         grid-template-areas:
@@ -44,16 +70,6 @@ const { title, data } = Astro.props
           "content";
         grid-template-rows: auto 1fr;
         height: 100vh;
-      }
-
-      #page-header {
-        grid-area: header;
-      }
-
-      #content {
-        grid-area: content;
-        height: 100%;
-        overflow-y: auto;
       }
     </style>
   </body>
