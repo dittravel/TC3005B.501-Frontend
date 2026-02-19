@@ -1,3 +1,8 @@
+/*
+ * Component to display a user menu with options
+ * for settings and logout
+ */
+
 import { useState, useRef, useEffect } from "react";
 import { apiRequest } from "@utils/apiClient";
 import Button from "@components/Button";
@@ -37,13 +42,13 @@ export default function UserMenu({ children }: UserMenuProps) {
 
   return (
     // Container for the user menu button and dropdown
-    <div className="relative inline-block" ref={menuRef}>
+    <div className="relative h-full" ref={menuRef}>
       <button
         onClick={() => setShowMenu(!showMenu)}
-        className="flex items-center gap-2 bg-white text-primary-500 py-1 px-4
+        className="h-full flex items-center gap-2 bg-white text-primary-500 py-1 px-3
                   rounded-full font-bold text-sm cursor-pointer
                   transition-all duration-200
-                  hover:bg-primary-100"
+                  hover:bg-primary-50"
         title="Menú de usuario"> {/* Tooltip */}
         {children}
       </button>
@@ -51,8 +56,8 @@ export default function UserMenu({ children }: UserMenuProps) {
       {/* Dropdown Menu */}
       {showMenu && (
         <div className="absolute top-full right-0 mt-2 w-56
-                       bg-white shadow-xl rounded-lg p-4 z-100
-                       border border-gray-200">
+                       bg-background shadow-xl rounded-lg p-4 z-100
+                       border border-border">
           <div className="flex flex-col gap-2">
             <Button onClick={handleSettings} color="primary" className="w-full">
               Ajustes de Usuario

@@ -58,6 +58,14 @@ const initialFormData: FormData = {
   phone_number: ''
 };
 
+const labelClass = "block text-sm font-medium text-text-secondary mb-1";
+const baseInputClass = "w-full border rounded-md px-3 py-2 bg-neutral-50 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500 border-border";
+const errorClass = "text-red-500 text-sm mt-1";
+const formClass = "bg-card rounded-lg shadow-md p-8 border border-border";
+const infoClass = "flex items-center bg-gradient-to-r from-primary-50 to-primary-100 border-l-4 border-blue-500 p-4 mb-8 rounded shadow-sm";
+const buttonContainerClass = "flex flex-col sm:flex-row justify-end gap-3 pt-4";
+const toastClass = "fixed top-4 right-4 z-50";
+
 export default function CreateUserForm({ mode, user_data, redirectTo,token }: CreateUserFormProps) {
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [errors, setErrors] = useState<FormErrors>({});
@@ -212,13 +220,11 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
   };
 
   const inputClass = (fieldName: string) =>
-    `w-full border rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500 ${
-      errors[fieldName] ? 'border-red-500' : 'border-gray-300'
-    }`;
+    `${baseInputClass} ${errors[fieldName] ? 'border-red-500' : ''}`;
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-8">
-      <div className="flex items-center bg-gradient-to-r from-blue-50 to-blue-100 border-l-4 border-blue-500 p-4 mb-8 rounded shadow-sm">
+    <div className={formClass}>
+      <div className={infoClass}>
         <svg className="w-6 h-6 text-blue-500 mr-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="white" />
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01" />
@@ -232,7 +238,7 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
         {/* Usuario y Contraseña */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className={labelClass}>
               Nombre de Usuario <span className="text-red-500">*</span>
             </label>
             <input
@@ -244,12 +250,12 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
               placeholder="Ej: juan.perez"
             />
             {errors.user_name && (
-              <p className="text-red-500 text-sm mt-1">{errors.user_name}</p>
+              <p className={errorClass}>{errors.user_name}</p>
             )}
           </div>
           { mode === 'create' && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className={labelClass}>
               Contraseña <span className="text-red-500">*</span>
             </label>
             <input
@@ -261,7 +267,7 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
               placeholder="Contraseña segura"
             />
             {errors.password && (
-              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+              <p className={errorClass}>{errors.password}</p>
             )}
           </div>
           )}
@@ -270,7 +276,7 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
         {/* Email y Teléfono */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className={labelClass}>
               Email <span className="text-red-500">*</span>
             </label>
             <input
@@ -282,12 +288,12 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
               placeholder="usuario@empresa.com"
             />
             {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              <p className={errorClass}>{errors.email}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className={labelClass}>
               Número de Teléfono <span className="text-gray-400">(opcional)</span>
             </label>
             <input
@@ -299,14 +305,14 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
               placeholder="555-1234"
             />
             {errors.phone_number && (
-              <p className="text-red-500 text-sm mt-1">{errors.phone_number}</p>
+              <p className={errorClass}>{errors.phone_number}</p>
             )}
           </div>
         </div>
 
         {/* Estación de Trabajo */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className={labelClass}>
             Estación de Trabajo <span className="text-red-500">*</span>
           </label>
           <input
@@ -318,14 +324,14 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
             placeholder="Ej: WS-001"
           />
           {errors.workstation && (
-            <p className="text-red-500 text-sm mt-1">{errors.workstation}</p>
+            <p className={errorClass}>{errors.workstation}</p>
           )}
         </div>
 
         {/* Rol y Departamento */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className={labelClass}>
               Rol <span className="text-red-500">*</span>
             </label>
             <select
@@ -342,12 +348,12 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
               ))}
             </select>
             {errors.role_id && (
-              <p className="text-red-500 text-sm mt-1">{errors.role_id}</p>
+              <p className={errorClass}>{errors.role_id}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className={labelClass}>
               Departamento <span className="text-red-500">*</span>
             </label>
             <select
@@ -364,13 +370,13 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
               ))}
             </select>
             {errors.department_id && (
-              <p className="text-red-500 text-sm mt-1">{errors.department_id}</p>
+              <p className={errorClass}>{errors.department_id}</p>
             )}
           </div>
         </div>
 
         {/* Botones */}
-        <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
+        <div className={buttonContainerClass}>
           <Button
             type="button"
             onClick={handleReset}
@@ -395,7 +401,7 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
       </form>
 
       {toast && (
-        <div className="fixed top-4 right-4 z-50">
+        <div className={toastClass}>
           <Toast
             message={toast.message}
             type={toast.type}

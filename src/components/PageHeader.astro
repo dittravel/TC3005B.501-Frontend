@@ -20,12 +20,12 @@ import ThemeButton from "@components/ThemeButton.astro";
 const isCurrentRoute = Astro.url.pathname === "/perfil-usuario";
 ---
 
-<header class="flex justify-between items-center bg-primary-500 px-4">
+<header class="h-15 flex justify-between items-center bg-header-bg px-4 py-3 border-b border-border">
   <!-- Left Section -->
-  <div class="flex items-center px-5">
+  <div class="h-15 flex items-center px-5">
     <img
       src="/logo_texto_dittravel_blanco.png"
-      class="h-15 w-auto rounded drop-shadow-lg cursor-pointer"
+      class="w-auto h-full rounded drop-shadow-lg cursor-pointer"
       onclick="if(confirm('¿Volver al dashboard?')) window.location.href = '/dashboard'"
       title="Volver al dashboard"
       alt="Logo Dittravel"
@@ -33,7 +33,7 @@ const isCurrentRoute = Astro.url.pathname === "/perfil-usuario";
   </div>
 
   <!-- Right Section -->
-  <div class="flex items-center gap-4">
+  <div class="h-full flex items-center gap-4">
     
     <!-- Theme Button -->
     <div class="flex items-center gap-2">
@@ -41,14 +41,14 @@ const isCurrentRoute = Astro.url.pathname === "/perfil-usuario";
     </div>
 
     <!-- User Role -->
-    <span class="text-primary-100 font-bold text-sm">
+    <span class="text-brand-100 font-bold text-sm">
       {buttonLabel}
     </span>
 
     <!-- User Info -->
     <UserMenu client:load>
-      <span>{userName}</span>
-      <MaterialIcon icon="person" color="primary-500" />
+      <span class="text-primary-500">{userName}</span>
+      <MaterialIcon icon="account_circle" color="primary-500" />
     </UserMenu>
   </div>
 </header>

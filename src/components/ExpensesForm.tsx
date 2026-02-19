@@ -11,6 +11,14 @@ interface Props {
   receiptToReplace?: string | null;
 }
 
+const labelClass = "block text-sm font-medium text-text-secondary mb-1";
+const baseInputClass = "w-full border rounded-md px-3 py-2 bg-neutral-50 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500 border-border";
+const errorClass = "text-red-500 text-sm mt-1";
+const formClass = "bg-card rounded-lg shadow-md p-8 border border-border";
+const infoClass = "flex items-center bg-gradient-to-r from-primary-50 to-primary-100 border-l-4 border-blue-500 p-4 mb-8 rounded shadow-sm";
+const buttonContainerClass = "flex flex-col sm:flex-row justify-end gap-3 pt-4";
+const toastClass = "fixed top-4 right-4 z-50";
+
 export default function ExpensesFormClient({ requestId, token, receiptToReplace }: Props) {
   const [concepto, setConcepto] = useState("Transporte");
   const [monto, setMonto] = useState("");
@@ -71,10 +79,10 @@ export default function ExpensesFormClient({ requestId, token, receiptToReplace 
     <div className="space-y-8">
       <div className="grid md:grid-cols-4 gap-4 mb-4">
         <div>
-          <label className="text-sm font-medium">Concepto</label>
+          <label className={labelClass}>Concepto</label>
           <select
             name="concepto"
-            className="w-full border rounded-md px-3 py-2"
+            className={baseInputClass}
             value={concepto}
             onChange={(e) => setConcepto(e.target.value)}
           >
@@ -88,11 +96,11 @@ export default function ExpensesFormClient({ requestId, token, receiptToReplace 
           </select>
         </div>
         <div>
-          <label className="text-sm font-medium">Monto</label>
+          <label className={labelClass}>Monto</label>
           <input
             type="number"
             step="0.01"
-            className="w-full border rounded-md px-3 py-2"
+            className={baseInputClass}
             placeholder="Ej. 443.50"
             value={monto}
             onChange={(e) => setMonto(e.target.value)}
@@ -108,7 +116,7 @@ export default function ExpensesFormClient({ requestId, token, receiptToReplace 
         setIsInternational={setIsInternational}
       />
 
-      <div className="flex justify-end gap-4 pt-4">
+      <div className={buttonContainerClass}>
         <a href={`/comprobar-solicitud/${requestId}`}>
           <Button type="button" variant="border" color="warning">
             Cancelar

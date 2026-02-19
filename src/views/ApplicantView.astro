@@ -1,9 +1,7 @@
 ---
-/**
- * Authors: Gabriel Muñoz, José González
- * 
- * Description: This is the applicant view of the dashboard.
- **/
+/*
+ * Applicant user page
+ */
 
 import MaterialIcon from "@components/MaterialIcon.astro";
 import Button from "@components/Button.astro";
@@ -13,6 +11,7 @@ import CancelRequestModal from "@components/CancelRequestModal.tsx";
 import { getCookie } from "@data/cookies";
 import { apiRequest } from '@utils/apiClient';
 
+// Color for each request status
 const colorDesign: { [key: string]: string } = {
   'Primera Revisión': "text-orange-400",
   'Segunda Revisión': "text-orange-500",
@@ -22,9 +21,10 @@ const colorDesign: { [key: string]: string } = {
   'Validación de comprobantes': "text-blue-600",
 };
 
+// Get user ID from cookies
 const user_id = getCookie("id", Astro.cookies);
 
-
+// Get user requests
 const requests = await (async () => {
   try {
     // Try to fetch requests with error handling
@@ -43,22 +43,27 @@ const requests = await (async () => {
     return [];
   }
 })();
+
+// Get username from astro props
 const { userName } = Astro.props;
 ---
 
 <div>
   <main>
+    {/* Header */}
     <TextHeader
-      title={`BIENVENIDO, ${userName.toUpperCase()}`}
-      subtitle="DITTA CONSULTING"
+      title={`Bienvenido, ${userName}`}
+      subtitle="Ditta Consulting"
     />
 
-    <section class="bg-white p-6 rounded-lg shadow w-full">
-      <h2 class="flex text-xl font-bold mb-4">
-        VIAJES EN PROCESO
+    <section class="p-6 rounded-lg bg-card shadow w-full border border-border">
+      {/* Title */}
+      <h2 class="flex text-xl font-bold mb-4 text-text-primary">
+        Viajes en Proceso
         <span class="px-2 align-middle text-primary-500">({requests.length})</span>
       </h2>
 
+      {/* Request list */}
       {requests.length > 0 ? (
         <div class="grid gap-4">
           {requests.map((request: any) => {
@@ -69,8 +74,8 @@ const { userName } = Astro.props;
               <div class="grid grid-cols-[2fr_2fr_1fr] gap-8">
                 <a href={`/detalles-solicitud/${request.request_id}`} class="col-span-2">
                   <div class="col-span-2 space-y-2 content-wrapper">
-                    <p class="font-bold text-lg break-words">#{request.request_id}</p>
-                    <div class="text-sm text-gray-700 grid grid-cols-[2fr_3fr] gap-y-1">
+                    <p class="font-bold text-lg wrap-break-words text-text-primary">#{request.request_id}</p>
+                    <div class="text-sm text-text-primary grid grid-cols-[2fr_3fr] gap-y-1">
                       <p><span class="font-semibold">País Destino:</span> {request.destination_country}</p>
                       <p>
                         <span class="font-semibold">Estado:</span> 
@@ -87,12 +92,12 @@ const { userName } = Astro.props;
                   <div class="flex flex-col gap-2">
                     <a href={`/editar-solicitud/${request.request_id}`}>
                       <Button color="primary" disabled={!isEditable} variant="filled" size="medium" customSizeClass="w-full">
-                        EDITAR
+                        Editar
                       </Button>
                     </a>
                     <a href={`/comprobar-solicitud/${request.request_id}`}>
                       <Button color="secondary" disabled={!mustBeChecked} variant="filled" size="medium" customSizeClass="w-full">
-                        COMPROBAR GASTOS
+                        Comprobar Gatos
                       </Button>
                     </a>
                   </div>
@@ -107,8 +112,8 @@ const { userName } = Astro.props;
                         <div>
                           <MaterialIcon
                             icon="delete"
-                            color="black"
-                            style="cursor: pointer"
+                            color="warning-500"
+                            style="cursor:pointer"
                           />
                         </div>
                       </CancelRequestModal>
@@ -120,15 +125,15 @@ const { userName } = Astro.props;
           })}
         </div>
       ) : (
-        <div class="bg-gray-100 p-6 rounded-lg shadow w-full text-center text-gray-500 font-semibold">
-          NO TIENES VIAJES AGENDADOS
+        <div class="bg-card p-6 rounded-lg shadow w-full text-center text-text-secondary font-semibold">
+          No tienes viajes agendados
         </div>
       )}
     </section>
 
     <a href="/crear-solicitud" class="mt-8 flex justify-center">
-      <Button variant="filled" color="secondary" size="custom" customSizeClass="w-128 py-3 text-base font-bold">
-        SOLICITA UN NUEVO VIAJE
+      <Button variant="filled" color="secondary" size="custom" customSizeClass="w-full py-3 text-base font-bold">
+        Solicita un nuevo viaje
       </Button>
     </a>
 

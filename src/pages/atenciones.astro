@@ -36,7 +36,7 @@ const requests = await (async () => {
       <TableFallback />
     ) : (
       <TextHeader
-        title={"ATENCIONES DE " + userName.toUpperCase()}
+        title={`Atenciones de ${userName}`}
         subtitle="Aquí puedes ver las solicitudes pendientes de atender"
       />
       <AuthRequestsList

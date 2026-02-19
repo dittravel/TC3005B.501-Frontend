@@ -1,16 +1,45 @@
+/*
+ * Global Tailwind CSS styles for the application
+ * This file defines the color palette, typography, and layout styles
+ * for the entire application. It also includes custom utilities and
+ * font declarations.
+ *
+ * CHEAT SHEET: https://nerdcave.com/tailwind-cheat-sheet
+ * GENERATOR: https://tailwind-generator.com/generators
+ */
+
 @import "tailwindcss";
 @plugin '@tailwindcss/typography';
 
+/*
+Default theme colors
+*/
 @theme {
+  /* Brand */
+  --color-brand-50: #E6EDFE;
+  --color-brand-100: #B9CDFD;
+  --color-brand-200: #8DACFC;
+  --color-brand-300: #336BFA;
+  --color-brand-400: #053ECC;
+  --color-brand-500: #03226F;
   /* Neutral */
-  --color-neutral-0: #FFFFFF;
-  --color-neutral-25: #E4E4E4;
-  --color-neutral-50: #D6D8DE;
-  --color-neutral-100: #CED1D7;
-  --color-neutral-200: #C5C9D1;
-  --color-neutral-300: #BDC1CA;
-  --color-neutral-400: #A2A8B4;
-  --color-neutral-500: #878E9E;
+  --color-neutral-0: #ffffff;
+  --color-neutral-50: #f7f8fa;
+  --color-neutral-100: #eef0f4;
+  --color-neutral-200: #d6d8de;
+  --color-neutral-300: #bdc1ca;
+  --color-neutral-400: #a2a8b4;
+  --color-neutral-500: #878e9e;
+  --color-neutral-900: #0f1115;
+  /* Background */
+  --color-background: #E6EDFE;
+  --color-card: #f3f7ff;
+  --color-card-hover: #e6f0ff;
+  --color-border: #cfcfcf;
+  /* Text */
+  --color-text-primary: #000000;
+  --color-text-secondary: #555555;
+  --color-text-inverted: #ffffff;
   /* Primary */
   --color-primary-50: #E6EDFE;
   --color-primary-100: #B9CDFD;
@@ -19,12 +48,12 @@
   --color-primary-400: #053ECC;
   --color-primary-500: #03226F;
   /* Secondary */
-  --color-secondary-50: #A4B5EE;
-  --color-secondary-100: #8DA3EA;
-  --color-secondary-200: #7691E6;
-  --color-secondary-300: #496CDD;
-  --color-secondary-400: #2A53D7;
-  --color-secondary-500: #2346BA;
+  --color-secondary-50: #f0f4ff;
+  --color-secondary-100: #d9e4ff;
+  --color-secondary-200: #b3c9ff;
+  --color-secondary-300: #8cb0ff;
+  --color-secondary-400: #6695ff;
+  --color-secondary-500: #336bfa;
   /* Success */
   --color-success-50: #6DEB97;
   --color-success-100: #4FE782;
@@ -45,6 +74,10 @@
   --color-alert-200: #FFCC80;
   --color-alert-300: #FFB74D;
   --color-alert-400: #FFA726;
+  /* Layout */
+  --color-sidebar-bg: var(--brand-primary-500);
+  --color-sidebar-text: #ffffff;
+  --color-header-bg: #03226F;
   
   /* Fonts */
   --font-family: 'Roboto', sans-serif;
@@ -56,7 +89,7 @@
 /* Contextual classes */
 @layer utilities {
   .content-wrapper {
-    @apply bg-gray-100 p-4 rounded shadow-sm w-full h-full hover:scale-101 hover:bg-gray-200 transform transition-transform duration-200;
+    @apply bg-neutral-50 p-4 rounded shadow-sm w-full h-full hover:bg-card-hover border border-border;
   }
 }
 
@@ -93,39 +126,72 @@ html {
   font-family: 'Roboto', var(--font-fallback);
 }
 
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
-  transition: background-color 9999s ease-in-out 0s !important;
-  -webkit-text-fill-color: black !important;
-  box-shadow: 0 0 0px 1000px transparent inset !important;
-  caret-color: white !important;
-}
-
-html.dark {
-  --color-primary-50: #1e1e2f;
-  --color-primary-100: #2a2a3f;
-  --color-primary-200: #3b3b5a;
-  --color-primary-300: #505075;
-  --color-primary-400: #6b6b90;
-  --color-primary-500: #8686aa;
-
-  --color-neutral-0: #000000;
-  --color-neutral-100: #222222;
-  --color-neutral-200: #444444;
-  --color-neutral-300: #666666;
-  --color-neutral-400: #888888;
-  --color-neutral-500: #aaaaaa;
-}
-
-:root {
-  --color-background: #ffffff;
-  --color-text: #000000;
+/*
+Dark mode theme colors
+html.dark is used to override the default 
+color variables when dark mode is active.
+*/
+.dark {
+  /* Neutral */
+  --color-neutral-0: #0f1115;
+  --color-neutral-50: #161a22;
+  --color-neutral-100: #1d2330;
+  --color-neutral-200: #2a3242;
+  --color-neutral-300: #3a4356;
+  --color-neutral-400: #6b7485;
+  --color-neutral-500: #9aa3b2;
+  --color-neutral-900: #ffffff;
+  /* Background */
+  --color-bg: #17181c;
+  --color-card: #24262f;
+  --color-card-hover: #2a2c36;
+  --color-border: #4f4f4f;
+  /* Text */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #9fa7b0;
+  --color-text-inverted: #111111;
+  /* Primary */
+  --color-secondary-50: #f0f4ff;
+  --color-secondary-100: #d9e4ff;
+  --color-secondary-200: #b3c9ff;
+  --color-secondary-300: #8cb0ff;
+  --color-secondary-400: #6695ff;
+  --color-secondary-500: #336bfa;
+  /* Secondary */
+  --color-primary-50: #E6EDFE;
+  --color-primary-100: #B9CDFD;
+  --color-primary-200: #8DACFC;
+  --color-primary-300: #336BFA;
+  --color-primary-400: #395aac;
+  --color-primary-500: #2c4da0;
+  /* Success */
+  --color-success-50: #6DEB97;
+  --color-success-100: #4FE782;
+  --color-success-200: #32E36D;
+  --color-success-300: #1DD75B;
+  --color-success-400: #19BC50;
+  --color-success-500: #16A144;
+  /* Warning */
+  --color-warning-50: #EA8588;
+  --color-warning-100: #E66C70;
+  --color-warning-200: #E25458;
+  --color-warning-300: #DE3840;
+  --color-warning-400: #D22329;
+  --color-warning-500: #B41E23;
+  /* Alert */
+  --color-alert-50: #FFF3E0;
+  --color-alert-100: #FFE0B2;
+  --color-alert-200: #FFCC80;
+  --color-alert-300: #FFB74D;
+  --color-alert-400: #FFA726;
+  /* Layout */
+  --color-sidebar-bg: #0b1630;
+  --color-sidebar-text: #ffffff;
+  --color-header-bg: #24262f;
 }
 
 .dark {
-  --color-background: #1a1a1a;
+  --color-background: #17181c;
   --color-card-bg: #353535;
   --color-text: #9485a5;
   --color-table-bg: #767676;
@@ -166,5 +232,12 @@ html, body, #app, #content, #sidebar, #messages {
   overflow-y: auto;
 }
 
-// CHEAT SHEET: https://nerdcave.com/tailwind-cheat-sheet
-// GENERATOR: https://tailwind-generator.com/generators
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  transition: background-color 9999s ease-in-out 0s !important;
+  -webkit-text-fill-color: var(--color-text-primary) !important;
+  box-shadow: 0 0 0px 1000px transparent inset !important;
+  caret-color: white !important;
+}

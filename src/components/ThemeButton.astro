@@ -4,7 +4,7 @@ import MaterialIcon from "@components/MaterialIcon.astro";
 
 <button
   id="theme-toggle"
-  class="bg-primary-500 rounded-lg p-2.5 h-10 w-10
+  class="bg-header-bg rounded-full p-1.5
          flex justify-center items-center
          cursor-pointer transition-colors duration-200
          hover:bg-primary-300"
@@ -24,7 +24,7 @@ import MaterialIcon from "@components/MaterialIcon.astro";
     }
   };
 
-  // Cargar tema guardado
+  // Load saved theme from localStorage on page load
   const savedTheme = localStorage.getItem("theme");
   if (savedTheme) {
     applyTheme(savedTheme);

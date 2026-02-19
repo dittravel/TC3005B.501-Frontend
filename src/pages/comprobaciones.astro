@@ -35,7 +35,7 @@ const requests = await (async () => {
       <TableFallback />
     ) : (
       <TextHeader
-        title={"COMPROBACIONES DE " + userName.toUpperCase()}
+        title={`Comprobaciones de ${userName}`}
         subtitle="Aquí puedes ver las solicitudes pendientes de comprobar"
       />
       <AuthRequestsList
