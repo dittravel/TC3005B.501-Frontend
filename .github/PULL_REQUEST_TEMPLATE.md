@@ -16,6 +16,12 @@ Select one (required):
 
 ---
 
+**Description of feature:**
+
+_What does this PR implement?_
+
+---
+
 ## Pre-Submission Checklist (All PRs)
 
 - [ ] I have read the [CONTRIBUTING](../../CONTRIBUTING.md) guide
@@ -23,9 +29,3 @@ Select one (required):
 - [ ] PR targets the appropriate branch (`main` on dittravel)
 - [ ] Code has been tested locally
 - [ ] No console errors or warnings
-
----
-
-**Description of feature:**
-
-_What does this PR implement?_
