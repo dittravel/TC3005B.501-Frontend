@@ -15,6 +15,8 @@ interface Props {
   token: string;
 }
 
+const baseInputClass = "w-full border rounded-md px-3 py-2 bg-card placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500 border-border";
+
 const emptyRoute: TravelRoute = {
   router_index: 0,
   origin_country_name: '',
@@ -44,7 +46,8 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
   const [disabledButton, setDisabledButton] = useState<boolean>(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
-  const inputStyle = 'border border-gray-300 p-2 rounded w-full bg-white';
+  const inputClass = (fieldName: string) =>
+    `${baseInputClass} ${error ? 'border-red-500' : ''}`;
   useEffect(() => {
     if (data) {
       const transformedRoutes = data.routes.map(route => ({
@@ -533,14 +536,14 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
         </button>
       </div>
 
-      <hr className="my-8 border-gray-300" />
+      <hr className="my-8 border-border" />
 
       {/* General Trip Details */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-700">Detalles Generales del Viaje</h3>
         <div>
           <label className="block text-sm font-medium mb-1">Anticipo Esperado (MXN)<span className="text-red-500"> *</span></label>
-          <input name="requested_fee" placeholder="Anticipo Esperado (MXN)" type="number" className={inputStyle} value={formData.requested_fee === 0 ? '' : formData.requested_fee} onChange={handleGeneralChange} required />
+          <input name="requested_fee" placeholder="Anticipo Esperado (MXN)" type="number" className={inputClass('requested_fee')} value={formData.requested_fee === 0 ? '' : formData.requested_fee} onChange={handleGeneralChange} required />
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">Observaciones / Comentarios<span className="text-red-500"> *</span></label>

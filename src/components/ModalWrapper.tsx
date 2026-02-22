@@ -50,7 +50,7 @@ export default function ModalWrapper({
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className={buttonClassName + "pointer-events-auto hover:scale-115 transform transition-transform duration-200"}
+        className={buttonClassName + " cursor-pointer"}
         style={disabled ? { opacity: 0.5, pointerEvents: "none" } : undefined}
       >
         {children}

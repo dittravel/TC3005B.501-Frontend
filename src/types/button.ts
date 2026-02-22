@@ -32,9 +32,9 @@ const sizeClasses = {
 
 const colorMap = {
   primary: {
-    bg: 'bg-[var(--color-primary-200)]',
-    hover: 'hover:bg-[var(--color-primary-100)]',
-    active: 'active:bg-[var(--color-primary-300)]',
+    bg: 'bg-[var(--color-primary-300)]',
+    hover: 'hover:bg-[var(--color-primary-400)]',
+    active: 'active:bg-[var(--color-primary-500)]',
     baseText: 'text-white',
     text: 'text-[var(--color-primary-200)]',
     border: 'border-[var(--color-primary-200)]',
@@ -45,9 +45,9 @@ const colorMap = {
     ring: 'focus:ring-[var(--color-primary-100)]',
   },
   secondary: {
-    bg: 'bg-[var(--color-secondary-200)]',
-    hover: 'hover:bg-[var(--color-secondary-100)]',
-    active: 'active:bg-[var(--color-secondary-300)]',
+    bg: 'bg-[var(--color-secondary-400)]',
+    hover: 'hover:bg-[var(--color-secondary-500)]',
+    active: 'active:bg-[var(--color-secondary-500)]',
     baseText: 'text-white',
     text: 'text-[var(--color-secondary-200)]',
     border: 'border-[var(--color-secondary-200)]',
@@ -96,19 +96,19 @@ export function getButtonClasses({
   const safeColor = colorMap[color] ?? colorMap.primary;
   const sizeClass = size === 'custom' ? customSizeClass : sizeClasses[size] ?? sizeClasses.medium;
 
-  const base = `rounded-md font-medium transition-all duration-200 ${safeColor.ring}`;
+  const base = `rounded-md font-medium transition-all duration-200 ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} ${safeColor.ring}`;
 
   const variants = {
     filled: disabled
-      ? 'bg-[var(--color-neutral-500)] text-white cursor-not-allowed'
+      ? 'bg-[var(--color-neutral-300)] text-text-secondary'
       : `${safeColor.bg} ${safeColor.baseText} ${safeColor.hover} ${safeColor.active}`,
 
     border: disabled
-      ? 'border border-[var(--color-neutral-400)] text-[var(--color-neutral-400)] cursor-not-allowed bg-transparent'
+      ? 'border border-[var(--color-neutral-400)] text-[var(--color-neutral-400)] bg-transparent'
       : `border bg-transparent ${safeColor.text} ${safeColor.border} ${safeColor.hoverBorder} ${safeColor.hoverText} ${safeColor.activeBorder} ${safeColor.activeText}`,
 
     empty: disabled
-      ? 'text-[var(--color-neutral-400)] cursor-not-allowed bg-transparent'
+      ? 'text-[var(--color-neutral-400)] bg-transparent'
       : `bg-transparent ${safeColor.text} ${safeColor.hoverText} ${safeColor.activeText}`,
   };
 

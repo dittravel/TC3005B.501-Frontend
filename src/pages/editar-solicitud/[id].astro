@@ -35,10 +35,10 @@ try {
 <MainLayout title="Editar Solicitud" data={{ userName, buttonLabel, role }}>
   <div>
     <TextHeader
-      title="EDITAR UNA SOLICITUD DE VIAJE EXISTENTE"
+      title="Editar Una Solicitud De Viaje Existente"
       subtitle="Por favor termine de editar el siguiente formulario por completo"
     />
-    <main class="bg-white rounded-lg shadow-md p-8">
+    <main class="bg-card p-6 rounded-lg shadow w-full border border-border">
       <TravelRequestForm
         client:only="react"
         data={request}

@@ -19,9 +19,9 @@ const currentPath = Astro.url.pathname;
 const items = SIDEBAR_CONFIG[role] ?? [];
 ---
 
-<aside class="w-64 h-full bg-white border-r border-neutral-100">
+<aside class="w-64 h-full border-r border-border bg-sidebar">
   <div class="h-full px-4 py-6 overflow-auto">
-    <ul class="space-y-4 font-medium list-none p-0 m-0">
+    <ul class="space-y-2 list-none p-0 m-0">
       {
         items.map((item) => {
           const isActive = currentPath.startsWith(item.route);
@@ -35,3 +35,4 @@ const items = SIDEBAR_CONFIG[role] ?? [];
     </ul>
   </div>
 </aside>
+

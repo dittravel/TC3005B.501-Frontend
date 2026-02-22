@@ -7,7 +7,7 @@
 const { title, subtitle } = Astro.props;
 ---
 
-<section class="mb-6">
-  <h1 class="text-4xl font-bold">{title}</h1>
-  <p class="text-xl font-semibold text-secondary-500">{subtitle}</p>
+<section class="mb-6 w-full rounded-lg p-6 border border-border bg-linear-to-r from-card to-bg">
+  <h1 class="text-2xl font-bold text-text-primary">{title}</h1>
+  <p class="text-xl font-semibold text-secondary-400">{subtitle}</p>
 </section>
