@@ -1,0 +1,40 @@
+---
+import MaterialIcon from "@components/MaterialIcon.astro";
+---
+
+<button
+  id="theme-toggle"
+  class="bg-primary-500 rounded-lg p-2.5 h-10 w-10
+         flex justify-center items-center
+         cursor-pointer transition-colors duration-200
+         hover:bg-primary-300"
+  title="Cambiar tema"
+>
+  <MaterialIcon icon="dark_mode" />
+</button>
+
+<script is:inline>
+  const button = document.getElementById("theme-toggle");
+
+  const applyTheme = (theme) => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  };
+
+  // Cargar tema guardado
+  const savedTheme = localStorage.getItem("theme");
+  if (savedTheme) {
+    applyTheme(savedTheme);
+  }
+
+  button?.addEventListener("click", () => {
+    const isDark = document.documentElement.classList.contains("dark");
+    const newTheme = isDark ? "light" : "dark";
+
+    applyTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
+  });
+</script>

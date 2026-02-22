@@ -15,6 +15,7 @@ const { userName, buttonLabel } = Astro.props;
 import LogoutButton from "@components/Logout.tsx";
 import MaterialIcon from "@components/MaterialIcon.astro";
 import UserMenu from "@components/UserMenu.tsx";
+import ThemeButton from "@components/ThemeButton.astro";
 
 const isCurrentRoute = Astro.url.pathname === "/perfil-usuario";
 ---
@@ -25,7 +26,6 @@ const isCurrentRoute = Astro.url.pathname === "/perfil-usuario";
     <img
       src="/logo_texto_dittravel_blanco.png"
       class="h-15 w-auto rounded drop-shadow-lg cursor-pointer"
-      onmouseover="this.classList.add('hover:scale-101')"
       onclick="if(confirm('¿Volver al dashboard?')) window.location.href = '/dashboard'"
       title="Volver al dashboard"
       alt="Logo Dittravel"
@@ -35,17 +35,9 @@ const isCurrentRoute = Astro.url.pathname === "/perfil-usuario";
   <!-- Right Section -->
   <div class="flex items-center gap-4">
     
-    <!-- Buttons -->
+    <!-- Theme Button -->
     <div class="flex items-center gap-2">
-      <button
-        class="bg-primary-500 rounded-lg p-2.5 h-10 w-10
-              flex justify-center items-center
-              cursor-pointer transition-colors duration-200
-              hover:bg-primary-300"
-        title="Cambiar tema"
-      >
-        <MaterialIcon icon="dark_mode" />
-      </button>
+      <ThemeButton />
     </div>
 
     <!-- User Role -->
