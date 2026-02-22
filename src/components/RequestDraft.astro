@@ -1,8 +1,10 @@
 ---
 /**
-* Authors: Eduardo Porto Morales
-* Description: This is the draft request component. It displays the user's requests and allows them to edit or delete them.
-**/
+ * Authors: Eduardo Porto Morales
+ * 
+ * This is the draft request component. It displays the user's requests 
+ * and allows them to edit or delete them.
+ */
 
 import MaterialIcon from "@/components/MaterialIcon.astro";
 import TextHeader from "@components/TextHeader.astro";
@@ -50,7 +52,7 @@ requests= filteredRequests;
                         client:only="react"
                         id={request.request_id}
                         disabled={false}
-                        token={getCookie("token", Astro.cookies)}
+                        token={getCookie("token", Astro.cookies) || ""}
                       >
                         <div>
                           <MaterialIcon

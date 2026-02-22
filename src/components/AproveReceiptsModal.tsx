@@ -1,3 +1,8 @@
+/**
+ * AproveReceiptsModal component handles the approval of receipts 
+ * in the accounts payable module.
+ */
+
 import { useCallback } from "react";
 import { apiRequest } from "@utils/apiClient";
 import ModalWrapper from "@components/ModalWrapper";
@@ -8,7 +13,7 @@ interface Props {
   message: string;
   redirection: string;
   modal_type: "success" | "warning";
-  variant?: "primary" | "secondary"| "filled";
+  variant?: "filled" | "border" | "empty";
   children: React.ReactNode;
   disabled?: boolean;
   token: string;

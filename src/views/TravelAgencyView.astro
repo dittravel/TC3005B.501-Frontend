@@ -25,16 +25,16 @@ const requests = await (async () => {
 <div>
   <main>
     <TextHeader
-      title={`BIENVENIDO, ${userName.toUpperCase()}`}
-      subtitle="DITTA CONSULTING"
+      title={`Bienvenido, ${userName}`}
+      subtitle="Ditta Consulting"
     />
       <RequestSection
-        title="SOLICITUDES POR ATENDER"
+        title="Solicitudes por atender"
         requests={requests}
         anchor="atenciones"
         urlBase="atender-solicitud"
         subtitle="Esta solicitud está esperando ser atendida."
-        emptyMessage="NO HAY SOLICITUDES POR ATENDER"
+        emptyMessage="No hay solicitudes por atender"
       />
   </main>
 </div>

@@ -1,3 +1,7 @@
+/**
+ * UploadReceiptFiles component for uploading receipt files to the API.
+ */
+
 import { useEffect } from "react";
 const API_BASE_URL = import.meta.env.PUBLIC_API_BASE_URL;
 

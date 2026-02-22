@@ -1,3 +1,7 @@
+/**
+ * AttendRequest component for handling attendance to travel requests.
+ */
+
 import { useState, useCallback } from "react";
 import { apiRequest } from "@utils/apiClient";
 import ModalWrapper from "@components/ModalWrapper";

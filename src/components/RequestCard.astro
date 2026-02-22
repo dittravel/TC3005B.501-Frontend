@@ -1,7 +1,8 @@
 ---
 /**
  * Author: Eduardo Porto Morales
- * Description: Card component for displaying request information.
+ * 
+ * Card component for displaying request information.
  */
 
 const { request, urlBase, subtitle } = Astro.props;
@@ -15,7 +16,7 @@ const { request, urlBase, subtitle } = Astro.props;
     </div>
 
     <div class="grid grid-cols-[2fr_1fr] text-sm text-neutral-700">
-      <div class="flex flex-col justify-between min-h-[64px]">
+      <div class="flex flex-col justify-between min-h-16">
         <div>
           <span class="inline font-medium text-neutral-500">Del:</span> 
           <p class="inline">{request.beginning_date}</p>

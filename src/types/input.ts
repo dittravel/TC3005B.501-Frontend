@@ -1,3 +1,10 @@
+/**
+ * Input Types and Patterns
+ * 
+ * Defines the structure and validation patterns for various input
+ * types used in forms across the application.
+ */
+
 export interface BaseInputProps {
     label?: string;
     name: string;

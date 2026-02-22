@@ -1,12 +1,9 @@
 /**
- * Author: Eduardo Porto Morales
- * 
  * Fallback configuration utilities
  * 
- * Description:
  * Defines valid fallback types, sizes, default classes, messages and styles.
  * Used for consistent and scalable fallback rendering across the application.
- **/
+ */
 
 export const FALLBACK_TYPES = ["Loading", "Error", "Timeout"] as const;
 export type FallbackType = (typeof FALLBACK_TYPES)[number];

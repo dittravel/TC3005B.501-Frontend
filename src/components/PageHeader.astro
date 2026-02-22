@@ -2,7 +2,7 @@
 /**
  * Author: Julia Maria Stephanie Duenkelsbuehler Castillo
  * 
- * Description: This component is a header for our system.
+ * This component is a header for our system.
  * 
  * Example usage:
  * 	<PageHeader
@@ -12,12 +12,9 @@
  */
 
 const { userName, buttonLabel } = Astro.props;
-import LogoutButton from "@components/Logout.tsx";
 import MaterialIcon from "@components/MaterialIcon.astro";
 import UserMenu from "@components/UserMenu.tsx";
 import ThemeButton from "@components/ThemeButton.astro";
-
-const isCurrentRoute = Astro.url.pathname === "/perfil-usuario";
 ---
 
 <header class="h-15 flex justify-between items-center bg-header-bg px-4 py-3 border-b border-border">

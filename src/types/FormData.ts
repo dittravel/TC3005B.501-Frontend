@@ -1,3 +1,9 @@
+/**
+ * Form Data
+ * 
+ * Structure representing the data collected from a travel request form
+ */
+
 import type { TravelRoute } from './TravelRoute';
 
 export interface FormData {

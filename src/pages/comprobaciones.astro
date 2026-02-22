@@ -1,8 +1,8 @@
 ---
 /**
- * Author: Diego Ortega Fernández
- *
- **/
+ * Page for pending authorizations of the authorizer roles
+ */
+
 import MainLayout from "@layouts/MainLayout.astro";
 import TextHeader from "@components/TextHeader.astro";
 import AuthRequestsList from "@/components/RequestsLists/AuthRequestsList";
@@ -13,12 +13,12 @@ import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
-const userName = getCookie("username", Astro.cookies);
+const userName = getCookie("username", Astro.cookies) || "";
 const buttonLabel = roleLabels[role];
 
 import { apiRequest } from "@/utils/apiClient";
 
-//Status corresponding to Accounts Payable
+// Status corresponding to Accounts Payable
 const status = 7;
 const requests = await (async () => {
   try {
@@ -29,7 +29,7 @@ const requests = await (async () => {
 })()
 ---
 
-<MainLayout title="Comprobaciones pendientes" data={{ userName, buttonLabel, role }}>
+<MainLayout title="Comprobaciones pendientes" data={{userName, buttonLabel, role}}>
   <div>
     {requests && requests.length === 0 ? (
       <TableFallback />
@@ -41,6 +41,7 @@ const requests = await (async () => {
       <AuthRequestsList
         client:only="react"
         data={requests}
+        role={role}
         type="comprobar-gastos"
       />
     )}

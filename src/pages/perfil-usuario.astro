@@ -1,8 +1,6 @@
 ---
 /**
- * Author: Michael Devlyn
- *
- * Description: User porfile info page.
+ * User porfile info page
  */
 
 import MainLayout from "@layouts/HeaderLayout.astro";
@@ -15,13 +13,13 @@ import { apiRequest } from "@/utils/apiClient";
 import Button from "@components/Button.astro";
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
-const userName = getCookie("username", Astro.cookies);
+const userName = getCookie("username", Astro.cookies) || "";
 const userId = getCookie("id", Astro.cookies);
 const buttonLabel = roleLabels[role];
 const userData = await apiRequest(`/user/get-user-data/${userId}`, { cookies: Astro.cookies });
 ---
 
-<MainLayout title="Perfil de Usuario" data={{ userName, buttonLabel }}>
+<MainLayout title="Perfil de Usuario" data={{userName, buttonLabel}}>
     <div>
         <div class="mb-8 flex items-center justify-between">
             <Typography variant="header">Perfil</Typography>

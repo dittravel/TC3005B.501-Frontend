@@ -1,3 +1,7 @@
+/**
+ * AproveRequestModal component handles the approval of travel requests.
+ */
+
 import { useCallback, useState } from "react";
 import { apiRequest } from "@utils/apiClient";
 import ModalWrapper from "@components/ModalWrapper";
@@ -9,7 +13,7 @@ interface Props {
   message: string;
   redirection: string;
   modal_type: "success" | "warning";
-  variant?: "primary" | "secondary"| "filled";
+  variant?: "filled" | "border" | "empty";
   children: React.ReactNode;
   token: string;
 }

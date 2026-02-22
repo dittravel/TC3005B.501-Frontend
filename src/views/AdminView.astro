@@ -1,6 +1,6 @@
 ---
-/*
- * Admin users page
+/**
+ * Admin view of the dashboard
  */
 
 import TextHeader from "@components/TextHeader.astro";
@@ -117,7 +117,7 @@ const userName = getCookie("username", Astro.cookies);
                       title="Eliminar usuario"
                       message={`¿Estás seguro de que deseas eliminar al usuario ${user.user_name}? Esta acción no se puede deshacer.`}
                       modal_type="warning"
-                      token={getCookie("token", Astro.cookies)}
+                      token={getCookie("token", Astro.cookies) || ""}
                     >
                       Borrar
                     </UltimateWrapper>

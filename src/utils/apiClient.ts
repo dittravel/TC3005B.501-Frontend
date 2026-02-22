@@ -1,22 +1,28 @@
-/*
- * Author: Eduardo Porto Morales
- 
- --GET
-    const requests = await apiRequest('/applicant/get-user-requests/1');
-
- --POST
-    await apiRequest('/applicant/create-request', {
-        method: 'POST',
-        data: { payload }
-    });
-
- --PUT
-    await apiRequest('/applicant/update-request/1', {
-        method: 'PUT',
-        data: { payload }
-    });
-
-*/
+/**
+ * API Client Utility
+ * 
+ * This module provides a utility function `apiRequest` to make HTTP requests to the backend API.
+ * It handles authentication by including a JWT token from cookies, and it also manages SSL certificate
+ * validation for development environments with self-signed certificates.
+ * 
+ * 
+ * Usage:
+ * 
+ * --GET
+ *  const requests = await apiRequest('/applicant/get-user-requests/1');
+ * 
+ * --POST
+ *  await apiRequest('/applicant/create-request', {
+ *    method: 'POST',
+ *    data: { payload }
+ *  });
+ * 
+ * --PUT
+ *  await apiRequest('/applicant/update-request/1', {
+ *    method: 'PUT',
+ *    data: { payload }
+ *  });
+ */
 
 import { getSession } from "@data/cookies";
 
@@ -39,6 +45,16 @@ interface ApiOptions {
   cookies?: import("astro").APIContext["cookies"];
 }
 
+/**
+ * Makes an API request to the backend with the given path and options.
+ * It automatically includes the JWT token from cookies for authentication.
+ * The function also handles SSL certificate issues in development environments.
+ * 
+ * @param path - The API endpoint path (e.g., '/applicant/get-user-requests/1')
+ * @param options - Optional configuration for the request, including method, data, headers, and cookies
+ * @returns A promise that resolves to the response data from the API
+ * @throws An error if the request fails or if the response is not ok
+ */
 export async function apiRequest<T = any>(
   path: string,
   options: ApiOptions = {}

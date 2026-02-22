@@ -1,3 +1,7 @@
+/**
+ * Modal component for displaying confirmation dialogs and alerts.
+ */
+
 import { MODAL_STYLES } from "@config/modal";
 import type { ModalType } from "@config/modal";
 

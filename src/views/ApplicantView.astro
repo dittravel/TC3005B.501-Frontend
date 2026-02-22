@@ -1,6 +1,6 @@
 ---
-/*
- * Applicant user page
+/**
+ * Applicant view of the dashboard
  */
 
 import MaterialIcon from "@components/MaterialIcon.astro";
@@ -107,7 +107,7 @@ const { userName } = Astro.props;
                         client:only="react"
                         id={request.request_id}
                         disabled={isNotCancelable}
-                        token={getCookie("token", Astro.cookies)}
+                        token={getCookie("token", Astro.cookies) || ""}
                       >
                         <div>
                           <MaterialIcon

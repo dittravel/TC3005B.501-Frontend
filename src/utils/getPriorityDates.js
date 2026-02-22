@@ -1,3 +1,9 @@
+/**
+ * Get Request Priority
+ * 
+ * This function calculates the priority of a request based on how many days ago it was made.
+ */
+
 export function getRequestPriority(requestDate) {
   const date = new Date(requestDate)
   const now = new Date()

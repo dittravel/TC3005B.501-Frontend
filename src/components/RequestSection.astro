@@ -1,4 +1,9 @@
 ---
+/**
+ * This component displays a section of travel requests, 
+ * such as pending approvals or recent submissions.
+ */
+
 import RequestCard from "@components/RequestCard.astro";
 
 const {
@@ -7,9 +12,10 @@ const {
 	anchor,
   urlBase,
   subtitle,
-  emptyMessage = "NO HAY SOLICITUDES DISPONIBLES"
+  emptyMessage = "No hay solicitudes disponibles"
 } = Astro.props;
 ---
+
 <section class="bg-white p-6 rounded-lg shadow w-full">
 	<div class="flex items-center justify-between mb-4">
 		<h2 class="text-xl font-bold flex items-center">

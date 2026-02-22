@@ -1,8 +1,7 @@
 ---
 /**
- * Author: Nicole Dávila Hernández
- * Description: This script is used to create a page that shows the reimbursement panel for the user.
- **/
+ * This script is used to create a page that shows the reimbursement panel for the user.
+ */
 
 import InputField from '@components/InputField.astro';
 import Button from '@components/Button.astro';
@@ -14,7 +13,7 @@ import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
-const userName = getCookie("username", Astro.cookies);
+const userName = getCookie("username", Astro.cookies) || "";
 const buttonLabel = roleLabels[role];
 
 // Dummy data for demonstration
@@ -33,7 +32,7 @@ const verifiedReceipts = [
 ];
 ---
 
-<MainLayout title="Panel de Reembolsos" data={{ userName, buttonLabel, role }}>
+<MainLayout title="Panel de Reembolsos" data={{userName, buttonLabel, role}}>
   <div>
     <TextHeader
       title="PANEL DE REEMBOLSOS"
@@ -165,7 +164,7 @@ const verifiedReceipts = [
               <select
                 name="receipts"
                 multiple
-                class="block w-full px-3 py-2 border border-secondary-300 rounded-md shadow-sm text-sm h-[calc(2.5rem+2px)]"
+                class="block w-full px-3 py-2 border border-secondary-300 rounded-md shadow-sm text-sm h-10.5"
                 required
               >
                 {verifiedReceipts.map(receipt => (

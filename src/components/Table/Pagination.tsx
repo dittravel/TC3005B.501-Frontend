@@ -1,7 +1,5 @@
 /**
- * Author: Eduardo Porto Morales
- * 
- * Description: Make reusable pagination for list of lists
+ * Reusable pagination for list of lists
  */
 
 import { useState, useEffect } from "react";
@@ -13,6 +11,16 @@ interface PaginationProps {
   maxVisible?: number;
 }
 
+/**
+ * Pagination component that provides navigation controls for paginated data.
+ * It displays a set of page numbers and allows users to navigate between them.
+ * The component also includes controls to jump to the previous or next block of pages.
+ * @param totalPages - The total number of pages available.
+ * @param page - The current active page number.
+ * @param setPage - A function to update the current page number.
+ * @param maxVisible - The maximum number of page buttons to display at once (default is 5).
+ * @returns A JSX element representing the pagination controls.
+ */
 export default function Pagination({
   totalPages,
   page,

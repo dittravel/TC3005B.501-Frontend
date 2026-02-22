@@ -1,4 +1,11 @@
 ---
+/**
+ * HeaderLayout
+ * 
+ * This layout component defines the overall structure of the page, including the header and main content area.
+ * It also includes a dark mode toggle script and styles for the grid layout.
+ */
+
 import "@styles/global.css"
 import PageHeader from "@components/PageHeader.astro"
 
@@ -42,6 +49,12 @@ const { title, data } = Astro.props
 
     <!-- Dark mode toggle script -->
     <script>
+      declare global {
+        interface Window {
+          toggleDarkMode: () => void;
+        }
+      }
+
       const html = document.documentElement;
       const saved = localStorage.getItem('theme');
       if (saved === 'dark') html.classList.add('dark');

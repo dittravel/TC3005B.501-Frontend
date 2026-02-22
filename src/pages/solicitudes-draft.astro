@@ -1,8 +1,7 @@
 ---
 /**
-* Authors: Eduardo Porto Morales
-* Description: This page allows the user to view and manage their draft requests.
-**/
+ * This page allows the user to view and manage their draft requests.
+ */
 
 import MainLayout from "@layouts/MainLayout.astro";
 import RequestDraft from "@components/RequestDraft.astro";
@@ -12,7 +11,7 @@ import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
-const userName = getCookie("username", Astro.cookies);
+const userName = getCookie("username", Astro.cookies) || "";
 const buttonLabel = roleLabels[role];
 
 import { apiRequest } from '@utils/apiClient';

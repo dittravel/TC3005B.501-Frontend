@@ -1,3 +1,8 @@
+/**
+ * TravelRequestActionWrapper component for handling travel request 
+ * actions and decisions.
+ */
+
 import { useCallback, useState } from "react";
 import { apiRequest } from "@utils/apiClient";
 import ModalWrapper from "@components/ModalWrapper";

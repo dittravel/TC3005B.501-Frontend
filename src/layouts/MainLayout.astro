@@ -1,4 +1,14 @@
 ---
+/**
+ * MainLayout
+ * 
+ * This layout component defines the overall structure of the page, including the header, 
+ * sidebar, main content area, and an optional messages sidebar.
+ * 
+ * It also includes styles for the grid layout and a conditional class to adjust the layout
+ * when messages are shown.
+ */
+
 import '@styles/global.css' 
 import PageHeader from "@components/PageHeader.astro";
 import SideBar from "@components/Sidebar.astro";
@@ -19,7 +29,7 @@ const { title, data, showMessages = false } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="utf-8" />
     <meta name="description" content="Astro description" />

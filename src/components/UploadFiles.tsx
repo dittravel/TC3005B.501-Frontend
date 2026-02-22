@@ -1,3 +1,7 @@
+/**
+ * UploadFiles component for uploading PDF and XML receipt files.
+ */
+
 interface Props {
   onPdfChange?: (file: File | null) => void;
   onXmlChange?: (file: File | null) => void;

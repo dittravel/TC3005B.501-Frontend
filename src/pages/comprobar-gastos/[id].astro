@@ -1,10 +1,8 @@
 ---
-
 /**
- * Author: José Antonio González and Kenia Esmeralda Ramos Javier
- * Description: This is the page where we separate the content that is stablished for a certain user of Account Payable team.
- * 
+ * This is the page where we separate the content that is stablished for a certain user of Account Payable team.
  */
+
 export const prerender = false;
 import MainLayout from "@layouts/MainLayout.astro";
 import TextHeader from "@components/TextHeader.astro";
@@ -16,9 +14,8 @@ import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
-const userName = getCookie("username", Astro.cookies);
+const userName = getCookie("username", Astro.cookies) || "";
 const buttonLabel = roleLabels[role];
-
 
 const status_colors = {
   'Pending': 'text-warning-400',
@@ -42,7 +39,6 @@ try {
 } catch (error) {
   request = null;
   throw new Error(`No request found with ID ${id}`);
-  return Astro.redirect('/404');
 }
 
 const numericId = Number(id);
@@ -59,7 +55,7 @@ const enrichedExpenses = await Promise.all(
 const allReviewed = enrichedExpenses.every((receipt: any) => receipt.validation !== "Pendiente");
 ---
 
-<MainLayout title={`Solicitud #${request.request_id}`} data={{ userName, buttonLabel, role }} >
+<MainLayout title={`Solicitud #${request.request_id}`} data={{userName, buttonLabel, role}} >
 
 <main class="flex flex-col items-center">
   <div class="w-full flex flex-col rounded border border-gray-300 p-10">
@@ -79,7 +75,7 @@ const allReviewed = enrichedExpenses.every((receipt: any) => receipt.validation 
       <FinishRequestButton
         client:only="react"
         requestId={request.request_id}
-        token={getCookie("token", Astro.cookies)}
+        token={getCookie("token", Astro.cookies) || ""}
       />
     )}
   </div>
@@ -101,7 +97,7 @@ const allReviewed = enrichedExpenses.every((receipt: any) => receipt.validation 
             <div class="grid grid-cols-[2fr_2fr_1fr] gap-6">
               
               <div class="col-span-2 space-y-2 content-wrapper">
-                <p class="font-bold text-lg break-words">#{receipt.receipt_id}</p>
+                <p class="font-bold text-lg warp-break-word">#{receipt.receipt_id}</p>
                 <div class="text-sm text-gray-700 grid grid-cols-[1fr_2fr] gap-y-1">
                   
                   <p><span class="font-semibold">Monto:</span> {receipt.amount} <span>MXN </span> </p>
@@ -109,7 +105,7 @@ const allReviewed = enrichedExpenses.every((receipt: any) => receipt.validation 
                   
                   <p class="flex items-center gap-2">
                     <span class="font-semibold">Status:</span>
-                    <span class={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${validationColors[receipt.validation] || "text-gray-400"}`}>
+                    <span class={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${validationColors[receipt.validation as keyof typeof validationColors] || "text-gray-400"}`}>
                       {receipt.validation}
                     </span>
 
@@ -141,7 +137,7 @@ const allReviewed = enrichedExpenses.every((receipt: any) => receipt.validation 
                   receipt_id={receipt.receipt_id}
                   expense_status={receipt.expense_status}
                   disabled={receipt.validation !== "Pendiente"}
-                  token={getCookie("token", Astro.cookies)}
+                  token={getCookie("token", Astro.cookies) || ""}
                 />
               </div>
             </div>    

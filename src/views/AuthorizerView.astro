@@ -24,16 +24,16 @@ const { userName } = Astro.props;
 <div>
   <main>
     <TextHeader
-      title={`BIENVENIDO, ${userName.toUpperCase()}`}
-      subtitle="DITTA CONSULTING"
+      title={`Bienvenido, ${userName}`}
+      subtitle="Ditta Consulting"
     />
       <RequestSection
-        title="SOLICITUDES POR AUTORIZAR"
+        title="Solicitudes por autorizar"
         requests={requests}
         anchor="autorizaciones"
         urlBase="autorizar-solicitud"
         subtitle="Esta solicitud está esperando ser autorizada."
-        emptyMessage="NO HAY SOLICITUDES POR AUTORIZAR"
+        emptyMessage="No hay solicitudes por autorizar"
       />
   </main>
 </div>

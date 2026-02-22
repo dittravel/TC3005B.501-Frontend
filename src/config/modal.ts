@@ -1,3 +1,9 @@
+/**
+ * Modal configuration
+ * 
+ * Used for general styling and type definitions of the Modal component
+ */
+
 export const MODAL_TYPES = ["confirm", "warning", "error", "success"] as const;
 
 export type ModalType = (typeof MODAL_TYPES)[number];

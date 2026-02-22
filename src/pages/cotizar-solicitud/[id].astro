@@ -1,6 +1,7 @@
 ---
 /**
- * Author: Eduardo Porto Morales
+ * This page displays the details of a specific travel request and allows the user to attend to it.
+ * It fetches the request details based on the ID from the URL parameters and renders the information
  */
 
 export const prerender = false;
@@ -13,7 +14,7 @@ import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
-const userName = getCookie("username", Astro.cookies);
+const userName = getCookie("username", Astro.cookies) || "";
 const buttonLabel = roleLabels[role];
 
 import { apiRequest } from "@/utils/apiClient";
@@ -25,11 +26,10 @@ try {
 } catch (error) {
   request = null;
   throw new Error(`No request found with ID ${id}`);
-  return Astro.redirect('/404');
 }
 ---
 
-<MainLayout title={`Solicitud #${request.request_id}`} data={{ userName, buttonLabel, role }} >
+<MainLayout title={`Solicitud #${request.request_id}`} data={{userName, buttonLabel, role}} >
   <RequestDetail
     request={request}
     title={`Solicitud #${request.request_id}`}
@@ -39,7 +39,7 @@ try {
     <AttendRequest
       client:only="react"
       request_id = {request.request_id}
-      token={getCookie("token", Astro.cookies)}
+      token={getCookie("token", Astro.cookies) || ""}
     />
   </div>
 </MainLayout>

@@ -1,8 +1,8 @@
 ---
 /**
-* Authors: Gabriel Muñoz Luna
-* Description: Muestra el formulario.
-**/
+ * This script defines the page for uploading a receipt.
+ */
+
 export const prerender = false;
 
 import MainLayout from "@layouts/MainLayout.astro";
@@ -13,12 +13,12 @@ import type { UserRole } from "@type/roles";
 import { roleLabels } from "@config/role-labels";
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
-const userName = getCookie("username", Astro.cookies);
+const userName = getCookie("username", Astro.cookies) || "";
 const buttonLabel = roleLabels[role];
 
 const { id } = Astro.params;
 ---
 
-<MainLayout title="Crear Recibo" data={{ userName, buttonLabel, role }}>
+<MainLayout title="Crear Recibo" data={{userName, buttonLabel, role}}>
   <ExpensesForm />
 </MainLayout>

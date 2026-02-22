@@ -1,9 +1,7 @@
 ---
 /**
- * Authors: Eduardo Porto Morales
- * 
- * Description: This is the accounts payable view of the dashboard.
- **/
+ * Accounts payable view of the dashboard
+ */
 
 import TextHeader from "@components/TextHeader.astro";
 import RequestSection from "@components/RequestSection.astro";
@@ -12,6 +10,7 @@ import { getCookie } from "@data/cookies";
 import { apiRequest } from '@utils/apiClient';
 const deparment = getCookie("department_id", Astro.cookies);
 
+// Get requests in "Por cotizar" and "Por comprobar" states for the user's department
 const requestsInCotizar = await (async () => {
   try {
     return await apiRequest(`/user/get-travel-requests/${deparment}/4`, { cookies: Astro.cookies });
@@ -20,6 +19,7 @@ const requestsInCotizar = await (async () => {
   }
 })()
 
+// Get requests in "Por comprobar" state for the user's department
 const requestsInComprobar = await (async () => {
   try {
     return await apiRequest(`/user/get-travel-requests/${deparment}/7`, { cookies: Astro.cookies });
@@ -28,35 +28,33 @@ const requestsInComprobar = await (async () => {
   }
 })()
 
-// ACA HAY QUE PONER DOS FETCH, UNO PARA SOLICITUDES POR COTIZAR Y OTRO PARA SOLICITUDES POR COMPROBAR
-
 const { userName } = Astro.props;
 ---
 
 <div>
   <main>
     <TextHeader
-      title={`BIENVENIDO, ${userName.toUpperCase()}`}
-      subtitle="DITTA CONSULTING"
+      title={`Bienvenido, ${userName}`}
+      subtitle="Ditta Consulting"
     />
 
     <div class="grid grid-cols-1 gap-8">
       <RequestSection
-        title="SOLICITUDES POR COTIZAR"
+        title="Solicitudes por cotizar"
         requests={requestsInCotizar}
         anchor="cotizaciones"
         urlBase="cotizar-solicitud"
         subtitle="Esta solicitud está esperando cotización."
-        emptyMessage="NO HAY SOLICITUDES POR COTIZAR"
+        emptyMessage="No hay solicitudes por cotizar"
       />
 
       <RequestSection
-        title="SOLICITUDES POR COMPROBAR"
+        title="Solicitudes por comprobar"
         requests={requestsInComprobar}
         anchor="comprobaciones"
         urlBase="comprobar-gastos"
         subtitle="Esta solicitud está esperando comprobación."
-        emptyMessage="NO HAY SOLICITUDES POR COMPROBAR"
+        emptyMessage="No hay solicitudes por comprobar"
       />
     </div>
   </main>

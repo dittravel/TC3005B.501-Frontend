@@ -1,10 +1,7 @@
 ---
 /**
- * Authors: Eduardo Porto
- *
- * Description: This is the main request page for the authorizers. 
- * 
- **/
+ * This is the main request page for the authorizers. 
+ */
 
 import MainLayout from "@layouts/MainLayout.astro";
 import type { UserRole } from "@type/roles";
@@ -14,11 +11,11 @@ import { roleLabels } from "@config/role-labels";
 import ApplicantView from "@/views/ApplicantView.astro";
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
-const userName = getCookie("username", Astro.cookies);
+const userName = getCookie("username", Astro.cookies) || "";
 
 const buttonLabel = roleLabels[role];
 ---
 
-<MainLayout title="Dashboard" data={{ userName, buttonLabel, role }}>
+<MainLayout title="Dashboard" data={{userName, buttonLabel, role}}>
   <ApplicantView userName={userName} />
 </MainLayout>

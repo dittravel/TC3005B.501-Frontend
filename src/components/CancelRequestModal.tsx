@@ -1,3 +1,7 @@
+/**
+ * CancelRequestModal component for canceling travel requests.
+ */
+
 import { useState } from "react";
 import Modal from "@components/Modal";
 import { apiRequest } from "@utils/apiClient";

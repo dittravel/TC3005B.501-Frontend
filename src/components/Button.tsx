@@ -1,7 +1,6 @@
 /**
- * Description:
  * Button component for the application.
-*/
+ */
 
 import React from "react";
 

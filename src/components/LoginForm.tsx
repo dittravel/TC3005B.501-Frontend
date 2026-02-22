@@ -1,3 +1,7 @@
+/**
+ * LoginForm component for user authentication.
+ */
+
 import React, { useState } from "react";
 import Button from "@components/Button";
 import { apiRequest } from "@utils/apiClient";

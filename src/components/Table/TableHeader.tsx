@@ -1,7 +1,6 @@
 /**
- * Author: Diego Ortega Fernández
- *
- **/
+ * TableHeader component
+ */
 
 interface Column {
   key: string;
@@ -12,6 +11,11 @@ interface Props {
   columns: Column[];
 }
 
+/**
+ * TableHeader component that renders the header of a table based on the provided columns.
+ * @param columns - An array of column definitions, each with a key and label.
+ * @returns A JSX element representing the table header.
+ */
 export default function TableHeader({ columns }: Props) {
   return (
     <thead>

@@ -1,9 +1,11 @@
 ---
-/*
-  Component: Sidebar
-  Description: Renders a vertical sidebar menu based on the user's role.
-  Author: Kenia Ramos.
-*/
+/**
+ * Author: Kenia Ramos.
+ * 
+ * Sidebar
+ * 
+ * Renders a vertical sidebar menu based on the user's role.
+ */
 
 import type { UserRole } from "@type/roles";
 import { SIDEBAR_CONFIG } from "@type/menu-config";
@@ -35,4 +37,3 @@ const items = SIDEBAR_CONFIG[role] ?? [];
     </ul>
   </div>
 </aside>
-

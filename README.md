@@ -1,11 +1,4 @@
-<div align="center">
-
-[![Contributors][contributors-shield]][contributors-url]
-[![Issues][issues-shield]][issues-url]
-
-</div>
-
-# ARCHIVED-REPOSITORY: TC3005B.501-Frontend
+# TC3005B.501-Frontend
 Web Application of the travel management system portal developed during course TC3005B by group 501.
 
 ## Project Structure
@@ -76,13 +69,13 @@ The only option currently is to clone the repository locally from GitHub.
 #### Using `git`
 
 ```sh
-git clone https://github.com/101-Coconsulting/TC3005B.501-Frontend
+git clone https://github.com/dittravel/TC3005B.501-Frontend.git
 ```
 
 #### Using `gh` (GitHub CLI)
 
 ```sh
-gh repo clone 101-Coconsulting/TC3005B.501-Frontend
+gh repo clone dittravel/TC3005B.501-Frontend
 ```
 
 ### Dependencies
@@ -117,26 +110,39 @@ pnpm run dev
 npm run dev
 ```
 
-And you're good to go! A new browser window should open and you should be able to see the Authorizer's dashboard.
+The application will start in development mode. Open your browser to the displayed local URL (typically `http://localhost:3000`). You'll see the login page, where you can authenticate with your credentials.
 
 ### Configuring
 
-The current version lacks any sort of connection to any sort of backend, as well as any sort of login interface. Therefore, the way to access different dashboards for different roles, is to manually edit the [/src/data/cookies.ts](/src/data/cookies.ts) file to choose the role whose dashboard you want to visualize.
+The application is fully integrated with the backend API. To start using the application:
 
-Filename: /src/data/cookies.ts
-```typescript
-import type { UserRole } from "@type/roles";
+1. **Backend Setup**: Ensure the backend server is running (see [TC3005B.501-Backend](../TC3005B.501-Backend) for setup instructions).
 
-const mockCookies = {
-    username: "John Doe",
-    // CHANGE THIS
-    role: "Authorizer" as UserRole //'Applicant' | 'Authorizer' | 'Admin' | 'AccountsPayable' | 'TravelAgency';
-};
+2. **Environment Variables**: Create a `.env` file in the project root based on `.env.example`:
+   ```
+   PUBLIC_API_BASE_URL=http://localhost:3000
+   ```
 
-export const getCookie = (key: keyof typeof mockCookies): string | UserRole => {
-    return mockCookies[key];
-};
-```
+3. **Login**: Use the login interface to authenticate with your credentials. The available roles are:
+   - **Solicitante** (Applicant) - Create and manage travel requests
+   - **Agencia de viajes** (Travel Agency) - Attend to travel requests
+   - **Cuentas por pagar** (Accounts Payable) - Validate and check receipts
+   - **N1** - Authorize level 1 requests
+   - **N2** - Authorize level 2 requests
+   - **Administrador** (Administrator) - Manage users and system settings
+
+
+
+4. **Development/Testing**: For development purposes when the backend is unavailable, the application uses a mock session located in [/src/data/cookies.ts](/src/data/cookies.ts):
+   ```typescript
+   const mockSession: Session = {
+     username: "John Doe",
+     id: "1",
+     department_id: "1",
+     role: "Solicitante" as UserRole,
+     token: "token",
+   };
+   ```
 
 ### Development Stack
 
@@ -153,7 +159,3 @@ export const getCookie = (key: keyof typeof mockCookies): string | UserRole => {
 [typescript-badge]: https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white&color=blue
 [tailwind-badge]: https://img.shields.io/badge/Tailwind-ffffff?style=for-the-badge&logo=tailwindcss&logoColor=38bdf8
 [react-badge]: https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black&color=blue
-[contributors-shield]: https://img.shields.io/github/contributors/101-Coconsulting/TC3005B.501-Frontend.svg?style=for-the-badge
-[contributors-url]: https://github.com/101-Coconsulting/TC3005B.501-Frontend/graphs/contributors
-[issues-shield]: https://img.shields.io/github/issues/101-Coconsulting/TC3005B.501-Frontend.svg?style=for-the-badge
-[issues-url]: https://github.com/101-Coconsulting/TC3005B.501-Frontend/issues

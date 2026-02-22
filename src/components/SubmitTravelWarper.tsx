@@ -1,3 +1,8 @@
+/**
+ * SubmitTravelWrapper component for handling travel request submission 
+ * and expense management.
+ */
+
 import { apiRequest } from "@utils/apiClient";
 
 const receiptTypeMap: Record<string, number> = {
@@ -17,6 +22,14 @@ interface SubmitExpenseParams {
   token: string;
 }
 
+/**
+ * Submits a travel expense/receipt for a specific travel request.
+ * @param {number} requestId - The ID of the travel request
+ * @param {string} concepto - The expense concept/category (e.g., "Vuelo", "Hotel")
+ * @param {number} monto - The expense amount in currency units
+ * @param {string} token - Authorization token for API requests
+ * @returns {Promise<{count: number, lastReceiptId: number | null}>} Receipt count and last receipt ID
+ */
 export async function submitTravelExpense({
   requestId,
   concepto,
@@ -42,7 +55,7 @@ export async function submitTravelExpense({
     headers: { Authorization: `Bearer ${token}` }
   });
 
-  // Espera un momento dice mike
+  // Wait briefly for server-side processing
   await new Promise((res) => setTimeout(res, 500));
 
   const res = await apiRequest(`/accounts-payable/get-expense-validations/${requestId}`, { 
@@ -53,10 +66,8 @@ export async function submitTravelExpense({
   const expenses = res.Expenses ?? [];
   const count = expenses.length;
 
-  expenses.sort((a, b) => b.receipt_id - a.receipt_id);
+  expenses.sort((a: any, b: any) => b.receipt_id - a.receipt_id);
   const lastReceiptId = count > 0 ? expenses[0].receipt_id : null;
-
-  //alert(`Comprobante enviado exitosamente.`);
 
   return { count, lastReceiptId };
 }

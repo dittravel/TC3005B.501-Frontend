@@ -1,4 +1,4 @@
-/*
+/**
  * Global Tailwind CSS styles for the application
  * This file defines the color palette, typography, and layout styles
  * for the entire application. It also includes custom utilities and
@@ -11,9 +11,7 @@
 @import "tailwindcss";
 @plugin '@tailwindcss/typography';
 
-/*
-Default theme colors
-*/
+/* Default theme colors */
 @theme {
   /* Brand */
   --color-brand-50: #E6EDFE;

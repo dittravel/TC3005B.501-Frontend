@@ -1,8 +1,13 @@
 ---
+/**
+ * This component fetches and displays system notifications (alerts) 
+ * for the user based on their role and department.
+ */
+
 import { apiRequest } from "@/utils/apiClient";
 import { getCookie } from "@data/cookies";
 
-// Diccionario de status según el rol que accede
+// Status dictionary mapped by user role
 const statusByRole = {
   'Solicitante': 1,
   'Agencia de viajes': 2,

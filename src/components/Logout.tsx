@@ -1,3 +1,7 @@
+/**
+ * Logout component for handling user logout functionality.
+ */
+
 import { useState, useRef, useEffect } from "react";
 import { apiRequest } from "@utils/apiClient";
 

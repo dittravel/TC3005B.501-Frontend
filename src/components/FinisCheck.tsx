@@ -1,3 +1,7 @@
+/**
+ * FinisCheck component for finalizing and checking travel requests.
+ */
+
 import React from "react";
 import Button from "@components/Button";
 import { apiRequest } from "@utils/apiClient";
@@ -8,10 +12,16 @@ interface Props {
   token: string;
 }
 
+/**
+ * Handle the finalization of the request by validating all receipts.
+ * @param {number} requestId - The ID of the travel request to finalize
+ * @param {string} redirectTo - Optional URL to redirect after finalization (default: "/dashboard")
+ * @param {string} token - Authorization token for API requests
+ */
 export default function FinishRequestButton({ requestId, redirectTo = "/dashboard", token}: Props) {
   const handleClick = async () => {
     try {
-      // Puedes cambiar el método y la lógica según lo que quieras hacer
+      // Submit the request for finalization with all validated receipts
       await apiRequest(`/accounts-payable/validate-receipts/${requestId}`, { 
       method: "PUT",
       headers: { Authorization: `Bearer ${token}` } 

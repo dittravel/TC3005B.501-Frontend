@@ -1,3 +1,7 @@
+/**
+ * RouteInputGroup component for managing travel route input fields.
+ */
+
 import React from 'react';
 import type { TravelRoute } from '@/types/TravelRoute';
 

@@ -1,8 +1,8 @@
 /**
- * Author: Eduarod Porto Morales
+ * Duplicate JSON Object
  * 
- * Description: Meanwhile, this function creates a specified number of copies of a given JSON object.
- **/
+ * This function creates a specified number of copies of a given JSON object.
+ */
 
 export function duplicateJson(original, copies) {
     if (copies <= 0) {

@@ -1,11 +1,8 @@
 ---
 /**
- * Authors: Gabriel Muñoz, José González, Eduardo Porto
- *
- * Description: This is the dashboard page for the application. 
- * It displays different content based on the user's role (Applicant or Authorizer).
- * 
- **/
+ * Dashboard page for the application. 
+ * It displays different content based on the user's role
+ */
 
 import MainLayout from "@layouts/MainLayout.astro";
 import { roleViews } from "@views/role-views";
@@ -15,7 +12,7 @@ import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
-const userName = getCookie("username", Astro.cookies);
+const userName = getCookie("username", Astro.cookies) || "";
 
 const buttonLabel = roleLabels[role];
 const ViewComponent = roleViews[role];
@@ -23,6 +20,6 @@ const ViewComponent = roleViews[role];
 const showMessages: boolean = role !== "Solicitante" && role !== "Administrador";
 ---
 
-<MainLayout title="Dashboard" data={{ userName, buttonLabel, role }} showMessages={showMessages}>
+<MainLayout title="Dashboard" data={{userName, buttonLabel, role}} showMessages={showMessages}>
   <ViewComponent userName={userName}/>
 </MainLayout>

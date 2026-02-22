@@ -1,6 +1,13 @@
+/**
+ * Unauthorized Page HTML Generator
+ * 
+ * This function generates a complete HTML page to display when a user tries to access a page
+ * they are not authorized to view.
+ */
+
 export function unauthorizedPage(pathname: string, isAuthenticated: boolean): string {
   return `<!DOCTYPE html>
-    <html lang="en">
+    <html lang="es">
     <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

@@ -1,3 +1,7 @@
+/**
+ * TravelRequestForm component for creating and editing travel requests.
+ */
+
 import { useState, useEffect } from 'react';
 import { apiRequest } from '@utils/apiClient';
 import type { TravelRoute } from '@/types/TravelRoute';
@@ -52,10 +56,10 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
     if (data) {
       const transformedRoutes = data.routes.map(route => ({
         ...route,
-        origin_country_name: route.origin_country,
-        origin_city_name: route.origin_city,
-        destination_country_name: route.destination_country,
-        destination_city_name: route.destination_city,
+        origin_country_name: route.origin_country_name || '',
+        origin_city_name: route.origin_city_name || '',
+        destination_country_name: route.destination_country_name || '',
+        destination_city_name: route.destination_city_name || '',
       }));
       const newData = {
         ...data,
@@ -81,6 +85,12 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
     fetchDepartmentInfo();
   }, [user_id, token]);
 
+  /**
+   * Updates a travel route at the specified index.
+   * @param {number} index - The index of the route to update
+   * @param {string} name - The field name to update
+   * @param {any} value - The new value for the field
+   */
   const handleRouteUpdate = (index: number, name: string, value: any) => {
     setError(null)
     setFormData((prev) => {
@@ -97,6 +107,10 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
     });
   };
 
+  /**
+   * Handles general form field changes.
+   * @param {React.ChangeEvent} e - The change event from form input or textarea
+   */
   const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setError(null)
     const { name, value, type } = e.target;
@@ -107,6 +121,9 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
     }));
   };
 
+  /**
+   * Adds a new empty travel route to the form.
+   */
   const addRoute = () => {
     setFormData((prev) => ({
       ...prev,
@@ -503,7 +520,7 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
   return (
     <form onSubmit={handleSubmitRequest} className="space-y-8">
       {/* Nota de campos obligatorios */}
-      <div className="flex items-center bg-gradient-to-r from-blue-50 to-blue-100 border-l-4 border-blue-500 p-4 rounded shadow-sm mb-4">
+      <div className="flex items-center bg-linear-to-r from-blue-50 to-blue-100 border-l-4 border-blue-500 p-4 rounded shadow-sm mb-4">
         <svg className="w-6 h-6 text-blue-500 mr-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="white" />
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01" />

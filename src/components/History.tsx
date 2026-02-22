@@ -1,7 +1,8 @@
 /**
  * Author: Eduardo Porto Morales & Hector Julian Zarate Ramirez
  * 
- * Description: This component uses React to render client side de useState to manage pagination.
+ * This component uses React to render client side de useState 
+ * to manage pagination.
  */
 
 import { useState } from "react";
@@ -65,7 +66,7 @@ export default function History({ data , itemsPerPage = 5 }: Props) {
                     </div>
                   </div>
                   </div>
-                  <div className="mt-4 md:mt-0 md:ml-8 flex-shrink-0 flex flex-col items-center">
+                  <div className="mt-4 md:mt-0 md:ml-8 shrink-0 flex flex-col items-center">
                   <span className={`text-xs font-semibold px-4 py-2 rounded-full shadow ${getStatusStyle(request.currentStatus)}`}>
                     {(request.status || "DESCONOCIDO").toUpperCase()}
                   </span>

@@ -1,3 +1,9 @@
+/**
+ * Role labels configuration
+ * 
+ * This maps each role to a name that can be displayed in the UI
+ */
+
 export const roleLabels: Record<string, string> = {
     'Solicitante': "Solicitante",
     'N1': "Autorizador N1",

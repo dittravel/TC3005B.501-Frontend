@@ -1,8 +1,7 @@
 ---
 /**
-* Authors: Eduardo Porto Morales
-* Description: This page allows the user to view and manage their draft requests.
-**/
+ * Page for checking the status of expense verification for applicants
+ */
 
 import MainLayout from "@layouts/MainLayout.astro";
 import TextHeader from "@components/TextHeader.astro";
@@ -13,7 +12,7 @@ import { roleLabels } from "@config/role-labels";
 import { apiRequest } from '@utils/apiClient';
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
-const userName = getCookie("username", Astro.cookies);
+const userName = getCookie("username", Astro.cookies) || "";
 const buttonLabel = roleLabels[role];
 const user_id = getCookie("id", Astro.cookies);
 
@@ -52,11 +51,11 @@ const requests = await Promise.all(
 );
 ---
 
-<MainLayout title="Dashboard" data={{ userName, buttonLabel, role }}>
+<MainLayout title="Dashboard" data={{userName, buttonLabel, role}}>
   <div>
     <main>
       <TextHeader
-        title={`COMPROBACIONES PENDIENTES DE ${userName.toUpperCase()}`}
+        title={`Comprobaciones pendientes de ${userName}`}
         subtitle="Aquí puedes conocer el estado de solicitudes en proceso de comprobación"
       />
       <section class="bg-white p-6 rounded-lg shadow w-full">
@@ -70,13 +69,13 @@ const requests = await Promise.all(
                   <a href={`/comprobar-solicitud/${request.request_id}`} class="block w-full">
                     <div class="space-y-2 content-wrapper">
                       <div class="flex items-center justify-between">
-                        <p class="font-bold text-lg break-words">#{request.request_id}</p>
+                        <p class="font-bold text-lg wrap-break-word">#{request.request_id}</p>
                         { total === 0 ? (
                           <span class="text-sm text-gray-500">
-                          NO SE HAN ENVIADO COMPROBANTES
+                            No se han enviado comprobantes
                           </span>
                         ) : (
-                          <p class="text-sm text-gray-500">{accepted}/{total} ACEPTADAS</p>
+                          <p class="text-sm text-gray-500">{accepted}/{total} Aceptadas</p>
                         )}
                       </div>
                       { total != 0 && (
@@ -122,7 +121,7 @@ const requests = await Promise.all(
           </div>
         ) : (
           <div class="bg-gray-100 p-6 rounded-lg shadow w-full text-center text-gray-500 font-semibold">
-            NO TIENES COMPROBACIONES PENDIENTES
+            No tienes comprobantes pendientes
           </div>
         )}
       </section>

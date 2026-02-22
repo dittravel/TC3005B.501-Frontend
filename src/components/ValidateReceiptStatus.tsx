@@ -1,3 +1,7 @@
+/**
+ * ValidateReceiptStatus component for validating and confirming receipt status.
+ */
+
 import { useCallback } from "react";
 import { apiRequest } from "@utils/apiClient";
 import ModalWrapper from "@components/ModalWrapper";
@@ -8,7 +12,7 @@ interface Props {
   message: string;
   redirection: string;
   modal_type: "success" | "warning";
-  variant?: "primary" | "secondary";
+  variant?: "filled" | "border" | "empty";
   children: React.ReactNode;
   token: string;
 }

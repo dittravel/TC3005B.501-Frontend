@@ -1,7 +1,8 @@
 /**
- * Author: Diego Ortega Fernández
- *
- **/
+ * This component renders a paginated list of authorization requests for an authorizer.
+ * It receives the list of requests as a prop and displays them in a table format.
+ * The component also handles pagination logic to show a limited number of requests per page.
+ */
 
 import { useState, useEffect } from 'react';
 import DataTable from '@components/Table/DataTable';
@@ -19,6 +20,7 @@ interface Column {
   label: string;
 }
 
+// Define the columns for the data table
 const columns: Column[] = [
   { key: 'request_id', label: 'ID Viaje' },
   { key: 'status', label: 'Status' },
@@ -28,6 +30,11 @@ const columns: Column[] = [
   { key: 'action', label: 'Acciones' },
 ];
 
+/**
+ * Maps a request object to the format expected by the DataTable component.
+ * @param request - The original request object from the API.
+ * @returns An object with keys corresponding to the DataTable columns.
+ */
 function mapRequestToTableRow(request: Record<string, any>): Record<string, any> {
   return {
     status: request.request_status,
@@ -38,6 +45,13 @@ function mapRequestToTableRow(request: Record<string, any>): Record<string, any>
   };
 }
 
+/**
+ * AuthorizerRequestsList component renders a paginated list of authorization requests.
+ * @param data - The array of request objects to display.
+ * @param type - An optional string to specify the type of requests (e.g., "autorizaciones").
+ * @param role - The user role to determine available actions.
+ * @returns A React component that displays the requests in a table with pagination controls.
+ */
 export default function AuthorizerRequestsList({ data, type, role }: Props) {
   const requestsPerPage = 10;
   const [page, setPage] = useState(1);

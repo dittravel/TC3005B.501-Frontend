@@ -1,6 +1,5 @@
-/*
- * Component to display a user menu with options
- * for settings and logout
+/**
+ * UserMenu component for displaying user options and settings.
  */
 
 import { useState, useRef, useEffect } from "react";

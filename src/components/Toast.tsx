@@ -1,3 +1,7 @@
+/**
+ * Toast component for displaying temporary notification messages.
+ */
+
 import { useEffect, useState } from 'react';
 
 interface Props {

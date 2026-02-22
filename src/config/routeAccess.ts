@@ -1,3 +1,9 @@
+/**
+ * Route Access
+ * 
+ * Mapping of user roles to their accessible routes in the application
+ */
+
 import type { UserRole } from '@type/roles';
 
 export const roleRoutes: Record<UserRole, string[]> = {
@@ -9,4 +15,5 @@ export const roleRoutes: Record<UserRole, string[]> = {
   'Administrador': ['/dashboard', '/perfil-usuario','/crear-usuario', '/editar-usuario/*'],
 };
 
+// Flatten all routes into a single array for easy access control checks
 export const allWhitelistedRoutes: string[] = Object.values(roleRoutes).flat();

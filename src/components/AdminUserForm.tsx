@@ -1,7 +1,5 @@
 /**
- * Author: Michael devlyn 
- * 
- * Description: React component for creating new users in the admin panel.
+ * React component for creating new users in the admin panel
  */
 
 import React, { useState, useEffect } from 'react';
@@ -66,7 +64,14 @@ const infoClass = "flex items-center bg-gradient-to-r from-primary-50 to-primary
 const buttonContainerClass = "flex flex-col sm:flex-row justify-end gap-3 pt-4";
 const toastClass = "fixed top-4 right-4 z-50";
 
-export default function CreateUserForm({ mode, user_data, redirectTo,token }: CreateUserFormProps) {
+/**
+ * CreateUserForm component allows administrators to create or edit users in the system.
+ * @param {'create' | 'edit'} props.mode - Determines if the form is in create or edit mode.
+ * @param {object} props.user_data - User data to pre-fill the form when in 'edit' mode.
+ * @param {string} props.redirectTo - URL to redirect after successful form submission.
+ * @param {string} props.token - Authorization token for API requests.
+ */
+export default function CreateUserForm({ mode, user_data, redirectTo, token }: CreateUserFormProps) {
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -75,8 +80,8 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
   useEffect(() => {
     if (mode === 'edit' && user_data) {
       setFormData({
-        role_id: roles.find(role => role.name === user_data.role_name)?.id,
-        department_id: departments.find(dep => dep.name === user_data.department_name)?.id,
+        role_id: roles.find(role => role.name === user_data.role_name)?.id ?? '',
+        department_id: departments.find(dep => dep.name === user_data.department_name)?.id ?? '',
         user_name: user_data.user_name,
         password: '', // Password should not be pre-filled
         workstation: user_data.workstation,
@@ -90,6 +95,10 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
 
   
 
+  /**
+   * Validates all form fields and sets error messages if validation fails.
+   * @returns {boolean} True if all validations pass, false otherwise
+   */
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
@@ -130,6 +139,10 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
     return Object.keys(newErrors).length === 0;
   };
 
+  /**
+   * Handles input field changes and clears associated field errors.
+   * @param {React.ChangeEvent} e - The change event from input or select element
+   */
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -144,6 +157,10 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
     }
   };
 
+  /**
+   * Handles form submission for user creation or update.
+   * @param {React.FormEvent} e - The form submission event
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -235,7 +252,7 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Usuario y Contraseña */}
+        {/* Username and Password */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className={labelClass}>
@@ -273,7 +290,7 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
           )}
         </div>
 
-        {/* Email y Teléfono */}
+        {/* Email and Phone Number */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className={labelClass}>
@@ -310,7 +327,7 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
           </div>
         </div>
 
-        {/* Estación de Trabajo */}
+        {/* Workstation */}
         <div>
           <label className={labelClass}>
             Estación de Trabajo <span className="text-red-500">*</span>
@@ -328,7 +345,7 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
           )}
         </div>
 
-        {/* Rol y Departamento */}
+        {/* Role and Department */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className={labelClass}>
@@ -375,7 +392,7 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
           </div>
         </div>
 
-        {/* Botones */}
+        {/* Buttons */}
         <div className={buttonContainerClass}>
           <Button
             type="button"

@@ -1,3 +1,7 @@
+# API Endpoints
+
+This document provides a summary of the API endpoints available in the application, including their methods, expected responses, and error handling. Each endpoint is designed to perform specific operations related to travel requests, user information, and expense validations.
+
 **attend-travel-request/{user_id}**
 
 method: PUT
@@ -13,7 +17,6 @@ method: PUT
 
 "500":
     description: Internal server error
-
 
 **/authorize-travel-request/{user_id}**
 

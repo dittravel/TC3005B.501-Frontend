@@ -1,3 +1,8 @@
+/**
+ * UltimateWrapper component for generic dialog/modal deletion or action 
+ * confirmation.
+ */
+
 import { useCallback, useState } from "react";
 import { apiRequest } from "@utils/apiClient";
 import ModalWrapper from "@components/ModalWrapper";

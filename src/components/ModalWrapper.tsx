@@ -3,10 +3,13 @@
  * rebuild: Jose Antonio González
  * 
  * Description:
- * This component is a wrapper for the Modal component. It is used to demonstrate how to use the Modal component in a real application.
+ * This component is a wrapper for the Modal component. 
+ * It is used to demonstrate how to use the Modal component 
+ * in a real application.
  *
- *
- * This is an example of how to use the Modal component in a real application. You may create a new file in the src/components directory and copy this code into it.
+ * This is an example of how to use the Modal component in a 
+ * real application. You may create a new file in the src/components 
+ * directory and copy this code into it.
  **/ 
 
 import { useState } from "react";

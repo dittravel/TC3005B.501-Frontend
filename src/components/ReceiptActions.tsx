@@ -1,3 +1,7 @@
+/**
+ * ReceiptActions component for managing receipt approval and rejection actions.
+ */
+
 import React, { useState } from "react";
 import Modal from "@components/Modal";
 import AproveReceipStatus from "@components/AproveReceiptsModal";

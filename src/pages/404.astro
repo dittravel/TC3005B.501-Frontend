@@ -1,4 +1,8 @@
 ---
+/**
+ * 404 page
+ */
+
 import Layout from "@layouts/Layout.astro";
 const token = Astro.cookies.get("token")?.value;
 const isAuthenticated = !!token;
@@ -8,7 +12,7 @@ const isAuthenticated = !!token;
   <main
     class="min-h-screen bg-[linear-gradient(135deg,#0f2027,#203a43,#2c5364)] text-white font-sans px-6 flex flex-col"
   >
-    <div class="flex-grow flex flex-col justify-center items-center text-center max-w-lg mx-auto">
+    <div class="grow flex flex-col justify-center items-center text-center max-w-lg mx-auto">
       <img
         src="/favicon.svg"
         alt="Not found icon"
@@ -36,7 +40,7 @@ const isAuthenticated = !!token;
         class="bg-blue-600 text-white font-semibold px-8 py-3 rounded-md shadow hover:bg-blue-700 transition-colors duration-200"
         aria-label="Navigate"
       >
-        {isAuthenticated ? "Go to Dashboard" : "Go to Login"}
+        {isAuthenticated ? "Volver al Dashboard" : "Ir a Login"}
       </a>
     </div>
   </main>

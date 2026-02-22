@@ -1,5 +1,10 @@
 ---
-import ExpensesFormClient from "@components/ExpensesForm.tsx"; // Ajusta la ruta si cambia
+/**
+ * This component renders a form for submitting travel expenses related 
+ * to a specific travel request.
+ */
+
+import ExpensesFormClient from "@components/ExpensesForm.tsx"; // Adjust route if path changes
 import { getCookie } from "@data/cookies";
 import { apiRequest } from "@utils/apiClient";
 
@@ -32,7 +37,7 @@ const travelData = await (async () => {
   <ExpensesFormClient
     client:only="react"
     requestId={travelData.request_id}
-    token={getCookie("token", Astro.cookies)}
+    token={getCookie("token", Astro.cookies) || ""}
     receiptToReplace={Astro.props.receiptToReplace}
   />
 </section>

@@ -1,8 +1,7 @@
 ---
 /**
- * Author: Diego Ortega Fernández
- *
- **/
+ * Page for pending attentions of the travel agency role
+ */
 
 import MainLayout from "@layouts/MainLayout.astro";
 import TextHeader from "@components/TextHeader.astro";
@@ -14,12 +13,12 @@ import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
-const userName = getCookie("username", Astro.cookies);
+const userName = getCookie("username", Astro.cookies) || "";
 const buttonLabel = roleLabels[role];
 
 import { apiRequest } from "@/utils/apiClient";
 
-//Status corresponding to TravelAgency
+// Status corresponding to TravelAgency
 const status = 5;
 const requests = await (async () => {
   try {
@@ -30,7 +29,7 @@ const requests = await (async () => {
 })()
 ---
 
-<MainLayout title="Atenciones pendientes" data={{ userName, buttonLabel, role }}>
+<MainLayout title="Atenciones pendientes" data={{userName, buttonLabel, role}}>
   <div>
     {requests && requests.length === 0 ? (
       <TableFallback />

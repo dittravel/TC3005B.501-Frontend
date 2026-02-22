@@ -1,8 +1,6 @@
 ---
 /**
- * Author: Nicole Dávila Hernández and Julia Maria Stephanie Duenkelsbuehler Castillo
- * 
- * Description: This is the creation page for a new, single user.
+ * Creation page for a new, single user.
  */
 
 import TextHeader from '@components/TextHeader.astro';
@@ -14,10 +12,10 @@ import type { UserRole } from "@type/roles";
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
 const buttonLabel = roleLabels[role];
-const userName = getCookie("username", Astro.cookies);
+const userName = getCookie("username", Astro.cookies) || "";
 ---
 
-<MainLayout title="Crear Usuario" data={{ userName, buttonLabel, role }}>
+<MainLayout title="Crear Usuario" data={{userName, buttonLabel, role}}>
   <div>
     <TextHeader
       title="Crear Nuevo Usuario"
@@ -27,7 +25,7 @@ const userName = getCookie("username", Astro.cookies);
       mode="create"
       client:only="react"
       redirectTo="/dashboard"
-      token={getCookie("token", Astro.cookies)}
+      token={getCookie("token", Astro.cookies) || ""}
     />
   </div>
 </MainLayout>

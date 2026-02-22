@@ -1,4 +1,8 @@
-import React, { useState } from "react";
+/**
+ * ExpensesForm component for managing travel request expenses and receipts.
+ */
+
+import { useState } from "react";
 import UploadFiles from "@components/UploadFiles";
 import Button from "@components/Button.tsx";
 import { submitTravelExpense } from "@components/SubmitTravelWarper";
@@ -13,11 +17,7 @@ interface Props {
 
 const labelClass = "block text-sm font-medium text-text-secondary mb-1";
 const baseInputClass = "w-full border rounded-md px-3 py-2 bg-neutral-50 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500 border-border";
-const errorClass = "text-red-500 text-sm mt-1";
-const formClass = "bg-card rounded-lg shadow-md p-8 border border-border";
-const infoClass = "flex items-center bg-gradient-to-r from-primary-50 to-primary-100 border-l-4 border-blue-500 p-4 mb-8 rounded shadow-sm";
 const buttonContainerClass = "flex flex-col sm:flex-row justify-end gap-3 pt-4";
-const toastClass = "fixed top-4 right-4 z-50";
 
 export default function ExpensesFormClient({ requestId, token, receiptToReplace }: Props) {
   const [concepto, setConcepto] = useState("Transporte");
@@ -69,8 +69,6 @@ export default function ExpensesFormClient({ requestId, token, receiptToReplace 
       setLastReceiptId(lastReceiptId);
 
     } catch (err) {
-      console.error(err);
-      //alert("Error al enviar la comprobación");
       setSubmitting(false);
     }
   };
@@ -140,7 +138,7 @@ export default function ExpensesFormClient({ requestId, token, receiptToReplace 
           receiptId={lastReceiptId}
           pdfFile={pdfFile}
           xmlFile={xmlFile}
-          receiptToReplace={receiptToReplace} // <- pasa el ID aquí
+          receiptToReplace={receiptToReplace}
           onDone={() => {
             alert("Subidos correctamente");
             window.location.href = `/comprobar-solicitud/${requestId}`;

@@ -1,6 +1,5 @@
 /**
- * Author: Diego Ortega Fernández
- *
+ * Table row
  **/
 
 interface Column {
@@ -15,6 +14,14 @@ interface Props {
   role_href: string;
 }
 
+/**
+ * TableRow component that renders a single row of a table based on the provided data and column definitions.
+ * @param row - An object representing the data for the current row, where keys correspond to column keys.
+ * @param columns - An array of column definitions, each with a key and label.
+ * @param index - The index of the current row, used for styling purposes (e.g., alternating row colors).
+ * @param role_href - A string that determines the href for action buttons in the row based on the user's role.
+ * @returns A JSX element representing a table row.
+ */
 export default function TableRow({ row, columns, index, role_href }: Props) {
   return (
     <tr className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>

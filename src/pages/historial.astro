@@ -1,8 +1,7 @@
 ---
 /**
- * Author: Hector Julian Zarate Ramirez
- * Description: This script is used to create a page that shows the history of requests made by the user.
- **/
+ * This script is used to create a page that shows the history of requests made by the user.
+ */
 
 import MainLayout from "@layouts/MainLayout.astro";
 import History from "@components/History.tsx";
@@ -13,7 +12,7 @@ import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
-const userName = getCookie("username", Astro.cookies);
+const userName = getCookie("username", Astro.cookies) || "";
 const buttonLabel = roleLabels[role];
 
 import { apiRequest } from "@/utils/apiClient";

@@ -1,16 +1,10 @@
 /**
- * Author: Diego Ortega Fernández
- *
- **/
+ * This component renders a data table with dynamic columns and rows.
+ */
 
 import TableHeader from '@components/Table/TableHeader.tsx';
 import TableRow from '@components/Table/TableRow.tsx';
-
 import type { UserRole } from "@type/roles";
-import { getCookie } from "@data/cookies";
-// For React components, we need to handle Astro.cookies differently
-// This will be handled by the cookies.ts module's resolveCookies function
-//const role: UserRole = getCookie("role") as UserRole;
 
 interface Column {
   key: string;
@@ -24,6 +18,7 @@ interface Props {
   type?: string;
 }
 
+// Mapping of user roles to their corresponding href values for action buttons in the table
 const roleDictionary = {
   'N1': "autorizar-solicitud",
   'N2': "autorizar-solicitud",
@@ -33,6 +28,7 @@ const roleDictionary = {
 
 type ValidRole = keyof typeof roleDictionary;
 
+// Determines the href for action buttons based on the user's role and an optional type parameter
 function getRoleHref(role: UserRole, type: string): string {
   if (type) {
     return type;
@@ -43,7 +39,14 @@ function getRoleHref(role: UserRole, type: string): string {
   return "error";
 }
 
-
+/**
+ * DataTable component that renders a table based on the provided columns and rows.
+ * @param columns - An array of column definitions, each with a key and label.
+ * @param rows - An array of data objects representing the rows of the table.
+ * @param type - An optional parameter that can override the default href for action buttons.
+ * @param role - The user's role, used to determine action button links.
+ * @returns A JSX element representing the data table.
+ */
 export default function DataTable({ columns, rows, type, role }: Props) {
   const isLoading = rows.length === 0;
   const roleHref = getRoleHref(role, type ?? "");
