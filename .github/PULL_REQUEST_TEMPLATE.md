@@ -29,5 +29,3 @@ _What does this PR implement?_
 - [ ] PR targets the appropriate branch (`main` on dittravel)
 - [ ] Code has been tested locally
 - [ ] No console errors or warnings
-
----
