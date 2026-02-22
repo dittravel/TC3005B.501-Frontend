@@ -42,7 +42,6 @@ const { title, data } = Astro.props
 
     <!-- Dark mode toggle script -->
     <script>
-      // Guardar preferencia en localStorage opcional
       const html = document.documentElement;
       const saved = localStorage.getItem('theme');
       if (saved === 'dark') html.classList.add('dark');

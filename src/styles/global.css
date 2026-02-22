@@ -208,12 +208,24 @@ html, body, #app, #content, #sidebar, #messages {
 
 #app {
   display: grid;
+  height: 100vh;
+}
+
+/* Grid layout only when sidebar exists (MainLayout with sidebar) */
+#app > #sidebar {
   grid-template-areas:
     "header header header"
     "sidebar content messages";
   grid-template-columns: auto 1fr 0;
   grid-template-rows: auto 1fr;
-  height: 100vh;
+}
+
+#app:has(> #sidebar) {
+  grid-template-areas:
+    "header header header"
+    "sidebar content messages";
+  grid-template-columns: auto 1fr 0;
+  grid-template-rows: auto 1fr;
 }
 
 #app.list-messages {
