@@ -1,10 +1,18 @@
+/**
+ * ReceiptActions Component
+ * 
+ * Provides action buttons for approving or rejecting travel receipts.
+ * Manages the state for displaying confirmation modals and handles API requests
+ * to update receipt approval status.
+ */
+
 import React, { useState } from "react";
 import Modal from "@components/Modal";
-import AproveReceipStatus from "@components/AproveReceiptsModal";
-import RejectReceipStatus from "@components/RejectReceiptsModal";
+import ApproveReceiptStatus from "@components/AproveReceiptsModal";
+import RejectReceiptStatus from "@components/RejectReceiptsModal";
 
 interface ReceiptProps {
-  receipt_id: number;
+  receiptId: number;
   disabled: boolean;
   onApprove: (id: number) => void;
   onReject: (id: number) => void;
@@ -12,7 +20,7 @@ interface ReceiptProps {
 }
 
 export default function ReceiptActions({
-  receipt_id,
+  receiptId,
   disabled,
   onApprove,
   onReject,
@@ -22,18 +30,29 @@ export default function ReceiptActions({
   const [action, setAction] = useState<"approve" | "reject" | null>(null);
   const [loading, setLoading] = useState(false);
 
+  /**
+   * Opens the confirmation modal for the specified action type.
+   * @param {string} type - The action type: "approve" or "reject"
+   * @returns {void}
+   */
   const handleClick = (type: "approve" | "reject") => {
     setAction(type);
     setShowModal(true);
   };
 
+  /**
+   * Handles the confirmation of receipt approval or rejection.
+   * Sends a PUT request to update the receipt status and calls the appropriate callback.
+   * @returns {Promise<void>}
+   */
   const confirmAction = async () => {
+    // Convert action to approval value: 1 for approve, 0 for reject
     const approval = action === "approve" ? 1 : 0;
 
     try {
       setLoading(true);
       const res = await fetch(
-        `${import.meta.env.PUBLIC_API_BASE_URL}/accounts-payable/validate-receipt/${receipt_id}`,
+        `${import.meta.env.PUBLIC_API_BASE_URL}/accounts-payable/validate-receipt/${receiptId}`,
         {
           method: "PUT",
           headers: { 
@@ -46,8 +65,9 @@ export default function ReceiptActions({
 
       const data = await res.json();
 
+      // Execute appropriate callback based on action result
       if (res.ok) {
-        approval === 1 ? onApprove(receipt_id) : onReject(receipt_id);
+        approval === 1 ? onApprove(receiptId) : onReject(receiptId);
       } else {
         alert(data.error || "No se pudo actualizar.");
       }
@@ -62,32 +82,35 @@ export default function ReceiptActions({
 
   return (
     <div className="flex flex-row gap-2 items-center justify-center w-full">
-      <AproveReceipStatus
-        receipt_id={receipt_id}
+      {/* Approve Receipt Button */}
+      <ApproveReceiptStatus
+        receiptId={receiptId}
         title="Aprobar comprobante"
         message="¿Está seguro de que deseas aprobar este comprobante?"
         redirection="/dashboard"
-        modal_type="success"
+        modalType="success"
         variant="filled"
         disabled={disabled} 
         token={token}
       >
         Aprobar
-      </AproveReceipStatus>
+      </ApproveReceiptStatus>
 
-      <RejectReceipStatus
-        receipt_id={receipt_id}
+      {/* Reject Receipt Button */}
+      <RejectReceiptStatus
+        receiptId={receiptId}
         title="Rechazar comprobante"
         message="¿Está seguro de que deseas rechazar este comprobante?"
         redirection="/dashboard"
-        modal_type="warning"
+        modalType="warning"
         variant="filled"
         disabled={disabled} 
         token={token}
       >
         Rechazar
-      </RejectReceipStatus>
+      </RejectReceiptStatus>
 
+      {/* Confirmation Modal */}
       <Modal
         title="¿Estás seguro?"
         message={`¿Seguro que deseas ${action === "approve" ? "aprobar" : "rechazar"} este comprobante?`}

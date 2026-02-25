@@ -3,48 +3,58 @@ import { apiRequest } from "@utils/apiClient";
 import ModalWrapper from "@components/ModalWrapper";
 
 interface Props {
-  receipt_id: number;
+  receiptId: number;
   title: string;
   message: string;
   redirection: string;
-  modal_type: "success" | "warning";
+  modalType: "success" | "warning";
   variant?: "primary" | "secondary"| "filled";
   children: React.ReactNode;
   token: string;
 }
 
-export default function ValidateReceiptStatus({
-  receipt_id,
+export default function AproveRequestModal({
+  receiptId: propReceiptId,
   title,
   message,
   redirection,
-  modal_type,
+  modalType: propModalType,
   variant,
   children,
   token
 }: Props) {
+  const receiptId = propReceiptId;
+  const modalType = propModalType;
+  const redirectionUrl = redirection;
+
+  /**
+   * Handles confirmation action for approving a receipt.
+   * Sends API request and redirects or reloads page on success.
+   */
   const handleConfirm = useCallback(async () => {
     try {
-      const url = `/accounts-payable/validate-receipt/${receipt_id}`;
-      await apiRequest(url, { method: "PUT", data: {"approval": 1}, headers: { Authorization: `Bearer ${token}` }});
-      alert(`Comprobante enviado exitosamente.`)
+      // API call to validate receipt
+      const url = `/api/accounts-payable/validate-receipt/${receiptId}`;
+      await apiRequest(url, { method: "PUT", data: { approval: 1 }, headers: { Authorization: `Bearer ${token}` } });
+      alert(`Comprobante enviado exitosamente.`);
 
-      if (redirection) {
-        window.location.href = redirection;
+      // Redirect or reload after success
+      if (redirectionUrl) {
+        window.location.href = redirectionUrl;
       } else {
         window.location.reload();
       }
     } catch (error) {
-      console.error("Error en la solicitud:", error);
+      
     }
-  }, [receipt_id, redirection]);
+  }, [receiptId, redirectionUrl, token]);
 
   return (
     <ModalWrapper
       title={title}
       message={message}
-      button_type={modal_type}
-      modal_type={modal_type}
+      buttonType={modalType}
+      modalType={modalType}
       onConfirm={handleConfirm}
       variant={variant}
     >

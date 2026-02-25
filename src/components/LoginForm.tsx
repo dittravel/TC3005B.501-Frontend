@@ -1,7 +1,15 @@
+/**
+ * LoginForm Component
+ * 
+ * Provides a login form for user authentication. Handles username and password submission,
+ * sets authentication cookies on successful login, and displays error messages on failure.
+ */
+
 import React, { useState } from "react";
 import Button from "@components/Button";
 import { apiRequest } from "@utils/apiClient";
 
+// Tailwind CSS classes for consistent input field styling
 const inputStyle = `peer w-full h-[50px]
   border border-gray-400 rounded outline-none
   text-black text-sm px-3 placeholder-gray-400`;
@@ -11,8 +19,16 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
+  /**
+   * Handles the login form submission.
+   * Clears previous session, authenticates the user, sets cookies with user credentials,
+   * and redirects to dashboard on success.
+   * @param {React.FormEvent} e - The form submission event
+   * @returns {Promise<void>}
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Clear any existing session before login
     await apiRequest("/user/logout", {
       method: "GET",
     });
@@ -24,19 +40,21 @@ export default function LoginForm() {
         data: { username, password },
       });
 
+      // Clear error message on successful login
       setErrorMessage("");
     
       alert("Inicio de sesión exitoso");
 
-      // Set cookies manually on client side to ensure they're available immediately
+      // Set authentication cookies to persist user session and credentials
       document.cookie = `token=${response.token}; path=/; secure; SameSite=Strict`;
       document.cookie = `role=${response.role}; path=/`;
       document.cookie = `username=${response.username}; path=/`;
-      document.cookie = `user_id=${response.user_id}; path=/`;
-      document.cookie = `department_id=${response.department_id}; path=/`;
+      document.cookie = `userId=${response.userId}; path=/`;
+      document.cookie = `departmentId=${response.departmentId}; path=/`;
       window.location.href = "/dashboard";
 
     } catch (error: any) {
+      // Extract error message from API response or use default message
       const msg = error?.response?.data?.error || "Error al iniciar sesión";
       setErrorMessage(msg);
     }
@@ -116,11 +134,11 @@ export default function LoginForm() {
             ¿Olvidaste tu contraseña? Contacta a un administrador para restablecerla.
           </p>
 
-          {/* Error Message */}
+          {/* Error Message Display */}
           {errorMessage && (
-              <p className="text-center text-sm text-red-600">
-                {errorMessage}
-              </p>
+            <p className="text-center text-sm text-red-600">
+              {errorMessage}
+            </p>
           )}
         </form>
       </div>

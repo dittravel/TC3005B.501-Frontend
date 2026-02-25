@@ -10,7 +10,7 @@ import RequestSection from "@components/RequestSection.astro";
 
 import { getCookie } from "@data/cookies";
 import { apiRequest } from '@utils/apiClient';
-const deparment = getCookie("department_id", Astro.cookies);
+const deparment = getCookie("departmentId", Astro.cookies);
 
 const requestsInCotizar = await (async () => {
   try {

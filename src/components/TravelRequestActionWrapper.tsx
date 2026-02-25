@@ -1,40 +1,55 @@
+/**
+ * TravelRequestActionWrapper Component
+ * 
+ * Wraps an action button with a confirmation modal for authorizing or declining travel requests.
+ * Handles API requests and displays success toast notifications before redirecting.
+ */
+
 import { useCallback, useState } from "react";
 import { apiRequest } from "@utils/apiClient";
 import ModalWrapper from "@components/ModalWrapper";
 import Toast from "@components/Toast";
 
 interface Props {
-  request_id: number;
+  requestId: number;
   endpoint: string;
   role: number;
   title: string;
   message: string;
   redirection: string;
-  modal_type: "success" | "warning";
+  modalType: "success" | "warning";
   children: React.ReactNode;
   token: string;
 }
 
 export default function TravelRequestActionWrapper({
-  request_id,
+  requestId,
   endpoint,
   role,
   title,
   message,
   redirection,
-  modal_type,
+  modalType,
   children,
   token,
 }: Props) {
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  /**
+   * Handles the confirmation action for travel request authorization or rejection.
+   * Sends a PUT request to the appropriate endpoint and displays a success toast
+   * before redirecting or reloading the page.
+   * @returns {Promise<void>}
+   */
   const handleConfirm = useCallback(async () => {
     try {
-      const url = `${endpoint}/${request_id}/${role}`;
+      const url = `${endpoint}/${requestId}/${role}`;
       await apiRequest(url, { 
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` }
       });
 
+      // Display appropriate success message based on the endpoint action
       if (endpoint.includes("authorize-travel-request")) {
         setToast({ message: 'Solicitud autorizada exitosamente.', type: 'success' });
         await new Promise(resolve => setTimeout(resolve, 2000));
@@ -42,6 +57,8 @@ export default function TravelRequestActionWrapper({
         setToast({ message: 'Solicitud rechazada exitosamente.', type: 'success' });
         await new Promise(resolve => setTimeout(resolve, 2000));
       }
+
+      // Redirect to specified URL or reload current page
       if (redirection) {
         window.location.href = redirection;
       } else {
@@ -50,15 +67,15 @@ export default function TravelRequestActionWrapper({
     } catch (error) {
       console.error("Error en la solicitud:", error);
     }
-  }, [request_id, endpoint, redirection, role]);
+  }, [requestId, endpoint, redirection, role]);
 
   return (
     <>
       <ModalWrapper
         title={title}
         message={message}
-        button_type={modal_type}
-        modal_type={modal_type}
+        buttonType={modalType}
+        modalType={modalType}
         onConfirm={handleConfirm}
       >
         {children}

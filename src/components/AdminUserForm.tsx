@@ -1,22 +1,17 @@
-/**
- * Author: Michael devlyn 
- * 
- * Description: React component for creating new users in the admin panel.
- */
-
 import React, { useState, useEffect } from 'react';
 import Button from '@components/Button';
 import { apiRequest } from '@utils/apiClient';
 import Toast from '@components/Toast';
 
+// Internal form data structure (not exported)
 interface FormData {
-  role_id: number | '';
-  department_id: number | '';
-  user_name: string;
+  roleId: number | '';
+  departmentId: number | '';
+  userName: string;
   password: string;
   workstation: string;
   email: string;
-  phone_number: string;
+  phoneNumber: string;
 }
 
 interface FormErrors {
@@ -25,9 +20,9 @@ interface FormErrors {
 
 interface CreateUserFormProps {
   mode: 'create' | 'edit';
-  user_data?: any; // User data for editing, if applicable
+  user_data?: any; 
   redirectTo?: string;
-  token: string; // Authorization token for API requests
+  token: string; 
 }
 
 const roles = [
@@ -49,13 +44,13 @@ const departments = [
 ];
 
 const initialFormData: FormData = {
-  role_id: '',
-  department_id: '',
-  user_name: '',
+  roleId: '',
+  departmentId: '',
+  userName: '',
   password: '',
   workstation: '',
   email: '',
-  phone_number: ''
+  phoneNumber: ''
 };
 
 export default function CreateUserForm({ mode, user_data, redirectTo,token }: CreateUserFormProps) {
@@ -65,15 +60,16 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
+    // Pre-fill form for edit mode, otherwise reset
     if (mode === 'edit' && user_data) {
       setFormData({
-        role_id: roles.find(role => role.name === user_data.role_name)?.id,
-        department_id: departments.find(dep => dep.name === user_data.department_name)?.id,
-        user_name: user_data.user_name,
+        roleId: roles.find(role => role.name === user_data.role_name)?.id,
+        departmentId: departments.find(dep => dep.name === user_data.department_name)?.id,
+        userName: user_data.user_name,
         password: '', // Password should not be pre-filled
         workstation: user_data.workstation,
         email: user_data.email,
-        phone_number: user_data.phone_number || ''
+        phoneNumber: user_data.phone_number || ''
       });
     } else {
       setFormData(initialFormData);
@@ -82,14 +78,18 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
 
   
 
+  /**
+   * Validates the form fields and sets error messages.
+   * @returns {boolean} True if form is valid, false otherwise
+   */
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
     // Required field validation
-    if (!formData.user_name.trim()) {
-      newErrors.user_name = 'El nombre de usuario es requerido';
-    } else if (formData.user_name.includes(' ')) {
-      newErrors.user_name = 'El nombre de usuario no puede contener espacios';
+    if (!formData.userName.trim()) {
+      newErrors.userName = 'El nombre de usuario es requerido';
+    } else if (formData.userName.includes(' ')) {
+      newErrors.userName = 'El nombre de usuario no puede contener espacios';
     }
 
     if (mode === 'create') {
@@ -110,23 +110,27 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
       newErrors.workstation = 'La estación de trabajo es requerida';
     }
 
-    if (!formData.role_id) {
-      newErrors.role_id = 'El rol es requerido';
+    if (!formData.roleId) {
+      newErrors.roleId = 'El rol es requerido';
     }
 
-    if (!formData.department_id) {
-      newErrors.department_id = 'El departamento es requerido';
+    if (!formData.departmentId) {
+      newErrors.departmentId = 'El departamento es requerido';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  /**
+   * Handles input changes and updates form state.
+   * @param {React.ChangeEvent<HTMLInputElement | HTMLSelectElement>} e - Input event
+   */
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'role_id' || name === 'department_id' ? 
+      [name]: name === 'roleId' || name === 'departmentId' ?
         (value === '' ? '' : parseInt(value)) : value
     }));
 
@@ -136,9 +140,13 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
     }
   };
 
+  /**
+   * Handles form submission, sends API request, and manages response/errors.
+   * @param {React.FormEvent} e - Form event
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       setToast({ message: 'Por favor corrige los errores en el formulario', type: 'error' });
       return;
@@ -146,17 +154,18 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
 
     setIsSubmitting(true);
     setToast(null);
-    
+
     try {
+      // Prepare payload for API
       const payload = mode === 'edit'
         ? { ...formData, ...(formData.password ? {} : { password: undefined }) }
         : formData;
 
       const endpoint = mode === 'edit'
-        ? `/admin/update-user/${user_data.user_id}`
+        ? `/admin/update-user/${user_data.userId}`
         : '/admin/create-user';
 
-      console.log('Submitting form data:', payload);
+      // API request
       const response = await apiRequest(endpoint, {
         method: mode === 'edit' ? 'PUT' : 'POST',
         data: payload,
@@ -165,7 +174,6 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
         }
       });
 
-      console.log(`${mode === 'edit' ? 'Edit' : 'Create'} response:`, response);
       setToast({ message: `Usuario ${mode === 'edit' ? 'actualizado' : 'creado'} exitosamente`, type: 'success' });
       if (mode === 'create') {
         setFormData(initialFormData);
@@ -174,9 +182,9 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
       if (redirectTo) {
         window.location.href = redirectTo;
       }
-      
+
     } catch (error: any) {
-      console.error(`${mode === 'edit' ? 'Update' : 'Create'} error:`, error);
+      // Handle backend validation errors
       if (error.message.includes('errors')) {
         try {
           const errorData = JSON.parse(error.message.split(': ')[1]);
@@ -199,6 +207,9 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
     }
   };
 
+  /**
+   * Handles form reset or cancel action.
+   */
   const handleReset = () => {
     if (mode === 'edit') {
       if (redirectTo) {
@@ -211,6 +222,11 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
     }
   };
 
+  /**
+   * Returns input class string based on error state.
+   * @param {string} fieldName - Field name
+   * @returns {string} CSS class string
+   */
   const inputClass = (fieldName: string) =>
     `w-full border rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500 ${
       errors[fieldName] ? 'border-red-500' : 'border-gray-300'
@@ -237,14 +253,14 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
             </label>
             <input
               type="text"
-              name="user_name"
-              value={formData.user_name}
+              name="userName"
+              value={formData.userName}
               onChange={handleInputChange}
-              className={inputClass('user_name')}
+              className={inputClass('userName')}
               placeholder="Ej: juan.perez"
             />
-            {errors.user_name && (
-              <p className="text-red-500 text-sm mt-1">{errors.user_name}</p>
+            {errors.userName && (
+              <p className="text-red-500 text-sm mt-1">{errors.userName}</p>
             )}
           </div>
           { mode === 'create' && (
@@ -292,14 +308,14 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
             </label>
             <input
               type="tel"
-              name="phone_number"
-              value={formData.phone_number}
+              name="phoneNumber"
+              value={formData.phoneNumber}
               onChange={handleInputChange}
-              className={inputClass('phone_number')}
+              className={inputClass('phoneNumber')}
               placeholder="555-1234"
             />
-            {errors.phone_number && (
-              <p className="text-red-500 text-sm mt-1">{errors.phone_number}</p>
+            {errors.phoneNumber && (
+              <p className="text-red-500 text-sm mt-1">{errors.phoneNumber}</p>
             )}
           </div>
         </div>
@@ -329,10 +345,10 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
               Rol <span className="text-red-500">*</span>
             </label>
             <select
-              name="role_id"
-              value={formData.role_id}
+              name="roleId"
+              value={formData.roleId}
               onChange={handleInputChange}
-              className={inputClass('role_id')}
+              className={inputClass('roleId')}
             >
               <option value="">Seleccionar rol</option>
               {roles.map(role => (
@@ -341,8 +357,8 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
                 </option>
               ))}
             </select>
-            {errors.role_id && (
-              <p className="text-red-500 text-sm mt-1">{errors.role_id}</p>
+            {errors.roleId && (
+              <p className="text-red-500 text-sm mt-1">{errors.roleId}</p>
             )}
           </div>
 
@@ -351,10 +367,10 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
               Departamento <span className="text-red-500">*</span>
             </label>
             <select
-              name="department_id"
-              value={formData.department_id}
+              name="departmentId"
+              value={formData.departmentId}
               onChange={handleInputChange}
-              className={inputClass('department_id')}
+              className={inputClass('departmentId')}
             >
               <option value="">Seleccionar departamento</option>
               {departments.map(dept => (
@@ -363,8 +379,8 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
                 </option>
               ))}
             </select>
-            {errors.department_id && (
-              <p className="text-red-500 text-sm mt-1">{errors.department_id}</p>
+            {errors.departmentId && (
+              <p className="text-red-500 text-sm mt-1">{errors.departmentId}</p>
             )}
           </div>
         </div>

@@ -18,25 +18,25 @@ if (role === 'N1') {
   role_number = 4;
 }
 const { request } = Astro.props;
-const id = request.request_id;
+const id = request.requestId;
 ---
 <main class="flex flex-col">
   <div>
     <RequestDetail
       request={request}
-      title={`SOLICITUD #${request.request_id}`}
+      title={`SOLICITUD #${request.requestId}`}
       subtitle="Detalles de la solicitud"
     />
     <div class="flex justify-end gap-4 mt-8">
       <TravelRequestActionWrapper
         client:only="react"
-        request_id={id}
+        requestId={id}
         endpoint="/authorizer/authorize-travel-request"
         role={role_number}
         title="Confirmar autorización"
         message="¿Está seguro de que desea autorizar esta solicitud?"
         redirection="/dashboard"
-        modal_type="success"
+        modalType="success"
         token={getCookie("token", Astro.cookies)}
         >
         Aceptar
@@ -44,13 +44,13 @@ const id = request.request_id;
 
       <TravelRequestActionWrapper
         client:only="react"
-        request_id={id}
+        requestId={id}
         endpoint="/authorizer/decline-travel-request"
         role={role_number}
         title="Rechazar autorización"
         message="¿Está seguro de que desea rechazar esta solicitud?"
         redirection="/dashboard"
-        modal_type="warning"
+        modalType="warning"
         token={getCookie("token", Astro.cookies)}
         >
         Rechazar

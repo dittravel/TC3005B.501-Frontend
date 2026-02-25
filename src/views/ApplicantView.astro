@@ -22,14 +22,14 @@ const colorDesign: { [key: string]: string } = {
   'Validación de comprobantes': "text-blue-600",
 };
 
-const user_id = getCookie("id", Astro.cookies);
+const userId = getCookie("id", Astro.cookies);
 
 
 const requests = await (async () => {
   try {
     // Try to fetch requests with error handling
     try {
-      const allRequests = await apiRequest(`/applicant/get-user-requests/${user_id}`, {
+      const allRequests = await apiRequest(`/applicant/get-user-requests/${userId}`, {
         cookies: Astro.cookies
       });
       return allRequests.filter((request: any) => request.status !== "Borrador");
@@ -67,30 +67,30 @@ const { userName } = Astro.props;
             const mustBeChecked = request.status === "Comprobación gastos del viaje";
             return (
               <div class="grid grid-cols-[2fr_2fr_1fr] gap-8">
-                <a href={`/detalles-solicitud/${request.request_id}`} class="col-span-2">
+                <a href={`/detalles-solicitud/${request.}`} class="col-span-2">
                   <div class="col-span-2 space-y-2 content-wrapper">
-                    <p class="font-bold text-lg break-words">#{request.request_id}</p>
+                    <p class="font-bold text-lg break-words">#{request.}</p>
                     <div class="text-sm text-gray-700 grid grid-cols-[2fr_3fr] gap-y-1">
-                      <p><span class="font-semibold">País Destino:</span> {request.destination_country}</p>
+                      <p><span class="font-semibold">País Destino:</span> {request.destinationCountry}</p>
                       <p>
                         <span class="font-semibold">Estado:</span> 
                         <span class={`ml-1 font-semibold text-sm rounded bg-yellow ${colorDesign[String(request.status)]}`}>
                           {(request.status ? request.status.toUpperCase() : '')}
                         </span>
                       </p>
-                      <p><span class="font-semibold">Fechas:</span> {request.beginning_date} - {request.ending_date}</p>
+                      <p><span class="font-semibold">Fechas:</span> {request.beginningDate} - {request.endingDate}</p>
                       <p><span class="font-semibold">Responsable:</span> Eduardo Porto Morales</p>
                     </div>
                   </div>
                 </a>
                 <div class="grid grid-cols-[1fr_auto] gap-4 items-center">
                   <div class="flex flex-col gap-2">
-                    <a href={`/editar-solicitud/${request.request_id}`}>
+                    <a href={`/editar-solicitud/${request.}`}>
                       <Button color="primary" disabled={!isEditable} variant="filled" size="medium" customSizeClass="w-full">
                         EDITAR
                       </Button>
                     </a>
-                    <a href={`/comprobar-solicitud/${request.request_id}`}>
+                    <a href={`/comprobar-solicitud/${request.}`}>
                       <Button color="secondary" disabled={!mustBeChecked} variant="filled" size="medium" customSizeClass="w-full">
                         COMPROBAR GASTOS
                       </Button>
@@ -100,7 +100,7 @@ const { userName } = Astro.props;
                     <span class="flex items-center justify-center w-6 h-6">                        
                       <CancelRequestModal
                         client:only="react"
-                        id={request.request_id}
+                        id={request.}
                         disabled={isNotCancelable}
                         token={getCookie("token", Astro.cookies)}
                       >

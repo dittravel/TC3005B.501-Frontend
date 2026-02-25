@@ -1,56 +1,65 @@
+/**
+ * RejectReceiptsModal Component
+ * 
+ * Displays a modal for rejecting a receipt. When confirmed, sends a PUT request
+ * to mark the receipt as rejected and reloads the page to reflect the changes.
+ */
+
 import { useCallback } from "react";
 import { apiRequest } from "@utils/apiClient";
 import ModalWrapper from "@components/ModalWrapper";
 
 interface Props {
-  receipt_id: number;
+  receiptId: number;
   title: string;
   message: string;
   redirection: string;
-  modal_type: "success" | "warning";
+  modalType: "success" | "warning";
   variant?: "primary" | "secondary"| "filled";
   children: React.ReactNode;
   disabled?: boolean;
   token: string;
 }
 
-export default function RejectReceipStatus({
-  receipt_id,
+export default function RejectReceiptStatus({
+  receiptId,
   title,
   message,
   redirection,
-  modal_type,
+  modalType,
   variant,
   children,
   disabled = false,
   token,
 }: Props) {
+  /**
+   * Handles the confirmation action for rejecting a receipt.
+   * Sends a PUT request to set approval status to 0 (rejected) and reloads the page.
+   * @returns {Promise<void>}
+   */
   const handleConfirm = useCallback(async () => {
     try {
-        const url = `/accounts-payable/validate-receipt/${receipt_id}`;
+      const url = `/accounts-payable/validate-receipt/${receiptId}`;
       await apiRequest(url, { 
         method: "PUT", 
-        data: {"approval": 0},
+        data: { "approval": 0 },
         headers: { Authorization: `Bearer ${token}` }
       });
-      alert(`Rechazado correctamente`)
+      alert(`Rechazado correctamente`);
 
-      if (redirection) {
-        window.location.reload();
-      } else {
-        window.location.reload();
-      }
+      // Reload page to reflect receipt rejection
+      window.location.reload();
     } catch (error) {
       console.error("Error en la solicitud:", error);
     }
-  }, [receipt_id, redirection]);
+  }, [receiptId, redirection]);
 
   return (
     <ModalWrapper
       title={title}
       message={message}
-      button_type={modal_type}
-      modal_type={modal_type}
+      buttonType={modalType}
+      modalType={modalType}
       onConfirm={handleConfirm}
       variant={variant}
       disabled={disabled}

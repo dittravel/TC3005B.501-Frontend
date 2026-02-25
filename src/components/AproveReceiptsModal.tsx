@@ -3,23 +3,23 @@ import { apiRequest } from "@utils/apiClient";
 import ModalWrapper from "@components/ModalWrapper";
 
 interface Props {
-  receipt_id: number;
+  receiptId: number;
   title: string;
   message: string;
   redirection: string;
-  modal_type: "success" | "warning";
+  modalType: "success" | "warning";
   variant?: "primary" | "secondary"| "filled";
   children: React.ReactNode;
   disabled?: boolean;
   token: string;
 }
 
-export default function AproveReceipStatus({
-  receipt_id,
+export default function ApproveReceiptStatus({
+  receiptId,
   title,
   message,
   redirection,
-  modal_type,
+  modalType,
   variant,
   children,
   disabled = false,
@@ -27,7 +27,7 @@ export default function AproveReceipStatus({
 }: Props) {
   const handleConfirm = useCallback(async () => {
     try {
-        const url = `/accounts-payable/validate-receipt/${receipt_id}`;
+        const url = `/accounts-payable/validate-receipt/${receiptId}`;
       await apiRequest(url, { 
         method: "PUT", 
         data: {"approval": 1},
@@ -43,14 +43,14 @@ export default function AproveReceipStatus({
     } catch (error) {
       console.error("Error en la solicitud:", error);
     }
-  }, [receipt_id, redirection]);
+  }, [receiptId, redirection]);
 
   return (
     <ModalWrapper
       title={title}
       message={message}
-      button_type={modal_type}
-      modal_type={modal_type}
+      buttonType={modalType}
+      modalType={modalType}
       onConfirm={handleConfirm}
       variant={variant}
       disabled={disabled}

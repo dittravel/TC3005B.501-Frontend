@@ -1,3 +1,11 @@
+/**
+ * TravelRequestForm Component
+ * 
+ * Comprehensive travel request form that supports creating, editing, and saving draft requests.
+ * Manages multiple routes with detailed validation for dates, times, and required fields.
+ * Includes automatic save to draft functionality and role-based navigation.
+ */
+
 import { useState, useEffect } from 'react';
 import { apiRequest } from '@utils/apiClient';
 import type { TravelRoute } from '@/types/TravelRoute';
@@ -9,35 +17,35 @@ import Toast from '@/components/Toast';
 interface Props {
   data?: FormData;
   mode: 'create' | 'edit' | 'draft';
-  request_id?: string;
-  user_id: string;
+  requestId?: string;
+  userId: string;
   role?: string;
   token: string;
 }
 
 const emptyRoute: TravelRoute = {
-  router_index: 0,
-  origin_country_name: '',
-  origin_city_name: '',
-  destination_country_name: '',
-  destination_city_name: '',
-  beginning_date: '',
-  beginning_time: '',
-  ending_date: '',
-  ending_time: '',
-  plane_needed: false,
-  hotel_needed: false
+  routeIndex: 0,
+  originCountryName: '',
+  originCityName: '',
+  destinationCountryName: '',
+  destinationCityName: '',
+  beginningDate: '',
+  beginningTime: '',
+  endingDate: '',
+  endingTime: '',
+  planeNeeded: false,
+  hotelNeeded: false
 };
 
 const initialFormState: FormData = {
   ...emptyRoute,
   notes: '',
-  requested_fee: '',
-  imposed_fee: 0,
-  routes: [{ ...emptyRoute, router_index: 0 }],
+  requestedFee: '',
+  imposedFee: 0,
+  routes: [{ ...emptyRoute, routeIndex: 0 }],
 };
 
-export default function TravelRequestForm({ data, mode, request_id, user_id, role, token }: Props) {
+export default function TravelRequestForm({ data, mode, requestId, userId, role, token }: Props) {
   const [deptData, setDeptData] = useState<DepartmentData | null>(null);
   const [formData, setFormData] = useState<FormData>(initialFormState);
   const [error, setError] = useState<string | null>(null);
@@ -45,14 +53,18 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const inputStyle = 'border border-gray-300 p-2 rounded w-full bg-white';
+
+  /**
+   * Transforms and loads initial form data when component receives data prop.
+   */
   useEffect(() => {
     if (data) {
       const transformedRoutes = data.routes.map(route => ({
         ...route,
-        origin_country_name: route.origin_country,
-        origin_city_name: route.origin_city,
-        destination_country_name: route.destination_country,
-        destination_city_name: route.destination_city,
+        originCountryName: route.originCountryName,
+        originCityName: route.originCityName,
+        destinationCountryName: route.destinationCountryName,
+        destinationCityName: route.destinationCityName,
       }));
       const newData = {
         ...data,
@@ -62,24 +74,34 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
     }
   }, [data]);
 
+  /**
+   * Fetches department information for the current user.
+   */
   useEffect(() => {
     async function fetchDepartmentInfo() {
       try {
-        const response = await apiRequest(`/applicant/get-cc/${user_id}`, {
+        const response = await apiRequest(`/applicant/get-cc/${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
         });
         setDeptData(response);
       } catch (err) {
-        console.error('Error fetching department info:', err);
+        // TODO: Implement proper error handling for department fetch failures
       }
     }
     fetchDepartmentInfo();
-  }, [user_id, token]);
+  }, [userId, token]);
 
+  /**
+   * Handles updates to individual route fields.
+   * @param {number} index - The route index to update
+   * @param {string} name - The field name to update
+   * @param {any} value - The new value for the field
+   * @returns {void}
+   */
   const handleRouteUpdate = (index: number, name: string, value: any) => {
-    setError(null)
+    setError(null);
     setFormData((prev) => {
       const updatedRoutes = prev.routes.map((route, i) => {
         if (i === index) {
@@ -94,8 +116,13 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
     });
   };
 
+  /**
+   * Handles changes to general form fields (notes, requested fee, etc.).
+   * @param {React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>} e - The change event
+   * @returns {void}
+   */
   const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setError(null)
+    setError(null);
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
     setFormData((prev) => ({
@@ -104,25 +131,42 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
     }));
   };
 
+  /**
+   * Adds a new empty route to the form.
+   * @returns {void}
+   */
   const addRoute = () => {
     setFormData((prev) => ({
       ...prev,
-      routes: [...prev.routes, { ...emptyRoute, router_index: prev.routes.length }]
+      routes: [...prev.routes, { ...emptyRoute, routeIndex: prev.routes.length }]
     }));
   };
 
+  /**
+   * Removes a route at the specified index and reindexes remaining routes.
+   * @param {number} indexToRemove - The route index to remove
+   * @returns {void}
+   */
   const removeRoute = (indexToRemove: number) => {
     setFormData((prev) => {
       const filteredRoutes = prev.routes.filter((_, i) => i !== indexToRemove);
       const reindexedRoutes = filteredRoutes.map((route, i) => ({
         ...route,
-        router_index: i,
+        routeIndex: i,
       }));
       return { ...prev, routes: reindexedRoutes };
     });
   };
 
-  // --- Date and Time Validation Logic ---
+  /**
+   * Validates all routes for date/time constraints and required fields.
+   * Checks that:
+   * - Dates are not empty and formatted correctly
+   * - Beginning date is not in the past
+   * - Ending date is not before beginning date
+   * - If same day, ending time must be after beginning time
+   * @returns {string | null} Error message if validation fails, null if successful
+   */
   const validateRoutes = (): string | null => {
     const today = new Date();
     // Set today to the start of the day (00:00:00) for accurate date-only comparison
@@ -130,64 +174,76 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
 
     for (const [idx, route] of formData.routes.entries()) {
       // Validate that date strings are not empty before creating Date objects
-      if (!route.beginning_date || !route.ending_date) {
+      if (!route.beginningDate || !route.endingDate) {
         return `Ruta #${idx + 1}: Las fechas de inicio y fin son obligatorias.`;
       }
 
-      const beginningDate = new Date(route.beginning_date);
-      const endingDate = new Date(route.ending_date);
+      const beginningDate = new Date(route.beginningDate);
+      const endingDate = new Date(route.endingDate);
 
       // Check if Date objects are valid (e.g., handles malformed date strings if not caught by input type="date")
       if (isNaN(beginningDate.getTime()) || isNaN(endingDate.getTime())) {
         return `Ruta #${idx + 1}: Formato de fecha inválido. Por favor, utiliza el formato MM/DD/YYYY.`;
       }
 
-      // 1. Check if beginning_date is in the past
+      // 1. Check if beginningDate is in the past
       // Compare normalized dates to ignore time component
       const beginningDateOnly = new Date(beginningDate.getFullYear(), beginningDate.getMonth(), beginningDate.getDate());
       if (beginningDateOnly < today) {
-        return `Ruta #${idx + 1}: La fecha de inicio (${route.beginning_date}) no puede ser una fecha pasada.`;
+        return `Ruta #${idx + 1}: La fecha de inicio (${route.beginningDate}) no puede ser una fecha pasada.`;
       }
 
-      // 2. Check if ending_date is before beginning_date
+      // 2. Check if endingDate is before beginningDate
       // Compare normalized dates for initial check
       const endingDateOnly = new Date(endingDate.getFullYear(), endingDate.getMonth(), endingDate.getDate());
       if (endingDateOnly < beginningDateOnly) {
-        return `Ruta #${idx + 1}: La fecha de fin (${route.ending_date}) debe ser igual o posterior a la fecha de inicio (${route.beginning_date}).`;
+        return `Ruta #${idx + 1}: La fecha de fin (${route.endingDate}) debe ser igual o posterior a la fecha de inicio (${route.beginningDate}).`;
       }
       
       // 3. If dates are the same, check times
       if (endingDateOnly.getTime() === beginningDateOnly.getTime()) {
-        if (!route.beginning_time || !route.ending_time) {
+        if (!route.beginningTime || !route.endingTime) {
           return `Ruta #${idx + 1}: Las horas de inicio y fin son obligatorias cuando las fechas son las mismas.`;
         }
 
         // Parse hours and minutes
-        const [bh, bm] = route.beginning_time.split(':').map(Number);
-        const [eh, em] = route.ending_time.split(':').map(Number);
+        const [bh, bm] = route.beginningTime.split(':').map(Number);
+        const [eh, em] = route.endingTime.split(':').map(Number);
         
         const beginningMinutes = bh * 60 + bm;
         const endingMinutes = eh * 60 + em;
 
         if (endingMinutes <= beginningMinutes) { // Use <= to enforce "posterior" (strictly after)
-          return `Ruta #${idx + 1}: La hora de fin (${route.ending_time}) debe ser posterior a la hora de inicio (${route.beginning_time}) cuando las fechas son las mismas.`;
+          return `Ruta #${idx + 1}: La hora de fin (${route.endingTime}) debe ser posterior a la hora de inicio (${route.beginningTime}) cuando las fechas son las mismas.`;
         }
       }
     }
     return null; // No errors found
   };
-  // --- End Date and Time Validation Logic ---
 
+  /**
+   * Sets a toast notification that automatically hides after the specified duration.
+   * Disables the submit button during the notification display.
+   * @param {string} message - The toast message
+   * @param {'success' | 'error'} type - The toast type
+   * @param {number} duration - How long to display the toast (default: 2000ms)
+   * @returns {void}
+   */
   const handleSetToast = (message: string, type: 'success' | 'error', duration: number = 2000) => {
-    setDisabledButton(true)
+    setDisabledButton(true);
     setToast({ message, type });
-    //setTimeout(() => setError(null), duration);
     setTimeout(() => {
       setToast(null);
       setDisabledButton(false);
     }, duration);
   };
 
+  /**
+   * Handles submission of a new travel request.
+   * Validates all required fields and route data before sending to API.
+   * @param {React.FormEvent} e - The form submission event
+   * @returns {Promise<void>}
+   */
   const handleSubmitRequest = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -200,15 +256,15 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
 
     const firstRoute = formData.routes[0];
     if (
-      !firstRoute.origin_country_name ||
-      !firstRoute.origin_city_name ||
-      !firstRoute.destination_country_name ||
-      !firstRoute.destination_city_name ||
-      !firstRoute.beginning_date ||
-      !firstRoute.beginning_time ||
-      !firstRoute.ending_date ||
-      !firstRoute.ending_time ||
-      !formData.requested_fee ||
+      !firstRoute.originCountryName ||
+      !firstRoute.originCityName ||
+      !firstRoute.destinationCountryName ||
+      !firstRoute.destinationCityName ||
+      !firstRoute.beginningDate ||
+      !firstRoute.beginningTime ||
+      !firstRoute.endingDate ||
+      !firstRoute.endingTime ||
+      !formData.requestedFee ||
       !formData.notes
     ) {
       setError('Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.');
@@ -219,27 +275,27 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
     setError(null);
 
     const dataToSend = {
-      router_index: firstRoute.router_index,
+      routeIndex: firstRoute.routeIndex,
       notes: formData.notes,
-      requested_fee: parseFloat(formData.requested_fee as string) || 0,
-      imposed_fee: 0,
-      origin_country_name: firstRoute.origin_country_name,
-      origin_city_name: firstRoute.origin_city_name,
-      destination_country_name: firstRoute.destination_country_name,
-      destination_city_name: firstRoute.destination_city_name,
-      beginning_date: firstRoute.beginning_date,
-      beginning_time: firstRoute.beginning_time,
-      ending_date: firstRoute.ending_date,
-      ending_time: firstRoute.ending_time,
-      plane_needed: firstRoute.plane_needed,
-      hotel_needed: firstRoute.hotel_needed,
+      requestedFee: parseFloat(formData.requestedFee as string) || 0,
+      imposedFee: 0,
+      originCountryName: firstRoute.originCountryName,
+      originCityName: firstRoute.originCityName,
+      destinationCountryName: firstRoute.destinationCountryName,
+      destinationCityName: firstRoute.destinationCityName,
+      beginningDate: firstRoute.beginningDate,
+      beginningTime: firstRoute.beginningTime,
+      endingDate: firstRoute.endingDate,
+      endingTime: firstRoute.endingTime,
+      planeNeeded: firstRoute.planeNeeded,
+      hotelNeeded: firstRoute.hotelNeeded,
       additionalRoutes: formData.routes.slice(1).map((route, idx) => ({
-      ...route,
-      router_index: idx + 1
+        ...route,
+        routeIndex: idx + 1
       })),
     };
     try {
-      await apiRequest(`/applicant/create-travel-request/${user_id}`, {
+      await apiRequest(`/applicant/create-travel-request/${userId}`, {
         method: 'POST',
         data: dataToSend,
         headers: {
@@ -254,12 +310,18 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
         window.location.href = '/solicitudes-autorizador';
       }
     } catch (error) {
-      console.error('Error al enviar la solicitud:', error);
+      // TODO: Implement proper error handling to extract specific error messages from API
       setError('Hubo un error al enviar la solicitud.');
       setToast({ message: 'Hubo un error al enviar la solicitud.', type: 'error' });
     }
   };
 
+  /**
+   * Saves the form data as a draft without full validation.
+   * Allows partial completion and provides warning for invalid dates.
+   * @param {React.FormEvent} e - The form submission event
+   * @returns {Promise<void>}
+   */
   const handleSaveDraft = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -271,38 +333,38 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
     const firstRoute = formData.routes[0] || {};
     const draftData: Record<string, any> = {};
 
-    if (firstRoute.router_index !== undefined) draftData.router_index = firstRoute.router_index;
+    if (firstRoute.routeIndex !== undefined) draftData.routeIndex = firstRoute.routeIndex;
     if (formData.notes) draftData.notes = formData.notes;
-    if (formData.requested_fee) draftData.requested_fee = parseFloat(formData.requested_fee as string) || 0;
-    draftData.imposed_fee = 0; // Always send imposed_fee as 0
+    if (formData.requestedFee) draftData.requestedFee = parseFloat(formData.requestedFee as string) || 0;
+    draftData.imposedFee = 0; // Always send imposedFee as 0
 
-    if (firstRoute.origin_country_name) draftData.origin_country_name = firstRoute.origin_country_name;
-    if (firstRoute.origin_city_name) draftData.origin_city_name = firstRoute.origin_city_name;
-    if (firstRoute.destination_country_name) draftData.destination_country_name = firstRoute.destination_country_name;
-    if (firstRoute.destination_city_name) draftData.destination_city_name = firstRoute.destination_city_name;
-    if (firstRoute.beginning_date) draftData.beginning_date = firstRoute.beginning_date;
-    if (firstRoute.beginning_time) draftData.beginning_time = firstRoute.beginning_time;
-    if (firstRoute.ending_date) draftData.ending_date = firstRoute.ending_date;
-    if (firstRoute.ending_time) draftData.ending_time = firstRoute.ending_time;
-    if (firstRoute.plane_needed) draftData.plane_needed = firstRoute.plane_needed;
-    if (firstRoute.hotel_needed) draftData.hotel_needed = firstRoute.hotel_needed;
+    if (firstRoute.originCountryName) draftData.originCountryName = firstRoute.originCountryName;
+    if (firstRoute.originCityName) draftData.originCityName = firstRoute.originCityName;
+    if (firstRoute.destinationCountryName) draftData.destinationCountryName = firstRoute.destinationCountryName;
+    if (firstRoute.destinationCityName) draftData.destinationCityName = firstRoute.destinationCityName;
+    if (firstRoute.beginningDate) draftData.beginningDate = firstRoute.beginningDate;
+    if (firstRoute.beginningTime) draftData.beginningTime = firstRoute.beginningTime;
+    if (firstRoute.endingDate) draftData.endingDate = firstRoute.endingDate;
+    if (firstRoute.endingTime) draftData.endingTime = firstRoute.endingTime;
+    if (firstRoute.planeNeeded) draftData.planeNeeded = firstRoute.planeNeeded;
+    if (firstRoute.hotelNeeded) draftData.hotelNeeded = firstRoute.hotelNeeded;
 
     const additionalRoutes = formData.routes.slice(1)
       .map((route, idx) => ({
-      ...route,
-      router_index: idx + 1
+        ...route,
+        routeIndex: idx + 1
       }))
       .filter(route =>
-      route.origin_country_name ||
-      route.origin_city_name ||
-      route.destination_country_name ||
-      route.destination_city_name ||
-      route.beginning_date ||
-      route.beginning_time ||
-      route.ending_date ||
-      route.ending_time ||
-      route.plane_needed ||
-      route.hotel_needed
+        route.originCountryName ||
+        route.originCityName ||
+        route.destinationCountryName ||
+        route.destinationCityName ||
+        route.beginningDate ||
+        route.beginningTime ||
+        route.endingDate ||
+        route.endingTime ||
+        route.planeNeeded ||
+        route.hotelNeeded
       );
 
     if (additionalRoutes.length > 0) {
@@ -312,7 +374,7 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
     }
 
     try {
-      await apiRequest(`/applicant/create-draft-travel-request/${user_id}`, {
+      await apiRequest(`/applicant/create-draft-travel-request/${userId}`, {
         method: 'POST',
         data: draftData,
         headers: {
@@ -323,12 +385,20 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
       await new Promise(resolve => setTimeout(resolve, 2000));
       window.location.href = '/solicitudes-draft';
     } catch (err) {
-      console.error('Error al guardar borrador:', err);
+      // TODO: Implement proper error handling to extract specific error messages from API
       setError('Hubo un error al guardar el borrador.');
       handleSetToast('Hubo un error al guardar el borrador. Por favor, inténtalo de nuevo.', 'error');
     }
   };
 
+  /**
+   * Handles editing of an existing request or draft.
+   * Supports both full validation mode (for submission) and partial validation mode (for drafts).
+   * @param {React.FormEvent} e - The form submission event
+   * @param {boolean} completeForm - Whether to enforce full validation
+   * @param {string} href_route - The redirect URL after successful edit
+   * @returns {Promise<boolean>} True if edit was successful, false otherwise
+   */
   const handleEditRequest = async (
     e: React.FormEvent,
     completeForm: boolean,
@@ -346,15 +416,15 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
 
       const firstRoute = formData.routes[0];
       const missingFields = [
-        firstRoute.origin_country_name,
-        firstRoute.origin_city_name,
-        firstRoute.destination_country_name,
-        firstRoute.destination_city_name,
-        firstRoute.beginning_date,
-        firstRoute.beginning_time,
-        firstRoute.ending_date,
-        firstRoute.ending_time,
-        formData.requested_fee,
+        firstRoute.originCountryName,
+        firstRoute.originCityName,
+        firstRoute.destinationCountryName,
+        firstRoute.destinationCityName,
+        firstRoute.beginningDate,
+        firstRoute.beginningTime,
+        firstRoute.endingDate,
+        firstRoute.endingTime,
+        formData.requestedFee,
         formData.notes,
       ].some(field => !field);
 
@@ -376,43 +446,43 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
     const firstRoute = formData.routes[0];
 
     const includeIfExists = (key: string, value: any) => {
-      if (value !== undefined && value !== '' && value !== null) { // Add null check for robustness
+      if (value !== undefined && value !== '' && value !== null) {
         editedData[key] = value;
       }
     };
 
-    includeIfExists('router_index', firstRoute.router_index);
+    includeIfExists('routeIndex', firstRoute.routeIndex);
     editedData.notes = typeof formData.notes === 'string' ? formData.notes.trim() : '';
-    includeIfExists('requested_fee', parseFloat(formData.requested_fee as string));
-    editedData.imposed_fee = 0;
-    includeIfExists('origin_country_name', firstRoute.origin_country_name);
-    includeIfExists('origin_city_name', firstRoute.origin_city_name);
-    includeIfExists('destination_country_name', firstRoute.destination_country_name);
-    includeIfExists('destination_city_name', firstRoute.destination_city_name);
-    includeIfExists('beginning_date', firstRoute.beginning_date);
-    includeIfExists('beginning_time', firstRoute.beginning_time);
-    includeIfExists('ending_date', firstRoute.ending_date);
-    includeIfExists('ending_time', firstRoute.ending_time);
-    editedData.plane_needed = firstRoute.plane_needed;
-    editedData.hotel_needed = firstRoute.hotel_needed;
+    includeIfExists('requestedFee', parseFloat(formData.requestedFee as string));
+    editedData.imposedFee = 0;
+    includeIfExists('originCountryName', firstRoute.originCountryName);
+    includeIfExists('originCityName', firstRoute.originCityName);
+    includeIfExists('destinationCountryName', firstRoute.destinationCountryName);
+    includeIfExists('destinationCityName', firstRoute.destinationCityName);
+    includeIfExists('beginningDate', firstRoute.beginningDate);
+    includeIfExists('beginningTime', firstRoute.beginningTime);
+    includeIfExists('endingDate', firstRoute.endingDate);
+    includeIfExists('endingTime', firstRoute.endingTime);
+    editedData.planeNeeded = firstRoute.planeNeeded;
+    editedData.hotelNeeded = firstRoute.hotelNeeded;
 
     const additionalRoutes = formData.routes
       .slice(1)
       .map((route, idx) => ({
         ...route,
-        router_index: idx + 1,
+        routeIndex: idx + 1,
       }))
       .filter(route =>
-        route.origin_country_name ||
-        route.origin_city_name ||
-        route.destination_country_name ||
-        route.destination_city_name ||
-        route.beginning_date ||
-        route.beginning_time ||
-        route.ending_date ||
-        route.ending_time ||
-        route.plane_needed ||
-        route.hotel_needed
+        route.originCountryName ||
+        route.originCityName ||
+        route.destinationCountryName ||
+        route.destinationCityName ||
+        route.beginningDate ||
+        route.beginningTime ||
+        route.endingDate ||
+        route.endingTime ||
+        route.planeNeeded ||
+        route.hotelNeeded
       );
 
     if (additionalRoutes.length > 0) {
@@ -422,7 +492,7 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
     }
 
     try {
-      await apiRequest(`/applicant/edit-travel-request/${request_id}`, {
+      await apiRequest(`/applicant/edit-travel-request/${requestId}`, {
         method: 'PUT',
         data: editedData,
         headers: {
@@ -436,14 +506,20 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
       }
       return true;
     } catch (err) {
-      console.error('Error al editar la solicitud:', err);
+      // TODO: Implement proper error handling to extract specific error messages from API
       setError('Hubo un error al editar la solicitud. Por favor, inténtalo de nuevo.');
       handleSetToast('Hubo un error al editar la solicitud. Por favor, inténtalo de nuevo.', 'error');
       return false;
     }
   };
 
-    const handleFinishDraft = async (e: React.FormEvent) => {
+  /**
+   * Completes a draft by finalizing it as a submitted request.
+   * Performs full validation before completing the draft.
+   * @param {React.FormEvent} e - The form submission event
+   * @returns {Promise<void>}
+   */
+  const handleFinishDraft = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const routeError = validateRoutes();
@@ -455,15 +531,15 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
 
     const firstRoute = formData.routes[0];
     if (
-      !firstRoute.origin_country_name ||
-      !firstRoute.origin_city_name ||
-      !firstRoute.destination_country_name ||
-      !firstRoute.destination_city_name ||
-      !firstRoute.beginning_date ||
-      !firstRoute.beginning_time ||
-      !firstRoute.ending_date ||
-      !firstRoute.ending_time ||
-      !formData.requested_fee ||
+      !firstRoute.originCountryName ||
+      !firstRoute.originCityName ||
+      !firstRoute.destinationCountryName ||
+      !firstRoute.destinationCityName ||
+      !firstRoute.beginningDate ||
+      !firstRoute.beginningTime ||
+      !firstRoute.endingDate ||
+      !firstRoute.endingTime ||
+      !formData.requestedFee ||
       !formData.notes
     ) {
       setError('Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.');
@@ -475,7 +551,7 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
     if (!editSuccess) return;
 
     try {
-      await apiRequest(`/applicant/confirm-draft-travel-request/${user_id}/${request_id}`, {
+      await apiRequest(`/applicant/confirm-draft-travel-request/${userId}/${requestId}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`
@@ -485,12 +561,16 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
       await new Promise(resolve => setTimeout(resolve, 2000));
       window.location.href = '/solicitudes-draft';
     } catch (err) {
-      console.error('Error al completar el borrador:', err);
+      // TODO: Implement proper error handling to extract specific error messages from API
       setError('Hubo un error al completar el borrador. Por favor, inténtalo de nuevo.');
       handleSetToast('Hubo un error al completar el borrador. Por favor, inténtalo de nuevo.', 'error');
     }
   };
 
+  /**
+   * Resets the form to its initial state and clears any error/toast messages.
+   * @returns {void}
+   */
   const handleResetForm = () => {
     setFormData(initialFormState);
     setError(null);
@@ -499,7 +579,7 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
 
   return (
     <form onSubmit={handleSubmitRequest} className="space-y-8">
-      {/* Nota de campos obligatorios */}
+      {/* Required Fields Notice */}
       <div className="flex items-center bg-gradient-to-r from-blue-50 to-blue-100 border-l-4 border-blue-500 p-4 rounded shadow-sm mb-4">
         <svg className="w-6 h-6 text-blue-500 mr-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="white" />
@@ -513,7 +593,7 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
       {/* Render all routes dynamically */}
       {formData.routes.map((route, index) => (
         <RouteInputGroup
-          key={route.router_index}
+          key={route.routeIndex}
           route={route}
           onChange={handleRouteUpdate}
           index={index}
@@ -540,7 +620,7 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
         <h3 className="text-lg font-semibold text-gray-700">Detalles Generales del Viaje</h3>
         <div>
           <label className="block text-sm font-medium mb-1">Anticipo Esperado (MXN)<span className="text-red-500"> *</span></label>
-          <input name="requested_fee" placeholder="Anticipo Esperado (MXN)" type="number" className={inputStyle} value={formData.requested_fee === 0 ? '' : formData.requested_fee} onChange={handleGeneralChange} required />
+          <input name="requestedFee" placeholder="Anticipo Esperado (MXN)" type="number" className={inputStyle} value={formData.requestedFee === 0 ? '' : formData.requestedFee} onChange={handleGeneralChange} required />
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">Observaciones / Comentarios<span className="text-red-500"> *</span></label>
@@ -572,7 +652,7 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
         </div>
       )}
 
-      {/* Mensaje de Error */}
+      {/* Error and Info Messages */}
       { error && (
         <div className="bg-red-200 text-red-800 p-4 rounded-md">
           <p className="text-sm">{error}</p>
@@ -594,6 +674,7 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
         </div>
       )}
 
+      {/* Form Action Buttons */}
       <div className="flex flex-col sm:flex-row justify-end gap-3">
         <button type="button" onClick={handleResetForm} className="disabled:bg-gray-400 disabled:cursor-not-allowed bg-red-500 text-white px-6 py-2 rounded-md shadow hover:bg-red-600 transition-colors"
           disabled={disabledButton}
