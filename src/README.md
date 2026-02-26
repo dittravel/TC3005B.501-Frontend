@@ -16,13 +16,17 @@ Contains reusable UI components – modular presentation elements like buttons, 
 
 Defines global constants and project configurations, such as default values and general settings.
 
+### `config/`
+
+Contains configuration files that define application-wide settings and access rules. This includes modal type definitions and styles (`modal.ts`), user role display labels (`role-labels.ts`), and route access control per role (`routeAccess.ts`).
+
+### `data/`
+
+Holds data files used across the application, like session and cookie management utilities (`cookies.ts`), API endpoint reference documentation (`data.md`), and sample user data for development and testing (`users.csv`).
+
 ### `layouts/`
 
 Includes layout templates used as the base structure for pages – for example, header, footer, and global navigation.
-
-### `lib/`
-
-Holds shared modules and helper functions that don't belong to a specific category. These are not generic utilities but are specific modules reused across multiple components.
 
 ### `pages/`
 
