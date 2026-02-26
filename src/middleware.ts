@@ -17,37 +17,35 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   const url = new URL(request.url);
   const pathname = url.pathname;
   
-  // 1. Permitir rutas públicas sin autenticación
+  // 1. Allow public routes without authentication
   if (matchPath(pathname, publicRoutes)) {
     return next();
   }
   
-  // 2. Obtener el rol desde las cookies
+  // 2. Get role from cookies
   const cookieHeader = request.headers.get('cookie') || '';
   const roleMatch = cookieHeader.match(/(?:^|;\s*)role=([^;]+)/);
   const role = roleMatch ? decodeURIComponent(roleMatch[1]) : '';
   const tokenMatch = cookieHeader.match(/(?:^|;\s*)token=([^;]+)/);
-  const isAuthenticated = !!tokenMatch || !!role; // Consider authenticated if role exists
+  const isAuthenticated = !!tokenMatch || !!role;
   const html = unauthorizedPage(pathname, isAuthenticated);
 
-  // 2.1 Si no hay rol, redirigir a la página de inicio de sesión
+  // 2.1 If no role is found, redirect to login page
   if (!role) {
     return Response.redirect(new URL('/login', request.url), 302);
   }
 
-  // 3. Validar si la ruta está registrada en el sistema
+  // 3. Check if the route is registered in the system
   const isKnownRoute = matchPath(pathname, allWhitelistedRoutes);
   if (!isKnownRoute) {
-    //return Response.redirect(new URL('/404', request.url), 302);
     return new Response(html, { status: 404, headers: { 'Content-Type': 'text/html' } });
   }
 
-  // 4. Validar si el rol tiene acceso a la ruta
+  // 4. Check if the role has access to the route
   const allowedRoutes = roleRoutes[role as keyof typeof roleRoutes] ?? [];
   const isAuthorized = matchPath(pathname, allowedRoutes);
 
   if (!isAuthorized) {
-    //return Response.redirect(new URL('/404', request.url), 302);
     return new Response(html, { status: 404, headers: { 'Content-Type': 'text/html' } });
   }
 
