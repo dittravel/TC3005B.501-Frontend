@@ -1,3 +1,10 @@
+/**
+ * AttendRequest Component
+ * 
+ * Allows accounts payable staff to assign a budget (imposed fee) to a travel request.
+ * Validates the fee amount and submits it via API, then redirects to dashboard on success.
+ */
+
 import { useState, useCallback } from "react";
 import { apiRequest } from "@utils/apiClient";
 import ModalWrapper from "@components/ModalWrapper";
@@ -8,19 +15,27 @@ interface Props {
   token: string;
 }
 
-export default function AssignBudget({ request_id, token }: Props) {
+export default function AttendRequest({ request_id, token }: Props) {
   const [imposedFee, setImposedFee] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
+  /**
+   * Handles the confirmation action for assigning a budget to a travel request.
+   * Validates the imposed fee amount, submits it to the accounts payable endpoint,
+   * and redirects to dashboard on success.
+   * @returns {Promise<void>}
+   */
   const handleConfirm = useCallback(async () => {
     const parsedFee = parseFloat(imposedFee);
 
+    // Validate that the imposed fee is a valid positive number
     if (!imposedFee || isNaN(parsedFee) || parsedFee <= 0) {
       setErrorMessage("Por favor ingrese un monto válido mayor a 0.");
       return;
     }
 
+    // Clear any previous error messages
     setErrorMessage("");
 
     try {
@@ -28,7 +43,7 @@ export default function AssignBudget({ request_id, token }: Props) {
       await apiRequest(url, {
         method: "PUT",
         data: {
-          imposed_fee: parsedFee,
+          imposedFee: parsedFee,
         },
         headers: { Authorization: `Bearer ${token}` }
       });

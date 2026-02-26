@@ -1,7 +1,10 @@
 /**
- * Description:
- * Button component for the application.
-*/
+ * Button Component
+ * 
+ * Reusable button component with configurable variants, sizes, and colors.
+ * Supports different button styles and automatically applies appropriate styling
+ * based on the provided props.
+ */
 
 import React from "react";
 
@@ -12,7 +15,16 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   customSizeClass?: string;
 }
 
-
+/**
+ * Generates CSS classes for the button based on variant, size, and color props.
+ * Maps size and color options to their corresponding Tailwind CSS classes.
+ * @param {Object} options - Configuration object
+ * @param {string} options.variant - Button variant style
+ * @param {string} options.size - Button size
+ * @param {string} options.color - Button color scheme
+ * @param {string} options.customSizeClass - Custom size classes for 'custom' size option
+ * @returns {string} Combined Tailwind CSS class string
+ */
 const getClasses = ({
   variant,
   size,
@@ -35,7 +47,11 @@ const getClasses = ({
   return `${base} ${sizeMap[size]} ${colorMap[color]}`;
 };
 
-
+/**
+ * Button Component
+ * @param {ButtonProps} props - Button properties including variant, size, color, and HTML button attributes
+ * @returns {JSX.Element} Rendered button element with applied styles
+ */
 export default function Button({
   children,
   customSizeClass = "",

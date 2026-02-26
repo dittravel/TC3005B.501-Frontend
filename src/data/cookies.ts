@@ -3,7 +3,7 @@
 // const mockCookies = {
 //     username: "John Doe",
 //     id: "1",
-//     department_id: "1",
+//     departmentId: "1",
 //     role: "Applicant" as UserRole //'Applicant' | 'Authorizer' | 'Admin' | 'AccountsPayable' | 'TravelAgency';
 // };
 

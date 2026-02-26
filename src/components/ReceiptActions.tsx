@@ -1,7 +1,15 @@
+/**
+ * ReceiptActions Component
+ * 
+ * Provides action buttons for approving or rejecting travel receipts.
+ * Manages the state for displaying confirmation modals and handles API requests
+ * to update receipt approval status.
+ */
+
 import React, { useState } from "react";
 import Modal from "@components/Modal";
-import AproveReceipStatus from "@components/AproveReceiptsModal";
-import RejectReceipStatus from "@components/RejectReceiptsModal";
+import ApproveReceiptStatus from "@components/AproveReceiptsModal";
+import RejectReceiptStatus from "@components/RejectReceiptsModal";
 
 interface ReceiptProps {
   receipt_id: number;
@@ -22,12 +30,23 @@ export default function ReceiptActions({
   const [action, setAction] = useState<"approve" | "reject" | null>(null);
   const [loading, setLoading] = useState(false);
 
+  /**
+   * Opens the confirmation modal for the specified action type.
+   * @param {string} type - The action type: "approve" or "reject"
+   * @returns {void}
+   */
   const handleClick = (type: "approve" | "reject") => {
     setAction(type);
     setShowModal(true);
   };
 
+  /**
+   * Handles the confirmation of receipt approval or rejection.
+   * Sends a PUT request to update the receipt status and calls the appropriate callback.
+   * @returns {Promise<void>}
+   */
   const confirmAction = async () => {
+    // Convert action to approval value: 1 for approve, 0 for reject
     const approval = action === "approve" ? 1 : 0;
 
     try {
@@ -46,6 +65,7 @@ export default function ReceiptActions({
 
       const data = await res.json();
 
+      // Execute appropriate callback based on action result
       if (res.ok) {
         approval === 1 ? onApprove(receipt_id) : onReject(receipt_id);
       } else {
@@ -62,7 +82,8 @@ export default function ReceiptActions({
 
   return (
     <div className="flex flex-row gap-2 items-center justify-center w-full">
-      <AproveReceipStatus
+      {/* Approve Receipt Button */}
+      <ApproveReceiptStatus
         receipt_id={receipt_id}
         title="Aprobar comprobante"
         message="¿Está seguro de que deseas aprobar este comprobante?"
@@ -73,9 +94,10 @@ export default function ReceiptActions({
         token={token}
       >
         Aprobar
-      </AproveReceipStatus>
+      </ApproveReceiptStatus>
 
-      <RejectReceipStatus
+      {/* Reject Receipt Button */}
+      <RejectReceiptStatus
         receipt_id={receipt_id}
         title="Rechazar comprobante"
         message="¿Está seguro de que deseas rechazar este comprobante?"
@@ -86,8 +108,9 @@ export default function ReceiptActions({
         token={token}
       >
         Rechazar
-      </RejectReceipStatus>
+      </RejectReceiptStatus>
 
+      {/* Confirmation Modal */}
       <Modal
         title="¿Estás seguro?"
         message={`¿Seguro que deseas ${action === "approve" ? "aprobar" : "rechazar"} este comprobante?`}

@@ -1,5 +1,5 @@
 ---
-import ExpensesFormClient from "@components/ExpensesForm.tsx"; // Ajusta la ruta si cambia
+import ExpensesForm from "@components/ExpensesForm.tsx"; // Ajusta la ruta si cambia
 import { getCookie } from "@data/cookies";
 import { apiRequest } from "@utils/apiClient";
 
@@ -29,7 +29,7 @@ const travelData = await (async () => {
     <strong>Fechas:</strong> {travelData.routes[0].beginning_date} - {travelData.routes[0].ending_date}
   </p>
 
-  <ExpensesFormClient
+  <ExpensesForm
     client:only="react"
     requestId={travelData.request_id}
     token={getCookie("token", Astro.cookies)}

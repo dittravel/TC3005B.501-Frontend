@@ -13,7 +13,7 @@ interface Props {
   token: string;
 }
 
-export default function ValidateReceiptStatus({
+export default function AproveRequestModal({
   receipt_id,
   title,
   message,
@@ -23,12 +23,19 @@ export default function ValidateReceiptStatus({
   children,
   token
 }: Props) {
+
+  /**
+   * Handles confirmation action for approving a receipt.
+   * Sends API request and redirects or reloads page on success.
+   */
   const handleConfirm = useCallback(async () => {
     try {
-      const url = `/accounts-payable/validate-receipt/${receipt_id}`;
-      await apiRequest(url, { method: "PUT", data: {"approval": 1}, headers: { Authorization: `Bearer ${token}` }});
-      alert(`Comprobante enviado exitosamente.`)
+      // API call to validate receipt
+      const url = `/api/accounts-payable/validate-receipt/${receipt_id}`;
+      await apiRequest(url, { method: "PUT", data: { approval: 1 }, headers: { Authorization: `Bearer ${token}` } });
+      alert(`Comprobante enviado exitosamente.`);
 
+      // Redirect or reload after success
       if (redirection) {
         window.location.href = redirection;
       } else {

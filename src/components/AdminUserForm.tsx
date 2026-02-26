@@ -1,14 +1,9 @@
-/**
- * Author: Michael devlyn 
- * 
- * Description: React component for creating new users in the admin panel.
- */
-
 import React, { useState, useEffect } from 'react';
 import Button from '@components/Button';
 import { apiRequest } from '@utils/apiClient';
 import Toast from '@components/Toast';
 
+// Internal form data structure (not exported)
 interface FormData {
   role_id: number | '';
   department_id: number | '';
@@ -25,9 +20,9 @@ interface FormErrors {
 
 interface CreateUserFormProps {
   mode: 'create' | 'edit';
-  user_data?: any; // User data for editing, if applicable
+  user_data?: any; 
   redirectTo?: string;
-  token: string; // Authorization token for API requests
+  token: string; 
 }
 
 const roles = [
@@ -65,12 +60,13 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
+    // Pre-fill form for edit mode, otherwise reset
     if (mode === 'edit' && user_data) {
       setFormData({
         role_id: roles.find(role => role.name === user_data.role_name)?.id,
         department_id: departments.find(dep => dep.name === user_data.department_name)?.id,
         user_name: user_data.user_name,
-        password: '', // Password should not be pre-filled
+        password: '', 
         workstation: user_data.workstation,
         email: user_data.email,
         phone_number: user_data.phone_number || ''
@@ -82,6 +78,10 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
 
   
 
+  /**
+   * Validates the form fields and sets error messages.
+   * @returns {boolean} True if form is valid, false otherwise
+   */
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
@@ -122,23 +122,30 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
     return Object.keys(newErrors).length === 0;
   };
 
+  /**
+   * Handles input changes and updates form state.
+   * @param {React.ChangeEvent<HTMLInputElement | HTMLSelectElement>} e - Input event
+   */
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'role_id' || name === 'department_id' ? 
+      [name]: name === 'role_id' || name === 'department_id' ?
         (value === '' ? '' : parseInt(value)) : value
     }));
 
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
+  /**
+   * Handles form submission, sends API request, and manages response/errors.
+   * @param {React.FormEvent} e - Form event
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       setToast({ message: 'Por favor corrige los errores en el formulario', type: 'error' });
       return;
@@ -146,17 +153,18 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
 
     setIsSubmitting(true);
     setToast(null);
-    
+
     try {
+      // Prepare payload for API
       const payload = mode === 'edit'
         ? { ...formData, ...(formData.password ? {} : { password: undefined }) }
         : formData;
 
       const endpoint = mode === 'edit'
-        ? `/admin/update-user/${user_data.user_id}`
+        ? `/admin/update-user/${user_data.userId}`
         : '/admin/create-user';
 
-      console.log('Submitting form data:', payload);
+      // API request
       const response = await apiRequest(endpoint, {
         method: mode === 'edit' ? 'PUT' : 'POST',
         data: payload,
@@ -165,7 +173,6 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
         }
       });
 
-      console.log(`${mode === 'edit' ? 'Edit' : 'Create'} response:`, response);
       setToast({ message: `Usuario ${mode === 'edit' ? 'actualizado' : 'creado'} exitosamente`, type: 'success' });
       if (mode === 'create') {
         setFormData(initialFormData);
@@ -174,9 +181,9 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
       if (redirectTo) {
         window.location.href = redirectTo;
       }
-      
+
     } catch (error: any) {
-      console.error(`${mode === 'edit' ? 'Update' : 'Create'} error:`, error);
+      // Handle backend validation errors
       if (error.message.includes('errors')) {
         try {
           const errorData = JSON.parse(error.message.split(': ')[1]);
@@ -199,6 +206,9 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
     }
   };
 
+  /**
+   * Handles form reset or cancel action.
+   */
   const handleReset = () => {
     if (mode === 'edit') {
       if (redirectTo) {
@@ -211,6 +221,11 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
     }
   };
 
+  /**
+   * Returns input class string based on error state.
+   * @param {string} fieldName - Field name
+   * @returns {string} CSS class string
+   */
   const inputClass = (fieldName: string) =>
     `w-full border rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500 ${
       errors[fieldName] ? 'border-red-500' : 'border-gray-300'

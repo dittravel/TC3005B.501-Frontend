@@ -1,7 +1,10 @@
 /**
- * Author: Eduardo Porto Morales & Hector Julian Zarate Ramirez
+ * History Component
  * 
- * Description: This component uses React to render client side de useState to manage pagination.
+ * Displays a paginated list of travel requests with their status, origin, destination,
+ * and travel dates. Each request is clickable and links to the detailed view.
+ * Manages pagination client-side using React hooks.
+ * 
  */
 
 import { useState } from "react";
@@ -19,6 +22,11 @@ export default function History({ data , itemsPerPage = 5 }: Props) {
   const end = start + itemsPerPage;
   const pageRequests = data.slice(start, end);
 
+  /**
+   * Returns CSS classes for styling the status badge based on the request status.
+   * @param {string} status - The current status of the request
+   * @returns {string} Tailwind CSS classes for the status badge styling
+   */
   const getStatusStyle = (status: string) => {
     switch (status) {
       case "Aprobado":
@@ -32,46 +40,46 @@ export default function History({ data , itemsPerPage = 5 }: Props) {
 
   return (
     <div>
-			<div className="bg-white p-6 rounded-lg shadow w-full">
+      <div className="bg-white p-6 rounded-lg shadow w-full">
         {data.length > 0 ? (
           <div>
             {pageRequests.map((request: any) => (
-                <div className="flex justify-center mb-6">
+              <div className="flex justify-center mb-6">
                 <a
                   key={request.request_id}
                   href={`/detalles-solicitud/${request.request_id}`}
                   className="flex flex-col md:flex-row items-center justify-between w-full max-w-5xl bg-gray-50 rounded-lg shadow-md p-6 transition hover:shadow-lg hover:bg-gray-100"
                 >
                   <div className="flex flex-col items-center md:items-start gap-2 w-full md:w-auto">
-                  <h2 className="text-xl font-bold text-gray-800 mb-1 text-center md:text-left">
-                    #{request.request_id}
-                  </h2>
-                  <div className="grid grid-cols-2 gap-24 w-full">
-                    <div>
-                    <p className="text-sm text-gray-600">
-                      <span className="font-semibold">Origen:</span> {request.origin_country}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      <span className="font-semibold">Destino:</span> {request.destination_country}
-                    </p>
+                    <h2 className="text-xl font-bold text-gray-800 mb-1 text-center md:text-left">
+                      #{request.request_id}
+                    </h2>
+                    <div className="grid grid-cols-2 gap-24 w-full">
+                      <div>
+                        <p className="text-sm text-gray-600">
+                          <span className="font-semibold">Origen:</span> {request.origin_country}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          <span className="font-semibold">Destino:</span> {request.destination_country}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">
+                          <span className="font-semibold">Fecha Inicio:</span> {request.beginning_date}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          <span className="font-semibold">Fecha Fin:</span> {request.ending_date}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                    <p className="text-sm text-gray-600">
-                      <span className="font-semibold">Fecha Inicio:</span> {request.beginning_date}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      <span className="font-semibold">Fecha Fin:</span> {request.ending_date}
-                    </p>
-                    </div>
-                  </div>
                   </div>
                   <div className="mt-4 md:mt-0 md:ml-8 flex-shrink-0 flex flex-col items-center">
-                  <span className={`text-xs font-semibold px-4 py-2 rounded-full shadow ${getStatusStyle(request.currentStatus)}`}>
-                    {(request.status || "DESCONOCIDO").toUpperCase()}
-                  </span>
+                    <span className={`text-xs font-semibold px-4 py-2 rounded-full shadow ${getStatusStyle(request.currentStatus)}`}>
+                      {(request.status || "DESCONOCIDO").toUpperCase()}
+                    </span>
                   </div>
                 </a>
-                </div>
+              </div>
             ))}
             <Pagination
               totalPages={totalPages}
@@ -85,7 +93,7 @@ export default function History({ data , itemsPerPage = 5 }: Props) {
             NO CUENTAS CON VIAJES COMPLETADOS, CANCELADOS O RECHAZADOS
           </div>
         )}
-			</div>
+      </div>
     </div>
   );
 }

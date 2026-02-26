@@ -1,3 +1,11 @@
+/**
+ * LogoutButton Component
+ * 
+ * Displays a logout button that opens a confirmation modal when clicked.
+ * Clicking confirm in the modal sends a logout request and redirects to the login page.
+ * Closes the confirmation modal when clicking outside of it.
+ */
+
 import { useState, useRef, useEffect } from "react";
 import { apiRequest } from "@utils/apiClient";
 
@@ -9,6 +17,11 @@ export default function LogoutButton({ children }: LogoutButtonProps) {
   const [showConfirm, setShowConfirm] = useState(false);
   const confirmRef = useRef<HTMLDivElement>(null);
 
+  /**
+   * Handles the logout action by sending a logout request to the API
+   * and redirecting the user to the login page.
+   * @returns {Promise<void>}
+   */
   const handleLogout = async () => {
     await apiRequest("/user/logout", {
       method: "GET",
@@ -16,6 +29,10 @@ export default function LogoutButton({ children }: LogoutButtonProps) {
     window.location.href = "/login";
   };
 
+  /**
+   * Sets up a click outside listener to close the confirmation modal
+   * when the user clicks outside of it.
+   */
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (confirmRef.current && !confirmRef.current.contains(event.target as Node)) {
@@ -29,6 +46,7 @@ export default function LogoutButton({ children }: LogoutButtonProps) {
 
   return (
     <div className="relative inline-block" ref={confirmRef}>
+      {/* Logout Button */}
       <button
         onClick={() => setShowConfirm(!showConfirm)}
         className="bg-primary-300 rounded-lg p-2.5 h-10 w-10 flex justify-center items-center cursor-pointer transition-colors duration-200 hover:bg-primary-50"
@@ -36,6 +54,7 @@ export default function LogoutButton({ children }: LogoutButtonProps) {
         {children}
       </button>
 
+      {/* Logout Confirmation Modal */}
       {showConfirm && (
         <div className="absolute top-full right-0 mt-2 w-56 bg-white shadow-xl rounded-lg p-4 z-100 border border-gray-200">
           <p className="text-gray-800 mb-4 text-sm">¿Estás seguro de que deseas cerrar sesión?</p>
