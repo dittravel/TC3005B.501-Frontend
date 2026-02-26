@@ -11,14 +11,14 @@ import Button from "@components/Button.tsx";
 import Modal from "@components/Modal";
 
 interface RequestProps {
-  requestId: string;
-  requestStatusId: string;
+  request_id: string;
+  request_status_id: string;
   onApprove: (id: number) => void;
   onReject: (id: number) => void;
 }
 
 export default function RequestActions({
-  requestId,
+  request_id,
   onApprove,
   onReject,
 }: RequestProps) {
@@ -41,8 +41,8 @@ export default function RequestActions({
    * @returns {void}
    */
   const confirmAction = () => {
-    if (action === "approve") onApprove(requestId);
-    if (action === "reject") onReject(requestId);
+    if (action === "approve") onApprove(request_id);
+    if (action === "reject") onReject(request_id);
     setShowModal(false);
     setAction(null);
   };

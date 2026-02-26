@@ -49,8 +49,8 @@ export default function LoginForm() {
       document.cookie = `token=${response.token}; path=/; secure; SameSite=Strict`;
       document.cookie = `role=${response.role}; path=/`;
       document.cookie = `username=${response.username}; path=/`;
-      document.cookie = `userId=${response.userId}; path=/`;
-      document.cookie = `departmentId=${response.departmentId}; path=/`;
+      document.cookie = `user_id=${response.user_id}; path=/`;
+      document.cookie = `department_id=${response.department_id}; path=/`;
       window.location.href = "/dashboard";
 
     } catch (error: any) {

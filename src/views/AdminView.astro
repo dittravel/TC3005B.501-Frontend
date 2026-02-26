@@ -15,7 +15,7 @@ import { getCookie } from "@data/cookies";
 
 // Define the User interface
 interface User {
-  userId: number;
+  user_id: number;
   user_name: string;
   email: string;
   role_name: string;
@@ -82,7 +82,7 @@ const userName = getCookie("username", Astro.cookies);
               <tbody class="divide-y divide-gray-200">
                 {users.map((user: User, index: number) => (
                   <tr class={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td class="px-4 py-4 text-sm text-gray-900">{user.userId}</td>
+                    <td class="px-4 py-4 text-sm text-gray-900">{user.user_id}</td>
                     <td class="px-4 py-4">
                       <div class="text-sm font-medium text-gray-900">{user.user_name}</div>
                     </td>
@@ -102,7 +102,7 @@ const userName = getCookie("username", Astro.cookies);
                     </td>
                     <td class="px-4 py-4 text-sm text-gray-900">{user.department_name || 'Admin'}</td>
                     <td class="px-4 py-4 text-center">
-											<a href={`/editar-usuario/${user.userId}`}>
+											<a href={`/editar-usuario/${user.user_id}`}>
 												<button class="text-blue-600 hover:text-blue-800 text-sm">
 													EDITAR
 												</button>
@@ -111,11 +111,11 @@ const userName = getCookie("username", Astro.cookies);
                     <td class="px-4 py-4">
 											<UltimateWrapper
 												client:only="react"
-												userId={user.userId}
+												user_id={user.user_id}
 												endpoint="/admin/delete-user"
 												title="Eliminar usuario"
 												message={`¿Estás seguro de que deseas eliminar al usuario ${user.user_name}? Esta acción no se puede deshacer.`}
-												modalType="warning"
+												modal_type="warning"
 												token={getCookie("token", Astro.cookies)}
 											>
 												BORRAR

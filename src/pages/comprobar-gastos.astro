@@ -15,7 +15,7 @@ import { apiRequest } from '@utils/apiClient';
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
 const userName = getCookie("username", Astro.cookies);
 const buttonLabel = roleLabels[role];
-const userId = getCookie("id", Astro.cookies);
+const user_id = getCookie("id", Astro.cookies);
 
 function getVerificationStats(request: any) {
   const verifications = Array.isArray(request.verifications) ? request.verifications : [];
@@ -29,7 +29,7 @@ function getVerificationStats(request: any) {
 // Obtener solicitudes
 const requestsRaw = await (async () => {
   try {
-    const requests = await apiRequest(`/applicant/get-user-requests/${userId}`, { cookies: Astro.cookies });
+    const requests = await apiRequest(`/applicant/get-user-requests/${user_id}`, { cookies: Astro.cookies });
     return Array.isArray(requests)
       ? requests.filter((request: any) => request.status === 'Comprobación gastos del viaje')
       : [];
@@ -42,10 +42,10 @@ const requestsRaw = await (async () => {
 const requests = await Promise.all(
   requestsRaw.map(async (request: any) => {
     try {
-      const { Expenses } = await apiRequest(`/accounts-payable/get-expense-validations/${request.}`, { cookies: Astro.cookies });
+      const { Expenses } = await apiRequest(`/accounts-payable/get-expense-validations/${request.request_id}`, { cookies: Astro.cookies });
       return { ...request, verifications: Expenses ?? [] };
     } catch (e) {
-      console.error(`Error al cargar verificaciones de ${request.}`, e);
+      console.error(`Error al cargar verificaciones de ${request.request_id}`, e);
       return { ...request, verifications: [] };
     }
   })
@@ -67,10 +67,10 @@ const requests = await Promise.all(
               const percent = (count: number) => total ? (count / total) * 100 : 0;
               return (
                 <div class="grid grid-cols-[1fr_auto] items-center rounded-lg">
-                  <a href={`/comprobar-solicitud/${request.}`} class="block w-full">
+                  <a href={`/comprobar-solicitud/${request.request_id}`} class="block w-full">
                     <div class="space-y-2 content-wrapper">
                       <div class="flex items-center justify-between">
-                        <p class="font-bold text-lg break-words">#{request.}</p>
+                        <p class="font-bold text-lg break-words">#{request.request_id}</p>
                         { total === 0 ? (
                           <span class="text-sm text-gray-500">
                           NO SE HAN ENVIADO COMPROBANTES
@@ -88,8 +88,8 @@ const requests = await Promise.all(
                       )}
 
                       <div class="text-sm text-gray-700 grid grid-cols-[1fr_2fr] gap-y-1">
-                        <p><span class="font-semibold">Lugar:</span> {request.destinationCountry}</p>
-                        <p><span class="font-semibold">Fechas:</span> {request.beginningDate} - {request.endingDate}</p>
+                        <p><span class="font-semibold">Lugar:</span> {request.destination_country}</p>
+                        <p><span class="font-semibold">Fechas:</span> {request.beginning_date} - {request.ending_date}</p>
                         <p>
                           <span class="font-semibold">Estado:</span> 
                           <span

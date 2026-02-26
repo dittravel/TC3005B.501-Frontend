@@ -11,25 +11,25 @@ import ModalWrapper from "@components/ModalWrapper";
 import Toast from "@components/Toast";
 
 interface Props {
-  requestId: number;
+  request_id: number;
   endpoint: string;
   role: number;
   title: string;
   message: string;
   redirection: string;
-  modalType: "success" | "warning";
+  modal_type: "success" | "warning";
   children: React.ReactNode;
   token: string;
 }
 
 export default function TravelRequestActionWrapper({
-  requestId,
+  request_id,
   endpoint,
   role,
   title,
   message,
   redirection,
-  modalType,
+  modal_type,
   children,
   token,
 }: Props) {
@@ -43,7 +43,7 @@ export default function TravelRequestActionWrapper({
    */
   const handleConfirm = useCallback(async () => {
     try {
-      const url = `${endpoint}/${requestId}/${role}`;
+      const url = `${endpoint}/${request_id}/${role}`;
       await apiRequest(url, { 
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` }
@@ -67,15 +67,15 @@ export default function TravelRequestActionWrapper({
     } catch (error) {
       console.error("Error en la solicitud:", error);
     }
-  }, [requestId, endpoint, redirection, role]);
+  }, [request_id, endpoint, redirection, role]);
 
   return (
     <>
       <ModalWrapper
         title={title}
         message={message}
-        buttonType={modalType}
-        modalType={modalType}
+        button_type={modal_type}
+        modal_type={modal_type}
         onConfirm={handleConfirm}
       >
         {children}

@@ -10,11 +10,11 @@ import { apiRequest } from "@utils/apiClient";
 import ModalWrapper from "@components/ModalWrapper";
 
 interface Props {
-  requestId: number;
+  request_id: number;
   title: string;
   message: string;
   redirection: string;
-  modalType: "success" | "warning";
+  modal_type: "success" | "warning";
   variant?: "primary" | "secondary";
   children: React.ReactNode;
   token: string;
@@ -22,22 +22,22 @@ interface Props {
 
 /**
  * ValidateReceiptStatus
- * @param {number} requestId - The ID of the travel request to validate receipts for
+ * @param {number} request_id - The ID of the travel request to validate receipts for
  * @param {string} title - Modal title
  * @param {string} message - Modal confirmation message
  * @param {string} redirection - URL to redirect to after successful validation
- * @param {string} modalType - Modal style type (success or warning)
+ * @param {string} modal_type - Modal style type (success or warning)
  * @param {string} [variant] - Button variant style (primary or secondary)
  * @param {React.ReactNode} children - Button label/content to display
  * @param {string} token - Bearer token for API authentication
  * @returns {React.ReactNode} Confirmation modal for receipt validation
  */
 export default function ValidateReceiptStatus({
-  requestId,
+  request_id,
   title,
   message,
   redirection,
-  modalType,
+  modal_type,
   variant,
   children,
   token,
@@ -50,7 +50,7 @@ export default function ValidateReceiptStatus({
   const handleConfirm = useCallback(async () => {
     try {
       // Call expense validation endpoint
-      const url = `/applicant/send-expense-validation/${requestId}`;
+      const url = `/applicant/send-expense-validation/${request_id}`;
       await apiRequest(url, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` }
@@ -66,14 +66,14 @@ export default function ValidateReceiptStatus({
     } catch (error) {
       console.error("Error en la solicitud:", error);
     }
-  }, [requestId, redirection]);
+  }, [request_id, redirection]);
 
   return (
     <ModalWrapper
       title={title}
       message={message}
-      buttonType={modalType}
-      modalType={modalType}
+      button_type={modal_type}
+      modal_type={modal_type}
       onConfirm={handleConfirm}
       variant={variant}
     >

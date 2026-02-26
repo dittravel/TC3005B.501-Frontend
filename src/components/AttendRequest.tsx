@@ -11,11 +11,11 @@ import ModalWrapper from "@components/ModalWrapper";
 import Toast from '@components/Toast';
 
 interface Props {
-  requestId: string;
+  request_id: string;
   token: string;
 }
 
-export default function AttendRequest({ requestId, token }: Props) {
+export default function AttendRequest({ request_id, token }: Props) {
   const [imposedFee, setImposedFee] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -39,7 +39,7 @@ export default function AttendRequest({ requestId, token }: Props) {
     setErrorMessage("");
 
     try {
-      const url = `/accounts-payable/attend-travel-request/${requestId}`;
+      const url = `/accounts-payable/attend-travel-request/${request_id}`;
       await apiRequest(url, {
         method: "PUT",
         data: {
@@ -54,7 +54,7 @@ export default function AttendRequest({ requestId, token }: Props) {
       console.error("Error al asignar presupuesto:", error);
       alert("Ocurrió un error al enviar la información.");
     }
-  }, [imposedFee, requestId]);
+  }, [imposedFee, request_id]);
 
   return (
     <div className="w-full p-6 bg-white rounded border border-gray-300">
@@ -89,8 +89,8 @@ export default function AttendRequest({ requestId, token }: Props) {
         <ModalWrapper
           title="¿Estás seguro de asignar este presupuesto?"
           message="Una vez asignado, la solicitud no podrá ser modificada."
-          buttonType="primary"
-          modalType="success"
+          button_type="primary"
+          modal_type="success"
           onConfirm={handleConfirm}
           variant="filled"
         >

@@ -11,11 +11,11 @@ import ModalWrapper from "@components/ModalWrapper";
 import Toast from "@components/Toast";
 
 interface Props {
-  userId: number;
+  user_id: number;
   endpoint: string;
   title: string;
   message: string;
-  modalType: "success" | "warning";
+  modal_type: "success" | "warning";
   children: React.ReactNode;
   token: string;
   redirectTo?: string;
@@ -23,22 +23,22 @@ interface Props {
 
 /**
  * UltimateWrapper
- * @param {number} userId - The ID of the user to perform the action on
- * @param {string} endpoint - The API endpoint for the action (without userId)
+ * @param {number} user_id - The ID of the user to perform the action on
+ * @param {string} endpoint - The API endpoint for the action (without user_id)
  * @param {string} title - Modal title
  * @param {string} message - Modal confirmation message
- * @param {string} modalType - Modal style type (success or warning)
+ * @param {string} modal_type - Modal style type (success or warning)
  * @param {React.ReactNode} children - Button label/content to display
  * @param {string} token - Bearer token for API authentication
  * @param {string} [redirectTo="/dashboard"] - URL to redirect to after success
  * @returns {React.ReactNode} Modal with toast notification system
  */
 export default function UltimateWrapper({
-  userId,
+  user_id,
   endpoint,
   title,
   message,
-  modalType,
+  modal_type,
   children,
   token,
   redirectTo = "/dashboard"
@@ -53,8 +53,8 @@ export default function UltimateWrapper({
    */
   const handleConfirm = useCallback(async () => {
     try {
-      // Construct the full endpoint URL with userId
-      const url = `${endpoint}/${userId}`;
+      // Construct the full endpoint URL with user_id
+      const url = `${endpoint}/${user_id}`;
       await apiRequest(url, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` }
@@ -65,7 +65,7 @@ export default function UltimateWrapper({
       await new Promise(resolve => setTimeout(resolve, 2000));
       window.location.href = redirectTo;
     } catch (error) {
-      // TODO: Implement proper error handling with specific error messages and toast display
+      console.error("Error en la solicitud:", error);
     }
   }, [endpoint]);
 
@@ -74,8 +74,8 @@ export default function UltimateWrapper({
       <ModalWrapper
         title={title}
         message={message}
-        buttonType={modalType}
-        modalType={modalType}
+        button_type={modal_type}
+        modal_type={modal_type}
         onConfirm={handleConfirm}
       >
         {children}

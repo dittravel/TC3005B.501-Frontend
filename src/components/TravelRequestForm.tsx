@@ -17,35 +17,35 @@ import Toast from '@/components/Toast';
 interface Props {
   data?: FormData;
   mode: 'create' | 'edit' | 'draft';
-  requestId?: string;
-  userId: string;
+  request_id?: string;
+  user_id: string;
   role?: string;
   token: string;
 }
 
 const emptyRoute: TravelRoute = {
-  routeIndex: 0,
-  originCountryName: '',
-  originCityName: '',
-  destinationCountryName: '',
-  destinationCityName: '',
-  beginningDate: '',
-  beginningTime: '',
-  endingDate: '',
-  endingTime: '',
-  planeNeeded: false,
-  hotelNeeded: false
+  router_index: 0,
+  origin_country_name: '',
+  origin_city_name: '',
+  destination_country_name: '',
+  destination_city_name: '',
+  beginning_date: '',
+  beginning_time: '',
+  ending_date: '',
+  ending_time: '',
+  plane_needed: false,
+  hotel_needed: false
 };
 
 const initialFormState: FormData = {
   ...emptyRoute,
   notes: '',
-  requestedFee: '',
-  imposedFee: 0,
-  routes: [{ ...emptyRoute, routeIndex: 0 }],
+  requested_fee: '',
+  imposed_fee: 0,
+  routes: [{ ...emptyRoute, router_index: 0 }],
 };
 
-export default function TravelRequestForm({ data, mode, requestId, userId, role, token }: Props) {
+export default function TravelRequestForm({ data, mode, request_id, user_id, role, token }: Props) {
   const [deptData, setDeptData] = useState<DepartmentData | null>(null);
   const [formData, setFormData] = useState<FormData>(initialFormState);
   const [error, setError] = useState<string | null>(null);
@@ -61,10 +61,10 @@ export default function TravelRequestForm({ data, mode, requestId, userId, role,
     if (data) {
       const transformedRoutes = data.routes.map(route => ({
         ...route,
-        originCountryName: route.originCountryName,
-        originCityName: route.originCityName,
-        destinationCountryName: route.destinationCountryName,
-        destinationCityName: route.destinationCityName,
+        origin_country_name: route.origin_country_name,
+        origin_city_name: route.origin_city_name,
+        destination_country_name: route.destination_country_name,
+        destination_city_name: route.destination_city_name,
       }));
       const newData = {
         ...data,
@@ -80,7 +80,7 @@ export default function TravelRequestForm({ data, mode, requestId, userId, role,
   useEffect(() => {
     async function fetchDepartmentInfo() {
       try {
-        const response = await apiRequest(`/applicant/get-cc/${userId}`, {
+        const response = await apiRequest(`/applicant/get-cc/${user_id}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -91,7 +91,7 @@ export default function TravelRequestForm({ data, mode, requestId, userId, role,
       }
     }
     fetchDepartmentInfo();
-  }, [userId, token]);
+  }, [user_id, token]);
 
   /**
    * Handles updates to individual route fields.
@@ -138,7 +138,7 @@ export default function TravelRequestForm({ data, mode, requestId, userId, role,
   const addRoute = () => {
     setFormData((prev) => ({
       ...prev,
-      routes: [...prev.routes, { ...emptyRoute, routeIndex: prev.routes.length }]
+      routes: [...prev.routes, { ...emptyRoute, router_index: prev.routes.length }]
     }));
   };
 
@@ -152,7 +152,7 @@ export default function TravelRequestForm({ data, mode, requestId, userId, role,
       const filteredRoutes = prev.routes.filter((_, i) => i !== indexToRemove);
       const reindexedRoutes = filteredRoutes.map((route, i) => ({
         ...route,
-        routeIndex: i,
+        router_index: i,
       }));
       return { ...prev, routes: reindexedRoutes };
     });
@@ -174,47 +174,47 @@ export default function TravelRequestForm({ data, mode, requestId, userId, role,
 
     for (const [idx, route] of formData.routes.entries()) {
       // Validate that date strings are not empty before creating Date objects
-      if (!route.beginningDate || !route.endingDate) {
+      if (!route.beginning_date || !route.ending_date) {
         return `Ruta #${idx + 1}: Las fechas de inicio y fin son obligatorias.`;
       }
 
-      const beginningDate = new Date(route.beginningDate);
-      const endingDate = new Date(route.endingDate);
+      const beginning_date = new Date(route.beginning_date);
+      const ending_date = new Date(route.ending_date);
 
       // Check if Date objects are valid (e.g., handles malformed date strings if not caught by input type="date")
-      if (isNaN(beginningDate.getTime()) || isNaN(endingDate.getTime())) {
+      if (isNaN(beginning_date.getTime()) || isNaN(ending_date.getTime())) {
         return `Ruta #${idx + 1}: Formato de fecha inválido. Por favor, utiliza el formato MM/DD/YYYY.`;
       }
 
-      // 1. Check if beginningDate is in the past
+      // 1. Check if beginning_date is in the past
       // Compare normalized dates to ignore time component
-      const beginningDateOnly = new Date(beginningDate.getFullYear(), beginningDate.getMonth(), beginningDate.getDate());
+      const beginningDateOnly = new Date(beginning_date.getFullYear(), beginning_date.getMonth(), beginning_date.getDate());
       if (beginningDateOnly < today) {
-        return `Ruta #${idx + 1}: La fecha de inicio (${route.beginningDate}) no puede ser una fecha pasada.`;
+        return `Ruta #${idx + 1}: La fecha de inicio (${route.beginning_date}) no puede ser una fecha pasada.`;
       }
 
-      // 2. Check if endingDate is before beginningDate
+      // 2. Check if ending_date is before beginning_date
       // Compare normalized dates for initial check
-      const endingDateOnly = new Date(endingDate.getFullYear(), endingDate.getMonth(), endingDate.getDate());
+      const endingDateOnly = new Date(ending_date.getFullYear(), ending_date.getMonth(), ending_date.getDate());
       if (endingDateOnly < beginningDateOnly) {
-        return `Ruta #${idx + 1}: La fecha de fin (${route.endingDate}) debe ser igual o posterior a la fecha de inicio (${route.beginningDate}).`;
+        return `Ruta #${idx + 1}: La fecha de fin (${route.ending_date}) debe ser igual o posterior a la fecha de inicio (${route.beginning_date}).`;
       }
       
       // 3. If dates are the same, check times
       if (endingDateOnly.getTime() === beginningDateOnly.getTime()) {
-        if (!route.beginningTime || !route.endingTime) {
+        if (!route.beginning_time || !route.ending_time) {
           return `Ruta #${idx + 1}: Las horas de inicio y fin son obligatorias cuando las fechas son las mismas.`;
         }
 
         // Parse hours and minutes
-        const [bh, bm] = route.beginningTime.split(':').map(Number);
-        const [eh, em] = route.endingTime.split(':').map(Number);
+        const [bh, bm] = route.beginning_time.split(':').map(Number);
+        const [eh, em] = route.ending_time.split(':').map(Number);
         
         const beginningMinutes = bh * 60 + bm;
         const endingMinutes = eh * 60 + em;
 
         if (endingMinutes <= beginningMinutes) { // Use <= to enforce "posterior" (strictly after)
-          return `Ruta #${idx + 1}: La hora de fin (${route.endingTime}) debe ser posterior a la hora de inicio (${route.beginningTime}) cuando las fechas son las mismas.`;
+          return `Ruta #${idx + 1}: La hora de fin (${route.ending_time}) debe ser posterior a la hora de inicio (${route.beginning_time}) cuando las fechas son las mismas.`;
         }
       }
     }
@@ -256,15 +256,15 @@ export default function TravelRequestForm({ data, mode, requestId, userId, role,
 
     const firstRoute = formData.routes[0];
     if (
-      !firstRoute.originCountryName ||
-      !firstRoute.originCityName ||
-      !firstRoute.destinationCountryName ||
-      !firstRoute.destinationCityName ||
-      !firstRoute.beginningDate ||
-      !firstRoute.beginningTime ||
-      !firstRoute.endingDate ||
-      !firstRoute.endingTime ||
-      !formData.requestedFee ||
+      !firstRoute.origin_country_name ||
+      !firstRoute.origin_city_name ||
+      !firstRoute.destination_country_name ||
+      !firstRoute.destination_city_name ||
+      !firstRoute.beginning_date ||
+      !firstRoute.beginning_time ||
+      !firstRoute.ending_date ||
+      !firstRoute.ending_time ||
+      !formData.requested_fee ||
       !formData.notes
     ) {
       setError('Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.');
@@ -275,27 +275,27 @@ export default function TravelRequestForm({ data, mode, requestId, userId, role,
     setError(null);
 
     const dataToSend = {
-      routeIndex: firstRoute.routeIndex,
+      router_index: firstRoute.router_index,
       notes: formData.notes,
-      requestedFee: parseFloat(formData.requestedFee as string) || 0,
-      imposedFee: 0,
-      originCountryName: firstRoute.originCountryName,
-      originCityName: firstRoute.originCityName,
-      destinationCountryName: firstRoute.destinationCountryName,
-      destinationCityName: firstRoute.destinationCityName,
-      beginningDate: firstRoute.beginningDate,
-      beginningTime: firstRoute.beginningTime,
-      endingDate: firstRoute.endingDate,
-      endingTime: firstRoute.endingTime,
-      planeNeeded: firstRoute.planeNeeded,
-      hotelNeeded: firstRoute.hotelNeeded,
+      requested_fee: parseFloat(formData.requested_fee as string) || 0,
+      imposed_fee: 0,
+      origin_country_name: firstRoute.origin_country_name,
+      origin_city_name: firstRoute.origin_city_name,
+      destination_country_name: firstRoute.destination_country_name,
+      destination_city_name: firstRoute.destination_city_name,
+      beginning_date: firstRoute.beginning_date,
+      beginning_time: firstRoute.beginning_time,
+      ending_date: firstRoute.ending_date,
+      ending_time: firstRoute.ending_time,
+      plane_needed: firstRoute.plane_needed,
+      hotel_needed: firstRoute.hotel_needed,
       additionalRoutes: formData.routes.slice(1).map((route, idx) => ({
         ...route,
-        routeIndex: idx + 1
+        router_index: idx + 1
       })),
     };
     try {
-      await apiRequest(`/applicant/create-travel-request/${userId}`, {
+      await apiRequest(`/applicant/create-travel-request/${user_id}`, {
         method: 'POST',
         data: dataToSend,
         headers: {
@@ -310,7 +310,7 @@ export default function TravelRequestForm({ data, mode, requestId, userId, role,
         window.location.href = '/solicitudes-autorizador';
       }
     } catch (error) {
-      // TODO: Implement proper error handling to extract specific error messages from API
+      console.error('Error al enviar la solicitud:', error);
       setError('Hubo un error al enviar la solicitud.');
       setToast({ message: 'Hubo un error al enviar la solicitud.', type: 'error' });
     }
@@ -333,38 +333,38 @@ export default function TravelRequestForm({ data, mode, requestId, userId, role,
     const firstRoute = formData.routes[0] || {};
     const draftData: Record<string, any> = {};
 
-    if (firstRoute.routeIndex !== undefined) draftData.routeIndex = firstRoute.routeIndex;
+    if (firstRoute.router_index !== undefined) draftData.router_index = firstRoute.router_index;
     if (formData.notes) draftData.notes = formData.notes;
-    if (formData.requestedFee) draftData.requestedFee = parseFloat(formData.requestedFee as string) || 0;
-    draftData.imposedFee = 0; // Always send imposedFee as 0
+    if (formData.requested_fee) draftData.requested_fee = parseFloat(formData.requested_fee as string) || 0;
+    draftData.imposed_fee = 0; // Always send imposed_fee as 0
 
-    if (firstRoute.originCountryName) draftData.originCountryName = firstRoute.originCountryName;
-    if (firstRoute.originCityName) draftData.originCityName = firstRoute.originCityName;
-    if (firstRoute.destinationCountryName) draftData.destinationCountryName = firstRoute.destinationCountryName;
-    if (firstRoute.destinationCityName) draftData.destinationCityName = firstRoute.destinationCityName;
-    if (firstRoute.beginningDate) draftData.beginningDate = firstRoute.beginningDate;
-    if (firstRoute.beginningTime) draftData.beginningTime = firstRoute.beginningTime;
-    if (firstRoute.endingDate) draftData.endingDate = firstRoute.endingDate;
-    if (firstRoute.endingTime) draftData.endingTime = firstRoute.endingTime;
-    if (firstRoute.planeNeeded) draftData.planeNeeded = firstRoute.planeNeeded;
-    if (firstRoute.hotelNeeded) draftData.hotelNeeded = firstRoute.hotelNeeded;
+    if (firstRoute.origin_country_name) draftData.origin_country_name = firstRoute.origin_country_name;
+    if (firstRoute.origin_city_name) draftData.origin_city_name = firstRoute.origin_city_name;
+    if (firstRoute.destination_country_name) draftData.destination_country_name = firstRoute.destination_country_name;
+    if (firstRoute.destination_city_name) draftData.destination_city_name = firstRoute.destination_city_name;
+    if (firstRoute.beginning_date) draftData.beginning_date = firstRoute.beginning_date;
+    if (firstRoute.beginning_time) draftData.beginning_time = firstRoute.beginning_time;
+    if (firstRoute.ending_date) draftData.ending_date = firstRoute.ending_date;
+    if (firstRoute.ending_time) draftData.ending_time = firstRoute.ending_time;
+    if (firstRoute.plane_needed) draftData.plane_needed = firstRoute.plane_needed;
+    if (firstRoute.hotel_needed) draftData.hotel_needed = firstRoute.hotel_needed;
 
     const additionalRoutes = formData.routes.slice(1)
       .map((route, idx) => ({
         ...route,
-        routeIndex: idx + 1
+        router_index: idx + 1
       }))
       .filter(route =>
-        route.originCountryName ||
-        route.originCityName ||
-        route.destinationCountryName ||
-        route.destinationCityName ||
-        route.beginningDate ||
-        route.beginningTime ||
-        route.endingDate ||
-        route.endingTime ||
-        route.planeNeeded ||
-        route.hotelNeeded
+        route.origin_country_name ||
+        route.origin_city_name ||
+        route.destination_country_name ||
+        route.destination_city_name ||
+        route.beginning_date ||
+        route.beginning_time ||
+        route.ending_date ||
+        route.ending_time ||
+        route.plane_needed ||
+        route.hotel_needed
       );
 
     if (additionalRoutes.length > 0) {
@@ -374,7 +374,7 @@ export default function TravelRequestForm({ data, mode, requestId, userId, role,
     }
 
     try {
-      await apiRequest(`/applicant/create-draft-travel-request/${userId}`, {
+      await apiRequest(`/applicant/create-draft-travel-request/${user_id}`, {
         method: 'POST',
         data: draftData,
         headers: {
@@ -416,15 +416,15 @@ export default function TravelRequestForm({ data, mode, requestId, userId, role,
 
       const firstRoute = formData.routes[0];
       const missingFields = [
-        firstRoute.originCountryName,
-        firstRoute.originCityName,
-        firstRoute.destinationCountryName,
-        firstRoute.destinationCityName,
-        firstRoute.beginningDate,
-        firstRoute.beginningTime,
-        firstRoute.endingDate,
-        firstRoute.endingTime,
-        formData.requestedFee,
+        firstRoute.origin_country_name,
+        firstRoute.origin_city_name,
+        firstRoute.destination_country_name,
+        firstRoute.destination_city_name,
+        firstRoute.beginning_date,
+        firstRoute.beginning_time,
+        firstRoute.ending_date,
+        firstRoute.ending_time,
+        formData.requested_fee,
         formData.notes,
       ].some(field => !field);
 
@@ -451,38 +451,38 @@ export default function TravelRequestForm({ data, mode, requestId, userId, role,
       }
     };
 
-    includeIfExists('routeIndex', firstRoute.routeIndex);
+    includeIfExists('router_index', firstRoute.router_index);
     editedData.notes = typeof formData.notes === 'string' ? formData.notes.trim() : '';
-    includeIfExists('requestedFee', parseFloat(formData.requestedFee as string));
-    editedData.imposedFee = 0;
-    includeIfExists('originCountryName', firstRoute.originCountryName);
-    includeIfExists('originCityName', firstRoute.originCityName);
-    includeIfExists('destinationCountryName', firstRoute.destinationCountryName);
-    includeIfExists('destinationCityName', firstRoute.destinationCityName);
-    includeIfExists('beginningDate', firstRoute.beginningDate);
-    includeIfExists('beginningTime', firstRoute.beginningTime);
-    includeIfExists('endingDate', firstRoute.endingDate);
-    includeIfExists('endingTime', firstRoute.endingTime);
-    editedData.planeNeeded = firstRoute.planeNeeded;
-    editedData.hotelNeeded = firstRoute.hotelNeeded;
+    includeIfExists('requested_fee', parseFloat(formData.requested_fee as string));
+    editedData.imposed_fee = 0;
+    includeIfExists('origin_country_name', firstRoute.origin_country_name);
+    includeIfExists('origin_city_name', firstRoute.origin_city_name);
+    includeIfExists('destination_country_name', firstRoute.destination_country_name);
+    includeIfExists('destination_city_name', firstRoute.destination_city_name);
+    includeIfExists('beginning_date', firstRoute.beginning_date);
+    includeIfExists('beginning_time', firstRoute.beginning_time);
+    includeIfExists('ending_date', firstRoute.ending_date);
+    includeIfExists('ending_time', firstRoute.ending_time);
+    editedData.plane_needed = firstRoute.plane_needed;
+    editedData.hotel_needed = firstRoute.hotel_needed;
 
     const additionalRoutes = formData.routes
       .slice(1)
       .map((route, idx) => ({
         ...route,
-        routeIndex: idx + 1,
+        router_index: idx + 1,
       }))
       .filter(route =>
-        route.originCountryName ||
-        route.originCityName ||
-        route.destinationCountryName ||
-        route.destinationCityName ||
-        route.beginningDate ||
-        route.beginningTime ||
-        route.endingDate ||
-        route.endingTime ||
-        route.planeNeeded ||
-        route.hotelNeeded
+        route.origin_country_name ||
+        route.origin_city_name ||
+        route.destination_country_name ||
+        route.destination_city_name ||
+        route.beginning_date ||
+        route.beginning_time ||
+        route.ending_date ||
+        route.ending_time ||
+        route.plane_needed ||
+        route.hotel_needed
       );
 
     if (additionalRoutes.length > 0) {
@@ -492,7 +492,7 @@ export default function TravelRequestForm({ data, mode, requestId, userId, role,
     }
 
     try {
-      await apiRequest(`/applicant/edit-travel-request/${requestId}`, {
+      await apiRequest(`/applicant/edit-travel-request/${request_id}`, {
         method: 'PUT',
         data: editedData,
         headers: {
@@ -531,15 +531,15 @@ export default function TravelRequestForm({ data, mode, requestId, userId, role,
 
     const firstRoute = formData.routes[0];
     if (
-      !firstRoute.originCountryName ||
-      !firstRoute.originCityName ||
-      !firstRoute.destinationCountryName ||
-      !firstRoute.destinationCityName ||
-      !firstRoute.beginningDate ||
-      !firstRoute.beginningTime ||
-      !firstRoute.endingDate ||
-      !firstRoute.endingTime ||
-      !formData.requestedFee ||
+      !firstRoute.origin_country_name ||
+      !firstRoute.origin_city_name ||
+      !firstRoute.destination_country_name ||
+      !firstRoute.destination_city_name ||
+      !firstRoute.beginning_date ||
+      !firstRoute.beginning_time ||
+      !firstRoute.ending_date ||
+      !firstRoute.ending_time ||
+      !formData.requested_fee ||
       !formData.notes
     ) {
       setError('Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.');
@@ -551,7 +551,7 @@ export default function TravelRequestForm({ data, mode, requestId, userId, role,
     if (!editSuccess) return;
 
     try {
-      await apiRequest(`/applicant/confirm-draft-travel-request/${userId}/${requestId}`, {
+      await apiRequest(`/applicant/confirm-draft-travel-request/${user_id}/${request_id}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`
@@ -593,7 +593,7 @@ export default function TravelRequestForm({ data, mode, requestId, userId, role,
       {/* Render all routes dynamically */}
       {formData.routes.map((route, index) => (
         <RouteInputGroup
-          key={route.routeIndex}
+          key={route.router_index}
           route={route}
           onChange={handleRouteUpdate}
           index={index}
@@ -620,7 +620,7 @@ export default function TravelRequestForm({ data, mode, requestId, userId, role,
         <h3 className="text-lg font-semibold text-gray-700">Detalles Generales del Viaje</h3>
         <div>
           <label className="block text-sm font-medium mb-1">Anticipo Esperado (MXN)<span className="text-red-500"> *</span></label>
-          <input name="requestedFee" placeholder="Anticipo Esperado (MXN)" type="number" className={inputStyle} value={formData.requestedFee === 0 ? '' : formData.requestedFee} onChange={handleGeneralChange} required />
+          <input name="requested_fee" placeholder="Anticipo Esperado (MXN)" type="number" className={inputStyle} value={formData.requested_fee === 0 ? '' : formData.requested_fee} onChange={handleGeneralChange} required />
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">Observaciones / Comentarios<span className="text-red-500"> *</span></label>

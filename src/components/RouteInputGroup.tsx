@@ -67,10 +67,10 @@ const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, inde
         <div>
           <label className="block text-sm font-medium mb-1">País de Origen<span className="text-red-500"> *</span></label>
           <input
-            name="originCountryName"
+            name="origin_country_name"
             placeholder="País Origen"
             className={inputStyle}
-            value={route.originCountryName === "notSelected" ? '' : route.originCountryName}
+            value={route.origin_country_name === "notSelected" ? '' : route.origin_country_name}
             onChange={handleInputChange}
             required
           />
@@ -80,10 +80,10 @@ const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, inde
         <div>
           <label className="block text-sm font-medium mb-1">Ciudad de Origen<span className="text-red-500"> *</span></label>
           <input
-            name="originCityName"
+            name="origin_city_name"
             placeholder="Ciudad Origen"
             className={inputStyle}
-            value={route.originCityName === "notSelected" ? '' : route.originCityName}
+            value={route.origin_city_name === "notSelected" ? '' : route.origin_city_name}
             onChange={handleInputChange}
             required
           />
@@ -93,10 +93,10 @@ const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, inde
         <div>
           <label className="block text-sm font-medium mb-1">País de Destino<span className="text-red-500"> *</span></label>
           <input
-            name="destinationCountryName"
+            name="destination_country_name"
             placeholder="País Destino"
             className={inputStyle}
-            value={route.destinationCountryName === "notSelected" ? '' : route.destinationCountryName}
+            value={route.destination_country_name === "notSelected" ? '' : route.destination_country_name}
             onChange={handleInputChange}
             required
           />
@@ -106,10 +106,10 @@ const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, inde
         <div>
           <label className="block text-sm font-medium mb-1">Ciudad de Destino<span className="text-red-500"> *</span></label>
           <input
-            name="destinationCityName"
+            name="destination_city_name"
             placeholder="Ciudad Destino"
             className={inputStyle}
-            value={route.destinationCityName === "notSelected" ? '' : route.destinationCityName}
+            value={route.destination_city_name === "notSelected" ? '' : route.destination_city_name}
             onChange={handleInputChange}
             required
           />
@@ -119,11 +119,11 @@ const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, inde
         <div>
           <label className="block text-sm font-medium mb-1">Fecha de Inicio (MM/DD/YYYY)<span className="text-red-500"> *</span></label>
           <input
-            name="beginningDate"
+            name="beginning_date"
             type="date"
             min={todayISO}
             className={inputStyle}
-            value={route.beginningDate === "1900-01-01" ? '' : route.beginningDate}
+            value={route.beginning_date === "1900-01-01" ? '' : route.beginning_date}
             onChange={handleInputChange}
             required
           />
@@ -133,10 +133,10 @@ const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, inde
         <div>
           <label className="block text-sm font-medium mb-1">Hora de Inicio (HH:MM AM/PM)<span className="text-red-500"> *</span></label>
           <input
-            name="beginningTime"
+            name="beginning_time"
             type="time"
             className={inputStyle}
-            value={route.beginningTime === "00:00:00" ? '' : route.beginningTime}
+            value={route.beginning_time === "00:00:00" ? '' : route.beginning_time}
             onChange={handleInputChange}
             required
           />
@@ -146,11 +146,11 @@ const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, inde
         <div>
           <label className="block text-sm font-medium mb-1">Fecha de Fin (MM/DD/YYYY)<span className="text-red-500"> *</span></label>
           <input
-            name="endingDate"
+            name="ending_date"
             type="date"
-            min={route.beginningDate && route.beginningDate !== "1900-01-01" ? route.beginningDate : todayISO}
+            min={route.beginning_date && route.beginning_date !== "1900-01-01" ? route.beginning_date : todayISO}
             className={inputStyle}
-            value={route.endingDate === "1900-01-01" ? '' : route.endingDate}
+            value={route.ending_date === "1900-01-01" ? '' : route.ending_date}
             onChange={handleInputChange}
             required
           />
@@ -160,10 +160,10 @@ const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, inde
         <div>
           <label className="block text-sm font-medium mb-1">Hora de Fin (HH:MM AM/PM)<span className="text-red-500"> *</span></label>
           <input
-            name="endingTime"
+            name="ending_time"
             type="time"
             className={inputStyle}
-            value={route.endingTime === "00:00:00" ? '' : route.endingTime}
+            value={route.ending_time === "00:00:00" ? '' : route.ending_time}
             onChange={handleInputChange}
             required
           />
@@ -173,8 +173,8 @@ const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, inde
         <label className="flex items-center gap-2 my-2">
           <input
             type="checkbox"
-            name="planeNeeded"
-            checked={route.planeNeeded}
+            name="plane_needed"
+            checked={route.plane_needed}
             onChange={handleInputChange}
           />
           ¿Requiere Avión?
@@ -184,8 +184,8 @@ const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, inde
         <label className="flex items-center gap-2 my-2">
           <input
             type="checkbox"
-            name="hotelNeeded"
-            checked={route.hotelNeeded}
+            name="hotel_needed"
+            checked={route.hotel_needed}
             onChange={handleInputChange}
           />
           ¿Requiere Hotel?

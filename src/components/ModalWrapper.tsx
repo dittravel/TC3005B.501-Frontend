@@ -14,8 +14,8 @@ import { getButtonClasses } from "@type/button";
 interface ModalWrapperProps {
   title: string;
   message: string;
-  buttonType: "success" | "warning" | "primary" | "secondary";
-  modalType: "confirm" | "warning" | "error" | "success";
+  button_type: "success" | "warning" | "primary" | "secondary";
+  modal_type: "confirm" | "warning" | "error" | "success";
   variant?: "filled" | "border" | "empty";
   disabled?: boolean;
   show?: boolean;
@@ -35,12 +35,12 @@ interface ModalWrapperProps {
 export default function ModalWrapper({
   title,
   message,
-  buttonType,
-  modalType,
+  button_type,
+  modal_type,
   variant="filled",
   disabled = false,
   show = false,
-  buttonClassName = getButtonClasses({ variant: `${variant}`, color: `${buttonType}`, size: "medium" }),
+  buttonClassName = getButtonClasses({ variant: `${variant}`, color: `${button_type}`, size: "medium" }),
   onConfirm,
   children,
 }: ModalWrapperProps) {
@@ -71,7 +71,7 @@ export default function ModalWrapper({
       <Modal
         title={title}
         message={message}
-        type={modalType}
+        type={modal_type}
         show={isOpen}
         onClose={() => setIsOpen(false)}
         onConfirm={confirm}

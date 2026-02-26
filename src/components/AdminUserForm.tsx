@@ -5,13 +5,13 @@ import Toast from '@components/Toast';
 
 // Internal form data structure (not exported)
 interface FormData {
-  roleId: number | '';
-  departmentId: number | '';
-  userName: string;
+  role_id: number | '';
+  department_id: number | '';
+  user_name: string;
   password: string;
   workstation: string;
   email: string;
-  phoneNumber: string;
+  phone_number: string;
 }
 
 interface FormErrors {
@@ -44,13 +44,13 @@ const departments = [
 ];
 
 const initialFormData: FormData = {
-  roleId: '',
-  departmentId: '',
-  userName: '',
+  role_id: '',
+  department_id: '',
+  user_name: '',
   password: '',
   workstation: '',
   email: '',
-  phoneNumber: ''
+  phone_number: ''
 };
 
 export default function CreateUserForm({ mode, user_data, redirectTo,token }: CreateUserFormProps) {
@@ -63,13 +63,13 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
     // Pre-fill form for edit mode, otherwise reset
     if (mode === 'edit' && user_data) {
       setFormData({
-        roleId: roles.find(role => role.name === user_data.role_name)?.id,
-        departmentId: departments.find(dep => dep.name === user_data.department_name)?.id,
-        userName: user_data.user_name,
-        password: '', // Password should not be pre-filled
+        role_id: roles.find(role => role.name === user_data.role_name)?.id,
+        department_id: departments.find(dep => dep.name === user_data.department_name)?.id,
+        user_name: user_data.user_name,
+        password: '', 
         workstation: user_data.workstation,
         email: user_data.email,
-        phoneNumber: user_data.phone_number || ''
+        phone_number: user_data.phone_number || ''
       });
     } else {
       setFormData(initialFormData);
@@ -86,10 +86,10 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
     const newErrors: FormErrors = {};
 
     // Required field validation
-    if (!formData.userName.trim()) {
-      newErrors.userName = 'El nombre de usuario es requerido';
-    } else if (formData.userName.includes(' ')) {
-      newErrors.userName = 'El nombre de usuario no puede contener espacios';
+    if (!formData.user_name.trim()) {
+      newErrors.user_name = 'El nombre de usuario es requerido';
+    } else if (formData.user_name.includes(' ')) {
+      newErrors.user_name = 'El nombre de usuario no puede contener espacios';
     }
 
     if (mode === 'create') {
@@ -110,12 +110,12 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
       newErrors.workstation = 'La estación de trabajo es requerida';
     }
 
-    if (!formData.roleId) {
-      newErrors.roleId = 'El rol es requerido';
+    if (!formData.role_id) {
+      newErrors.role_id = 'El rol es requerido';
     }
 
-    if (!formData.departmentId) {
-      newErrors.departmentId = 'El departamento es requerido';
+    if (!formData.department_id) {
+      newErrors.department_id = 'El departamento es requerido';
     }
 
     setErrors(newErrors);
@@ -130,11 +130,10 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'roleId' || name === 'departmentId' ?
+      [name]: name === 'role_id' || name === 'department_id' ?
         (value === '' ? '' : parseInt(value)) : value
     }));
 
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -253,14 +252,14 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
             </label>
             <input
               type="text"
-              name="userName"
-              value={formData.userName}
+              name="user_name"
+              value={formData.user_name}
               onChange={handleInputChange}
-              className={inputClass('userName')}
+              className={inputClass('user_name')}
               placeholder="Ej: juan.perez"
             />
-            {errors.userName && (
-              <p className="text-red-500 text-sm mt-1">{errors.userName}</p>
+            {errors.user_name && (
+              <p className="text-red-500 text-sm mt-1">{errors.user_name}</p>
             )}
           </div>
           { mode === 'create' && (
@@ -308,14 +307,14 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
             </label>
             <input
               type="tel"
-              name="phoneNumber"
-              value={formData.phoneNumber}
+              name="phone_number"
+              value={formData.phone_number}
               onChange={handleInputChange}
-              className={inputClass('phoneNumber')}
+              className={inputClass('phone_number')}
               placeholder="555-1234"
             />
-            {errors.phoneNumber && (
-              <p className="text-red-500 text-sm mt-1">{errors.phoneNumber}</p>
+            {errors.phone_number && (
+              <p className="text-red-500 text-sm mt-1">{errors.phone_number}</p>
             )}
           </div>
         </div>
@@ -345,10 +344,10 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
               Rol <span className="text-red-500">*</span>
             </label>
             <select
-              name="roleId"
-              value={formData.roleId}
+              name="role_id"
+              value={formData.role_id}
               onChange={handleInputChange}
-              className={inputClass('roleId')}
+              className={inputClass('role_id')}
             >
               <option value="">Seleccionar rol</option>
               {roles.map(role => (
@@ -357,8 +356,8 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
                 </option>
               ))}
             </select>
-            {errors.roleId && (
-              <p className="text-red-500 text-sm mt-1">{errors.roleId}</p>
+            {errors.role_id && (
+              <p className="text-red-500 text-sm mt-1">{errors.role_id}</p>
             )}
           </div>
 
@@ -367,10 +366,10 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
               Departamento <span className="text-red-500">*</span>
             </label>
             <select
-              name="departmentId"
-              value={formData.departmentId}
+              name="department_id"
+              value={formData.department_id}
               onChange={handleInputChange}
-              className={inputClass('departmentId')}
+              className={inputClass('department_id')}
             >
               <option value="">Seleccionar departamento</option>
               {departments.map(dept => (
@@ -379,8 +378,8 @@ export default function CreateUserForm({ mode, user_data, redirectTo,token }: Cr
                 </option>
               ))}
             </select>
-            {errors.departmentId && (
-              <p className="text-red-500 text-sm mt-1">{errors.departmentId}</p>
+            {errors.department_id && (
+              <p className="text-red-500 text-sm mt-1">{errors.department_id}</p>
             )}
           </div>
         </div>

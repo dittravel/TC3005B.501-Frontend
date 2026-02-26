@@ -12,7 +12,7 @@ import ApproveReceiptStatus from "@components/AproveReceiptsModal";
 import RejectReceiptStatus from "@components/RejectReceiptsModal";
 
 interface ReceiptProps {
-  receiptId: number;
+  receipt_id: number;
   disabled: boolean;
   onApprove: (id: number) => void;
   onReject: (id: number) => void;
@@ -20,7 +20,7 @@ interface ReceiptProps {
 }
 
 export default function ReceiptActions({
-  receiptId,
+  receipt_id,
   disabled,
   onApprove,
   onReject,
@@ -52,7 +52,7 @@ export default function ReceiptActions({
     try {
       setLoading(true);
       const res = await fetch(
-        `${import.meta.env.PUBLIC_API_BASE_URL}/accounts-payable/validate-receipt/${receiptId}`,
+        `${import.meta.env.PUBLIC_API_BASE_URL}/accounts-payable/validate-receipt/${receipt_id}`,
         {
           method: "PUT",
           headers: { 
@@ -67,7 +67,7 @@ export default function ReceiptActions({
 
       // Execute appropriate callback based on action result
       if (res.ok) {
-        approval === 1 ? onApprove(receiptId) : onReject(receiptId);
+        approval === 1 ? onApprove(receipt_id) : onReject(receipt_id);
       } else {
         alert(data.error || "No se pudo actualizar.");
       }
@@ -84,11 +84,11 @@ export default function ReceiptActions({
     <div className="flex flex-row gap-2 items-center justify-center w-full">
       {/* Approve Receipt Button */}
       <ApproveReceiptStatus
-        receiptId={receiptId}
+        receipt_id={receipt_id}
         title="Aprobar comprobante"
         message="¿Está seguro de que deseas aprobar este comprobante?"
         redirection="/dashboard"
-        modalType="success"
+        modal_type="success"
         variant="filled"
         disabled={disabled} 
         token={token}
@@ -98,11 +98,11 @@ export default function ReceiptActions({
 
       {/* Reject Receipt Button */}
       <RejectReceiptStatus
-        receiptId={receiptId}
+        receipt_id={receipt_id}
         title="Rechazar comprobante"
         message="¿Está seguro de que deseas rechazar este comprobante?"
         redirection="/dashboard"
-        modalType="warning"
+        modal_type="warning"
         variant="filled"
         disabled={disabled} 
         token={token}

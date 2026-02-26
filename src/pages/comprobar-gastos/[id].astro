@@ -52,21 +52,21 @@ if (isNaN(numericId)) {
 
 const enrichedExpenses = await Promise.all(
   request.Expenses.map(async (receipt: any) => {
-    const fileMap = await apiRequest(`/files/receipt-files/${receipt.receiptId}`, { cookies: Astro.cookies });
+    const fileMap = await apiRequest(`/files/receipt-files/${receipt.receipt_id}`, { cookies: Astro.cookies });
     return { ...receipt, fileMap };
   })
 );
 const allReviewed = enrichedExpenses.every((receipt: any) => receipt.validation !== "Pendiente");
 ---
 
-<MainLayout title={`Solicitud #${request.}`} data={{ userName, buttonLabel, role }} >
+<MainLayout title={`Solicitud #${request.request_id}`} data={{ userName, buttonLabel, role }} >
 
 <main class="flex flex-col items-center">
   <div class="w-full flex flex-col rounded border border-gray-300 p-10">
 
     <div class="flex justify-between items-center">
   <TextHeader
-    title={`SOLICITUD #${request.}`}
+    title={`SOLICITUD #${request.request_id}`}
     subtitle="Comprobantes de Gastos"
   />
 
@@ -78,7 +78,7 @@ const allReviewed = enrichedExpenses.every((receipt: any) => receipt.validation 
     {allReviewed && (
       <FinishRequestButton
         client:only="react"
-        requestId={request.}
+        requestId={request.request_id}
         token={getCookie("token", Astro.cookies)}
       />
     )}
@@ -101,7 +101,7 @@ const allReviewed = enrichedExpenses.every((receipt: any) => receipt.validation 
             <div class="grid grid-cols-[2fr_2fr_1fr] gap-6">
               
               <div class="col-span-2 space-y-2 content-wrapper">
-                <p class="font-bold text-lg break-words">#{receipt.receiptId}</p>
+                <p class="font-bold text-lg break-words">#{receipt.receipt_id}</p>
                 <div class="text-sm text-gray-700 grid grid-cols-[1fr_2fr] gap-y-1">
                   
                   <p><span class="font-semibold">Monto:</span> {receipt.amount} <span>MXN </span> </p>
@@ -138,7 +138,7 @@ const allReviewed = enrichedExpenses.every((receipt: any) => receipt.validation 
 
                 <ReceiptActions
                   client:only="react"
-                  receiptId={receipt.receiptId}
+                  receipt_id={receipt.receipt_id}
                   expense_status={receipt.expense_status}
                   disabled={receipt.validation !== "Pendiente"}
                   token={getCookie("token", Astro.cookies)}

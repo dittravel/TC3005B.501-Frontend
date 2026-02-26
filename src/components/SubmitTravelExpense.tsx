@@ -8,7 +8,7 @@
 
 import { apiRequest } from "@utils/apiClient";
 
-// Maps expense concept names to their corresponding receipt type IDs
+// Maps expense concepto names to their corresponding receipt type IDs
 const receiptTypeMap: Record<string, number> = {
   "Autobús": 5,
   "Caseta": 4,
@@ -21,8 +21,8 @@ const receiptTypeMap: Record<string, number> = {
 
 interface SubmitExpenseParams {
   requestId: number;
-  concept: string;
-  amount: number;
+  concepto: string;
+  monto: number;
   token: string;
 }
 
@@ -31,29 +31,29 @@ interface SubmitExpenseParams {
  * Maps the expense concept to a receipt type ID and sends it to the API.
  * @param {SubmitExpenseParams} params - The expense submission parameters
  * @param {number} params.requestId - The travel request ID
- * @param {string} params.concept - The expense concept (e.g., "Transporte", "Hotel")
- * @param {number} params.amount - The expense amount in MXN
+ * @param {string} params.concepto - The expense concepto (e.g., "Transporte", "Hotel")
+ * @param {number} params.monto - The expense amount in MXN
  * @param {string} params.token - The authentication token
  * @returns {Promise<{ count: number; lastReceiptId: number | null }>} Object containing the expense count and last receipt ID
- * @throws {Error} If the expense concept is not found in the receipt type map
+ * @throws {Error} If the expense concepto is not found in the receipt type map
  */
 export async function SubmitTravelExpense({
   requestId,
-  concept,
-  amount,
+  concepto,
+  monto,
   token,
 }: SubmitExpenseParams): Promise<{ count: number; lastReceiptId: number | null }> {
-  // Get the receipt type ID for the expense concept
-  const receiptTypeId = receiptTypeMap[concept];
-  if (!receiptTypeId) throw new Error(`Concepto inválido: ${concept}`);
+  // Get the receipt type ID for the expense concepto
+  const receipt_type_id = receiptTypeMap[concepto];
+  if (!receipt_type_id) throw new Error(`Concepto inválido: ${concepto}`);
 
   // Prepare the payload for creating the expense validation
   const payload = {
     receipts: [
       {
-        receiptTypeId,
-        requestId: requestId,
-        amount: amount,
+        receipt_type_id,
+        request_id: requestId,
+        amount: monto,
       },
     ],
   };
@@ -78,8 +78,8 @@ export async function SubmitTravelExpense({
   const expenses = res.Expenses ?? [];
   const count = expenses.length;
 
-  expenses.sort((a, b) => b.receiptId - a.receiptId);
-  const lastReceiptId = count > 0 ? expenses[0].receiptId : null;
+  expenses.sort((a, b) => b.receipt_id - a.receipt_id);
+  const lastReceiptId = count > 0 ? expenses[0].receipt_id : null;
 
   return { count, lastReceiptId };
 }

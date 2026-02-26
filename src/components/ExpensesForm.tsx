@@ -20,8 +20,8 @@ interface Props {
 }
 
 export default function ExpensesForm({ requestId, token, receiptToReplace }: Props) {
-  const [concept, setConcept] = useState("Transporte");
-  const [amount, setAmount] = useState("");
+  const [concepto, setConcepto] = useState("Transporte");
+  const [monto, setMonto] = useState("");
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [xmlFile, setXmlFile] = useState<File | null>(null);
   const [isInternational, setIsInternational] = useState(false);
@@ -39,7 +39,7 @@ export default function ExpensesForm({ requestId, token, receiptToReplace }: Pro
       setSubmitting(true);
 
       // Validate that all required fields are filled with valid data
-      if (!concept || !amount || isNaN(parseFloat(amount)) || !pdfFile || (!isInternational && !xmlFile)) {
+      if (!concepto || !monto || isNaN(parseFloat(monto)) || !pdfFile || (!isInternational && !xmlFile)) {
         alert("Por favor, completa todos los campos correctamente.");
         setSubmitting(false);
         return;
@@ -70,8 +70,8 @@ export default function ExpensesForm({ requestId, token, receiptToReplace }: Pro
 
       const { lastReceiptId } = await SubmitTravelExpense({
         requestId,
-        concept,
-        amount: parseFloat(amount),
+        concepto,
+        monto: parseFloat(monto),
         token,
       });
 
@@ -90,10 +90,10 @@ export default function ExpensesForm({ requestId, token, receiptToReplace }: Pro
         <div>
           <label className="text-sm font-medium">Concepto</label>
           <select
-            name="concept"
+            name="concepto"
             className="w-full border rounded-md px-3 py-2"
-            value={concept}
-            onChange={(e) => setConcept(e.target.value)}
+            value={concepto}
+            onChange={(e) => setConcepto(e.target.value)}
           >
             <option>Transporte</option>
             <option>Hospedaje</option>
@@ -111,8 +111,8 @@ export default function ExpensesForm({ requestId, token, receiptToReplace }: Pro
             step="0.01"
             className="w-full border rounded-md px-3 py-2"
             placeholder="Ej. 443.50"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            value={monto}
+            onChange={(e) => setMonto(e.target.value)}
             required
           />
         </div>
@@ -134,8 +134,8 @@ export default function ExpensesForm({ requestId, token, receiptToReplace }: Pro
         <ModalWrapper
           title="Subir comprobación"
           message="¿Está seguro de que desea subir este Comprobante?"
-          modalType="confirm"
-          buttonType="primary"
+          modal_type="confirm"
+          button_type="primary"
           variant="filled"
           onConfirm={handleSubmit}
         >

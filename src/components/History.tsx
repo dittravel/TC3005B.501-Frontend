@@ -46,29 +46,29 @@ export default function History({ data , itemsPerPage = 5 }: Props) {
             {pageRequests.map((request: any) => (
               <div className="flex justify-center mb-6">
                 <a
-                  key={request.requestId}
-                  href={`/detalles-solicitud/${request.requestId}`}
+                  key={request.request_id}
+                  href={`/detalles-solicitud/${request.request_id}`}
                   className="flex flex-col md:flex-row items-center justify-between w-full max-w-5xl bg-gray-50 rounded-lg shadow-md p-6 transition hover:shadow-lg hover:bg-gray-100"
                 >
                   <div className="flex flex-col items-center md:items-start gap-2 w-full md:w-auto">
                     <h2 className="text-xl font-bold text-gray-800 mb-1 text-center md:text-left">
-                      #{request.requestId}
+                      #{request.request_id}
                     </h2>
                     <div className="grid grid-cols-2 gap-24 w-full">
                       <div>
                         <p className="text-sm text-gray-600">
-                          <span className="font-semibold">Origen:</span> {request.originCountry}
+                          <span className="font-semibold">Origen:</span> {request.origin_country}
                         </p>
                         <p className="text-sm text-gray-600">
-                          <span className="font-semibold">Destino:</span> {request.destinationCountry}
+                          <span className="font-semibold">Destino:</span> {request.destination_country}
                         </p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">
-                          <span className="font-semibold">Fecha Inicio:</span> {request.beginningDate}
+                          <span className="font-semibold">Fecha Inicio:</span> {request.beginning_date}
                         </p>
                         <p className="text-sm text-gray-600">
-                          <span className="font-semibold">Fecha Fin:</span> {request.endingDate}
+                          <span className="font-semibold">Fecha Fin:</span> {request.ending_date}
                         </p>
                       </div>
                     </div>

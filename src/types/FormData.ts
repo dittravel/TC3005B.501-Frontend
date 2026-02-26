@@ -1,19 +1,19 @@
 import type { TravelRoute } from './TravelRoute';
 
 export interface FormData {
-  routeIndex: number;
+  route_index: number;
   notes: string;
-  requestedFee: number | string;
-  imposedFee: number | string;
-  originCountryName: string;
-  originCityName: string;
-  destinationCountryName: string;
-  destinationCityName: string;
-  beginningDate: string;
-  beginningTime: string;
-  endingDate: string;
-  endingTime: string;
-  planeNeeded: boolean;
-  hotelNeeded: boolean;
+  requested_fee: number | string;
+  imposed_fee: number | string;
+  origin_country_name: string;
+  origin_city_name: string;
+  destination_country_name: string;
+  destination_city_name: string;
+  beginning_date: string;
+  beginning_time: string;
+  ending_date: string;
+  ending_time: string;
+  plane_needed: boolean;
+  hotel_needed: boolean;
   routes: TravelRoute[];
 }

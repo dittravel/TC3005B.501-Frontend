@@ -29,16 +29,16 @@ try {
 }
 ---
 
-<MainLayout title={`Solicitud #${request.}`} data={{ userName, buttonLabel, role }} >
+<MainLayout title={`Solicitud #${request.request_id}`} data={{ userName, buttonLabel, role }} >
   <RequestDetail
     request={request}
-    title={`SOLICITUD #${request.}`}
+    title={`SOLICITUD #${request.}request_id`}
     subtitle="Detalles de la Solicitud a Cotizar"
   />
   <div class="flex mt-8">
     <AttendRequest
       client:only="react"
-       = {request.}
+      request_id = {request.request_id}
       token={getCookie("token", Astro.cookies)}
     />
   </div>

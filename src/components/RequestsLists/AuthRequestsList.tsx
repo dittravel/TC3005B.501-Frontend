@@ -20,7 +20,7 @@ interface Column {
 }
 
 const columns: Column[] = [
-  { key: 'requestId', label: 'ID Viaje' },
+  { key: 'request_id', label: 'ID Viaje' },
   { key: 'status', label: 'Status' },
   { key: 'destination', label: 'Destino' },
   { key: 'departure_date', label: 'Fecha Salida' },
@@ -31,10 +31,10 @@ const columns: Column[] = [
 function mapRequestToTableRow(request: Record<string, any>): Record<string, any> {
   return {
     status: request.request_status,
-    requestId: request.requestId,
-    destination: request.destinationCountry,
-    arrival_date: request.endingDate,
-    departure_date: request.beginningDate
+    request_id: request.request_id,
+    destination: request.destination_country,
+    arrival_date: request.ending_date,
+    departure_date: request.beginning_date
   };
 }
 

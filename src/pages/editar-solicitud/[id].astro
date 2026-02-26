@@ -43,8 +43,8 @@ try {
         client:only="react"
         data={request}
         mode='edit'
-        ={id}
-        userId={getCookie("id", Astro.cookies)}
+        request_id={id}
+        user_id={getCookie("id", Astro.cookies)}
         role={role}
         token={getCookie("token", Astro.cookies)}
       />
