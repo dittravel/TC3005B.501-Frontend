@@ -13,7 +13,7 @@ interface Props {
   token: string;
 }
 
-export default function AproveRequestModal({
+export default function ValidateReceiptStatus({
   receipt_id,
   title,
   message,

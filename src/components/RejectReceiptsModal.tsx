@@ -21,7 +21,7 @@ interface Props {
   token: string;
 }
 
-export default function RejectReceiptStatus({
+export default function RejectReceipStatus({
   receipt_id,
   title,
   message,

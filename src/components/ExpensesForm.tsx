@@ -19,7 +19,7 @@ interface Props {
   receiptToReplace?: string | null;
 }
 
-export default function ExpensesForm({ requestId, token, receiptToReplace }: Props) {
+export default function ExpensesFormClient({ requestId, token, receiptToReplace }: Props) {
   const [concepto, setConcepto] = useState("Transporte");
   const [monto, setMonto] = useState("");
   const [pdfFile, setPdfFile] = useState<File | null>(null);

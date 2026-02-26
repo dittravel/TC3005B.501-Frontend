@@ -15,7 +15,7 @@ interface Props {
   token: string;
 }
 
-export default function AttendRequest({ request_id, token }: Props) {
+export default function AssignBudget({ request_id, token }: Props) {
   const [imposedFee, setImposedFee] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
