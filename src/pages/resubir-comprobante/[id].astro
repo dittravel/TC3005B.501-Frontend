@@ -6,7 +6,7 @@
 export const prerender = false;
 
 import MainLayout from "@layouts/MainLayout.astro";
-import ExpensesForm from "@components/ExpensesForm.astro";
+import ExpensesFormClient from "@components/ExpensesForm.astro";
 
 import { getCookie } from "@data/cookies";
 import type { UserRole } from "@type/roles";
@@ -24,5 +24,5 @@ const { id } = Astro.params;
 ---
 
 <MainLayout title="Crear Recibo" data={{ userName, buttonLabel, role }}>
-  <ExpensesForm receiptToReplace={receiptToReplace} />
+  <ExpensesFormClient receiptToReplace={receiptToReplace} />
 </MainLayout>

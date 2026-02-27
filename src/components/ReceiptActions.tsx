@@ -9,7 +9,7 @@
 import React, { useState } from "react";
 import Modal from "@components/Modal";
 import ApproveReceiptStatus from "@components/AproveReceiptsModal";
-import RejectReceiptStatus from "@components/RejectReceiptsModal";
+import RejectReceipStatus from "@components/RejectReceiptsModal";
 
 interface ReceiptProps {
   receipt_id: number;
@@ -97,7 +97,7 @@ export default function ReceiptActions({
       </ApproveReceiptStatus>
 
       {/* Reject Receipt Button */}
-      <RejectReceiptStatus
+      <RejectReceipStatus
         receipt_id={receipt_id}
         title="Rechazar comprobante"
         message="¿Está seguro de que deseas rechazar este comprobante?"
@@ -108,7 +108,7 @@ export default function ReceiptActions({
         token={token}
       >
         Rechazar
-      </RejectReceiptStatus>
+      </RejectReceipStatus>
 
       {/* Confirmation Modal */}
       <Modal

@@ -6,7 +6,7 @@
 export const prerender = false;
 import MainLayout from "@layouts/MainLayout.astro";
 import RequestDetail from "@components/RequestDetail.astro";
-import AttendRequest from "@components/AttendRequest";
+import AssignBudget from "@components/AttendRequest";
 import type { UserRole } from "@type/roles";
 
 import { getCookie } from "@data/cookies";
@@ -36,7 +36,7 @@ try {
     subtitle="Detalles de la Solicitud a Cotizar"
   />
   <div class="flex mt-8">
-    <AttendRequest
+    <AssignBudget
       client:only="react"
       request_id = {request.request_id}
       token={getCookie("token", Astro.cookies)}
