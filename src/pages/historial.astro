@@ -26,13 +26,9 @@ const requests = await (async () => {
 ---
 
 <MainLayout title="Historial" data={{ userName, buttonLabel, role }}>
-<div>
   <TextHeader
     title={`Historial de Viajes de ${userName}`}
     subtitle="Aquí puedes ver el historial de solicitudes realizadas"
   />
-  <div class="items-center justify-center">
-    <History client:only="react" data={requests} />
-  </div>
-</div>
+  <History client:only="react" data={requests} />
 </MainLayout>

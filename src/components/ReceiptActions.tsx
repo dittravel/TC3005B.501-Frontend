@@ -65,7 +65,7 @@ export default function ReceiptActions({
   };
 
   return (
-    <div className="flex flex-row gap-2 items-center justify-center w-full">
+    <div className="flex flex-col md:flex-row gap-2 w-full items-stretch">
       <AproveReceipStatus
         receipt_id={receipt_id}
         title="Aprobar comprobante"

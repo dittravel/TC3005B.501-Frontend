@@ -33,8 +33,8 @@ const sizeClasses = {
 // Color configuration for each button
 const colorMap = {
   primary: {
-    bg: 'bg-[var(--color-primary-300)]',
-    hover: 'hover:bg-[var(--color-primary-400)]',
+    bg: 'bg-[var(--color-primary-100)]',
+    hover: 'hover:bg-[var(--color-primary-500)]',
     active: 'active:bg-[var(--color-primary-500)]',
     baseText: 'text-white',
     text: 'text-[var(--color-primary-200)]',
@@ -60,7 +60,7 @@ const colorMap = {
   },
   success: {
     bg: 'bg-[var(--color-success-200)]',
-    hover: 'hover:bg-[var(--color-success-100)]',
+    hover: 'hover:bg-[var(--color-success-300)]',
     active: 'active:bg-[var(--color-success-300)]',
     baseText: 'text-white',
     text: 'text-[var(--color-success-200)]',
@@ -73,7 +73,7 @@ const colorMap = {
   },
   warning: {
     bg: 'bg-[var(--color-warning-200)]',
-    hover: 'hover:bg-[var(--color-warning-100)]',
+    hover: 'hover:bg-[var(--color-warning-300)]',
     active: 'active:bg-[var(--color-warning-300)]',
     baseText: 'text-white',
     text: 'text-[var(--color-warning-200)]',
@@ -111,7 +111,7 @@ export function getButtonClasses({
 
   const variants = {
     filled: disabled
-      ? 'bg-[var(--color-neutral-300)] text-text-secondary'
+      ? 'bg-[var(--color-neutral-200)] text-text-secondary'
       : `${safeColor.bg} ${safeColor.baseText} ${safeColor.hover} ${safeColor.active}`,
 
     border: disabled

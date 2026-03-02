@@ -1,0 +1,30 @@
+---
+/**
+ * MenuButton
+ * 
+ * A button that toggles the visibility of the sidebar on smaller screens.
+ */
+
+import MaterialIcon from "@components/MaterialIcon.astro";
+---
+
+<button
+  id="menu-button"
+  class="flex text-white cursor-pointer border-none bg-transparent p-0 hover:opacity-80 transition-opacity"
+  aria-label="Toggle sidebar"
+  type="button"
+>
+  <MaterialIcon icon="menu" />
+</button>
+
+<script>
+  const button = document.getElementById("menu-button");
+  if (button) {
+    button.addEventListener("click", () => {
+      const sidebar = document.getElementById("sidebar");
+      if (sidebar) {
+        sidebar.classList.toggle("open");
+      }
+    });
+  }
+</script>

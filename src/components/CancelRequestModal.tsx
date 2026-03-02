@@ -30,8 +30,7 @@ export default function CancelRequestModal({ id, disabled = false, children, tok
     <>
       <button
         onClick={() => setIsOpen(true)}
-        style={disabled ? { opacity: 0.5, pointerEvents: "none" } : undefined}
-        className="hover:scale-110 transform transition-transform duration-200"
+        style={disabled ? { pointerEvents: "none" } : undefined}
       >
         {children}
       </button>

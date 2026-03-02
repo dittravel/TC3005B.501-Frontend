@@ -6,6 +6,7 @@
 import { useCallback } from "react";
 import { apiRequest } from "@utils/apiClient";
 import ModalWrapper from "@components/ModalWrapper";
+import Button from "@components/Button";
 
 interface Props {
   receipt_id: number;
@@ -54,13 +55,21 @@ export default function AproveReceipStatus({
     <ModalWrapper
       title={title}
       message={message}
-      button_type={modal_type}
+      button_type="success"
       modal_type={modal_type}
       onConfirm={handleConfirm}
-      variant={variant}
       disabled={disabled}
-    >
-      {children}
-    </ModalWrapper>
+      triggerElement={
+        <Button
+          color="success"
+          variant="filled"
+          size="medium"
+          disabled={disabled}
+          customSizeClass="w-full"
+        >
+          {children}
+        </Button>
+      }
+    />
   );
 }

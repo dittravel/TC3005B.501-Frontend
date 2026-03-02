@@ -34,10 +34,10 @@ export default function Toast({ message, type, duration = 4000 }: Props) {
   `;
 
   const typeStyle = {
-    success: 'bg-green-50 border-green-500 text-green-800',
-    error: 'bg-red-50 border-red-500 text-red-800',
-    info: 'bg-blue-50 border-blue-500 text-blue-800',
-    warning: 'bg-yellow-50 border-yellow-500 text-yellow-800',
+    success: 'bg-success-50 border-success-500 text-success-400',
+    error: 'bg-warning-50 border-warning-500 text-warning-500',
+    info: 'bg-primary-50 border-primary-500 text-primary-500',
+    warning: 'bg-alert-50 border-alert-400 text-alert-400',
   };
 
   return (

@@ -41,12 +41,12 @@ export default function LogoutButton({ children }: LogoutButtonProps) {
       </button>
 
       {showConfirm && (
-        <div className="absolute top-full right-0 mt-2 w-56 bg-white shadow-xl rounded-lg p-4 z-100 border border-gray-200">
-          <p className="text-gray-800 mb-4 text-sm">¿Estás seguro de que deseas cerrar sesión?</p>
+        <div className="absolute top-full right-0 mt-2 w-56 bg-neutral-0 shadow-xl rounded-lg p-4 z-100 border border-border">
+          <p className="text-text-primary mb-4 text-sm">¿Estás seguro de que deseas cerrar sesión?</p>
           <div className="flex gap-2">
             <button
               onClick={handleLogout}
-              className="flex-1 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition-colors font-semibold"
+              className="flex-1 bg-warning-500 text-white py-2 rounded-lg hover:bg-warning-400 transition-colors font-semibold"
             >
               Cerrar Sesión
             </button>

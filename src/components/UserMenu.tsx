@@ -44,10 +44,10 @@ export default function UserMenu({ children }: UserMenuProps) {
     <div className="relative h-full" ref={menuRef}>
       <button
         onClick={() => setShowMenu(!showMenu)}
-        className="h-full flex items-center gap-2 bg-white text-primary-500 py-1 px-3
+        className="h-full flex items-center gap-2 bg-white text-black py-1 px-3
                   rounded-full font-bold text-sm cursor-pointer
                   transition-all duration-200
-                  hover:bg-primary-50"
+                  hover:opacity-80"
         title="Menú de usuario"> {/* Tooltip */}
         {children}
       </button>
@@ -55,10 +55,10 @@ export default function UserMenu({ children }: UserMenuProps) {
       {/* Dropdown Menu */}
       {showMenu && (
         <div className="absolute top-full right-0 mt-2 w-56
-                       bg-background shadow-xl rounded-lg p-4 z-100
+                       bg-card shadow-xl rounded-lg p-4 z-100
                        border border-border">
           <div className="flex flex-col gap-2">
-            <Button onClick={handleSettings} color="primary" className="w-full">
+            <Button onClick={handleSettings} color="secondary" className="w-full">
               Ajustes de Usuario
             </Button>
             <Button onClick={handleLogout} color="warning" className="w-full">

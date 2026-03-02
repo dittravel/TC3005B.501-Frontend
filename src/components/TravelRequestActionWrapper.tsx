@@ -6,6 +6,7 @@
 import { useCallback, useState } from "react";
 import { apiRequest } from "@utils/apiClient";
 import ModalWrapper from "@components/ModalWrapper";
+import Button from "@components/Button";
 import Toast from "@components/Toast";
 
 interface Props {
@@ -32,6 +33,11 @@ export default function TravelRequestActionWrapper({
   token,
 }: Props) {
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  
+  const getButtonColor = (): "success" | "warning" => {
+    return endpoint.includes("authorize-travel-request") ? "success" : "warning";
+  };
+
   const handleConfirm = useCallback(async () => {
     try {
       const url = `${endpoint}/${request_id}/${role}`;
@@ -65,9 +71,17 @@ export default function TravelRequestActionWrapper({
         button_type={modal_type}
         modal_type={modal_type}
         onConfirm={handleConfirm}
-      >
-        {children}
-      </ModalWrapper>
+        triggerElement={
+          <Button
+            color={getButtonColor()}
+            variant="filled"
+            size="medium"
+            customSizeClass="w-full"
+          >
+            {children}
+          </Button>
+        }
+      />
       {toast && <Toast message={toast.message} type={toast.type} />}
     </>
   );

@@ -57,10 +57,11 @@ const initialFormData: FormData = {
 };
 
 const labelClass = "block text-sm font-medium text-text-secondary mb-1";
-const baseInputClass = "w-full border rounded-md px-3 py-2 bg-neutral-50 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500 border-border";
-const errorClass = "text-red-500 text-sm mt-1";
+const baseInputClass = "w-full border rounded-md px-3 py-2 text-text-primary placeholder:text-text-secondary border-border bg-card hover:bg-card-hover focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary";
+const selectClass = "w-full border rounded-md px-3 py-2 text-text-primary border-border bg-card hover:bg-card-hover focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary cursor-pointer appearance-none";
+const errorClass = "text-warning-500 text-sm mt-1";
 const formClass = "bg-card rounded-lg shadow-md p-8 border border-border";
-const infoClass = "flex items-center bg-gradient-to-r from-primary-50 to-primary-100 border-l-4 border-blue-500 p-4 mb-8 rounded shadow-sm";
+const infoClass = "flex items-center bg-secondary/30 border-l-4 border-secondary p-4 mb-8 rounded shadow-sm";
 const buttonContainerClass = "flex flex-col sm:flex-row justify-end gap-3 pt-4";
 const toastClass = "fixed top-4 right-4 z-50";
 
@@ -237,16 +238,16 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token }: C
   };
 
   const inputClass = (fieldName: string) =>
-    `${baseInputClass} ${errors[fieldName] ? 'border-red-500' : ''}`;
+    `${baseInputClass} ${errors[fieldName] ? 'border-warning-500' : ''}`;
 
   return (
     <div className={formClass}>
       <div className={infoClass}>
-        <svg className="w-6 h-6 text-blue-500 mr-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+        <svg className="w-6 h-6 text-secondary mr-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="white" />
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01" />
         </svg>
-        <p className="text-sm text-blue-900 font-medium">
+        <p className="text-sm text-text-primary font-medium">
           Los campos obligatorios están marcados con un asterisco.
         </p>
       </div>
@@ -256,7 +257,7 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token }: C
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className={labelClass}>
-              Nombre de Usuario <span className="text-red-500">*</span>
+              Nombre de Usuario <span className="text-warning-500">*</span>
             </label>
             <input
               type="text"
@@ -273,7 +274,7 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token }: C
           { mode === 'create' && (
           <div>
             <label className={labelClass}>
-              Contraseña <span className="text-red-500">*</span>
+              Contraseña <span className="text-warning-500">*</span>
             </label>
             <input
               type="password"
@@ -294,7 +295,7 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token }: C
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className={labelClass}>
-              Email <span className="text-red-500">*</span>
+              Email <span className="text-warning-500">*</span>
             </label>
             <input
               type="email"
@@ -311,7 +312,7 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token }: C
 
           <div>
             <label className={labelClass}>
-              Número de Teléfono <span className="text-gray-400">(opcional)</span>
+              Número de Teléfono <span className="text-text-secondary">(opcional)</span>
             </label>
             <input
               type="tel"
@@ -330,7 +331,7 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token }: C
         {/* Workstation */}
         <div>
           <label className={labelClass}>
-            Estación de Trabajo <span className="text-red-500">*</span>
+            Estación de Trabajo <span className="text-warning-500">*</span>
           </label>
           <input
             type="text"
@@ -349,13 +350,13 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token }: C
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className={labelClass}>
-              Rol <span className="text-red-500">*</span>
+              Rol <span className="text-warning-500">*</span>
             </label>
             <select
               name="role_id"
               value={formData.role_id}
               onChange={handleInputChange}
-              className={inputClass('role_id')}
+              className={`${selectClass} ${errors.role_id ? 'border-warning-500' : ''}`}
             >
               <option value="">Seleccionar rol</option>
               {roles.map(role => (
@@ -371,13 +372,13 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token }: C
 
           <div>
             <label className={labelClass}>
-              Departamento <span className="text-red-500">*</span>
+              Departamento <span className="text-warning-500">*</span>
             </label>
             <select
               name="department_id"
               value={formData.department_id}
               onChange={handleInputChange}
-              className={inputClass('department_id')}
+              className={`${selectClass} ${errors.department_id ? 'border-warning-500' : ''}`}
             >
               <option value="">Seleccionar departamento</option>
               {departments.map(dept => (
@@ -398,7 +399,7 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token }: C
             type="button"
             onClick={handleReset}
             variant="border"
-            color="secondary"
+            color="primary"
             disabled={isSubmitting}
           >
             {mode === 'edit' ? 'Cancelar' : 'Limpiar Formulario'}
@@ -407,7 +408,7 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token }: C
           <Button
             type="submit"
             variant="filled"
-            color="primary"
+            color="secondary"
             disabled={isSubmitting}
           >
             {isSubmitting

@@ -8,21 +8,25 @@
  * 	<PageHeader
  *    userName="John Doe"
  *		buttonLabel="Admin"
+ *    showNotifications={true}
  *  />
  */
 
-const { userName, buttonLabel } = Astro.props;
+const { userName, buttonLabel, showNotifications = false } = Astro.props;
 import MaterialIcon from "@components/MaterialIcon.astro";
 import UserMenu from "@components/UserMenu.tsx";
-import ThemeButton from "@components/ThemeButton.astro";
+import ThemeButton from "./ThemeButton.astro";
+import MenuButton from "./MenuButton.astro";
+import NotificationsButton from "./NotificationsButton.astro";
 ---
 
 <header class="h-15 flex justify-between items-center bg-header-bg px-4 py-3 border-b border-border">
   <!-- Left Section -->
-  <div class="h-15 flex items-center px-5">
+  <div class="h-15 flex items-center px-5 gap-4">
+    <MenuButton client:load />
     <img
       src="/logo_texto_dittravel_blanco.png"
-      class="w-auto h-full rounded drop-shadow-lg cursor-pointer"
+      class="w-auto h-full rounded drop-shadow-lg cursor-pointer hidden md:block"
       onclick="if(confirm('¿Volver al dashboard?')) window.location.href = '/dashboard'"
       title="Volver al dashboard"
       alt="Logo Dittravel"
@@ -31,21 +35,22 @@ import ThemeButton from "@components/ThemeButton.astro";
 
   <!-- Right Section -->
   <div class="h-full flex items-center gap-4">
-    
-    <!-- Theme Button -->
-    <div class="flex items-center gap-2">
-      <ThemeButton />
-    </div>
+
+    <!-- Theme Toggle Button -->
+    <ThemeButton client:load />
 
     <!-- User Role -->
-    <span class="text-brand-100 font-bold text-sm">
+    <span class="text-brand-200 font-bold text-sm">
       {buttonLabel}
     </span>
 
     <!-- User Info -->
     <UserMenu client:load>
-      <span class="text-primary-500">{userName}</span>
-      <MaterialIcon icon="account_circle" color="primary-500" />
+      <span class="text-black">{userName}</span>
+      <MaterialIcon icon="account_circle" color="black" />
     </UserMenu>
+
+    <!-- Notifications Button -->
+    {showNotifications && <NotificationsButton client:load />}
   </div>
 </header>

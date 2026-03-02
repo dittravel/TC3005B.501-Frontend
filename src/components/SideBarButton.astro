@@ -20,20 +20,20 @@ const { item, isActive } = Astro.props;
 
 <a
   href={item.route}
-  class={`flex items-center gap-4 px-4 py-3 rounded-lg
+  class={`flex items-center gap-3 px-3 py-2 rounded-lg
           transition-colors duration-200
-          group bg-neutral-25
-          hover:bg-neutral-200
+          group bg-card
+          hover:bg-card-hover
     ${isActive 
-      ? 'bg-primary-500 text-white pointer-events-none'
-      : 'text-text-secondary'
+      ? 'bg-secondary text-white pointer-events-none'
+      : 'text-text-primary'
     }
   `}
 >
   <span class="flex items-center justify-center w-6 h-6">
     <MaterialIcon
       icon={item.icon}
-      color={isActive ? 'white' : 'text-secondary'}
+      color={isActive ? '' : 'text-primary'}
     />
   </span>
   <span class="truncate text-sm font-medium">{item.label}</span>

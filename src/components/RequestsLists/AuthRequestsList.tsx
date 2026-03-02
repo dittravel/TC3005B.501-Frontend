@@ -13,6 +13,8 @@ interface Props {
   data: any[];
   type?: string;
   role: UserRole;
+  title?: string;
+  subtitle?: string;
 }
 
 interface Column {
@@ -50,9 +52,11 @@ function mapRequestToTableRow(request: Record<string, any>): Record<string, any>
  * @param data - The array of request objects to display.
  * @param type - An optional string to specify the type of requests (e.g., "autorizaciones").
  * @param role - The user role to determine available actions.
+ * @param title - Optional title for the section.
+ * @param subtitle - Optional subtitle for the section.
  * @returns A React component that displays the requests in a table with pagination controls.
  */
-export default function AuthorizerRequestsList({ data, type, role }: Props) {
+export default function AuthorizerRequestsList({ data, type, role, title = "Solicitudes", subtitle }: Props) {
   const requestsPerPage = 10;
   const [page, setPage] = useState(1);
   const [visibleRequests, setVisibleRequests] = useState<Record<string, any>[]>([]);
@@ -67,7 +71,11 @@ export default function AuthorizerRequestsList({ data, type, role }: Props) {
   }, [page, data]);
   
   return (
-    <div>
+    <section className="w-full">
+      <div className="flex flex-col justify-between mb-4">
+        <h2 className="text-xl font-bold text-text-primary">{title} ({data.length})</h2>
+        {subtitle && <p className="text-sm text-text-secondary">{subtitle}</p>}
+      </div>
       <div className="flex flex-col w-full gap-4 min-h-160">
         <DataTable columns={columns} rows={visibleRequests} type={type} role={role}/>
       </div>
@@ -77,6 +85,6 @@ export default function AuthorizerRequestsList({ data, type, role }: Props) {
         setPage={setPage}
         maxVisible={5}
       />
-    </div>
+    </section>
   );
 }

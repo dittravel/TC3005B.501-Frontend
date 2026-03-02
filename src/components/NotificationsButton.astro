@@ -1,0 +1,30 @@
+---
+/**
+ * Notifications Button
+ * 
+ * A button that toggles the visibility of the notifications sidebar.
+ */
+
+import MaterialIcon from "@components/MaterialIcon.astro";
+---
+
+<button
+  id="notifications-button"
+  class="flex text-white cursor-pointer border-none bg-transparent p-0 hover:opacity-80 transition-opacity"
+  aria-label="Toggle sidebar"
+  type="button"
+>
+  <MaterialIcon icon="notifications" />
+</button>
+
+<script>
+  const button = document.getElementById("notifications-button");
+  if (button) {
+    button.addEventListener("click", () => {
+      const sidebar = document.getElementById("messages");
+      if (sidebar) {
+        sidebar.classList.toggle("open");
+      }
+    });
+  }
+</script>

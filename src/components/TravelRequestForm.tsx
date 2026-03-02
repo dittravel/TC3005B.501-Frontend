@@ -9,6 +9,7 @@ import type { FormData } from '@/types/FormData';
 import type { DepartmentData } from '@/types/DepartmentData';
 import RouteInputGroup from '@/components/RouteInputGroup';
 import Toast from '@/components/Toast';
+import Button from '@components/Button';
 
 interface Props {
   data?: FormData;
@@ -19,7 +20,7 @@ interface Props {
   token: string;
 }
 
-const baseInputClass = "w-full border rounded-md px-3 py-2 bg-card placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500 border-border";
+const baseInputClass = "w-full border rounded-md px-3 py-2 text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary bg-card border-border";
 
 const emptyRoute: TravelRoute = {
   router_index: 0,
@@ -51,7 +52,7 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const inputClass = (fieldName: string) =>
-    `${baseInputClass} ${error ? 'border-red-500' : ''}`;
+    `${baseInputClass} ${error ? 'border-warning-500' : ''}`;
   useEffect(() => {
     if (data) {
       const transformedRoutes = data.routes.map(route => ({
@@ -518,14 +519,14 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
   };
 
   return (
-    <form onSubmit={handleSubmitRequest} className="space-y-8">
-      {/* Nota de campos obligatorios */}
-      <div className="flex items-center bg-linear-to-r from-blue-50 to-blue-100 border-l-4 border-blue-500 p-4 rounded shadow-sm mb-4">
-        <svg className="w-6 h-6 text-blue-500 mr-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+    <form onSubmit={handleSubmitRequest}>
+      {/* Obligatory Fields Notice */}
+      <div className="flex items-center bg-secondary/30 border-l-4 border-secondary p-4 rounded shadow-sm mb-4">
+        <svg className="w-6 h-6 text-secondary mr-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="white" />
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01" />
         </svg>
-        <p className="text-sm text-blue-900 font-medium">
+        <p className="text-sm text-text-primary font-medium">
           Los campos obligatorios están marcados con un asterisco.
         </p>
       </div>
@@ -543,50 +544,48 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
       ))}
 
       {/* Button to add more routes */}
-      <div className="flex justify-start mt-6">
-        <button
+      <div className="flex justify-end mt-6">
+        <Button
           type="button"
           onClick={addRoute}
-          className="bg-blue-600 text-white px-5 py-2 rounded-md shadow-md hover:bg-blue-700 transition-colors"
+          color="secondary"
         >
-          + Agregar Ruta a mi Viaje
-        </button>
+          + Agregar Ruta
+        </Button>
       </div>
 
-      <hr className="my-8 border-border" />
-
       {/* General Trip Details */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-700">Detalles Generales del Viaje</h3>
+      <div className="space-y-6 mb-6">
+        <h3 className="text-lg font-semibold text-text-primary">Detalles Generales del Viaje</h3>
         <div>
-          <label className="block text-sm font-medium mb-1">Anticipo Esperado (MXN)<span className="text-red-500"> *</span></label>
+          <label className="block text-text-secondary text-sm font-medium mb-1">Anticipo Esperado (MXN)<span className="text-warning-500"> *</span></label>
           <input name="requested_fee" placeholder="Anticipo Esperado (MXN)" type="number" className={inputClass('requested_fee')} value={formData.requested_fee === 0 ? '' : formData.requested_fee} onChange={handleGeneralChange} required />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Observaciones / Comentarios<span className="text-red-500"> *</span></label>
-          <textarea name="notes" rows={4} className="w-full border p-2 rounded-md" value={formData.notes} onChange={handleGeneralChange} required></textarea>
+          <label className="block text-text-secondary text-sm font-medium mb-1">Observaciones / Comentarios<span className="text-warning-500"> *</span></label>
+          <textarea name="notes" rows={4} className="w-full border border-border p-3 rounded-md bg-card text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" value={formData.notes} onChange={handleGeneralChange} required></textarea>
         </div>
       </div>
 
       {/* Department Info */}
       {deptData && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div>
-            <label className="block text-sm font-medium mb-1">Centro de Costos</label>
+            <label className="block text-text-secondary text-sm font-medium mb-1">Centro de Costos</label>
             <input
               type="text"
               value={deptData.costs_center}
               disabled
-              className="w-full border rounded p-2 bg-gray-100"
+              className="w-full border border-border rounded-md px-3 py-2 bg-primary-50 text-text-secondary"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Departamento</label>
+            <label className="block text-text-secondary text-sm font-medium mb-1">Departamento</label>
             <input
               type="text"
               value={deptData.department_name}
               disabled
-              className="w-full border rounded p-2 bg-gray-100"
+              className="w-full border border-border rounded-md px-3 py-2 bg-primary-50 text-text-secondary"
             />
           </div>
         </div>
@@ -594,73 +593,88 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
 
       {/* Mensaje de Error */}
       { error && (
-        <div className="bg-red-200 text-red-800 p-4 rounded-md">
+        <div className="bg-warning-50 text-warning-500 p-4 rounded-md border border-warning-500 mb-4">
           <p className="text-sm">{error}</p>
         </div>
       )}
       {mode === 'draft' && !error && (
-        <div className="bg-yellow-100 text-yellow-800 p-4 rounded-md">
+        <div className="bg-alert-50 text-alert-400 p-4 rounded-md border border-alert-400 mb-4">
           <p className="text-sm">Estás editando un borrador. Asegúrate de completar todos los campos antes de enviar.</p>
         </div>
       )}
       {mode === 'edit' && !error && (
-        <div className="bg-yellow-100 text-yellow-800 p-4 rounded-md">
+        <div className="bg-alert-50 text-alert-400 p-4 rounded-md border border-alert-400 mb-4">
           <p className="text-sm">Estás editando una solicitud existente. Asegúrate de revisar todos los campos antes de actualizar.</p>
         </div>
       )}
       {mode === 'create' && !error && (
-        <div className="bg-blue-100 text-blue-800 p-4 rounded-md">
+        <div className="bg-secondary/30 text-secondary p-4 rounded-md border border-secondary mb-4">
           <p className="text-sm">Estás creando una nueva solicitud de viaje. Completa todos los campos requeridos.</p>
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row justify-end gap-3">
-        <button type="button" onClick={handleResetForm} className="disabled:bg-gray-400 disabled:cursor-not-allowed bg-red-500 text-white px-6 py-2 rounded-md shadow hover:bg-red-600 transition-colors"
+      <div className="flex flex-col sm:flex-row justify-end gap-3 mt-6">
+        <Button 
+          type="button" 
+          onClick={handleResetForm} 
+          variant="border"
+          color="primary"
           disabled={disabledButton}
         >
           Limpiar Formulario
-        </button>
+        </Button>
         {mode == 'create' && (
           <div className='flex gap-3'>
-            <button type="button" onClick={handleSaveDraft} className="disabled:bg-gray-400 disabled:cursor-not-allowed bg-gray-500 text-white px-6 py-2 rounded-md shadow hover:bg-gray-600 transition-colors"
+            <Button 
+              type="button" 
+              onClick={handleSaveDraft}
+              color="primary"
               disabled={disabledButton}
             >
               Guardar Borrador
-            </button>
-            <button type="button" onClick={handleSubmitRequest} className="disabled:bg-gray-400 disabled:cursor-not-allowed bg-green-600 text-white px-6 py-2 rounded-md shadow hover:bg-green-700 transition-colors"
+            </Button>
+            <Button 
+              type="button" 
+              onClick={handleSubmitRequest}
+              color="success"
               disabled={disabledButton}
             >
               Enviar Solicitud
-            </button>
+            </Button>
           </div>
         )}
         {mode == 'edit' && (
-          <button type="button"
+          <Button 
+            type="button"
             onClick={async (e) => {
               await handleEditRequest(e as unknown as React.FormEvent, true, '/dashboard');
             }}
-            className="disabled:bg-gray-400 disabled:cursor-not-allowed bg-blue-600 text-white px-6 py-2 rounded-md shadow hover:bg-blue-700 transition-colors"
+            color="secondary"
             disabled={disabledButton}
           >
             Actualizar Solicitud
-          </button>
+          </Button>
         )}
         {mode == 'draft' && (
           <div className='flex gap-3'>
-            <button type="button"
+            <Button 
+              type="button"
               onClick={async (e) => {
                 await handleEditRequest(e as unknown as React.FormEvent, false, '/solicitudes-draft');
               }}
-              className="disabled:bg-gray-400 disabled:cursor-not-allowed bg-gray-500 text-white px-6 py-2 rounded-md shadow hover:bg-gray-600 transition-colors"
+              color="primary"
               disabled={disabledButton}
             >
               Guardar Cambios
-            </button>
-            <button type="button" onClick={handleFinishDraft} className="disabled:bg-gray-400 disabled:cursor-not-allowed bg-green-600 text-white px-6 py-2 rounded-md shadow hover:bg-green-700 transition-colors"
+            </Button>
+            <Button 
+              type="button" 
+              onClick={handleFinishDraft}
+              color="success"
               disabled={disabledButton}
             >
               Enviar Solicitud
-            </button>
+            </Button>
           </div>
         )}
         {toast && <Toast message={toast.message} type={toast.type} />}

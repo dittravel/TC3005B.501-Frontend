@@ -3,8 +3,7 @@
  * Applicant view of the dashboard
  */
 
-import MaterialIcon from "@components/MaterialIcon.astro";
-import Button from "@components/Button.astro";
+import Button from "@components/Button";
 import TextHeader from "@components/TextHeader.astro";
 import CancelRequestModal from "@components/CancelRequestModal.tsx";
 
@@ -13,12 +12,12 @@ import { apiRequest } from '@utils/apiClient';
 
 // Color for each request status
 const colorDesign: { [key: string]: string } = {
-  'Primera Revisión': "text-orange-400",
-  'Segunda Revisión': "text-orange-500",
-  'Cotización del Viaje': "text-orange-600",
-  'Atención Agencia de Viajes': "text-orange-700",
-  'Comprobación gastos del viaje': "text-blue-500",
-  'Validación de comprobantes': "text-blue-600",
+  'Primera Revisión': "text-alert-400",
+  'Segunda Revisión': "text-alert-400",
+  'Cotización del Viaje': "text-alert-400",
+  'Atención Agencia de Viajes': "text-alert-400",
+  'Comprobación gastos del viaje': "text-primary-500",
+  'Validación de comprobantes': "text-primary-500",
 };
 
 // Get user ID from cookies
@@ -56,69 +55,68 @@ const { userName } = Astro.props;
       subtitle="Ditta Consulting"
     />
 
-    <section class="p-6 rounded-lg bg-card shadow w-full border border-border">
+    <section>
       {/* Title */}
-      <h2 class="flex text-xl font-bold mb-4 text-text-primary">
-        Viajes en Proceso
-        <span class="px-2 align-middle text-primary-500">({requests.length})</span>
-      </h2>
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold text-text-primary">
+          Viajes en Proceso
+          <span class="px-2 align-middle text-primary-500">({requests.length})</span>
+        </h2>
+        <a href="/crear-solicitud">
+          <Button variant="filled" color="secondary" size="custom" customSizeClass="py-2 px-4 text-base font-bold">
+            Solicita un nuevo viaje
+          </Button>
+        </a>
+      </div>
 
       {/* Request list */}
       {requests.length > 0 ? (
-        <div class="grid gap-4">
+        <div class="space-y-6">
           {requests.map((request: any) => {
             const isEditable = request.status === "Primera Revisión";
             const isNotCancelable = request.status === "Comprobación gastos del viaje" || request.status === "Validación de comprobantes";
             const mustBeChecked = request.status === "Comprobación gastos del viaje";
             return (
-              <div class="grid grid-cols-[2fr_2fr_1fr] gap-8">
-                <a href={`/detalles-solicitud/${request.request_id}`} class="col-span-2">
-                  <div class="col-span-2 space-y-2 content-wrapper">
-                    <p class="font-bold text-lg wrap-break-words text-text-primary">#{request.request_id}</p>
-                    <div class="text-sm text-text-primary grid grid-cols-[2fr_3fr] gap-y-1">
-                      <p><span class="font-semibold">País Destino:</span> {request.destination_country}</p>
-                      <p>
-                        <span class="font-semibold">Estado:</span> 
-                        <span class={`ml-1 font-semibold text-sm rounded bg-yellow ${colorDesign[String(request.status)]}`}>
-                          {(request.status ? request.status.toUpperCase() : '')}
-                        </span>
-                      </p>
-                      <p><span class="font-semibold">Fechas:</span> {request.beginning_date} - {request.ending_date}</p>
-                      <p><span class="font-semibold">Responsable:</span> Eduardo Porto Morales</p>
+              <div class="content-wrapper">
+                <div class="grid grid-cols-[1fr] md:grid-cols-[2fr_1fr] gap-8 md:gap-8">
+                  <a href={`/detalles-solicitud/${request.request_id}`}>
+                    <div>
+                      <p class="font-bold text-lg wrap-break-words text-text-primary">#{request.request_id}</p>
+                      <div class="text-sm text-text-primary grid grid-cols-[2fr_3fr] gap-y-1">
+                        <p><span class="font-semibold">País Destino:</span> {request.destination_country}</p>
+                        <p>
+                          <span class="font-semibold">Estado:</span> 
+                          <span class={`ml-1 font-semibold text-sm rounded bg-yellow ${colorDesign[String(request.status)]}`}>
+                            {(request.status ? request.status.toUpperCase() : '')}
+                          </span>
+                        </p>
+                        <p><span class="font-semibold">Fechas:</span> {request.beginning_date} - {request.ending_date}</p>
+                        <p><span class="font-semibold">Responsable:</span> Eduardo Porto Morales</p>
+                      </div>
                     </div>
-                  </div>
-                </a>
-                <div class="grid grid-cols-[1fr_auto] gap-4 items-center">
+                  </a>
                   <div class="flex flex-col gap-2">
-                    <a href={`/editar-solicitud/${request.request_id}`}>
-                      <Button color="primary" disabled={!isEditable} variant="filled" size="medium" customSizeClass="w-full">
-                        Editar
-                      </Button>
-                    </a>
-                    <a href={`/comprobar-solicitud/${request.request_id}`}>
-                      <Button color="secondary" disabled={!mustBeChecked} variant="filled" size="medium" customSizeClass="w-full">
-                        Comprobar Gatos
-                      </Button>
-                    </a>
-                  </div>
-                  <div class="flex justify-end items-center h-full">
-                    <span class="flex items-center justify-center w-6 h-6">                        
-                      <CancelRequestModal
-                        client:only="react"
-                        id={request.request_id}
-                        disabled={isNotCancelable}
-                        token={getCookie("token", Astro.cookies) || ""}
-                      >
-                        <div>
-                          <MaterialIcon
-                            icon="delete"
-                            color="warning-500"
-                            style="cursor:pointer"
-                          />
-                        </div>
-                      </CancelRequestModal>
-                    </span>
-                  </div>
+                  <a href={`/editar-solicitud/${request.request_id}`} class="w-full">
+                    <Button color="secondary" disabled={!isEditable} variant="filled" size="medium" customSizeClass="w-full">
+                      Editar
+                    </Button>
+                  </a>
+                  <a href={`/comprobar-solicitud/${request.request_id}`} class="w-full">
+                    <Button color="secondary" disabled={!mustBeChecked} variant="filled" size="medium" customSizeClass="w-full">
+                      Comprobar Gastos
+                    </Button>
+                  </a>
+                  <CancelRequestModal
+                    client:only="react"
+                    id={request.request_id}
+                    disabled={isNotCancelable}
+                    token={getCookie("token", Astro.cookies) || ""}
+                  >
+                    <Button color="warning" disabled={isNotCancelable} variant="filled" size="medium" customSizeClass="w-full">
+                      Cancelar
+                    </Button>
+                  </CancelRequestModal>
+                </div>
                 </div>
               </div>
             );
@@ -130,12 +128,6 @@ const { userName } = Astro.props;
         </div>
       )}
     </section>
-
-    <a href="/crear-solicitud" class="mt-8 flex justify-center">
-      <Button variant="filled" color="secondary" size="custom" customSizeClass="w-full py-3 text-base font-bold">
-        Solicita un nuevo viaje
-      </Button>
-    </a>
 
   </main>
 </div>

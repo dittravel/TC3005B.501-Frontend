@@ -29,5 +29,5 @@ try {
 ---
 
 <MainLayout title={`Detalle #${request.request_id}`} data={{userName, buttonLabel, role}} >
-  <RequestDetail request={request} />
+  <RequestDetail request={request} title={`Solicitud #${request.request_id}`} subtitle="Detalles de solicitud de viaje" />
 </MainLayout>

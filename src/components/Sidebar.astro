@@ -5,9 +5,11 @@
  * Sidebar
  * 
  * Renders a vertical sidebar menu based on the user's role.
+ * Menu items are dynamically grouped by category.
  */
 
 import type { UserRole } from "@type/roles";
+import type { MenuItem } from "@type/menu-config";
 import { SIDEBAR_CONFIG } from "@type/menu-config";
 import SidebarButton from "@components/SideBarButton.astro";
 
@@ -19,21 +21,44 @@ const { role } = Astro.props;
 const currentPath = Astro.url.pathname;
 
 const items = SIDEBAR_CONFIG[role] ?? [];
+
+// Group items by category dynamically
+const groupedItems = items.reduce((acc, item) => {
+  const category = item.category || 'General';
+  if (!acc[category]) acc[category] = [];
+  acc[category].push(item);
+  return acc;
+}, {} as Record<string, MenuItem[]>);
 ---
 
-<aside class="w-64 h-full border-r border-border bg-sidebar">
+<aside class="w-full md:w-64 h-full
+              border-r border-border bg-sidebar
+              lg:relative fixed lg:z-auto z-50
+              bg-card
+              ">
   <div class="h-full px-4 py-6 overflow-auto">
-    <ul class="space-y-2 list-none p-0 m-0">
-      {
-        items.map((item) => {
-          const isActive = currentPath.startsWith(item.route);
-          return (
-            <li>
-              <SidebarButton item={item} isActive={isActive} />
-            </li>
-          );
-        })
-      }
-    </ul>
+    {
+      Object.entries(groupedItems).map(([category, categoryItems]) => (
+        <div class="mb-6">
+          {category !== 'General' && (
+            <h3 class="text-xs font-semibold text-text-secondary uppercase tracking-wider px-2 mb-2">
+              {category}
+            </h3>
+          )}
+          <ul class="space-y-1 list-none p-0 m-0">
+            {
+              categoryItems.map((item) => {
+                const isActive = currentPath.startsWith(item.route);
+                return (
+                  <li>
+                    <SidebarButton item={item} isActive={isActive} />
+                  </li>
+                );
+              })
+            }
+          </ul>
+        </div>
+      ))
+    }
   </div>
 </aside>

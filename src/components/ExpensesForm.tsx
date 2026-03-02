@@ -16,7 +16,7 @@ interface Props {
 }
 
 const labelClass = "block text-sm font-medium text-text-secondary mb-1";
-const baseInputClass = "w-full border rounded-md px-3 py-2 bg-neutral-50 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-500 border-border";
+const baseInputClass = "w-full border border-border rounded-md px-3 py-2 bg-card text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary";
 const buttonContainerClass = "flex flex-col sm:flex-row justify-end gap-3 pt-4";
 
 export default function ExpensesFormClient({ requestId, token, receiptToReplace }: Props) {
@@ -115,8 +115,8 @@ export default function ExpensesFormClient({ requestId, token, receiptToReplace 
       />
 
       <div className={buttonContainerClass}>
-        <a href={`/comprobar-solicitud/${requestId}`}>
-          <Button type="button" variant="border" color="warning">
+        <a href={`/comprobar-solicitud/${requestId}`} className="w-full sm:w-auto">
+          <Button variant="border" color="warning">
             Cancelar
           </Button>
         </a>
@@ -124,7 +124,7 @@ export default function ExpensesFormClient({ requestId, token, receiptToReplace 
           title="Subir comprobación"
           message="¿Está seguro de que desea subir este Comprobante?"
           modal_type="confirm"
-          button_type="primary"
+          button_type="success"
           variant="filled"
           onConfirm={handleSubmit}
         >

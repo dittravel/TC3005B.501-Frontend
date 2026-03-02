@@ -3,8 +3,7 @@
  * This script is used to create a page that shows the reimbursement panel for the user.
  */
 
-import InputField from '@components/InputField.astro';
-import Button from '@components/Button.astro';
+import Button from '@components/Button';
 import TextHeader from '@components/TextHeader.astro';
 import MainLayout from "@layouts/MainLayout.astro";
 
@@ -35,112 +34,101 @@ const verifiedReceipts = [
 <MainLayout title="Panel de Reembolsos" data={{userName, buttonLabel, role}}>
   <div>
     <TextHeader
-      title="PANEL DE REEMBOLSOS"
+      title="Panel de reembolsos"
       subtitle="Gestione sus reembolsos y solicitudes de devolución"
     />
-    <main class="bg-white rounded-lg shadow-md p-8 space-y-8">
+    <main class="space-y-8">
       <!-- Balance Section -->
-      <div class="border-b border-secondary-300 pb-4">
-        <h3 class="text-lg font-bold text-primary-400">1. Balance Actual</h3>
-      </div>
-      
-      <div class="p-6 rounded-lg mb-8" class:list={[
-        currentBalance >= 0 ? 'bg-success-50' : 'bg-warning-50',
-        'border',
-        currentBalance >= 0 ? 'border-success-200' : 'border-warning-200'
-      ]}>
-        <div class="flex justify-between items-center">
-          <div>
-            <h4 class="text-lg font-medium text-secondary-200">Saldo Actual</h4>
-            <p class="text-sm text-secondary-100">
-              {currentBalance >= 0 ? 'La empresa le debe' : 'Usted le debe a la empresa'}
-            </p>
+      <div class="card">
+        <div class="border-b border-border pb-4 mb-6">
+          <h3 class="text-lg font-bold text-text-primary">1. Balance Actual</h3>
+        </div>
+        
+        <div class="bg-success/10 rounded-lg p-6" class:list={[
+          currentBalance >= 0 ? '' : 'bg-warning/10',
+        ]}>
+          <div class="flex justify-between items-center">
+            <div>
+              <h4 class="text-lg font-medium text-text-primary">Saldo Actual</h4>
+              <p class="text-sm text-text-secondary">
+                {currentBalance >= 0 ? 'La empresa le debe' : 'Usted le debe a la empresa'}
+              </p>
+            </div>
+            <span class:list={[
+              'text-2xl font-bold',
+              currentBalance >= 0 ? 'text-success-500' : 'text-warning-500'
+            ]}>
+              {currentBalance >= 0 ? '+' : ''}{currentBalance.toFixed(2)} USD
+            </span>
           </div>
-          <span class:list={[
-            'text-2xl font-bold',
-            currentBalance >= 0 ? 'text-success-400' : 'text-warning-400'
-          ]}>
-            {currentBalance >= 0 ? '+' : ''}{currentBalance.toFixed(2)} USD
-          </span>
         </div>
       </div>
 
       <!-- Bank Information Section -->
-      <div class="border-b border-secondary-300 pb-4">
-        <h3 class="text-lg font-bold text-primary-400">2. Información Bancaria</h3>
-        <p class="text-sm text-secondary-100 mt-1">
-          Por favor proporcione sus datos bancarios para recibir los reembolsos
-        </p>
-      </div>
-      
-      <form id="bankForm" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <InputField
-          label="Nombre del Banco"
-          name="bankName"
-          type="text"
-          required={true}
-        />
+      <div class="card">
+        <div class="border-b border-border pb-4 mb-6">
+          <h3 class="text-lg font-bold text-text-primary">2. Información Bancaria</h3>
+          <p class="text-sm text-text-secondary mt-1">
+            Por favor proporcione sus datos bancarios para recibir los reembolsos
+          </p>
+        </div>
         
-        <InputField
-          label="Nombre del Titular"
-          name="accountHolder"
-          type="text"
-          required={true}
-        />
+        <form id="bankForm" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <div>
+          <label class="block text-sm font-medium mb-1 text-text-secondary">Nombre del Banco</label>
+          <input type="text" name="bankName" class="w-full border border-border rounded-md px-3 py-2 bg-card text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" required />
+        </div>
         
-        <InputField
-          label="Número de Cuenta"
-          name="accountNumber"
-          type="text"
-          required={true}
-        />
+        <div>
+          <label class="block text-sm font-medium mb-1 text-text-secondary">Nombre del Titular</label>
+          <input type="text" name="accountHolder" class="w-full border border-border rounded-md px-3 py-2 bg-card text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" required />
+        </div>
         
-        <InputField
-          label="Tipo de Cuenta"
-          name="accountType"
-          type="text"
-          required={true}
-        />
+        <div>
+          <label class="block text-sm font-medium mb-1 text-text-secondary">Número de Cuenta</label>
+          <input type="text" name="accountNumber" class="w-full border border-border rounded-md px-3 py-2 bg-card text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" required />
+        </div>
         
-        <InputField
-          label="Código SWIFT/BIC"
-          name="swiftCode"
-          type="text"
-          required={true}
-        />
+        <div>
+          <label class="block text-sm font-medium mb-1 text-text-secondary">Tipo de Cuenta</label>
+          <input type="text" name="accountType" class="w-full border border-border rounded-md px-3 py-2 bg-card text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" required />
+        </div>
         
-        <InputField
-          label="Código IBAN"
-          name="iban"
-          type="text"
-          required={true}
-        />
+        <div>
+          <label class="block text-sm font-medium mb-1 text-text-secondary">Código SWIFT/BIC</label>
+          <input type="text" name="swiftCode" class="w-full border border-border rounded-md px-3 py-2 bg-card text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" required />
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium mb-1 text-text-secondary">Código IBAN</label>
+          <input type="text" name="iban" class="w-full border border-border rounded-md px-3 py-2 bg-card text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" required />
+        </div>
         
         <div class="md:col-span-2 flex justify-end pt-4">
           <Button 
             variant="filled" 
-            color="primary" 
-            type="submit"
-            class="px-6"
+            color="secondary"
           >
             Guardar Información Bancaria
           </Button>
         </div>
       </form>
+      </div>
 
       <!-- Reimbursement Request Section -->
-      <div class="border-b border-secondary-300 pb-4">
-        <h3 class="text-lg font-bold text-primary-400">3. Solicitud de Reembolso</h3>
-        <p class="text-sm text-secondary-100 mt-1">
-          {currentBalance > 0 ? 'Puede solicitar un reembolso hasta por el monto de su saldo disponible' : 'Actualmente no tiene saldo disponible para reembolso'}
-        </p>
-      </div>
-      
-      {currentBalance > 0 && (
+      <div class="card">
+        <div class="border-b border-border pb-4 mb-6">
+          <h3 class="text-lg font-bold text-text-primary">3. Solicitud de Reembolso</h3>
+          <p class="text-sm text-text-secondary mt-1">
+            {currentBalance > 0 ? 'Puede solicitar un reembolso hasta por el monto de su saldo disponible' : 'Actualmente no tiene saldo disponible para reembolso'}
+          </p>
+        </div>
+        
+        {currentBalance > 0 && (
         <form id="reimbursementForm" class="space-y-6 mb-8">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium mb-2 text-secondary-200">
+              <label class="block text-sm font-medium mb-2 text-text-secondary">
                 Monto a Solicitar (USD)
               </label>
               <input
@@ -150,21 +138,21 @@ const verifiedReceipts = [
                 max={currentBalance.toFixed(2)}
                 step="0.01"
                 required
-                class="block w-full px-3 py-2 border border-secondary-300 rounded-md shadow-sm text-sm"
+                class="w-full border border-border rounded-md px-3 py-2 bg-card text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary"
               />
-              <p class="text-xs text-secondary-100 mt-1">
+              <p class="text-xs text-text-secondary mt-1">
                 Máximo disponible: {currentBalance.toFixed(2)} USD
               </p>
             </div>
             
             <div>
-              <label class="block text-sm font-medium mb-2 text-secondary-200">
+              <label class="block text-sm font-medium mb-2 text-text-secondary">
                 Comprobantes Verificados
               </label>
               <select
                 name="receipts"
                 multiple
-                class="block w-full px-3 py-2 border border-secondary-300 rounded-md shadow-sm text-sm h-10.5"
+                class="w-full border border-border rounded-md px-3 py-2 bg-card text-text-primary focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary h-10.5"
                 required
               >
                 {verifiedReceipts.map(receipt => (
@@ -173,82 +161,82 @@ const verifiedReceipts = [
                   </option>
                 ))}
               </select>
-              <p class="text-xs text-secondary-100 mt-1">
+              <p class="text-xs text-text-secondary mt-1">
                 Mantenga presionado Ctrl para seleccionar múltiples comprobantes
               </p>
             </div>
           </div>
           
           <div>
-            <label for="notes" class="block text-sm font-medium mb-2 text-secondary-200">
+            <label for="notes" class="block text-sm font-medium mb-2 text-text-secondary">
               Notas Adicionales
             </label>
             <textarea
               id="notes"
               name="notes"
               rows={3}
-              class="block w-full px-3 py-2 border border-secondary-300 rounded-md shadow-sm text-sm"
+              class="w-full border border-border rounded-md px-3 py-2 bg-card text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary"
             ></textarea>
           </div>
           
           <div class="flex justify-end pt-4">
             <Button 
               variant="filled" 
-              color="primary" 
-              type="submit"
-              class="px-6"
+              color="secondary"
             >
               Solicitar Reembolso
             </Button>
           </div>
         </form>
-      )}
+        )}
+      </div>
 
       <!-- Reimbursement History Section -->
-      <div class="border-b border-secondary-300 pb-4">
-        <h3 class="text-lg font-bold text-primary-400">4. Historial de Reembolsos</h3>
-      </div>
-      
-      <div class="overflow-x-auto mb-8">
-        <table class="min-w-full divide-y divide-secondary-200">
-          <thead class="bg-secondary-50">
+      <div class="card">
+        <div class="border-b border-border pb-4 mb-6">
+          <h3 class="text-lg font-bold text-text-primary">4. Historial de Reembolsos</h3>
+        </div>
+        
+        <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-border">
+          <thead class="bg-secondary">
             <tr>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-secondary-200 uppercase tracking-wider">
+              <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                 Fecha
               </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-secondary-200 uppercase tracking-wider">
+              <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                 Monto
               </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-secondary-200 uppercase tracking-wider">
+              <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                 Estado
               </th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-secondary-200 uppercase tracking-wider">
+              <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                 Solicitud Relacionada
               </th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-secondary-200">
+          <tbody class="bg-card divide-y divide-border">
             {reimbursementHistory.map((item) => (
               <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-secondary-200">
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-text-primary">
                   {item.date}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-secondary-200">
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-text-primary">
                   ${item.amount.toFixed(2)}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                <td class="px-4 py-3 whitespace-nowrap text-sm">
                   <span class:list={[
                     'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
-                    item.status === 'paid' ? 'bg-success-100 text-success-800' : '',
-                    item.status === 'approved' ? 'bg-primary-100 text-primary-800' : '',
-                    item.status === 'pending' ? 'bg-warning-100 text-warning-800' : ''
+                    item.status === 'paid' ? 'bg-success/20 text-success-500' : '',
+                    item.status === 'approved' ? 'bg-primary/20 text-text-primary' : '',
+                    item.status === 'pending' ? 'bg-warning/20 text-warning-500' : ''
                   ]}>
                     {item.status === 'paid' ? 'Pagado' : ''}
                     {item.status === 'approved' ? 'Aprobado' : ''}
                     {item.status === 'pending' ? 'Pendiente' : ''}
                   </span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-primary-400 underline">
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-secondary-500 underline">
                   <a href={`/requests/${item.requestId}`}>{item.requestId}</a>
                 </td>
               </tr>
@@ -271,10 +259,10 @@ const verifiedReceipts = [
     
     requiredFields.forEach(field => {
       if (!field.value.trim()) {
-        field.classList.add('border-warning-400');
+        field.classList.add('border-warning-500');
         isValid = false;
       } else {
-        field.classList.remove('border-warning-400');
+        field.classList.remove('border-warning-500');
       }
     });
 
@@ -303,27 +291,27 @@ const verifiedReceipts = [
     
     if (isNaN(amount) || amount <= 0) {
       alert('Por favor ingrese un monto válido');
-      amountInput.classList.add('border-warning-400');
+      amountInput.classList.add('border-warning-500');
       return;
     }
     
     if (amount > maxAmount) {
       alert('El monto solicitado no puede exceder su saldo disponible');
-      amountInput.classList.add('border-warning-400');
+      amountInput.classList.add('border-warning-500');
       return;
     }
     
-    amountInput.classList.remove('border-warning-400');
+    amountInput.classList.remove('border-warning-500');
     
     // Validate receipts
     const receiptsSelect = this.querySelector('[name="receipts"]');
     if (receiptsSelect.selectedOptions.length === 0) {
       alert('Por favor seleccione al menos un comprobante verificado');
-      receiptsSelect.classList.add('border-warning-400');
+      receiptsSelect.classList.add('border-warning-500');
       return;
     }
     
-    receiptsSelect.classList.remove('border-warning-400');
+    receiptsSelect.classList.remove('border-warning-500');
     
     // Collect form data
     const formData = new FormData(this);

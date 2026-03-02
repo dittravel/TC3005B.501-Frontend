@@ -6,7 +6,7 @@
  * and allows them to edit or delete them.
  */
 
-import MaterialIcon from "@/components/MaterialIcon.astro";
+import Button from "@components/Button";
 import TextHeader from "@components/TextHeader.astro";
 import CancelRequestModal from "@components/CancelRequestModal.tsx";
 import { getCookie } from "@data/cookies";
@@ -24,21 +24,22 @@ requests= filteredRequests;
       subtitle="Aquí puedes ver los draft de solicitudes por completar"
     />
     
-    <section class="bg-white p-6 rounded-lg shadow w-full">
+    <section>
       {requests.length > 0 ? (
         <div class="grid gap-4">
           {requests.map((request: any) => {
             return (
-              <div class="grid grid-cols-[1fr_auto] gap-6 items-center">
+              <div class="content-wrapper">
+                <div class="grid grid-cols-[1fr] md:grid-cols-[2fr_1fr] gap-8 md:gap-8">
                 <a href={`/completar-draft/${request.request_id}`} class="block">
-                  <div class="space-y-2 content-wrapper">
-                    <p class="font-bold text-lg wrap-break-word">#{request.request_id}</p>
-                    <div class="text-sm text-gray-700 grid grid-cols-[1fr_2fr] gap-y-1">
+                  <div class="space-y-2">
+                    <p class="font-bold text-lg text-text-primary">#{request.request_id}</p>
+                    <div class="text-sm text-text-primary grid grid-cols-[1fr_2fr] gap-y-1">
                       <p><span class="font-semibold">País Destino:</span> {request.destination_country === 'notSelected' ? 'NO SELECCIONADO' : request.destination_country}</p>
                       <p><span class="font-semibold">Fechas:</span> {request.beginning_date === "1900-01-01" ? 'NO DETERMINADA' : `${request.beginning_date} - ${request.ending_date}`}</p>
                       <p>
                         <span class="font-semibold">Estado:</span> 
-                        <span class={`ml-1 font-semibold text-gray-500`}>
+                        <span class={`ml-1 font-semibold text-text-secondary`}>
                           {request.status.toUpperCase()}
                         </span>
                       </p>
@@ -46,31 +47,33 @@ requests= filteredRequests;
                     </div>
                   </div>
                 </a>
-                <div class="flex justify-end items-center h-full p-2">
-                  <span class="flex items-center justify-center w-6 h-6">                        
-                    <CancelRequestModal
-                        client:only="react"
-                        id={request.request_id}
-                        disabled={false}
-                        token={getCookie("token", Astro.cookies) || ""}
-                      >
-                        <div>
-                          <MaterialIcon
-                            icon="delete"
-                            color="black"
-                            style="cursor: pointer"
-                          />
-                        </div>
-                      </CancelRequestModal>
-                  </span>
+                <div class="flex flex-col gap-2">
+                  <a href={`/completar-draft/${request.request_id}`} class="w-full">
+                    <Button color="secondary" variant="filled" size="medium" customSizeClass="w-full">
+                      Editar
+                    </Button>
+                  </a>
+                  <CancelRequestModal
+                    client:only="react"
+                    id={request.request_id}
+                    disabled={false}
+                    token={getCookie("token", Astro.cookies) || ""}
+                  >
+                    <Button color="warning" variant="border" size="medium" customSizeClass="w-full">
+                      Eliminar
+                    </Button>
+                  </CancelRequestModal>
                 </div>
               </div>
+            </div>
             );
           })}
         </div>
       ) : (
-        <div class="bg-gray-100 p-6 rounded-lg shadow w-full text-center text-gray-500 font-semibold">
-          NO TIENES DRAFTS DE SOLICITUDES
+        <div class="content-wrapper">
+          <div class="text-center text-text-secondary font-semibold">
+            NO TIENES DRAFTS DE SOLICITUDES
+          </div>
         </div>
       )}
     </section>

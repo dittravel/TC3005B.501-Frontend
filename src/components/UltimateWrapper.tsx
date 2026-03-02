@@ -24,7 +24,7 @@ export default function UltimateWrapper({
 	endpoint,
 	title,
 	message,
-	modal_type,
+	modal_type = "warning",
 	children,
 	token,
 	redirectTo = "/dashboard"
@@ -51,11 +51,9 @@ export default function UltimateWrapper({
 				title={title}
 				message={message}
 				button_type={modal_type}
-				modal_type={modal_type}
 				onConfirm={handleConfirm}
-			>
-				{children}
-			</ModalWrapper>
+				triggerElement={children}
+			/>
 			{toast && <Toast message={toast.message} type={toast.type} />}
 		</>
 	);

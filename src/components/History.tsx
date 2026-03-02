@@ -23,70 +23,68 @@ export default function History({ data , itemsPerPage = 5 }: Props) {
   const getStatusStyle = (status: string) => {
     switch (status) {
       case "Aprobado":
-        return "bg-green-200 text-green-800";
+        return "bg-success-50/20 text-success-100";
       case "Pendiente":
-        return "bg-yellow-200 text-yellow-800";
+        return "bg-alert-50/20 text-alert-100";
       default:
-        return "bg-red-200 text-red-800";
+        return "bg-warning-50/20 text-warning-100";
     }
   };
 
   return (
-    <div>
-			<div className="bg-white p-6 rounded-lg shadow w-full">
-        {data.length > 0 ? (
-          <div>
-            {pageRequests.map((request: any) => (
-                <div className="flex justify-center mb-6">
-                <a
-                  key={request.request_id}
-                  href={`/detalles-solicitud/${request.request_id}`}
-                  className="flex flex-col md:flex-row items-center justify-between w-full max-w-5xl bg-gray-50 rounded-lg shadow-md p-6 transition hover:shadow-lg hover:bg-gray-100"
-                >
-                  <div className="flex flex-col items-center md:items-start gap-2 w-full md:w-auto">
-                  <h2 className="text-xl font-bold text-gray-800 mb-1 text-center md:text-left">
+    <div className="space-y-6">
+      {data.length > 0 ? (
+        <div className="space-y-6">
+          {pageRequests.map((request: any) => (
+            <a
+              key={request.request_id}
+              href={`/detalles-solicitud/${request.request_id}`}
+              className="content-wrapper block transition hover:shadow-lg"
+            >
+              <div className="grid grid-cols-[1fr] md:grid-cols-[2fr_1fr] gap-8 items-center">
+                <div className="space-y-2">
+                  <h2 className="text-xl font-bold text-text-primary">
                     #{request.request_id}
                   </h2>
-                  <div className="grid grid-cols-2 gap-24 w-full">
+                  <div className="grid grid-cols-2 gap-8">
                     <div>
-                    <p className="text-sm text-gray-600">
-                      <span className="font-semibold">Origen:</span> {request.origin_country}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      <span className="font-semibold">Destino:</span> {request.destination_country}
-                    </p>
+                      <p className="text-sm text-text-secondary">
+                        <span className="font-semibold">Origen:</span> {request.origin_country}
+                      </p>
+                      <p className="text-sm text-text-secondary">
+                        <span className="font-semibold">Destino:</span> {request.destination_country}
+                      </p>
                     </div>
                     <div>
-                    <p className="text-sm text-gray-600">
-                      <span className="font-semibold">Fecha Inicio:</span> {request.beginning_date}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      <span className="font-semibold">Fecha Fin:</span> {request.ending_date}
-                    </p>
+                      <p className="text-sm text-text-secondary">
+                        <span className="font-semibold">Fecha Inicio:</span> {request.beginning_date}
+                      </p>
+                      <p className="text-sm text-text-secondary">
+                        <span className="font-semibold">Fecha Fin:</span> {request.ending_date}
+                      </p>
                     </div>
                   </div>
-                  </div>
-                  <div className="mt-4 md:mt-0 md:ml-8 shrink-0 flex flex-col items-center">
-                  <span className={`text-xs font-semibold px-4 py-2 rounded-full shadow ${getStatusStyle(request.currentStatus)}`}>
+                </div>
+                <div className="flex items-center justify-center md:justify-end">
+                  <span className={`text-xs font-semibold px-4 py-2 rounded-full ${getStatusStyle(request.currentStatus)}`}>
                     {(request.status || "DESCONOCIDO").toUpperCase()}
                   </span>
-                  </div>
-                </a>
                 </div>
-            ))}
-            <Pagination
-              totalPages={totalPages}
-              page={page}
-              setPage={setPage}
-              maxVisible={5}
-            />
-          </div>
-        ) : (
-          <div className="bg-gray-100 p-6 rounded-lg shadow w-full text-center text-gray-500 font-semibold">
-            NO CUENTAS CON VIAJES COMPLETADOS, CANCELADOS O RECHAZADOS
-          </div>
-        )}
-			</div>
+              </div>
+            </a>
+          ))}
+          <Pagination
+            totalPages={totalPages}
+            page={page}
+            setPage={setPage}
+            maxVisible={5}
+          />
+        </div>
+      ) : (
+        <div className="content-wrapper text-center text-text-secondary font-semibold">
+          NO CUENTAS CON VIAJES COMPLETADOS, CANCELADOS O RECHAZADOS
+        </div>
+      )}
     </div>
   );
 }

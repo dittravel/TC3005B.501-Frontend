@@ -5,6 +5,7 @@
  */
 
 import RequestCard from "@components/RequestCard.astro";
+import Button from "@components/Button";
 
 const {
   title,
@@ -16,15 +17,21 @@ const {
 } = Astro.props;
 ---
 
-<section class="bg-white p-6 rounded-lg shadow w-full">
-	<div class="flex items-center justify-between mb-4">
-		<h2 class="text-xl font-bold flex items-center">
+<section class="w-full">
+	<div class="flex items-center justify-between mb-6">
+		<h2 class="text-xl font-bold flex items-center text-text-primary">
 			{title}
-			<span class="px-2 align-middle text-primary-500">({requests.length})</span>
+			<span class="px-2 align-middle text-secondary-500">({requests.length})</span>
 		</h2>
-		<a href={`/${anchor}`} class="text-sm text-primary-500 hover:underline">
+		<Button
+			href={`/${anchor}`}
+			variant="link"
+			color="secondary"
+			size="small"
+			client:only="react"
+		>
 			Ver todas
-		</a>
+		</Button>
 	</div>
 
   {requests.length > 0 ? (
@@ -38,7 +45,7 @@ const {
       ))}
     </div>
   ) : (
-    <div class="bg-gray-100 p-6 rounded-lg shadow w-full text-center text-gray-500 font-semibold">
+    <div class="bg-card p-6 rounded-lg border border-border w-full text-center text-text-secondary font-semibold">
       {emptyMessage}
     </div>
   )}

@@ -28,19 +28,20 @@ interface ModalWrapperProps {
   onConfirm?: () => void;
   onClose?: () => void;
   children?: React.ReactNode;
+  triggerElement?: React.ReactNode;
 }
 
 export default function ModalWrapper({
   title,
   message,
   button_type,
-  modal_type,
   variant="filled",
   disabled = false,
   show = false,
   buttonClassName = getButtonClasses({ variant: `${variant}`, color: `${button_type}`, size: "medium" }),
   onConfirm,
   children,
+  triggerElement,
 }: ModalWrapperProps) {
   const [isOpen, setIsOpen] = useState(show);
 
@@ -48,6 +49,24 @@ export default function ModalWrapper({
     onConfirm?.();
     setIsOpen(false);
   };
+
+  if (triggerElement) {
+    return (
+      <>
+        <div onClick={() => setIsOpen(true)} className="w-full">
+          {triggerElement}
+        </div>
+
+        <Modal
+          title={title}
+          message={message}
+          show={isOpen}
+          onClose={() => setIsOpen(false)}
+          onConfirm={confirm}
+        />
+      </>
+    );
+  }
 
   return (
     <>
@@ -62,7 +81,6 @@ export default function ModalWrapper({
       <Modal
         title={title}
         message={message}
-        type={modal_type}
         show={isOpen}
         onClose={() => setIsOpen(false)}
         onConfirm={confirm}

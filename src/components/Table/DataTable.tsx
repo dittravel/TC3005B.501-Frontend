@@ -53,17 +53,17 @@ export default function DataTable({ columns, rows, type, role }: Props) {
 
   if (isLoading) {
     return (
-      <div className="p-4 text-center text-gray-500">
+      <div className="p-4 text-center text-text-secondary">
         Cargando datos...
       </div>
     );
   }
 
   return (
-    <div className="rounded-md shadow-md overflow-hidden">
-      <table className="min-w-full bg-white">
+    <div className="overflow-x-auto border border-border rounded-lg">
+      <table className="min-w-full bg-card">
         <TableHeader columns={columns} />
-        <tbody>
+        <tbody className="divide-y divide-border">
           {rows.map((row, index) => (
             <TableRow key={index} row={row} columns={columns} index={index} role_href={roleHref}/>
           ))}

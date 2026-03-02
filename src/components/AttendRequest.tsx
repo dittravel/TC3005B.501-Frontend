@@ -6,6 +6,7 @@ import { useState, useCallback } from "react";
 import { apiRequest } from "@utils/apiClient";
 import ModalWrapper from "@components/ModalWrapper";
 import Toast from '@components/Toast';
+import Button from "@components/Button";
 
 interface Props {
   request_id: string;
@@ -46,17 +47,17 @@ export default function AssignBudget({ request_id, token }: Props) {
   }, [imposedFee, request_id]);
 
   return (
-    <div className="w-full p-6 bg-white rounded border border-gray-300">
-      <h1 className="text-xl font-semibold mb-4 text-gray-800">
+    <div className="w-full p-6 bg-card rounded border border-border">
+      <h1 className="text-xl font-semibold mb-4 text-text-primary">
         Asignar presupuesto a la solicitud de viaje
       </h1>
-      <p className="mb-4 text-gray-600">
+      <p className="mb-4 text-text-secondary">
         Una vez que haya revisado todos los datos del viaje, por favor asigne un
         monto presupuestal para cubrir los gastos.
       </p>
 
       <div className="mb-6">
-        <label htmlFor="imposedFee" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="imposedFee" className="block text-sm font-medium text-text-primary mb-1">
           Presupuesto impuesto (MXN)
         </label>
         <input
@@ -65,26 +66,28 @@ export default function AssignBudget({ request_id, token }: Props) {
           value={imposedFee}
           onChange={(e) => setImposedFee(e.target.value)}
           placeholder="Ingrese el monto presupuestal"
-          className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-border rounded-md px-3 py-2 bg-card text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary"
         />
         {errorMessage && (
-          <div className="bg-red-200 text-red-800 p-4 rounded-md mt-4">
+          <div className="bg-warning/20 text-warning-500 p-4 rounded-md mt-4">
             <p className="text-sm">{errorMessage}</p>
           </div>
         )}
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex w-full justify-end mt-6">
         <ModalWrapper
           title="¿Estás seguro de asignar este presupuesto?"
           message="Una vez asignado, la solicitud no podrá ser modificada."
-          button_type="primary"
+          button_type="success"
           modal_type="success"
           onConfirm={handleConfirm}
-          variant="filled"
-        >
-          Asignar presupuesto
-        </ModalWrapper>
+          triggerElement={
+            <Button color="success" variant="filled" size="medium">
+              Asignar presupuesto
+            </Button>
+          }
+        />
       </div>
       {toast && <Toast message={toast.message} type={toast.type} />}
     </div>

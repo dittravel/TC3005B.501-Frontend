@@ -11,13 +11,11 @@ import MaterialIcon from "@components/MaterialIcon.astro";
 
 <button
   id="theme-toggle"
-  class="bg-header-bg rounded-full p-1.5
-         flex justify-center items-center
-         cursor-pointer transition-colors duration-200
-         hover:bg-primary-300"
+  class="flex text-white cursor-pointer border-none bg-transparent p-0 hover:opacity-80 transition-opacity"
+  aria-label="Toggle theme"
   title="Cambiar tema"
 >
-  <MaterialIcon icon="dark_mode" />
+  <MaterialIcon icon="brightness_4" />
 </button>
 
 <script is:inline>

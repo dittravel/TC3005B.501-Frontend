@@ -23,7 +23,7 @@ const userName = getCookie("username", Astro.cookies) || "";
       title="Crear Nueva Solicitud de Viaje"
       subtitle="Por favor complete el siguiente formulario para generar una nueva solicitud de viaje."
     />
-    <main class="bg-white rounded-lg shadow-md p-8">
+    <main class="bg-card border border-border rounded-xl shadow-md p-6">
       <TravelRequestForm
         user_id={getCookie("id", Astro.cookies) || ""}
         client:only="react"

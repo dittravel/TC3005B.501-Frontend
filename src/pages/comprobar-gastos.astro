@@ -5,6 +5,7 @@
 
 import MainLayout from "@layouts/MainLayout.astro";
 import TextHeader from "@components/TextHeader.astro";
+import Button from "@components/Button";
 import type { UserRole } from "@type/roles";
 
 import { getCookie } from "@data/cookies";
@@ -58,35 +59,36 @@ const requests = await Promise.all(
         title={`Comprobaciones pendientes de ${userName}`}
         subtitle="Aquí puedes conocer el estado de solicitudes en proceso de comprobación"
       />
-      <section class="bg-white p-6 rounded-lg shadow w-full">
+      <section>
         {requests.length > 0 ? (
-          <div class="grid gap-8">
+          <div class="grid gap-4">
             {requests.map((request: any) => {
               const { total, accepted, rejected, pending } = getVerificationStats(request);
               const percent = (count: number) => total ? (count / total) * 100 : 0;
               return (
-                <div class="grid grid-cols-[1fr_auto] items-center rounded-lg">
-                  <a href={`/comprobar-solicitud/${request.request_id}`} class="block w-full">
-                    <div class="space-y-2 content-wrapper">
-                      <div class="flex items-center justify-between">
-                        <p class="font-bold text-lg wrap-break-word">#{request.request_id}</p>
-                        { total === 0 ? (
-                          <span class="text-sm text-gray-500">
-                            No se han enviado comprobantes
-                          </span>
-                        ) : (
-                          <p class="text-sm text-gray-500">{accepted}/{total} Aceptadas</p>
-                        )}
-                      </div>
+                <div class="content-wrapper">
+                <div class="grid grid-cols-[1fr] md:grid-cols-[2fr_1fr] gap-8 md:gap-8">
+                  <a href={`/comprobar-solicitud/${request.request_id}`} class="block">
+                    <div class="space-y-2">
+                      <p class="font-bold text-lg text-text-primary">#{request.request_id}</p>
+                      { total === 0 ? (
+                        <p class="text-sm text-text-secondary">
+                          No se han enviado comprobantes
+                        </p>
+                      ) : (
+                        <div class="flex items-center justify-between">
+                          <p class="text-sm text-text-secondary">{accepted}/{total} Aceptadas</p>
+                        </div>
+                      )}
                       { total != 0 && (
-                        <div class="w-full h-2 bg-gray-200 rounded overflow-hidden flex">
-                          <div class="bg-green-500 h-full" style={`width: ${percent(accepted)}%`} />
-                          <div class="bg-red-500 h-full" style={`width: ${percent(rejected)}%`} />
-                          <div class="bg-yellow-400 h-full" style={`width: ${percent(pending)}%`} />
+                        <div class="w-full h-2 bg-card rounded overflow-hidden flex">
+                          <div class="bg-success-500 h-full" style={`width: ${percent(accepted)}%`} />
+                          <div class="bg-warning-500 h-full" style={`width: ${percent(rejected)}%`} />
+                          <div class="bg-alert-400 h-full" style={`width: ${percent(pending)}%`} />
                         </div>
                       )}
 
-                      <div class="text-sm text-gray-700 grid grid-cols-[1fr_2fr] gap-y-1">
+                      <div class="text-sm text-text-primary grid grid-cols-[1fr_2fr] gap-y-1">
                         <p><span class="font-semibold">Lugar:</span> {request.destination_country}</p>
                         <p><span class="font-semibold">Fechas:</span> {request.beginning_date} - {request.ending_date}</p>
                         <p>
@@ -94,12 +96,12 @@ const requests = await Promise.all(
                           <span
                             class={`ml-1 font-semibold ${
                               pending > 0
-                                ? 'text-yellow-600'
+                                ? 'text-alert-400'
                                 : accepted === total
-                                  ? 'text-green-600'
+                                  ? 'text-success-500'
                                   : rejected === total
-                                    ? 'text-red-600'
-                                    : 'text-blue-600'
+                                    ? 'text-warning-500'
+                                    : 'text-primary-500'
                             }`}
                           >
                             {pending > 0 || total === 0
@@ -115,13 +117,23 @@ const requests = await Promise.all(
                       </div>
                     </div>
                   </a>
+                  <div class="flex flex-col gap-2 justify-center items-center">
+                    <a href={`/comprobar-solicitud/${request.request_id}`} class="w-full">
+                      <Button color="secondary" variant="filled" size="medium" customSizeClass="w-full">
+                        Ver Comprobantes
+                      </Button>
+                    </a>
+                  </div>
+                </div>
                 </div>
               );
             })}
           </div>
         ) : (
-          <div class="bg-gray-100 p-6 rounded-lg shadow w-full text-center text-gray-500 font-semibold">
-            No tienes comprobantes pendientes
+          <div class="content-wrapper">
+            <div class="text-center text-text-secondary font-semibold">
+              No tienes comprobantes pendientes
+            </div>
           </div>
         )}
       </section>
