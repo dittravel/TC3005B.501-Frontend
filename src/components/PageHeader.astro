@@ -14,7 +14,7 @@
 
 const { userName, buttonLabel, showNotifications = false } = Astro.props;
 import MaterialIcon from "@components/MaterialIcon.astro";
-import UserMenu from "@components/UserMenu.tsx";
+import UserMenu from "@components/UserMenu";
 import ThemeButton from "./ThemeButton.astro";
 import MenuButton from "./MenuButton.astro";
 import NotificationsButton from "./NotificationsButton.astro";
@@ -23,7 +23,7 @@ import NotificationsButton from "./NotificationsButton.astro";
 <header class="h-15 flex justify-between items-center bg-header-bg px-4 py-3 border-b border-border">
   <!-- Left Section -->
   <div class="h-15 flex items-center px-5 gap-4">
-    <MenuButton client:load />
+    <MenuButton />
     <img
       src="/logo_texto_dittravel_blanco.png"
       class="w-auto h-full rounded drop-shadow-lg cursor-pointer hidden md:block"
@@ -37,7 +37,7 @@ import NotificationsButton from "./NotificationsButton.astro";
   <div class="h-full flex items-center gap-4">
 
     <!-- Theme Toggle Button -->
-    <ThemeButton client:load />
+    <ThemeButton />
 
     <!-- User Role -->
     <span class="text-brand-200 font-bold text-sm">
@@ -51,6 +51,6 @@ import NotificationsButton from "./NotificationsButton.astro";
     </UserMenu>
 
     <!-- Notifications Button -->
-    {showNotifications && <NotificationsButton client:load />}
+    {showNotifications && <NotificationsButton />}
   </div>
 </header>

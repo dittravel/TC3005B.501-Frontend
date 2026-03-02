@@ -68,7 +68,7 @@ export default function ThemeButton({ inHeader = false }: { inHeader?: boolean }
   return (
     <button
       onClick={handleThemeToggle}
-      className="cursor-pointer p-2 rounded-full hover:bg-card-hover transition-colors"
+      className="cursor-pointer border-none bg-transparent p-0 hover:opacity-80 transition-opacity"
       title="Cambiar tema"
     >
       <Brightness4 className={iconColor} />

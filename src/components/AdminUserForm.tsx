@@ -57,7 +57,7 @@ const initialFormData: FormData = {
 };
 
 const labelClass = "block text-sm font-medium text-text-secondary mb-1";
-const baseInputClass = "w-full border rounded-md px-3 py-2 text-text-primary placeholder:text-text-secondary border-border bg-card hover:bg-card-hover focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary";
+const baseInputClass = "w-full border rounded-md px-3 py-2 text-text-primary placeholder:text-text-secondary border-border bg-card focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary";
 const selectClass = "w-full border rounded-md px-3 py-2 text-text-primary border-border bg-card hover:bg-card-hover focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary cursor-pointer appearance-none";
 const errorClass = "text-warning-500 text-sm mt-1";
 const formClass = "bg-card rounded-lg shadow-md p-8 border border-border";

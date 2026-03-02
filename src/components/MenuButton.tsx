@@ -10,7 +10,7 @@ export default function MenuButton() {
   const handleMenuClick = () => {
     const sidebar = document.getElementById("sidebar");
     if (sidebar) {
-      sidebar.classList.toggle("hidden-sidebar");
+      sidebar.classList.toggle("open");
     }
   };
 
