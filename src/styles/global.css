@@ -315,21 +315,21 @@ select option:checked {
 
 /* Dark mode */
 .dark select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  color-scheme: dark;
-  background-color: var(--color-card);
-  padding-right: 2.5rem;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  color-scheme: dark !important;
+  background-color: var(--color-card) !important;
+  padding-right: 2.5rem !important;
 }
 
 .dark select option {
-  background-color: var(--color-card);
-  color: var(--color-text-primary);
+  background-color: var(--color-card) !important;
+  color: var(--color-text-primary) !important;
 }
 
 .dark select option:checked {
-  background: var(--color-secondary-500);
-  background-color: var(--color-secondary-500);
-  color: var(--color-card);
+  background: var(--color-secondary-500) !important;
+  background-color: var(--color-secondary-500) !important;
+  color: var(--color-card) !important;
 }
