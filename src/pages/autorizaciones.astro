@@ -30,7 +30,7 @@ const requests = await (async () => {
 })()
 ---
 
-<MainLayout title="Autorizaciones pendientes" data={{userName, buttonLabel, role}}>
+<MainLayout title="Autorizaciones Pendientes" data={{userName, buttonLabel, role}}>
   <div>
     {requests && requests.length === 0 ? (
       <TableFallback />

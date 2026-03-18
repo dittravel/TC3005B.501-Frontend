@@ -58,7 +58,7 @@ const verifiedReceipts = [
               'text-2xl font-bold',
               currentBalance >= 0 ? 'text-success-500' : 'text-warning-500'
             ]}>
-              {currentBalance >= 0 ? '+' : ''}{currentBalance.toFixed(2)} USD
+              {currentBalance >= 0 ? '+' : ''}{currentBalance.toFixed(2)} MXN
             </span>
           </div>
         </div>
@@ -152,7 +152,7 @@ const verifiedReceipts = [
               <select
                 name="receipts"
                 multiple
-                class="w-full border border-border rounded-md px-3 py-2 bg-card text-text-primary focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary h-10.5"
+                class="w-full border border-border rounded-md px-3 py-2 bg-card text-text-primary focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary h-40"
                 required
               >
                 {verifiedReceipts.map(receipt => (

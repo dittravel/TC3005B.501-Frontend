@@ -6,6 +6,7 @@
 
 import { apiRequest } from "@/utils/apiClient";
 import { getCookie } from "@data/cookies";
+import MaterialIcon from "@components/MaterialIcon.astro";
 
 // Status dictionary mapped by user role
 const statusByRole = {
@@ -34,25 +35,35 @@ const alerts = await (async () => {
   <ul class="space-y-4 pb-8 overflow-hidden">
     {alerts.length === 0 && (
       <li>
-        <div class="flex flex-col p-4 h-48 border border-border rounded-xl shadow-md">
-          <span class="text-lg text-neutral-700 font-semibold">No hay notificaciones disponibles</span>
-          <span class="text-sm text-neutral-500 mt-1">Las notificaciones del sistema aparecerán aquí cuando estén disponibles.</span>
+        <div class="flex flex-col p-4 h-48 gap-2 border border-border rounded-xl shadow-md">
+          <span class="text-lg text-text-primary font-semibold">No hay notificaciones disponibles</span>
+          <span class="text-sm text-text-secondary">Las notificaciones del sistema aparecerán aquí cuando estén disponibles.</span>
         </div>
       </li>
     )}
     {alerts.map((alert:any) => (
-      <li class="relative bg-card border border-border rounded-xl p-4 shadow-sm overflow-hidden">
-        <div class="mb-4">
-          <p class="text-xs text-neutral-500 mb-2">
-            {
-              new Date(alert.alert_date.replace(/:([0-9]{3})Z$/, '.$1Z'))
-              .toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })
-            } - {alert.alert_time}
-          </p>
-          <p class="text-xs text-neutral-500 mb-2">Usuario: <span class="font-semibold">{alert.user_name}</span></p>
-          <p class="text-xs text-neutral-500 mb-2">ID de Solicitud: <span class="font-semibold">{alert.request_id}</span></p>
+      <li class="relative bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+        <div class="p-4 flex flex-col gap-2 bg-secondary/10">
+          <div class="flex items-center gap-2">
+            <MaterialIcon icon="calendar_today" color="" style="text-xs text-text-primary" />
+            <p class="text-xs text-text-primary">
+              {
+                new Date(alert.alert_date.replace(/:([0-9]{3})Z$/, '.$1Z'))
+                .toLocaleDateString('es-MX', { year: 'numeric', month: 'numeric', day: 'numeric' })
+              } - {alert.alert_time}
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <MaterialIcon icon="account_circle" color="" style="text-xs text-text-primary" />
+            <p class="text-xs text-text-primary">Usuario: <span class="font-semibold">{alert.user_name}</span></p>
+          </div>
+          <div class="flex items-center gap-2">
+            <MaterialIcon icon="receipt" color="" style="text-xs text-text-primary" />
+            <p class="text-xs text-text-primary">ID Solicitud: <span class="font-semibold">{alert.request_id}</span></p>
+          </div>
         </div>
-        <div>
+        <hr class="border-t border-border" />
+        <div class="p-4">
           <p class="text-sm text-text-primary">{alert.message_text}</p>
         </div>
       </li>

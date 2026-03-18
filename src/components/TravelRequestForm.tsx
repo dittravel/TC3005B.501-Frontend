@@ -27,7 +27,7 @@ interface Props {
 const baseInputClass = "w-full border rounded-md px-3 py-2 text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary bg-card border-border";
 
 const emptyRoute: TravelRoute = {
-  route_index: 0,
+  router_index: 0,
   origin_country_name: '',
   origin_city_name: '',
   destination_country_name: '',
@@ -45,7 +45,7 @@ const initialFormState: FormData = {
   notes: '',
   requested_fee: '',
   imposed_fee: 0,
-  routes: [{ ...emptyRoute, route_index: 0 }],
+  routes: [{ ...emptyRoute, router_index: 0 }],
 };
 
 export default function TravelRequestForm({ data, mode, request_id, user_id, role, token }: Props) {
@@ -59,12 +59,12 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
     `${baseInputClass} ${error ? 'border-warning-500' : ''}`;
   useEffect(() => {
     if (data) {
-      const transformedRoutes = data.routes.map(route => ({
+      const transformedRoutes = data.routes.map((route: any) => ({
         ...route,
-        origin_country_name: route.origin_country_name || '',
-        origin_city_name: route.origin_city_name || '',
-        destination_country_name: route.destination_country_name || '',
-        destination_city_name: route.destination_city_name || '',
+        origin_country_name: route.origin_country || '',
+        origin_city_name: route.origin_city || '',
+        destination_country_name: route.destination_country || '',
+        destination_city_name: route.destination_city || '',
       }));
       const newData = {
         ...data,
@@ -94,10 +94,11 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
   }, [user_id, token]);
 
   /**
-   * Updates a travel route at the specified index.
-   * @param {number} index - The index of the route to update
+   * Handles updates to individual route fields.
+   * @param {number} index - The route index to update
    * @param {string} name - The field name to update
    * @param {any} value - The new value for the field
+   * @returns {void}
    */
   const handleRouteUpdate = (index: number, name: string, value: any) => {
     setError(null);
@@ -116,8 +117,9 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
   };
 
   /**
-   * Handles general form field changes.
-   * @param {React.ChangeEvent} e - The change event from form input or textarea
+   * Handles changes to general form fields (notes, requested fee, etc.).
+   * @param {React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>} e - The change event
+   * @returns {void}
    */
   const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setError(null);
@@ -130,7 +132,8 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
   };
 
   /**
-   * Adds a new empty travel route to the form.
+   * Adds a new empty route to the form.
+   * @returns {void}
    */
   const addRoute = () => {
     setFormData((prev) => ({
@@ -272,7 +275,7 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
     setError(null);
 
     const dataToSend = {
-      router_index: firstRoute.route_index,
+      router_index: firstRoute.router_index,
       notes: formData.notes,
       requested_fee: parseFloat(formData.requested_fee as string) || 0,
       imposed_fee: 0,
@@ -330,7 +333,7 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
     const firstRoute = formData.routes[0] || {};
     const draftData: Record<string, any> = {};
 
-    if (firstRoute.route_index !== undefined) draftData.router_index = firstRoute.route_index;
+    if (firstRoute.router_index !== undefined) draftData.router_index = firstRoute.router_index;
     if (formData.notes) draftData.notes = formData.notes;
     if (formData.requested_fee) draftData.requested_fee = parseFloat(formData.requested_fee as string) || 0;
     draftData.imposed_fee = 0; // Always send imposed_fee as 0
@@ -448,7 +451,7 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
       }
     };
 
-    includeIfExists('router_index', firstRoute.route_index);
+    includeIfExists('router_index', firstRoute.router_index);
     editedData.notes = typeof formData.notes === 'string' ? formData.notes.trim() : '';
     includeIfExists('requested_fee', parseFloat(formData.requested_fee as string));
     editedData.imposed_fee = 0;
@@ -590,7 +593,7 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
       {/* Render all routes dynamically */}
       {formData.routes.map((route, index) => (
         <RouteInputGroup
-          key={route.route_index}
+          key={route.router_index}
           route={route}
           onChange={handleRouteUpdate}
           index={index}

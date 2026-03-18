@@ -29,7 +29,7 @@ const requests = await (async () => {
 })()
 ---
 
-<MainLayout title="Atenciones pendientes" data={{userName, buttonLabel, role}}>
+<MainLayout title="Atenciones Pendientes" data={{userName, buttonLabel, role}}>
   <div>
     {requests && requests.length === 0 ? (
       <TableFallback />
@@ -42,7 +42,7 @@ const requests = await (async () => {
         client:only="react"
         data={requests}
         role={role}
-        title="Solicitudes por Atender"
+        title="Solicitudes por atender"
       />
     )}
     </div>

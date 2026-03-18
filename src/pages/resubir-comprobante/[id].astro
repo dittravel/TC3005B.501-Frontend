@@ -22,6 +22,6 @@ const receiptToReplace = url.searchParams.get("replace");
 const { id } = Astro.params;
 ---
 
-<MainLayout title="Crear Recibo" data={{userName, buttonLabel, role}}>
+<MainLayout title="Crear Comprobante" data={{userName, buttonLabel, role}}>
   <ExpensesForm receiptToReplace={receiptToReplace} />
 </MainLayout>
