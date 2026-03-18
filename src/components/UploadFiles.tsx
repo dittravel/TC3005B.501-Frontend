@@ -1,5 +1,7 @@
 /**
- * UploadFiles component for uploading PDF and XML receipt files.
+ * UploadFiles Component
+ * Provides file upload inputs for PDF and XML documents with international trip checkbox.
+ * Conditionally displays XML upload field only for domestic trips.
  */
 
 interface Props {
@@ -9,6 +11,14 @@ interface Props {
   setIsInternational: (value: boolean) => void;
 }
 
+/**
+ * UploadFiles
+ * @param {Function} [onPdfChange] - Callback fired when PDF file is selected or cleared
+ * @param {Function} [onXmlChange] - Callback fired when XML file is selected or cleared
+ * @param {boolean} isInternational - Flag indicating if the trip is international
+ * @param {Function} setIsInternational - Updates the international trip flag
+ * @returns {React.ReactNode} File upload form with international checkbox
+ */
 export default function UploadFiles({
   onPdfChange,
   onXmlChange,
@@ -26,6 +36,7 @@ export default function UploadFiles({
         Es viaje internacional
       </label>
 
+      {/* PDF file upload - always visible */}
       <div>
         <label className="text-sm font-medium block mb-1 text-text-secondary">Subir archivo PDF</label>
         <input
@@ -36,6 +47,7 @@ export default function UploadFiles({
         />
       </div>
 
+      {/* XML file upload - only visible for domestic trips */}
       {!isInternational && (
         <div>
           <label className="text-sm font-medium block mb-1 text-text-secondary">Subir archivo XML</label>

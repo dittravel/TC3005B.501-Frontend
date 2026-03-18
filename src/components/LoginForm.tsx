@@ -1,5 +1,8 @@
 /**
- * LoginForm component for user authentication.
+ * LoginForm Component
+ * 
+ * Provides a login form for user authentication. Handles username and password submission,
+ * sets authentication cookies on successful login, and displays error messages on failure.
  */
 
 import React, { useState } from "react";
@@ -9,6 +12,7 @@ import ThemeButton from "@components/ThemeButton";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useTheme } from "@hooks/useTheme";
 
+// Tailwind CSS classes for consistent input field styling
 const inputStyle = `peer w-full h-[50px]
   border border-border rounded outline-none
   text-sm px-3 placeholder-text-secondary
@@ -25,8 +29,16 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const { theme } = useTheme();
 
+  /**
+   * Handles the login form submission.
+   * Clears previous session, authenticates the user, sets cookies with user credentials,
+   * and redirects to dashboard on success.
+   * @param {React.FormEvent} e - The form submission event
+   * @returns {Promise<void>}
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Clear any existing session before login
     await apiRequest("/user/logout", {
       method: "GET",
     });
@@ -38,11 +50,12 @@ export default function LoginForm() {
         data: { username, password },
       });
 
+      // Clear error message on successful login
       setErrorMessage("");
     
       alert("Inicio de sesión exitoso");
 
-      // Set cookies manually on client side to ensure they're available immediately
+      // Set authentication cookies to persist user session and credentials
       document.cookie = `token=${response.token}; path=/; secure; SameSite=Strict`;
       document.cookie = `role=${response.role}; path=/`;
       document.cookie = `username=${response.username}; path=/`;
@@ -51,6 +64,7 @@ export default function LoginForm() {
       window.location.href = "/dashboard";
 
     } catch (error: any) {
+      // Extract error message from API response or use default message
       const msg = error?.response?.data?.error || "Error al iniciar sesión";
       setErrorMessage(msg);
     }

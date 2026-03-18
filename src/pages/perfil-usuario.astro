@@ -11,7 +11,6 @@ import type { UserRole } from "@type/roles";
 import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
 import { apiRequest } from "@/utils/apiClient";
-import Button from "@components/Button.astro";
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
 const userName = getCookie("username", Astro.cookies) || "";

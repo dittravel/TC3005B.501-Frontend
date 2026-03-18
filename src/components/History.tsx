@@ -1,5 +1,9 @@
 /**
- * Author: Eduardo Porto Morales & Hector Julian Zarate Ramirez
+ * History Component
+ * 
+ * Displays a paginated list of travel requests with their status, origin, destination,
+ * and travel dates. Each request is clickable and links to the detailed view.
+ * Manages pagination client-side using React hooks.
  * 
  * This component uses React to render client side de useState 
  * to manage pagination.
@@ -20,6 +24,11 @@ export default function History({ data , itemsPerPage = 5 }: Props) {
   const end = start + itemsPerPage;
   const pageRequests = data.slice(start, end);
 
+  /**
+   * Returns CSS classes for styling the status badge based on the request status.
+   * @param {string} status - The current status of the request
+   * @returns {string} Tailwind CSS classes for the status badge styling
+   */
   const getStatusStyle = (status: string) => {
     switch (status) {
       case "Aprobado":

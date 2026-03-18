@@ -19,6 +19,8 @@ export default defineConfig({
   }),
   server: {
     open: '/login',
+    host: '0.0.0.0',
+    port: 4321,
   },
   integrations: [react()],
   vite: {

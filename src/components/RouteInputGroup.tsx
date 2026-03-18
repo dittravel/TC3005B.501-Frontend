@@ -1,5 +1,9 @@
 /**
- * RouteInputGroup component for managing travel route input fields.
+ * RouteInputGroup Component
+ * 
+ * Renders a form group for inputting travel route details including origin/destination
+ * countries and cities, start/end dates and times, and service requirements (plane/hotel).
+ * Supports dynamic removal and handles input validation with date constraints.
  */
 
 import React from 'react';
@@ -16,15 +20,30 @@ interface RouteInputGroupProps {
 
 const baseInputClass = "w-full border rounded-md px-3 py-2 text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary bg-card border-border";
 
+/**
+ * RouteInputGroup Component
+ * Displays a form group for a single travel route with various input fields.
+ * Manages route state changes and provides optional removal functionality.
+ * @param {RouteInputGroupProps} props - Component properties
+ * @returns {JSX.Element} Rendered route input form group
+ */
 const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, index, onRemove, isRemovable }) => {
+  /**
+   * Handles input changes for all input fields in the route form.
+   * Converts checkbox values to boolean and regular input values to string.
+   * @param {React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>} e - The change event
+   * @returns {void}
+   */
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
     onChange(index, name, type === 'checkbox' ? checked : value);
   };
 
+  // Get today's date in ISO format for date input minimum constraint
   const today = new Date();
   const todayISO = today.toISOString().split('T')[0];
+
   return (
     <div className="border-b-4 border-dashed border-card py-8 px-4 rounded-lg bg-secondary/10">
       <div className="flex justify-between items-center">
@@ -46,18 +65,26 @@ const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, inde
           <label className="block text-sm font-medium text-text-secondary mb-1">País de Origen<span className="text-warning-500"> *</span></label>
           <input name="origin_country_name" placeholder="País Origen" className={baseInputClass} value={route.origin_country_name === "notSelected" ? '' : route.origin_country_name} onChange={handleInputChange} required />
         </div>
+
+        {/* Origin City */}
         <div>
           <label className="block text-sm font-medium text-text-secondary mb-1">Ciudad de Origen<span className="text-warning-500"> *</span></label>
           <input name="origin_city_name" placeholder="Ciudad Origen" className={baseInputClass} value={route.origin_city_name === "notSelected" ? '' : route.origin_city_name} onChange={handleInputChange} required />
         </div>
+
+        {/* Destination Country */}
         <div>
           <label className="block text-sm font-medium text-text-secondary mb-1">País de Destino<span className="text-warning-500"> *</span></label>
           <input name="destination_country_name" placeholder="País Destino" className={baseInputClass} value={route.destination_country_name === "notSelected" ? '' : route.destination_country_name} onChange={handleInputChange} required />
         </div>
+
+        {/* Destination City */}
         <div>
           <label className="block text-sm font-medium text-text-secondary mb-1">Ciudad de Destino<span className="text-warning-500"> *</span></label>
           <input name="destination_city_name" placeholder="Ciudad Destino" className={baseInputClass} value={route.destination_city_name === "notSelected" ? '' : route.destination_city_name} onChange={handleInputChange} required />
         </div>
+
+        {/* Start Date */}
         <div>
           <label className="block text-sm font-medium text-text-secondary mb-1">Fecha de Inicio (MM/DD/YYYY)<span className="text-warning-500"> *</span></label>
           <input
@@ -70,10 +97,14 @@ const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, inde
             required
           />
         </div>
+
+        {/* Start Time */}
         <div>
           <label className="block text-sm font-medium text-text-secondary mb-1">Hora de Inicio (HH:MM AM/PM)<span className="text-warning-500"> *</span></label>
           <input name="beginning_time" type="time" className={baseInputClass} value={route.beginning_time === "00:00:00" ? '' : route.beginning_time} onChange={handleInputChange} required />
         </div>
+
+        {/* End Date */}
         <div>
           <label className="block text-sm font-medium text-text-secondary mb-1">Fecha de Fin (MM/DD/YYYY)<span className="text-warning-500"> *</span></label>
           <input
@@ -86,6 +117,8 @@ const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, inde
             required
           />
         </div>
+
+        {/* End Time */}
         <div>
           <label className="block text-sm font-medium text-text-secondary mb-1">Hora de Fin (HH:MM AM/PM)<span className="text-warning-500"> *</span></label>
           <input name="ending_time" type="time" className={baseInputClass} value={route.ending_time === "00:00:00" ? '' : route.ending_time} onChange={handleInputChange} required />

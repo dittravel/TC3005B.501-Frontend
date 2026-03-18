@@ -1,6 +1,8 @@
 /**
- * RejectReceiptsModal component handles the rejection of receipts 
- * in the accounts payable module.
+ * RejectReceiptsModal Component
+ * 
+ * Displays a modal for rejecting a receipt. When confirmed, sends a PUT request
+ * to mark the receipt as rejected and reloads the page to reflect the changes.
  */
 
 import { useCallback } from "react";
@@ -20,7 +22,7 @@ interface Props {
   token: string;
 }
 
-export default function RejectReceipStatus({
+export default function RejectReceiptStatus({
   receipt_id,
   title,
   message,
@@ -31,21 +33,23 @@ export default function RejectReceipStatus({
   disabled = false,
   token,
 }: Props) {
+  /**
+   * Handles the confirmation action for rejecting a receipt.
+   * Sends a PUT request to set approval status to 0 (rejected) and reloads the page.
+   * @returns {Promise<void>}
+   */
   const handleConfirm = useCallback(async () => {
     try {
-        const url = `/accounts-payable/validate-receipt/${receipt_id}`;
+      const url = `/accounts-payable/validate-receipt/${receipt_id}`;
       await apiRequest(url, { 
         method: "PUT", 
-        data: {"approval": 0},
+        data: { "approval": 0 },
         headers: { Authorization: `Bearer ${token}` }
       });
-      alert(`Rechazado correctamente`)
+      alert(`Rechazado correctamente`);
 
-      if (redirection) {
-        window.location.reload();
-      } else {
-        window.location.reload();
-      }
+      // Reload page to reflect receipt rejection
+      window.location.reload();
     } catch (error) {
       console.error("Error en la solicitud:", error);
     }

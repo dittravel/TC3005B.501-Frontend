@@ -1,5 +1,8 @@
 /**
- * CancelRequestModal component for canceling travel requests.
+ * CancelRequestModal Component
+ * 
+ * Provides a button that opens a confirmation modal for canceling a travel request.
+ * When confirmed, sends a PUT request to cancel the request and reloads the page.
  */
 
 import { useState } from "react";
@@ -16,6 +19,11 @@ interface Props {
 export default function CancelRequestModal({ id, disabled = false, children, token }: Props) {
   const [isOpen, setIsOpen] = useState(false);
 
+  /**
+   * Cancels a travel request by sending a PUT request to the API.
+   * On success, reloads the page to reflect the changes.
+   * @returns {Promise<void>}
+   */
   const cancelRequest = async () => {
     try {
       await apiRequest(`/applicant/cancel-travel-request/${id}`, { method: "PUT" , headers: { Authorization: `Bearer ${token}` } });
@@ -38,7 +46,6 @@ export default function CancelRequestModal({ id, disabled = false, children, tok
       <Modal
         title="Cancelar Solicitud"
         message="¿Estás seguro de que deseas cancelar esta solicitud?"
-        type="confirm"
         show={isOpen}
         onClose={() => setIsOpen(false)}
         onConfirm={cancelRequest}

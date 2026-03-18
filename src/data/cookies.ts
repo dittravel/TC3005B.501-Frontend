@@ -2,6 +2,19 @@
  * Cookies
  * 
  * Utilities for managing user session cookies in an Astro application.
+ * 
+ * const mockCookies = {
+ *  username: "John Doe",
+ *  id: "1",
+ *  departmentId: "1",
+ *  role: "Applicant" as UserRole //'Applicant' | 'Authorizer' | 'Admin' | 'AccountsPayable' | 'TravelAgency';
+ * };
+ * 
+ * import type { UserRole } from "@type/roles";
+ * 
+ * export const getCookie = (key: keyof typeof mockCookies): string | UserRole => {
+ *     return mockCookies[key];
+ * };
  */
 
 import type { APIContext } from "astro";

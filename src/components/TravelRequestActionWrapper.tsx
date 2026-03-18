@@ -1,6 +1,8 @@
 /**
- * TravelRequestActionWrapper component for handling travel request 
- * actions and decisions.
+ * TravelRequestActionWrapper Component
+ * 
+ * Wraps an action button with a confirmation modal for authorizing or declining travel requests.
+ * Handles API requests and displays success toast notifications before redirecting.
  */
 
 import { useCallback, useState } from "react";
@@ -46,6 +48,7 @@ export default function TravelRequestActionWrapper({
         headers: { Authorization: `Bearer ${token}` }
       });
 
+      // Display appropriate success message based on the endpoint action
       if (endpoint.includes("authorize-travel-request")) {
         setToast({ message: 'Solicitud autorizada exitosamente.', type: 'success' });
         await new Promise(resolve => setTimeout(resolve, 2000));
@@ -53,6 +56,8 @@ export default function TravelRequestActionWrapper({
         setToast({ message: 'Solicitud rechazada exitosamente.', type: 'success' });
         await new Promise(resolve => setTimeout(resolve, 2000));
       }
+
+      // Redirect to specified URL or reload current page
       if (redirection) {
         window.location.href = redirection;
       } else {

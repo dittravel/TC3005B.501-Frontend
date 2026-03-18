@@ -2,7 +2,7 @@
 
 This document provides a summary of the API endpoints available in the application, including their methods, expected responses, and error handling. Each endpoint is designed to perform specific operations related to travel requests, user information, and expense validations.
 
-**attend-travel-request/{user_id}**
+**attend-travel-request/{userId}**
 
 method: PUT
 
@@ -18,7 +18,8 @@ method: PUT
 "500":
     description: Internal server error
 
-**/authorize-travel-request/{user_id}**
+
+**/authorize-travel-request/{userId}**
 
 method: PUT
 
@@ -60,7 +61,7 @@ Method:POST
 "500":
     description: Internal server error 
 
-**/decline-travel-request/{user_id}**
+**/decline-travel-request/{userId}**
 
 Method: PUT
 
@@ -74,7 +75,7 @@ Method: PUT
     description: Internal server error
 
 
-**/edit-travel-request/{request_id}**
+**/edit-travel-request/{}**
 
 "200":
 description: Travel request successfully updated
@@ -88,7 +89,7 @@ description: Travel request successfully updated
 "500":
     description: Internal server error
 
-**/get-cc/{user_id}**
+**/get-cc/{userId}**
 
 method: GET
 
@@ -101,7 +102,7 @@ method: GET
 "500":
     description: Internal server error
 
-**/get-alerts/{user_id}/{n}**
+**/get-alerts/{userId}/{n}**
 
 method:GET
 
@@ -114,7 +115,7 @@ description: List of travel requests
 "500":
     description: Internal server error
 
-**/get-completed-requests/{user_id}**
+**/get-completed-requests/{userId}**
 
 method:get
 
@@ -128,7 +129,7 @@ method:get
     description: Internal server error
 
 
-**/get-travel-request/{user_id}**
+**/get-travel-request/{userId}**
 
 method:get
 
@@ -155,7 +156,7 @@ Method: GET
 "500":
     description: Internal server error
 
-**/get-user/{user_id}**
+**/get-user/{userId}**
 
 Method:GET
 
@@ -168,7 +169,7 @@ description: User information
 "500":
     description: Internal server error
 
-**/get-user-data/{user_id}**
+**/get-user-data/{userId}**
 
 Method: GET
 
@@ -184,7 +185,7 @@ Method: GET
 "500":
     description: Internal server error
 
-**/get-user-request/{request_id}**
+**/get-user-request/{}**
 
 method: GET
 
@@ -197,7 +198,7 @@ method: GET
 "500":
     description: Internal server error
 
-**/get-user-requests/{user_id}/{status}**
+**/get-user-requests/{userId}/{status}**
 
 Mehtod:get
 

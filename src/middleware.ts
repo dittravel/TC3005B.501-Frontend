@@ -40,7 +40,7 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   const url = new URL(request.url);
   const pathname = url.pathname;
   
-  // 1. Allow access to public routes without authentication
+  // 1. Allow public routes without authentication
   if (matchPath(pathname, publicRoutes)) {
     return next();
   }
@@ -50,7 +50,7 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   const roleMatch = cookieHeader.match(/(?:^|;\s*)role=([^;]+)/);
   const role = roleMatch ? decodeURIComponent(roleMatch[1]) : '';
   const tokenMatch = cookieHeader.match(/(?:^|;\s*)token=([^;]+)/);
-  const isAuthenticated = !!tokenMatch || !!role; // Consider authenticated if role exists
+  const isAuthenticated = !!tokenMatch || !!role;
   const html = unauthorizedPage(pathname, isAuthenticated);
 
   // 2.1 If no role is found, redirect to login page
@@ -58,13 +58,13 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     return Response.redirect(new URL('/login', request.url), 302);
   }
 
-  // 3. Validate if the requested route exists
+  // 3. Check if the route is registered in the system
   const isKnownRoute = matchPath(pathname, allWhitelistedRoutes);
   if (!isKnownRoute) {
     return new Response(html, { status: 404, headers: { 'Content-Type': 'text/html' } });
   }
 
-  // 4. Validate if the user's role allows access to the requested route
+  // 4. Check if the role has access to the route
   const allowedRoutes = roleRoutes[role as keyof typeof roleRoutes] ?? [];
   const isAuthorized = matchPath(pathname, allowedRoutes);
 

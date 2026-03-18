@@ -5,7 +5,7 @@
 import { useState } from "react";
 import UploadFiles from "@components/UploadFiles";
 import Button from "@components/Button.tsx";
-import { submitTravelExpense } from "@components/SubmitTravelWarper";
+import { SubmitTravelExpense } from "@/components/SubmitTravelExpense";
 import ModalWrapper from "@components/ModalWrapper.tsx";
 import UploadReceiptFiles from "@components/UploadReceiptFiles.tsx";
 
@@ -28,28 +28,38 @@ export default function ExpensesFormClient({ requestId, token, receiptToReplace 
   const [lastReceiptId, setLastReceiptId] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  /**
+   * Handles the submission of a travel expense.
+   * Validates all required fields and file formats before submitting.
+   * For international expenses, creates a default XML file if none is provided.
+   * @returns {Promise<void>}
+   */
   const handleSubmit = async () => {
     try {
       setSubmitting(true);
 
+      // Validate that all required fields are filled with valid data
       if (!concepto || !monto || isNaN(parseFloat(monto)) || !pdfFile || (!isInternational && !xmlFile)) {
         alert("Por favor, completa todos los campos correctamente.");
         setSubmitting(false);
         return;
       }
       
+      // Validate PDF file extension
       if (pdfFile && !pdfFile.name.toLowerCase().endsWith('.pdf')) {
         alert("El archivo debe ser un PDF válido.");
         setSubmitting(false);
         return;
       }
       
+      // Validate XML file extension for national expenses
       if (!isInternational && xmlFile && !xmlFile.name.toLowerCase().endsWith('.xml')) {
         alert("El archivo debe ser un XML válido.");
         setSubmitting(false);
         return;
       }
 
+      // For international expenses, use default XML if none provided
       let finalXmlFile = xmlFile;
       if (isInternational && !xmlFile) {
         const response = await fetch("/default.xml");
@@ -58,14 +68,14 @@ export default function ExpensesFormClient({ requestId, token, receiptToReplace 
         setXmlFile(finalXmlFile);
       }
 
-      const { lastReceiptId } = await submitTravelExpense({
+      const { lastReceiptId } = await SubmitTravelExpense({
         requestId,
         concepto,
         monto: parseFloat(monto),
         token,
       });
 
-      
+      // Store the last receipt ID for file upload
       setLastReceiptId(lastReceiptId);
 
     } catch (err) {
@@ -148,8 +158,6 @@ export default function ExpensesFormClient({ requestId, token, receiptToReplace 
             setSubmitting(false);
           }}
         />
-
-
       )}
     </div>
   );

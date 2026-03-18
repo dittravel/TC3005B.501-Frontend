@@ -3,7 +3,7 @@
  */
 
 export interface TravelRoute {
-  router_index: number;
+  route_index: number;
   origin_country_name: string;
   origin_city_name: string;
   destination_country_name: string;
