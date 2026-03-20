@@ -1,11 +1,21 @@
-# Changelog
+# Changelog :clipboard:
 
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),  
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] - Post-Trip Flow
+## [0.4.0] - 2025-06-20: XML Parsing
+
+### Added
+
+- CFDI data preview after uploading XML files in the expense form (`components/UploadReceiptFiles.tsx` and `components/UploadFiles.tsx`)
+
+### Changed
+
+- `ExpensesForm` now shows CFDI data if an XML file is uploaded and parsed successfully
+
+## [0.3.0] - Post-Trip Flow
 
 ### Added
 
@@ -13,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Expense Approval
 - Expense Validation
 
-## [0.2.0]: 2025-05-16: Request Follow-Up
+## [0.2.0] - 2025-05-16: Request Follow-Up
 
 ### Added
 

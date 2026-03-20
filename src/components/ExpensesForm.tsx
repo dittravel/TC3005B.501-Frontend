@@ -27,6 +27,8 @@ export default function ExpensesFormClient({ requestId, token, receiptToReplace 
   const [isInternational, setIsInternational] = useState(false);
   const [lastReceiptId, setLastReceiptId] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [cfdiData, setCfdiData] = useState<any>(null);
+  const [cfdiDataEdited, setCfdiDataEdited] = useState<any>(null);
 
   /**
    * Handles the submission of a travel expense.
@@ -83,6 +85,30 @@ export default function ExpensesFormClient({ requestId, token, receiptToReplace 
     }
   };
 
+  // Handle CFDI data received from XML parsing
+  const handleCfdiDataReceived = (data: any) => {
+    // Set the original CFDI data for reference
+    setCfdiData(data);
+    
+    // Create a separate data object for editing
+    setCfdiDataEdited(data);
+
+    // Autofill fields
+    if (data.total && !monto) {
+      setMonto(data.total.toString());
+    }
+  };
+
+  // Handles changes to CFDI data fields in the UI
+  // This allows the user to edit the parsed CFDI data before submission
+  const handleCfdiFieldChange = (field: string, value: string) => {
+    // Maintain the original cfdiData for reference and only update edited values
+    setCfdiDataEdited((prev: any) => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
   return (
     <div className="space-y-8">
       <div className="grid md:grid-cols-4 gap-4 mb-4">
@@ -120,9 +146,82 @@ export default function ExpensesFormClient({ requestId, token, receiptToReplace 
       <UploadFiles
         onPdfChange={setPdfFile}
         onXmlChange={setXmlFile}
+        onXMLParsed={handleCfdiDataReceived}
         isInternational={isInternational}
         setIsInternational={setIsInternational}
       />
+
+      {/* Show CFDI data if xml was parsed successfully */}
+      {cfdiData && (
+        <div className="bg-background/50 border border-border rounded-lg p-4">
+          <h3 className="font-semibold text-text-primary mb-4">Datos del Comprobante CFDI</h3>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className={labelClass}>RFC Emisor</label>
+              <input
+                type="text"
+                value={cfdiDataEdited.rfcEmisor || ""}
+                onChange={(e) => handleCfdiFieldChange("rfcEmisor", e.target.value)}
+                className={`${baseInputClass}`}
+              />
+            </div>
+            <div>
+              <label className={labelClass}>Nombre Emisor</label>
+              <input
+                type="text"
+                value={cfdiDataEdited.nombreEmisor || ""}
+                onChange={(e) => handleCfdiFieldChange("nombreEmisor", e.target.value)}
+                className={`${baseInputClass}`}
+              />
+            </div>
+            <div>
+              <label className={labelClass}>UUID</label>
+              <input
+                type="text"
+                value={cfdiDataEdited.uuid || ""}
+                onChange={(e) => handleCfdiFieldChange("uuid", e.target.value)}
+                className={`${baseInputClass}`}
+              />
+            </div>
+            <div>
+              <label className={labelClass}>Fecha</label>
+              <input
+                type="text"
+                value={cfdiDataEdited.fecha || ""}
+                onChange={(e) => handleCfdiFieldChange("fecha", e.target.value)}
+                className={`${baseInputClass}`}
+              />
+            </div>
+            <div>
+              <label className={labelClass}>Subtotal</label>
+              <input
+                type="number"
+                value={cfdiDataEdited.subtotal || ""}
+                onChange={(e) => handleCfdiFieldChange("subtotal", e.target.value)}
+                className={`${baseInputClass}`}
+              />
+            </div>
+            <div>
+              <label className={labelClass}>Impuestos</label>
+              <input
+                type="number"
+                value={cfdiDataEdited.impuestos || ""}
+                onChange={(e) => handleCfdiFieldChange("impuestos", e.target.value)}
+                className={`${baseInputClass}`}
+              />
+            </div>
+            <div>
+              <label className={labelClass}>Moneda</label>
+              <input
+                type="text"
+                value={cfdiDataEdited.moneda || ""}
+                onChange={(e) => handleCfdiFieldChange("moneda", e.target.value)}
+                className={`${baseInputClass}`}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className={buttonContainerClass}>
         <a href={`/comprobar-solicitud/${requestId}`} className="w-full sm:w-auto">
