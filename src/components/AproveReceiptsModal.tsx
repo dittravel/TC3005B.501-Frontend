@@ -55,7 +55,7 @@ export default function ApproveReceiptStatus({
     <ModalWrapper
       title={title}
       message={message}
-      button_type="success"
+      color="success"
       modal_type={modal_type}
       onConfirm={handleConfirm}
       disabled={disabled}

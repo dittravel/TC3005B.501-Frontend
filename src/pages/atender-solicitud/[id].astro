@@ -7,7 +7,8 @@ export const prerender = false;
 
 import MainLayout from "@layouts/MainLayout.astro";
 import RequestDetail from "@components/RequestDetail.astro";
-import AproveRequest from "@components/ValidateReceiptStatus";
+import AproveRequestModal from "@components/AproveRequestModal";
+import Button from "@components/Button";
 import type { UserRole } from "@type/roles";
 
 import { getCookie } from "@data/cookies";
@@ -37,17 +38,19 @@ try {
     subtitle="Detalles de la solicitud a atender"
   />
   <div class="flex justify-end gap-4 mt-8">
-    <AproveRequest
+    <AproveRequestModal
       client:only="react"
-      ={request.request_id}
-      title="Confirmar envío"
+      request_id={request.request_id}
+      title="Confirmar aprobación"
       message="¿Está seguro de aprobar esta solicitud?"
       redirection="/dashboard"
       modal_type="success"
       variant="filled"
       token={getCookie("token", Astro.cookies) || ""}
     >
-      Aprobar
-    </AproveRequest>
+      <Button color="success" variant="filled" size="medium">
+        Aprobar
+      </Button>
+    </AproveRequestModal>
   </div>
 </MainLayout>

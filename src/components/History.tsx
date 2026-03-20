@@ -31,12 +31,14 @@ export default function History({ data , itemsPerPage = 5 }: Props) {
    */
   const getStatusStyle = (status: string) => {
     switch (status) {
-      case "Aprobado":
-        return "bg-success-50/20 text-success-100";
-      case "Pendiente":
-        return "bg-alert-50/20 text-alert-100";
+      case "Finalizado":
+        return "bg-success-100/20 text-text-primary/60";
+      case "Rechazado":
+        return "bg-alert-200/50 text-text-primary/60";
+      case "Cancelado":
+        return "bg-warning-100/20 text-text-primary/60";
       default:
-        return "bg-warning-50/20 text-warning-100";
+        return "bg-secondary/20 text-text-primary/60";
     }
   };
 
@@ -48,9 +50,9 @@ export default function History({ data , itemsPerPage = 5 }: Props) {
             <a
               key={request.request_id}
               href={`/detalles-solicitud/${request.request_id}`}
-              className="content-wrapper block transition hover:shadow-lg"
+              className="content-wrapper block"
             >
-              <div className="grid grid-cols-[1fr] md:grid-cols-[2fr_1fr] gap-8 items-center">
+              <div className="grid grid-cols-[1fr] md:grid-cols-[2fr_1fr] gap-8 items-start">
                 <div className="space-y-2">
                   <h2 className="text-xl font-bold text-text-primary">
                     #{request.request_id}
@@ -74,10 +76,10 @@ export default function History({ data , itemsPerPage = 5 }: Props) {
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center justify-center md:justify-end">
-                  <span className={`text-xs font-semibold px-4 py-2 rounded-full ${getStatusStyle(request.currentStatus)}`}>
+                <div className="flex justify-end">
+                  <p className={`text-xs font-semibold px-4 py-2 rounded-full ${getStatusStyle(request.status)}`}>
                     {(request.status || "DESCONOCIDO").toUpperCase()}
-                  </span>
+                  </p>
                 </div>
               </div>
             </a>

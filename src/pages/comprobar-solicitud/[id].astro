@@ -60,7 +60,7 @@ const StateColors = {
                   <p class="font-bold text-lg text-text-primary">Comprobante #{index + 1}</p>
                   <p class="text-sm text-text-primary"><span class="font-semibold">Id:</span> {expense.receipt_id}</p>
                   <p class="text-sm text-text-primary"><span class="font-semibold">Tipo de gasto:</span> {expense.receipt_type_name}</p>
-                  <p class="text-sm text-text-primary"><span class="font-semibold">Monto:</span> ${expense.amount}</p>
+                  <p class="text-sm text-text-primary"><span class="font-semibold">Monto:</span> ${expense.amount} {expense.currency || 'MXN'}</p>
                 </div>
                 <div class="text-right">
                   <p class={`text-lg font-semibold ${StateColors[expense.validation as keyof typeof StateColors]}`}>
@@ -98,7 +98,7 @@ const StateColors = {
         token={getCookie("token", Astro.cookies) || ""}
       >
         <Button color="success" variant="filled" size="medium">
-          Envíar a validación
+          Enviar a validar
         </Button>
       </ValidateReceiptStatus>
     </div>

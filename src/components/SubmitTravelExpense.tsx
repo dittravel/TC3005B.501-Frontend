@@ -21,8 +21,10 @@ const receiptTypeMap: Record<string, number> = {
 
 interface SubmitExpenseParams {
   requestId: number;
+  routeId: number;
   concepto: string;
   monto: number;
+  currency: string;
   token: string;
 }
 
@@ -31,6 +33,7 @@ interface SubmitExpenseParams {
  * Maps the expense concept to a receipt type ID and sends it to the API.
  * @param {SubmitExpenseParams} params - The expense submission parameters
  * @param {number} params.requestId - The travel request ID
+ * @param {number} params.routeId - The route ID associated with the expense
  * @param {string} params.concepto - The expense concepto (e.g., "Transporte", "Hotel")
  * @param {number} params.monto - The expense amount in MXN
  * @param {string} params.token - The authentication token
@@ -39,8 +42,10 @@ interface SubmitExpenseParams {
  */
 export async function SubmitTravelExpense({
   requestId,
+  routeId,
   concepto,
   monto,
+  currency,
   token,
 }: SubmitExpenseParams): Promise<{ count: number; lastReceiptId: number | null }> {
   // Get the receipt type ID for the expense concepto
@@ -53,7 +58,9 @@ export async function SubmitTravelExpense({
       {
         receipt_type_id,
         request_id: requestId,
+        route_id: routeId,
         amount: monto,
+        currency,
       },
     ],
   };

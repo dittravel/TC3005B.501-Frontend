@@ -9,17 +9,17 @@
 
 import { useState } from "react";
 import Modal from "@components/Modal";
-import { getButtonClasses } from "@type/button";
+import Button from "@components/Button";
 
 interface ModalWrapperProps {
   title: string;
   message: string;
-  button_type: "success" | "warning" | "primary" | "secondary";
+  color: "success" | "warning" | "primary" | "secondary";
   modal_type: "confirm" | "warning" | "error" | "success";
-  variant?: "filled" | "border" | "empty";
+  variant?: "filled" | "border" | "empty" | "link";
+  size?: "small" | "medium" | "big";
   disabled?: boolean;
   show?: boolean;
-  buttonClassName?: string;
   onConfirm?: () => void;
   onClose?: () => void;
   children?: React.ReactNode;
@@ -36,11 +36,11 @@ interface ModalWrapperProps {
 export default function ModalWrapper({
   title,
   message,
-  button_type,
+  color = "primary",
   variant="filled",
+  size = "medium",
   disabled = false,
   show = false,
-  buttonClassName = getButtonClasses({ variant: `${variant}`, color: `${button_type}`, size: "medium" }),
   onConfirm,
   children,
   triggerElement,
@@ -60,7 +60,7 @@ export default function ModalWrapper({
   if (triggerElement) {
     return (
       <>
-        <div onClick={() => setIsOpen(true)} className="w-full">
+        <div onClick={() => setIsOpen(true)} className="inline-block">
           {triggerElement}
         </div>
 
@@ -78,13 +78,15 @@ export default function ModalWrapper({
   return (
     <>
       {/* Trigger Button */}
-      <button
+      <Button
         onClick={() => setIsOpen(true)}
-        className={buttonClassName + " cursor-pointer"}
-        style={disabled ? { opacity: 0.5, pointerEvents: "none" } : undefined}
+        variant={variant}
+        color={color}
+        size={size}
+        disabled={disabled}
       >
         {children}
-      </button>
+      </Button>
 
       {/* Modal Dialog */}
       <Modal

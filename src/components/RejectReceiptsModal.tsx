@@ -59,7 +59,7 @@ export default function RejectReceiptStatus({
     <ModalWrapper
       title={title}
       message={message}
-      button_type="warning"
+      color="warning"
       modal_type={modal_type}
       onConfirm={handleConfirm}
       disabled={disabled}

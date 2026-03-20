@@ -29,9 +29,8 @@ requests= filteredRequests;
         <div class="grid gap-4">
           {requests.map((request: any) => {
             return (
-              <div class="content-wrapper">
+              <div class="card">
                 <div class="grid grid-cols-[1fr] md:grid-cols-[2fr_1fr] gap-8 md:gap-8">
-                <a href={`/completar-draft/${request.request_id}`} class="block">
                   <div class="space-y-2">
                     <p class="font-bold text-lg text-text-primary">#{request.request_id}</p>
                     <div class="text-sm text-text-primary grid grid-cols-[1fr_2fr] gap-y-1">
@@ -46,26 +45,25 @@ requests= filteredRequests;
                       <p><span class="font-semibold">Responsable:</span> Eduardo Porto Morales</p>
                     </div>
                   </div>
-                </a>
-                <div class="flex flex-col gap-2">
-                  <a href={`/completar-draft/${request.request_id}`} class="w-full">
-                    <Button color="secondary" variant="filled" size="medium" customSizeClass="w-full">
-                      Editar
-                    </Button>
-                  </a>
-                  <CancelRequestModal
-                    client:only="react"
-                    id={request.request_id}
-                    disabled={false}
-                    token={getCookie("token", Astro.cookies) || ""}
-                  >
-                    <Button color="warning" variant="border" size="medium" customSizeClass="w-full">
-                      Eliminar
-                    </Button>
-                  </CancelRequestModal>
+                  <div class="flex flex-col gap-2">
+                    <a href={`/completar-draft/${request.request_id}`} class="w-full">
+                      <Button color="secondary" variant="filled" size="medium" customSizeClass="w-full">
+                        Editar
+                      </Button>
+                    </a>
+                    <CancelRequestModal
+                      client:only="react"
+                      id={request.request_id}
+                      disabled={false}
+                      token={getCookie("token", Astro.cookies) || ""}
+                    >
+                      <Button color="warning" variant="border" size="medium" customSizeClass="w-full">
+                        Eliminar
+                      </Button>
+                    </CancelRequestModal>
+                  </div>
                 </div>
               </div>
-            </div>
             );
           })}
         </div>

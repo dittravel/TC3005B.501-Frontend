@@ -4,9 +4,10 @@
  * to a specific travel request.
  */
 
-import ExpensesFormClient from "@components/ExpensesForm.tsx"; // Adjust route if path changes
+import ExpensesFormClient from "@components/ExpensesForm.tsx";
 import { getCookie } from "@data/cookies";
 import { apiRequest } from "@utils/apiClient";
+import TextHeader from "@components/TextHeader.astro";
 
 const { id } = Astro.params;
 const user_id = getCookie("id", Astro.cookies);
@@ -17,30 +18,29 @@ const travelData = await (async () => {
   } catch (error) {
     return {};
   }
-})()
+})();
 ---
+<div class="mb-6">
+  <TextHeader
+    title="Agregar comprobante de gastos"
+    subtitle="Adjunta los comprobantes relacionados con el destino del viaje"
+  />
+  <section class="card">
+    <div class="space-y-6">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold text-text-primary">Agregar comprobantes</h2>
+        <span class="bg-secondary/20 text-text-primary/60 px-3 py-1 rounded-full text-sm font-mono">
+          #{travelData.request_id}
+        </span>
+      </div>
 
-<section class="card">
-  <div class="space-y-6">
-    <div class="flex items-center justify-between">
-      <h2 class="text-xl font-bold text-text-primary">Generar Comprobación de Gastos del viaje</h2>
-      <span class="bg-secondary/20 text-text-secondary px-3 py-1 rounded-full text-sm font-mono">
-        #{travelData.request_id}
-      </span>
+      <ExpensesFormClient
+        client:only="react"
+        requestId={travelData.request_id}
+        routes={travelData.routes || []}
+        token={getCookie("token", Astro.cookies) || ""}
+        receiptToReplace={Astro.props.receiptToReplace}
+      />
     </div>
-
-    <p class="text-sm text-text-secondary">
-      <strong>Destino:</strong> {travelData.routes[0].destination_country} &nbsp;&nbsp;
-      <strong>Ciudad:</strong> {travelData.routes[0].destination_city} &nbsp;&nbsp;
-      <strong>Fechas:</strong> {travelData.routes[0].beginning_date} - {travelData.routes[0].ending_date}
-    </p>
-
-    <ExpensesFormClient
-      client:only="react"
-      requestId={travelData.request_id}
-      token={getCookie("token", Astro.cookies) || ""}
-      receiptToReplace={Astro.props.receiptToReplace}
-    />
-  </div>
-</section>
-
+  </section>
+</div>

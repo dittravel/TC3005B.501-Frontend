@@ -44,10 +44,8 @@ const verifiedReceipts = [
           <h3 class="text-lg font-bold text-text-primary">1. Balance Actual</h3>
         </div>
         
-        <div class="bg-success/10 rounded-lg p-6" class:list={[
-          currentBalance >= 0 ? '' : 'bg-warning/10',
-        ]}>
-          <div class="flex justify-between items-center">
+        <div class="md:p-10">
+          <div class="flex flex-col md:flex-row gap-4 justify-between items-center">
             <div>
               <h4 class="text-lg font-medium text-text-primary">Saldo Actual</h4>
               <p class="text-sm text-text-secondary">
@@ -55,10 +53,10 @@ const verifiedReceipts = [
               </p>
             </div>
             <span class:list={[
-              'text-2xl font-bold',
-              currentBalance >= 0 ? 'text-success-500' : 'text-warning-500'
+              'text-2xl font-bold px-3 py-1 rounded-full',
+              currentBalance >= 0 ? 'text-success-300 bg-success-100/20' : 'text-warning-300 bg-warning-100/20',
             ]}>
-              {currentBalance >= 0 ? '+' : ''}{currentBalance.toFixed(2)} MXN
+              {currentBalance >= 0 ? '+$' : ''}{currentBalance.toFixed(2)} MXN
             </span>
           </div>
         </div>

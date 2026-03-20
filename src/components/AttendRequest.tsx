@@ -90,7 +90,7 @@ export default function AttendRequest({ request_id, token }: Props) {
         <ModalWrapper
           title="¿Estás seguro de asignar este presupuesto?"
           message="Una vez asignado, la solicitud no podrá ser modificada."
-          button_type="success"
+          color="success"
           modal_type="success"
           onConfirm={handleConfirm}
           triggerElement={

@@ -2,7 +2,7 @@
  * ExpensesForm component for managing travel request expenses and receipts.
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import UploadFiles from "@components/UploadFiles";
 import Button from "@components/Button.tsx";
 import { SubmitTravelExpense } from "@/components/SubmitTravelExpense";
@@ -11,6 +11,7 @@ import UploadReceiptFiles from "@components/UploadReceiptFiles.tsx";
 
 interface Props {
   requestId: number;
+  routes: any[]; // List of routes associated with the travel request
   token: string;
   receiptToReplace?: string | null;
 }
@@ -19,9 +20,11 @@ const labelClass = "block text-sm font-medium text-text-secondary mb-1";
 const baseInputClass = "w-full border border-border rounded-md px-3 py-2 bg-card text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary";
 const buttonContainerClass = "flex flex-col sm:flex-row justify-end gap-3 pt-4";
 
-export default function ExpensesFormClient({ requestId, token, receiptToReplace }: Props) {
+export default function ExpensesFormClient({ requestId, routes, token, receiptToReplace }: Props) {
   const [concepto, setConcepto] = useState("Transporte");
   const [monto, setMonto] = useState("");
+  const [currency, setCurrency] = useState("");
+  const [routeId, setRouteId] = useState<number | null>(routes?.[0]?.route_id || null);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [xmlFile, setXmlFile] = useState<File | null>(null);
   const [isInternational, setIsInternational] = useState(false);
@@ -29,6 +32,11 @@ export default function ExpensesFormClient({ requestId, token, receiptToReplace 
   const [submitting, setSubmitting] = useState(false);
   const [cfdiData, setCfdiData] = useState<any>(null);
   const [cfdiDataEdited, setCfdiDataEdited] = useState<any>(null);
+
+  // Select MXN currency by default for national expenses
+  useEffect(() => {
+    isInternational ? setCurrency("USD") : setCurrency("MXN");
+  }, [isInternational]);
 
   /**
    * Handles the submission of a travel expense.
@@ -39,6 +47,13 @@ export default function ExpensesFormClient({ requestId, token, receiptToReplace 
   const handleSubmit = async () => {
     try {
       setSubmitting(true);
+
+      // Validate that a route is selected
+      if (!routeId) {
+        alert("Por favor, selecciona un destino válido.");
+        setSubmitting(false);
+        return;
+      }
 
       // Validate that all required fields are filled with valid data
       if (!concepto || !monto || isNaN(parseFloat(monto)) || !pdfFile || (!isInternational && !xmlFile)) {
@@ -72,8 +87,10 @@ export default function ExpensesFormClient({ requestId, token, receiptToReplace 
 
       const { lastReceiptId } = await SubmitTravelExpense({
         requestId,
+        routeId,
         concepto,
         monto: parseFloat(monto),
+        currency,
         token,
       });
 
@@ -96,6 +113,7 @@ export default function ExpensesFormClient({ requestId, token, receiptToReplace 
     // Autofill fields
     if (data.total && !monto) {
       setMonto(data.total.toString());
+      setCurrency(data.moneda || "MXN");
     }
   };
 
@@ -109,9 +127,29 @@ export default function ExpensesFormClient({ requestId, token, receiptToReplace 
     }));
   };
 
+  const handleRouteChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = parseInt(e.target.value);
+    setRouteId(value);
+  };
+
   return (
     <div className="space-y-8">
-      <div className="grid md:grid-cols-4 gap-4 mb-4">
+      <div className="grid md:grid-cols-5 gap-4 mb-4">
+        <div>
+          <label className={labelClass}>Destino</label>
+          <select
+            className={baseInputClass}
+            value={routeId || ""}
+            onChange={handleRouteChange}
+          >
+            <option value="">Selecciona un destino</option>
+            {routes?.map((route: any, idx: number) => (
+              <option key={idx} value={route.route_id || ""}>
+                {route.destination_city}, {route.destination_country} ({route.beginning_date} - {route.ending_date})
+              </option>
+            ))}
+          </select>
+        </div>
         <div>
           <label className={labelClass}>Concepto</label>
           <select
@@ -140,6 +178,19 @@ export default function ExpensesFormClient({ requestId, token, receiptToReplace 
             onChange={(e) => setMonto(e.target.value)}
             required
           />
+        </div>
+        <div>
+          <label className={labelClass}>Moneda</label>
+          <select
+            className={baseInputClass}
+            value={currency}
+            onChange={(e) => setCurrency(e.target.value)}
+          >
+            <option value="MXN">MXN</option>
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="CAD">CAD</option>
+          </select>
         </div>
       </div>
 
@@ -225,7 +276,7 @@ export default function ExpensesFormClient({ requestId, token, receiptToReplace 
 
       <div className={buttonContainerClass}>
         <a href={`/comprobar-solicitud/${requestId}`} className="w-full sm:w-auto">
-          <Button variant="border" color="warning">
+          <Button variant="border" color="primary">
             Cancelar
           </Button>
         </a>
@@ -233,11 +284,11 @@ export default function ExpensesFormClient({ requestId, token, receiptToReplace 
           title="Subir comprobación"
           message="¿Está seguro de que desea subir este Comprobante?"
           modal_type="confirm"
-          button_type="success"
+          color="success"
           variant="filled"
           onConfirm={handleSubmit}
         >
-          Subir Comprobante
+          Subir Comprobantes
         </ModalWrapper>
       </div>
 

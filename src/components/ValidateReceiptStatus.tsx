@@ -72,12 +72,11 @@ export default function ValidateReceiptStatus({
     <ModalWrapper
       title={title}
       message={message}
-      button_type={modal_type}
+      color={modal_type}
       modal_type={modal_type}
       onConfirm={handleConfirm}
       variant={variant}
-    >
-      {children}
-    </ModalWrapper>
+      triggerElement={children}
+    />
   );
 }

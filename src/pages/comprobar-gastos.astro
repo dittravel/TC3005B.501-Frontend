@@ -66,57 +66,55 @@ const requests = await Promise.all(
               const { total, accepted, rejected, pending } = getVerificationStats(request);
               const percent = (count: number) => total ? (count / total) * 100 : 0;
               return (
-                <div class="content-wrapper">
+                <div class="card">
                 <div class="grid grid-cols-[1fr] md:grid-cols-[2fr_1fr] gap-8 md:gap-8">
-                  <a href={`/comprobar-solicitud/${request.request_id}`} class="block">
-                    <div class="space-y-2">
-                      <p class="font-bold text-lg text-text-primary">#{request.request_id}</p>
-                      { total === 0 ? (
-                        <p class="text-sm text-text-secondary">
-                          No se han enviado comprobantes
-                        </p>
-                      ) : (
-                        <div class="flex items-center justify-between">
-                          <p class="text-sm text-text-secondary">{accepted}/{total} Aceptadas</p>
-                        </div>
-                      )}
-                      { total != 0 && (
-                        <div class="w-full h-2 bg-card rounded overflow-hidden flex">
-                          <div class="bg-success-500 h-full" style={`width: ${percent(accepted)}%`} />
-                          <div class="bg-warning-500 h-full" style={`width: ${percent(rejected)}%`} />
-                          <div class="bg-alert-400 h-full" style={`width: ${percent(pending)}%`} />
-                        </div>
-                      )}
-
-                      <div class="text-sm text-text-primary grid grid-cols-[1fr_2fr] gap-y-1">
-                        <p><span class="font-semibold">Lugar:</span> {request.destination_country}</p>
-                        <p><span class="font-semibold">Fechas:</span> {request.beginning_date} - {request.ending_date}</p>
-                        <p>
-                          <span class="font-semibold">Estado:</span> 
-                          <span
-                            class={`ml-1 font-semibold ${
-                              pending > 0
-                                ? 'text-alert-400'
-                                : accepted === total
-                                  ? 'text-success-500'
-                                  : rejected === total
-                                    ? 'text-warning-500'
-                                    : 'text-primary-500'
-                            }`}
-                          >
-                            {pending > 0 || total === 0
-                              ? 'PENDIENTE'
-                              : accepted === total
-                                ? 'ACEPTADA'
-                                : rejected === total
-                                  ? 'RECHAZADA'
-                                  : 'MIXTA'}
-                          </span>
-                        </p>
-                        <p><span class="font-semibold">Responsable:</span> Eduardo Porto Morales</p>
+                  <div class="space-y-2">
+                    <p class="font-bold text-lg text-text-primary">#{request.request_id}</p>
+                    { total === 0 ? (
+                      <p class="text-sm text-text-secondary">
+                        No se han enviado comprobantes
+                      </p>
+                    ) : (
+                      <div class="flex items-center justify-between">
+                        <p class="text-sm text-text-secondary">{accepted}/{total} Aceptadas</p>
                       </div>
+                    )}
+                    { total != 0 && (
+                      <div class="w-full h-2 bg-card rounded overflow-hidden flex">
+                        <div class="bg-success-500 h-full" style={`width: ${percent(accepted)}%`} />
+                        <div class="bg-warning-500 h-full" style={`width: ${percent(rejected)}%`} />
+                        <div class="bg-alert-400 h-full" style={`width: ${percent(pending)}%`} />
+                      </div>
+                    )}
+
+                    <div class="text-sm text-text-primary grid grid-cols-[1fr_2fr] gap-y-1">
+                      <p><span class="font-semibold">Lugar:</span> {request.destination_country}</p>
+                      <p><span class="font-semibold">Fechas:</span> {request.beginning_date} - {request.ending_date}</p>
+                      <p>
+                        <span class="font-semibold">Estado:</span> 
+                        <span
+                          class={`ml-1 font-semibold ${
+                            pending > 0
+                              ? 'text-alert-400'
+                              : accepted === total
+                                ? 'text-success-500'
+                                : rejected === total
+                                  ? 'text-warning-500'
+                                  : 'text-primary-500'
+                          }`}
+                        >
+                          {pending > 0 || total === 0
+                            ? 'PENDIENTE'
+                            : accepted === total
+                              ? 'ACEPTADA'
+                              : rejected === total
+                                ? 'RECHAZADA'
+                                : 'MIXTA'}
+                        </span>
+                      </p>
+                      <p><span class="font-semibold">Responsable:</span> Eduardo Porto Morales</p>
                     </div>
-                  </a>
+                  </div>
                   <div class="flex flex-col gap-2 justify-center items-center">
                     <a href={`/comprobar-solicitud/${request.request_id}`} class="w-full">
                       <Button color="secondary" variant="filled" size="medium" customSizeClass="w-full">

@@ -107,7 +107,7 @@ export function getButtonClasses({
   const safeColor = colorMap[color] ?? colorMap.primary;
   const sizeClass = size === 'custom' ? customSizeClass : sizeClasses[size] ?? sizeClasses.medium;
 
-  const base = `rounded-md font-medium transition-all duration-200 ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} ${safeColor.ring}`;
+  const base = `rounded-sm font-medium transition-all duration-200 ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} ${safeColor.ring}`;
 
   const variants = {
     filled: disabled
