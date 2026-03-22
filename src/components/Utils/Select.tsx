@@ -1,12 +1,17 @@
 /**
   * Input Component
   * 
-  * Reusable input component for form inputs
+  * Reusable select component for form inputs
   * 
   */
 
 import type { SelectProps } from '@/types/select';
 
+/**
+ * Select Component
+ * @param {SelectProps} props - The properties for the select component
+ * @returns {JSX.Element} The rendered select component
+ */
 export default function Input(props: SelectProps) {
   // Default props for the component
   const {
@@ -32,7 +37,8 @@ export default function Input(props: SelectProps) {
     ${base}
     ${error ? 'border-warning-500' : 'border-border'}
     ${disabled ? 'text-text-secondary cursor-not-allowed' : ''}
-    ${className}`.trim();
+    ${className}
+  `.trim();
   const errorId = name ? `${name}-error` : undefined;
   
   return (

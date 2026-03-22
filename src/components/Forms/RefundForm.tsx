@@ -318,7 +318,7 @@ export default function RefundForm({ role }: RefundFormProps) {
         </div>
       )}
 
-      {/* Reimbursement History Section */}
+      {/* Refund History Section */}
       <div className="card">
         <div className="card-title">
           <h3 className="text-lg font-bold text-text-primary">4. Historial de Reembolsos</h3>

@@ -2,12 +2,17 @@
  * SelectGroup Component
  * 
  * Reusable component for rendering a group of checkboxes.
- * Manages multiple checkbox selections and provides a Set-based API.
+ * Manages multiple checkbox selections
  */
 
 import Checkbox from '@/components/Utils/Checkbox';
 import type { SelectGroupProps } from '@/types/selectGroup';
 
+/**
+ * SelectGroup Component
+ * @param {SelectGroupProps} props - The properties for the select group component
+ * @returns {JSX.Element} The rendered select group component
+ */
 export default function SelectGroup({
   name,
   label,
@@ -18,6 +23,8 @@ export default function SelectGroup({
   className = '',
   helpText,
 }: SelectGroupProps) {
+
+  // Handles the change event for checkboxes, updating the selected values set
   const handleCheckboxChange = (itemId: string | number) => {
     const newSet = new Set(selectedValues);
     if (newSet.has(itemId)) {

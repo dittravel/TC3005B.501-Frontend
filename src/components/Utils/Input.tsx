@@ -8,6 +8,11 @@
 import type { BaseInputProps } from '@type/input.ts';
 import { InputPatterns } from '@type/input.ts';
 
+/**
+ * Input Component
+ * @param {BaseInputProps} props - The properties for the input component
+ * @returns {JSX.Element} The rendered input component
+ */
 export default function Input(props: BaseInputProps) {
   // Default props for the input component
 	const {
@@ -42,7 +47,8 @@ export default function Input(props: BaseInputProps) {
     ${base}
     ${error ? 'border-warning-500' : 'border-border'}
     ${disabled ? 'bg-neutral-50 cursor-not-allowed' : ''}
-    ${className}`.trim();
+    ${className}
+  `.trim();
 	const errorId = name ? `${name}-error` : undefined;
 
 	return (

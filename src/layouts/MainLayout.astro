@@ -65,6 +65,7 @@ const { title, data, showMessages = false } = Astro.props;
       )}
     </div>
 
+    {/* Inline script to include it directly in the HTML document */}
     <script is:inline>
       const sidebar = document.getElementById('sidebar');
       const messages = document.getElementById('messages');

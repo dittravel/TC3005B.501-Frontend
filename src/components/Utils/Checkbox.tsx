@@ -7,6 +7,11 @@
 
 import type { CheckboxProps } from '@/types/checkbox';
 
+/**
+ * Checkbox Component
+ * @param {CheckboxProps} props - The properties for the checkbox component
+ * @returns {JSX.Element} The rendered checkbox component
+ */
 export default function Checkbox(props: CheckboxProps) {
   // Default props for the component
   const {

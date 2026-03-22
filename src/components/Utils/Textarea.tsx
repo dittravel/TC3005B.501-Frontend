@@ -7,6 +7,11 @@
 
 import type { TextareaProps } from '@/types/textarea';
 
+/**
+ * Textarea Component
+ * @param {TextareaProps} props - The properties for the textarea component
+ * @returns {JSX.Element} The rendered textarea component
+ */
 export default function Textarea(props: TextareaProps) {
   // Default props for the component
   const {

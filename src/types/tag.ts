@@ -1,6 +1,7 @@
 /**
-* Tag component for displaying labels, statuses, categories, etc.
-* Supports different types, variants, and sizes for flexible styling.
+* Tag Props
+* 
+* Defines the properties for the Tag component, which is used to display categorized labels with different styles and sizes.
 */
 
 export interface TagProps {
