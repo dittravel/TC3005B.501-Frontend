@@ -4,9 +4,9 @@
  */
 
 export const prerender = false;
-import TextHeader from '@components/TextHeader.astro';
+import TextHeader from '@components/Layout/TextHeader.astro';
 import MainLayout from "@layouts/MainLayout.astro";
-import TravelRequestForm from "@components/TravelRequestForm.tsx";
+import TravelRequestForm from "@/components/Forms/TravelRequestForm";
 
 import type { UserRole } from "@type/roles";
 import { getCookie } from "@data/cookies";
@@ -35,7 +35,7 @@ try {
       title="Editar una solicitud de viaje existente"
       subtitle="Por favor termina de editar el siguiente formulario por completo"
     />
-    <main class="bg-card p-6 rounded-lg shadow w-full border border-border">
+    <main>
       <TravelRequestForm
         client:only="react"
         data={request}

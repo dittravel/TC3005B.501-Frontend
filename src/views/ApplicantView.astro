@@ -3,21 +3,21 @@
  * Applicant view of the dashboard
  */
 
-import Button from "@components/Button";
-import TextHeader from "@components/TextHeader.astro";
-import CancelRequestModal from "@components/CancelRequestModal.tsx";
-
+import Button from "@/components/Buttons/Button";
+import TextHeader from "@components/Layout/TextHeader.astro";
+import CancelRequestModal from "@/components/Modals/CancelRequestModal";
+import Tag from "@/components/Utils/Tag";
 import { getCookie } from "@data/cookies";
 import { apiRequest } from '@utils/apiClient';
 
 // Color for each request status
 const colorDesign: { [key: string]: string } = {
-  'Primera Revisión': "text-alert-400",
-  'Segunda Revisión': "text-alert-400",
-  'Cotización del Viaje': "text-alert-400",
-  'Atención Agencia de Viajes': "text-alert-400",
-  'Comprobación gastos del viaje': "text-primary-500",
-  'Validación de comprobantes': "text-primary-500",
+  'Primera Revisión': "success",
+  'Segunda Revisión': "alert",
+  'Cotización del Viaje': "warning",
+  'Atención Agencia de Viajes': "primary",
+  'Comprobación gastos del viaje': "secondary",
+  'Validación de comprobantes': "special",
 };
 
 // Get user ID from cookies
@@ -64,7 +64,7 @@ const { userName } = Astro.props;
         </h2>
         <a href="/crear-solicitud">
           <Button variant="filled" color="secondary" size="custom" customSizeClass="py-2 px-4 text-base font-bold">
-            Solicita un nuevo viaje
+            Crear Solicitud
           </Button>
         </a>
       </div>
@@ -81,14 +81,12 @@ const { userName } = Astro.props;
                 <div class="grid grid-cols-[1fr] md:grid-cols-[2fr_1fr] gap-8 md:gap-8">
                   <a href={`/detalles-solicitud/${request.request_id}`}>
                     <div>
-                      <p class="font-bold text-lg wrap-break-words text-text-primary">#{request.request_id}</p>
-                      <div class="text-sm text-text-primary grid grid-cols-[2fr_3fr] gap-y-1">
+                      <Tag text={`Solicitud #${request.request_id}`} type="secondary" />
+                      <div class="text-sm text-text-primary grid grid-cols-[2fr_3fr] gap-y-1 mt-4">
                         <p><span class="font-semibold">País Destino:</span> {request.destination_country}</p>
                         <p>
                           <span class="font-semibold">Estado:</span> 
-                          <span class={`ml-1 font-semibold text-sm rounded bg-yellow ${colorDesign[String(request.status)]}`}>
-                            {(request.status ? request.status.toUpperCase() : '')}
-                          </span>
+                          <Tag text={request.status} type={colorDesign[request.status] || "default"} />
                         </p>
                         <p><span class="font-semibold">Fechas:</span> {request.beginning_date} - {request.ending_date}</p>
                         <p><span class="font-semibold">Responsable:</span> Eduardo Porto Morales</p>
@@ -123,7 +121,7 @@ const { userName } = Astro.props;
           })}
         </div>
       ) : (
-        <div class="bg-card p-6 rounded-lg shadow w-full text-center text-text-secondary font-semibold">
+        <div class="card text-center text-text-secondary font-semibold">
           No tienes viajes agendados
         </div>
       )}

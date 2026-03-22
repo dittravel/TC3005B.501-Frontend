@@ -4,9 +4,9 @@
  * It includes sections for destinations, dates, additional information, and cost assignment.
  */
 
-import TextHeader from '@components/TextHeader.astro';
+import TextHeader from '@components/Layout/TextHeader.astro';
 import MainLayout from "@layouts/MainLayout.astro";
-import TravelRequestForm from "@/components/TravelRequestForm";
+import TravelRequestForm from "@/components/Forms/TravelRequestForm";
 
 import type { UserRole } from "@type/roles";
 import { getCookie } from "@data/cookies";
@@ -23,7 +23,7 @@ const userName = getCookie("username", Astro.cookies) || "";
       title="Crear nueva solicitud de viaje"
       subtitle="Por favor completa el siguiente formulario para generar una nueva solicitud de viaje"
     />
-    <main class="bg-card border border-border rounded-xl shadow-md p-6">
+    <main>
       <TravelRequestForm
         user_id={getCookie("id", Astro.cookies) || ""}
         client:only="react"

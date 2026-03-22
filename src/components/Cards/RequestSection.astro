@@ -1,0 +1,52 @@
+---
+/**
+ * This component displays a section of travel requests, 
+ * such as pending approvals or recent submissions.
+ */
+
+import RequestCard from "@components/Cards/RequestCard.astro";
+import Button from "@/components/Buttons/Button";
+
+const {
+  title,
+  requests = [],
+	anchor,
+  urlBase,
+  subtitle,
+  emptyMessage = "No hay solicitudes disponibles"
+} = Astro.props;
+---
+
+<section class="w-full">
+	<div class="flex items-center justify-between mb-6">
+		<h2 class="text-xl font-bold flex items-center text-text-primary">
+			{title}
+			<span class="px-2 align-middle text-secondary-500">({requests.length})</span>
+		</h2>
+		<Button
+			href={`/${anchor}`}
+			variant="link"
+			color="secondary"
+			size="small"
+			client:only="react"
+		>
+			Ver todas
+		</Button>
+	</div>
+
+  {requests.length > 0 ? (
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {requests.slice(0, 4).map((request:any) => (
+        <RequestCard 
+          request={request}
+          urlBase={urlBase} 
+          subtitle={subtitle} 
+        />
+      ))}
+    </div>
+  ) : (
+    <div class="card text-center text-text-secondary font-semibold">
+      {emptyMessage}
+    </div>
+  )}
+</section>

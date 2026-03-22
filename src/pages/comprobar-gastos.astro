@@ -4,8 +4,9 @@
  */
 
 import MainLayout from "@layouts/MainLayout.astro";
-import TextHeader from "@components/TextHeader.astro";
-import Button from "@components/Button";
+import TextHeader from "@components/Layout/TextHeader.astro";
+import Button from "@/components/Buttons/Button";
+import Tag from "@/components/Utils/Tag";
 import type { UserRole } from "@type/roles";
 
 import { getCookie } from "@data/cookies";
@@ -69,7 +70,7 @@ const requests = await Promise.all(
                 <div class="card">
                 <div class="grid grid-cols-[1fr] md:grid-cols-[2fr_1fr] gap-8 md:gap-8">
                   <div class="space-y-2">
-                    <p class="font-bold text-lg text-text-primary">#{request.request_id}</p>
+                    <Tag text={`Solicitud #${request.request_id}`} type="secondary" />
                     { total === 0 ? (
                       <p class="text-sm text-text-secondary">
                         No se han enviado comprobantes
@@ -91,26 +92,20 @@ const requests = await Promise.all(
                       <p><span class="font-semibold">Lugar:</span> {request.destination_country}</p>
                       <p><span class="font-semibold">Fechas:</span> {request.beginning_date} - {request.ending_date}</p>
                       <p>
-                        <span class="font-semibold">Estado:</span> 
-                        <span
-                          class={`ml-1 font-semibold ${
-                            pending > 0
-                              ? 'text-alert-400'
-                              : accepted === total
-                                ? 'text-success-500'
-                                : rejected === total
-                                  ? 'text-warning-500'
-                                  : 'text-primary-500'
-                          }`}
-                        >
-                          {pending > 0 || total === 0
-                            ? 'PENDIENTE'
-                            : accepted === total
-                              ? 'ACEPTADA'
-                              : rejected === total
-                                ? 'RECHAZADA'
-                                : 'MIXTA'}
-                        </span>
+                        <span class="font-semibold">Estado:</span>
+                        <Tag text={pending > 0 || total === 0
+                          ? 'Pendiente'
+                          : accepted === total
+                            ? 'Aceptada'
+                            : rejected === total
+                              ? 'Rechazada'
+                              : 'Mixta'} type={pending > 0
+                          ? 'warning'
+                          : accepted === total
+                            ? 'success'
+                            : rejected === total
+                              ? 'alert'
+                              : 'info'} />
                       </p>
                       <p><span class="font-semibold">Responsable:</span> Eduardo Porto Morales</p>
                     </div>
@@ -128,10 +123,8 @@ const requests = await Promise.all(
             })}
           </div>
         ) : (
-          <div class="content-wrapper">
-            <div class="text-center text-text-secondary font-semibold">
-              No tienes comprobantes pendientes
-            </div>
+          <div class="card text-center text-text-secondary font-semibold">
+            No tienes comprobantes pendientes
           </div>
         )}
       </section>

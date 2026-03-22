@@ -5,11 +5,11 @@
  * Description: This is the travel agent view of the application.
  **/
 
-import TextHeader from "@components/TextHeader.astro";
+import TextHeader from "@components/Layout/TextHeader.astro";
 import { getRequestPriority } from "@utils/getPriorityDates";
 import { getCookie } from "@data/cookies";
 import { apiRequest } from '@utils/apiClient';
-import RequestSection from "@components/RequestSection.astro";
+import RequestSection from "@components/Cards/RequestSection.astro";
 
 const { userName} = Astro.props;
 const requests = await (async () => {

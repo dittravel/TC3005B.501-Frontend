@@ -6,10 +6,11 @@
 export const prerender = false;
 
 import MainLayout from "@layouts/MainLayout.astro";
-import TextHeader from "@components/TextHeader.astro";
-import Button from "@components/Button";
+import TextHeader from "@components/Layout/TextHeader.astro";
+import Button from "@/components/Buttons/Button";
+import Tag from "@/components/Utils/Tag";
 import { getCookie } from "@data/cookies";
-import ValidateReceiptStatus from "@components/ValidateReceiptStatus.tsx";
+import ValidateReceiptStatus from "@/components/Modals/ValidateReceiptStatus";
 
 import type { UserRole } from "@type/roles";
 
@@ -30,9 +31,9 @@ try {
 }
 
 const StateColors = {
-  'Aprobado': ' text-success-500',
-  'Rechazado': ' text-warning-500',
-  'Pendiente': ' text-alert-400'
+  'Aprobado': 'success',
+  'Rechazado': 'alert',
+  'Pendiente': 'warning'
 };
 
 ---
@@ -54,18 +55,16 @@ const StateColors = {
       {request.Expenses.length > 0 ? (
         <div class="grid gap-4">
           {request.Expenses.map((expense: any, index: number) => (
-            <div class="content-wrapper">
+            <div class="card">
               <div class="flex flex-col md:flex-row justify-between gap-4 mb-4">
-                <div class="space-y-1">
-                  <p class="font-bold text-lg text-text-primary">Comprobante #{index + 1}</p>
+                <div class="space-y-2">
+                  <Tag text={`Comprobante #${index + 1}`} type="secondary" />
                   <p class="text-sm text-text-primary"><span class="font-semibold">Id:</span> {expense.receipt_id}</p>
                   <p class="text-sm text-text-primary"><span class="font-semibold">Tipo de gasto:</span> {expense.receipt_type_name}</p>
                   <p class="text-sm text-text-primary"><span class="font-semibold">Monto:</span> ${expense.amount} {expense.currency || 'MXN'}</p>
                 </div>
-                <div class="text-right">
-                  <p class={`text-lg font-semibold ${StateColors[expense.validation as keyof typeof StateColors]}`}>
-                    {expense.validation}
-                  </p>
+                <div>
+                  <Tag text={expense.validation} type={StateColors[expense.validation as keyof typeof StateColors]} />
                 </div>
               </div>
               {expense.validation === 'Rechazado' && (
@@ -79,14 +78,12 @@ const StateColors = {
           ))}
         </div>
       ) : (
-        <div class="content-wrapper">
-          <p class="text-center text-text-secondary font-semibold">
-            Aún no has subido comprobantes para esta solicitud.
-          </p>
+        <div class="card text-center text-text-secondary font-semibold">
+          Aún no has subido comprobantes para esta solicitud
         </div>
       )}
     </section>
-    <div class="fixed bottom-6 right-6 z-50">
+    <div class="flex justify-end mt-6">
       <ValidateReceiptStatus
         client:only="react"
         request_id={Number(id)}

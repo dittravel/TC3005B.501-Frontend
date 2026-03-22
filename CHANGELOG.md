@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),  
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2025-06-22: Src Cleanup and Refactoring
+
+### Added
+
+- New tag component for consistent labeling
+
+- New Input, Select, and TextArea components for form inputs
+
+- New Reminder component for displaying important notes and reminders in the UI
+
+### Changed
+
+- Refactored `src/components/` to include subdirectories for better organization (e.g., `Forms`, `Layout`, `Utils`).
+
+- Updated import paths to reflect the new directory structure.
+
+- Forms now use the new Input, Select, and TextArea components for consistent styling and behavior.
+
 ## [0.4.0] - 2025-06-20: XML Parsing
 
 ### Added

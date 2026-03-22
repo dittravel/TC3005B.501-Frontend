@@ -3,9 +3,9 @@
  * This is the edit user page where an existing user's details can be modified.
  */
 
-import TextHeader from '@components/TextHeader.astro';
+import TextHeader from '@components/Layout/TextHeader.astro';
 import MainLayout from "@layouts/MainLayout.astro";
-import AdminUserForm from "@/components/AdminUserForm";
+import AdminUserForm from "@/components/Forms/AdminUserForm";
 import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
 import type { UserRole } from "@type/roles";
@@ -32,7 +32,7 @@ try {
       subtitle="Modifica los campos necesarios para actualizar la información del usuario"
     />
     <AdminUserForm
-      client:only="react"
+      client:load
       mode="edit"
       user_data={user_data}
       redirectTo="/dashboard"

@@ -5,11 +5,12 @@
 
 export const prerender = false;
 import MainLayout from "@layouts/MainLayout.astro";
-import TextHeader from "@components/TextHeader.astro";
-import ReceiptActions from "@components/ReceiptActions";
-import Button from "@components/Button";
+import TextHeader from "@components/Layout/TextHeader.astro";
+import ReceiptActions from "@/components/Actions/ReceiptActions";
+import Button from "@/components/Buttons/Button";
+import Tag from "@/components/Utils/Tag";
 import type { UserRole } from "@type/roles";
-import FinishRequestButton from "@components/FinishRequestButton.tsx";
+import FinishRequestButton from "@/components/Buttons/FinishRequestButton";
 
 import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
@@ -19,9 +20,9 @@ const userName = getCookie("username", Astro.cookies) || "";
 const buttonLabel = roleLabels[role];
 
 const validationColors = {
-  "Aprobado": "bg-success-100/20 text-text-primary/60",
-  "Rechazado": "bg-warning-100/20 text-text-primary/60",
-  "Pendiente": "bg-alert-200/50 text-text-primary/60",
+  "Aprobado": "success",
+  "Rechazado": "alert",
+  "Pendiente": "warning",
 };
 
 import { apiRequest } from "@/utils/apiClient";
@@ -81,20 +82,20 @@ const allReviewed = enrichedExpenses.every((receipt: any) => receipt.validation 
 
             return (
               <div class="card">
+                <div class="flex justify-between items-start mb-4">
+                  <Tag text={`Comprobante #${receipt.receipt_id}`} type="secondary" />
+                  <Tag text={receipt.validation} type={validationColors[receipt.validation as keyof typeof validationColors] || "default"} />
+                </div>
+
                 <div class="grid grid-cols-[1fr] md:grid-cols-[2fr_1fr] gap-6">
                   <div class="space-y-3">
-                    <p class="font-bold text-lg text-text-primary">#{receipt.receipt_id}</p>
                     <div class="text-sm text-text-primary space-y-1">
                       <p><span class="font-semibold">Monto:</span> ${receipt.amount} {receipt.currency || 'MXN'}</p>
                       <p><span class="font-semibold">Rubro:</span> {receipt.receipt_type_name}</p>
                     </div>
                   </div>
 
-                  <div class="flex flex-col gap-2 justify-start">
-                    <span class={`inline-block px-3 py-1 text-xs font-semibold rounded-full self-end ${validationColors[receipt.validation as keyof typeof validationColors] || "bg-primary/20 text-text-secondary"}`}>
-                      {receipt.validation}
-                    </span>
-
+                  <div class="flex flex-col gap-2">
                     {pdf && (
                       <Button
                         href={`${import.meta.env.PUBLIC_API_BASE_URL}/files/receipt-file/${pdf.fileId}`}

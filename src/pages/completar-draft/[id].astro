@@ -4,9 +4,9 @@
  */
 
 export const prerender = false;
-import TextHeader from '@components/TextHeader.astro';
+import TextHeader from '@components/Layout/TextHeader.astro';
 import MainLayout from "@layouts/MainLayout.astro";
-import TravelRequestForm from "@components/TravelRequestForm.tsx";
+import TravelRequestForm from "@/components/Forms/TravelRequestForm";
 
 import type { UserRole } from "@type/roles";
 import { getCookie } from "@data/cookies";
@@ -34,7 +34,7 @@ try {
       title="Completar solicitud de viaje"
       subtitle="Por favor termine de llenar el siguiente draft por completo"
     />
-    <main class="bg-card rounded-lg shadow-md p-8">
+    <main>
       <TravelRequestForm
         client:only="react"
         data={request}

@@ -142,8 +142,23 @@
   .card {
     @apply bg-card p-4 rounded-xl shadow-sm w-full h-full border border-border;
   }
+  .card-title {
+    @apply w-full px-4 py-3 flex flex-col gap-2 justify-between items-start bg-card-hover border border-border rounded-md mb-4;
+  }
   .routes-wrapper {
-    @apply bg-background p-4 w-full h-full border-t-2 border-b-2 border-dashed border-border;
+    @apply bg-card-hover border border-border rounded-md w-full h-full overflow-hidden;
+  }
+  .route-title {
+    @apply w-full px-4 py-3 flex justify-between items-center;
+    background-color: var(--color-secondary);
+    color: white;
+    font-weight: 600;
+  }
+  .route-content {
+    @apply p-4;
+  }
+  .divider {
+    @apply border-b-2 border-dashed border-border my-6;
   }
 }
 
@@ -191,7 +206,7 @@ html, body {
 /* Layout Grid System */
 html, body, #app, #content {
   background-color: var(--color-background);
-  color: var(--color-text);
+  color: var(--color-text-primary);
   margin: 0;
   width: 100%;
   height: 100%;
@@ -286,20 +301,16 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  transition: background-color 9999s ease-in-out 0s !important;
   -webkit-text-fill-color: var(--color-text-primary) !important;
-  box-shadow: 0 0 0px 1000px transparent inset !important;
+  -webkit-box-shadow: 0 0 0 1000px var(--color-card) inset !important;
+  transition: background-color 9999s ease-in-out 0s !important;
   caret-color: var(--color-text-primary) !important;
 }
 
 /* Select and option styling */
 select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
   color-scheme: light;
   background-color: var(--color-card);
-  padding-right: 2.5rem;
 }
 
 select option {
@@ -315,12 +326,8 @@ select option:checked {
 
 /* Dark mode */
 .dark select {
-  appearance: none !important;
-  -webkit-appearance: none !important;
-  -moz-appearance: none !important;
   color-scheme: dark !important;
   background-color: var(--color-card) !important;
-  padding-right: 2.5rem !important;
 }
 
 .dark select option {

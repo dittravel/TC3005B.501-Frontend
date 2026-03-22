@@ -1,0 +1,76 @@
+---
+/**
+ * Authors: Eduardo Porto Morales
+ * 
+ * This is the draft request component. It displays the user's requests 
+ * and allows them to edit or delete them.
+ */
+
+import Button from "@/components/Buttons/Button";
+import TextHeader from "@components/Layout/TextHeader.astro";
+import CancelRequestModal from "@/components/Modals/CancelRequestModal";
+import Tag from "@/components/Utils/Tag";
+import { getCookie } from "@data/cookies";
+
+var { userName, requests } = Astro.props;
+const filteredRequests = requests.filter((request: { status: string; }) => request.status === "Borrador");
+requests= filteredRequests;
+
+---
+
+<div>
+  <main>
+    <TextHeader
+      title={`Draft de viajes de ${userName}`}
+      subtitle="Aquí puedes ver los draft de solicitudes por completar"
+    />
+    
+    <section>
+      {requests.length > 0 ? (
+        <div class="grid gap-4">
+          {requests.map((request: any) => {
+            return (
+              <div class="card">
+                <div class="grid grid-cols-[1fr] md:grid-cols-[2fr_1fr] gap-8 md:gap-8">
+                  <div class="space-y-2">
+                    <Tag text={`Solicitud #${request.request_id}`} type="secondary" />
+                    <div class="text-sm text-text-primary grid grid-cols-[1fr_2fr] gap-y-1">
+                      <p><span class="font-semibold">País Destino:</span> {request.destination_country === 'notSelected' ? 'NO SELECCIONADO' : request.destination_country}</p>
+                      <p><span class="font-semibold">Fechas:</span> {request.beginning_date === "1900-01-01" ? 'NO DETERMINADA' : `${request.beginning_date} - ${request.ending_date}`}</p>
+                      <p>
+                        <span class="font-semibold">Estado:</span> 
+                        <Tag text="Borrador" type="default" />
+                      </p>
+                      <p><span class="font-semibold">Responsable:</span> Eduardo Porto Morales</p>
+                    </div>
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <a href={`/completar-draft/${request.request_id}`} class="w-full">
+                      <Button color="secondary" variant="filled" size="medium" customSizeClass="w-full">
+                        Editar
+                      </Button>
+                    </a>
+                    <CancelRequestModal
+                      client:only="react"
+                      id={request.request_id}
+                      disabled={false}
+                      token={getCookie("token", Astro.cookies) || ""}
+                    >
+                      <Button color="warning" variant="border" size="medium" customSizeClass="w-full">
+                        Eliminar
+                      </Button>
+                    </CancelRequestModal>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div class="card text-center text-text-secondary font-semibold">
+          No tienes drafts de solicitudes
+        </div>
+      )}
+    </section>
+  </main>
+</div>

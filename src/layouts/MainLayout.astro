@@ -10,9 +10,9 @@
  */
 
 import '@styles/global.css' 
-import PageHeader from "@components/PageHeader.astro";
-import SideBar from "@components/Sidebar.astro";
-import Messages from "@/components/Messages.astro"
+import PageHeader from "@components/Layout/PageHeader.astro";
+import SideBar from "@components/Layout/Sidebar.astro";
+import Messages from "@/components/UI/Messages.astro"
 import type { UserRole } from "@type/roles";
 
 interface Props {
@@ -65,7 +65,7 @@ const { title, data, showMessages = false } = Astro.props;
       )}
     </div>
 
-    <script>
+    <script is:inline>
       const sidebar = document.getElementById('sidebar');
       const messages = document.getElementById('messages');
       

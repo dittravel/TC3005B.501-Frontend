@@ -1,0 +1,72 @@
+---
+/**
+ * This component fetches and displays system notifications (alerts) 
+ * for the user based on their role and department.
+ */
+
+import { apiRequest } from "@/utils/apiClient";
+import { getCookie } from "@data/cookies";
+import MaterialIcon from "@components/Utils/MaterialIcon.astro";
+
+// Status dictionary mapped by user role
+const statusByRole = {
+  'Solicitante': 1,
+  'Agencia de viajes': 2,
+  'Cuentas por pagar': 3,
+  'N1': 4,
+  'N2': 5,
+  'Administrador': 6,
+};
+
+type UserRole = keyof typeof statusByRole;
+const userRole = getCookie("role", Astro.cookies) as UserRole;
+const status = statusByRole[userRole];
+const alerts = await (async () => {
+  try {
+    return await apiRequest(`/authorizer/get-alerts/${getCookie("department_id", Astro.cookies)}/${status}/10`, { cookies: Astro.cookies });
+  } catch (error) {
+    return [];
+  }
+})()
+---
+
+<div class="h-full w-full flex flex-col bg-card p-4 border-l border-border">
+  <h2 class="text-xl font-bold text-text-primary mb-6 break-words">Notificaciones</h2>
+  <ul class="space-y-4 pb-8 overflow-hidden">
+    {alerts.length === 0 && (
+      <li>
+        <div class="flex flex-col p-4 h-48 gap-2 border border-border rounded-xl shadow-md">
+          <span class="text-lg text-text-primary font-semibold">No hay notificaciones disponibles</span>
+          <span class="text-sm text-text-secondary">Las notificaciones del sistema aparecerán aquí cuando estén disponibles.</span>
+        </div>
+      </li>
+    )}
+    {alerts.map((alert:any) => (
+      <li class="relative bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+        <div class="p-4 flex flex-col gap-2 bg-secondary/10">
+          <div class="flex items-center gap-2">
+            <MaterialIcon icon="calendar_today" color="" style="text-xs text-text-primary" />
+            <p class="text-xs text-text-primary">
+              {
+                new Date(alert.alert_date.replace(/:([0-9]{3})Z$/, '.$1Z'))
+                .toLocaleDateString('es-MX', { year: 'numeric', month: 'numeric', day: 'numeric' })
+              } - {alert.alert_time}
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <MaterialIcon icon="account_circle" color="" style="text-xs text-text-primary" />
+            <p class="text-xs text-text-primary">Usuario: <span class="font-semibold">{alert.user_name}</span></p>
+          </div>
+          <div class="flex items-center gap-2">
+            <MaterialIcon icon="receipt" color="" style="text-xs text-text-primary" />
+            <p class="text-xs text-text-primary">ID Solicitud: <span class="font-semibold">{alert.request_id}</span></p>
+          </div>
+        </div>
+        <hr class="border-t border-border" />
+        <div class="p-4">
+          <p class="text-sm text-text-primary">{alert.message_text}</p>
+        </div>
+      </li>
+    ))}
+  </ul>
+</div>

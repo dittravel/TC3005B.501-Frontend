@@ -3,14 +3,14 @@
  * Admin view of the dashboard
  */
 
-import TextHeader from "@components/TextHeader.astro";
+import TextHeader from "@components/Layout/TextHeader.astro";
 import TableFallback from "@components/Table/TableFallback.astro";
-import UltimateWrapper from "@components/UltimateWrapper";
-
+import UltimateWrapper from "@/components/Modals/UltimateWrapper";
 import type { UserRole } from "@type/roles";
 import { getCookie } from "@data/cookies";
 import { apiRequest } from "@/utils/apiClient";
-import Button from "@components/Button"; 
+import Button from "@/components/Buttons/Button";
+import Tag from "@/components/Utils/Tag";
 
 // Define the User interface
 interface User {
