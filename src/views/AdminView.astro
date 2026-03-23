@@ -10,7 +10,6 @@ import type { UserRole } from "@type/roles";
 import { getCookie } from "@data/cookies";
 import { apiRequest } from "@/utils/apiClient";
 import Button from "@/components/Buttons/Button";
-import Tag from "@/components/Utils/Tag";
 
 // Define the User interface
 interface User {
@@ -114,10 +113,10 @@ const userName = getCookie("username", Astro.cookies);
                       title="Eliminar usuario"
                       message={`¿Estás seguro de que deseas eliminar al usuario ${user.user_name}? Esta acción no se puede deshacer.`}
                       modal_type="warning"
+                      color="warning"
+                      label="Eliminar"
                       token={getCookie("token", Astro.cookies) || ""}
-                    >
-                      <Button color="warning">Eliminar</Button>
-                    </UltimateWrapper>
+                    />
                   </td>
                 </tr>
               ))}

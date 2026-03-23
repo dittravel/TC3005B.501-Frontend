@@ -5,9 +5,10 @@
  * then redirects or reloads the page on success.
  */
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { apiRequest } from "@utils/apiClient";
 import ModalWrapper from "@/components/Modals/ModalWrapper";
+import Toast from '@/components/Utils/Toast';
 
 interface Props {
   request_id: number;
@@ -15,8 +16,9 @@ interface Props {
   message: string;
   redirection: string;
   modal_type: "success" | "warning";
+  color?: "success" | "warning" | "primary" | "secondary";
   variant?: "filled" | "border" | "empty";
-  children: React.ReactNode;
+  label?: string;
   token: string;
 }
 
@@ -38,10 +40,12 @@ export default function ValidateReceiptStatus({
   message,
   redirection,
   modal_type,
-  variant,
-  children,
+  color = "success",
+  variant = "filled",
+  label = "Enviar",
   token,
 }: Props) {
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   /**
    * Handles the modal confirmation action
    * Makes API PUT request to validate and send expenses,
@@ -55,28 +59,35 @@ export default function ValidateReceiptStatus({
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` }
       });
-      alert(`Comprobante enviado exitosamente.`)
+      setToast({ message: 'Comprobante enviado exitosamente.', type: 'success' });
 
       // Redirect or reload page based on redirection parameter
-      if (redirection) {
-        window.location.href = redirection;
-      } else {
-        window.location.reload();
-      }
+      setTimeout(() => {
+        if (redirection) {
+          window.location.href = redirection;
+        } else {
+          window.location.reload();
+        }
+      }, 2000);
     } catch (error) {
       console.error("Error en la solicitud:", error);
+      setToast({ message: 'Error al enviar el comprobante.', type: 'error' });
     }
   }, [request_id, redirection]);
 
   return (
-    <ModalWrapper
-      title={title}
-      message={message}
-      color={modal_type}
-      modal_type={modal_type}
-      onConfirm={handleConfirm}
-      variant={variant}
-      triggerElement={children}
-    />
+    <>
+      {toast && <Toast message={toast.message} type={toast.type} />}
+      <ModalWrapper
+        title={title}
+        message={message}
+        color={color}
+        modal_type={modal_type}
+        onConfirm={handleConfirm}
+        variant={variant}
+      >
+        {label}
+      </ModalWrapper>
+    </>
   );
 }

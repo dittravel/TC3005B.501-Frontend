@@ -5,8 +5,7 @@
 
 import MainLayout from "@layouts/MainLayout.astro";
 import TextHeader from "@components/Layout/TextHeader.astro";
-import Button from "@/components/Buttons/Button";
-import Tag from "@/components/Utils/Tag";
+import ComprobacionesList from "@/components/RequestsLists/ComprobacionesList";
 import type { UserRole } from "@type/roles";
 
 import { getCookie } from "@data/cookies";
@@ -18,16 +17,7 @@ const userName = getCookie("username", Astro.cookies) || "";
 const buttonLabel = roleLabels[role];
 const user_id = getCookie("id", Astro.cookies);
 
-function getVerificationStats(request: any) {
-  const verifications = Array.isArray(request.verifications) ? request.verifications : [];
-  const total = verifications.length;
-  const accepted = verifications.filter((v: any) => v.validation === 'Aprobado').length;
-  const rejected = verifications.filter((v: any) => v.validation === 'Rechazado').length;
-  const pending = verifications.filter((v: any) => v.validation === 'Pendiente').length;
-  return { total, accepted, rejected, pending };
-}
-
-// Obtener solicitudes
+// Get requests
 const requestsRaw = await (async () => {
   try {
     const requests = await apiRequest(`/applicant/get-user-requests/${user_id}`, { cookies: Astro.cookies });
@@ -39,7 +29,7 @@ const requestsRaw = await (async () => {
   }
 })();
 
-// Agregar verificaciones a cada solicitud
+// Add verifications to each request
 const requests = await Promise.all(
   requestsRaw.map(async (request: any) => {
     try {
@@ -60,74 +50,12 @@ const requests = await Promise.all(
         title={`Comprobaciones pendientes de ${userName}`}
         subtitle="Aquí puedes conocer el estado de solicitudes en proceso de comprobación"
       />
-      <section>
-        {requests.length > 0 ? (
-          <div class="grid gap-4">
-            {requests.map((request: any) => {
-              const { total, accepted, rejected, pending } = getVerificationStats(request);
-              const percent = (count: number) => total ? (count / total) * 100 : 0;
-              return (
-                <div class="card">
-                <div class="grid grid-cols-[1fr] md:grid-cols-[2fr_1fr] gap-8 md:gap-8">
-                  <div class="space-y-2">
-                    <Tag text={`Solicitud #${request.request_id}`} type="secondary" />
-                    { total === 0 ? (
-                      <p class="text-sm text-text-secondary">
-                        No se han enviado comprobantes
-                      </p>
-                    ) : (
-                      <div class="flex items-center justify-between">
-                        <p class="text-sm text-text-secondary">{accepted}/{total} Aceptadas</p>
-                      </div>
-                    )}
-                    { total != 0 && (
-                      <div class="w-full h-2 bg-card rounded overflow-hidden flex">
-                        <div class="bg-success-500 h-full" style={`width: ${percent(accepted)}%`} />
-                        <div class="bg-warning-500 h-full" style={`width: ${percent(rejected)}%`} />
-                        <div class="bg-alert-400 h-full" style={`width: ${percent(pending)}%`} />
-                      </div>
-                    )}
-
-                    <div class="text-sm text-text-primary grid grid-cols-[1fr_2fr] gap-y-1">
-                      <p><span class="font-semibold">Lugar:</span> {request.destination_country}</p>
-                      <p><span class="font-semibold">Fechas:</span> {request.beginning_date} - {request.ending_date}</p>
-                      <p>
-                        <span class="font-semibold">Estado:</span>
-                        <Tag text={pending > 0 || total === 0
-                          ? 'Pendiente'
-                          : accepted === total
-                            ? 'Aceptada'
-                            : rejected === total
-                              ? 'Rechazada'
-                              : 'Mixta'} type={pending > 0
-                          ? 'warning'
-                          : accepted === total
-                            ? 'success'
-                            : rejected === total
-                              ? 'alert'
-                              : 'info'} />
-                      </p>
-                      <p><span class="font-semibold">Responsable:</span> Eduardo Porto Morales</p>
-                    </div>
-                  </div>
-                  <div class="flex flex-col gap-2 justify-center items-center">
-                    <a href={`/comprobar-solicitud/${request.request_id}`} class="w-full">
-                      <Button color="secondary" variant="filled" size="medium" customSizeClass="w-full">
-                        Ver Comprobantes
-                      </Button>
-                    </a>
-                  </div>
-                </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div class="card text-center text-text-secondary font-semibold">
-            No tienes comprobantes pendientes
-          </div>
-        )}
-      </section>
+      <ComprobacionesList
+        client:only="react"
+        data={requests}
+        title="Comprobaciones Pendientes"
+        subtitle="Estado de verificación de comprobantes"
+      />
     </main>
   </div>
 </MainLayout>

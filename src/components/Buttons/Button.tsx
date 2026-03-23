@@ -79,9 +79,11 @@ export default function Button({
   size = "medium",
   color = "primary",
   href,
+  className: customClassName = "",
   ...props
 }: ButtonProps) {
-  const className = getClasses({ variant, size, color, customSizeClass });
+  const baseClassName = getClasses({ variant, size, color, customSizeClass });
+  const className = `${baseClassName} ${customClassName}`.trim();
 
   if (href) {
     return (

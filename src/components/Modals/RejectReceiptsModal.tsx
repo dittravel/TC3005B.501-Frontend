@@ -5,10 +5,10 @@
  * to mark the receipt as rejected and reloads the page to reflect the changes.
  */
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { apiRequest } from "@utils/apiClient";
 import ModalWrapper from "@/components/Modals/ModalWrapper";
-import Button from "@/components/Buttons/Button";
+import Toast from '@/components/Utils/Toast';
 
 interface Props {
   receipt_id: number;
@@ -16,8 +16,9 @@ interface Props {
   message: string;
   redirection: string;
   modal_type: "success" | "warning";
+  color?: "success" | "warning" | "primary" | "secondary";
   variant?: "filled" | "border" | "empty";
-  children: React.ReactNode;
+  label?: string;
   disabled?: boolean;
   token: string;
 }
@@ -28,11 +29,13 @@ export default function RejectReceiptStatus({
   message,
   redirection,
   modal_type,
-  variant,
-  children,
+  color = "warning",
+  variant = "filled",
+  label = "Rechazar",
   disabled = false,
   token,
 }: Props) {
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   /**
    * Handles the confirmation action for rejecting a receipt.
    * Sends a PUT request to set approval status to 0 (rejected) and reloads the page.
@@ -46,34 +49,32 @@ export default function RejectReceiptStatus({
         data: { "approval": 0 },
         headers: { Authorization: `Bearer ${token}` }
       });
-      alert(`Rechazado correctamente`);
+      setToast({ message: 'Comprobante rechazado exitosamente.', type: 'success' });
 
       // Reload page to reflect receipt rejection
-      window.location.reload();
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (error) {
       console.error("Error en la solicitud:", error);
+      setToast({ message: 'Error al rechazar el comprobante.', type: 'error' });
     }
   }, [receipt_id, redirection]);
 
   return (
-    <ModalWrapper
-      title={title}
-      message={message}
-      color="warning"
-      modal_type={modal_type}
-      onConfirm={handleConfirm}
-      disabled={disabled}
-      triggerElement={
-        <Button
-          color="warning"
-          variant="filled"
-          size="medium"
-          disabled={disabled}
-          customSizeClass="w-full"
-        >
-          {children}
-        </Button>
-      }
-    />
+    <>
+      {toast && <Toast message={toast.message} type={toast.type} />}
+      <ModalWrapper
+        title={title}
+        message={message}
+        color={color}
+        modal_type={modal_type}
+        variant={variant}
+        disabled={disabled}
+        onConfirm={handleConfirm}
+      >
+        {label}
+      </ModalWrapper>
+    </>
   );
 }

@@ -16,7 +16,9 @@ interface Props {
   title: string;
   message: string;
   modal_type: "success" | "warning";
-  children: React.ReactNode;
+  color?: "success" | "warning" | "primary" | "secondary";
+  variant?: "filled" | "border" | "empty";
+  label?: string;
   token: string;
   redirectTo?: string;
 }
@@ -27,7 +29,9 @@ export default function UltimateWrapper({
   title,
   message,
   modal_type = "warning",
-  children,
+  color = "warning",
+  variant = "filled",
+  label = "Eliminar",
   token,
   redirectTo = "/dashboard"
 }: Props) {
@@ -41,24 +45,28 @@ export default function UltimateWrapper({
         headers: { Authorization: `Bearer ${token}` }
       });
       setToast({ message: 'Usuario desactivado exitosamente.', type: 'success' });
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      window.location.href=redirectTo;
+      setTimeout(() => {
+        window.location.href = redirectTo;
+      }, 2000);
     } catch (error) {
       console.error("Error en la solicitud:", error);
+      setToast({ message: 'Error al desactivar el usuario.', type: 'error' });
     }
-  }, [endpoint]);
+  }, [endpoint, redirectTo]);
   
   return (
     <>
+      {toast && <Toast message={toast.message} type={toast.type} />}
       <ModalWrapper
         title={title}
         message={message}
-        color={modal_type}
+        color={color}
         modal_type={modal_type}
+        variant={variant}
         onConfirm={handleConfirm}
-        triggerElement={children}
-      />
-      {toast && <Toast message={toast.message} type={toast.type} />}
+      >
+        {label}
+      </ModalWrapper>
     </>
   );
 }

@@ -17,8 +17,9 @@ interface Props {
   message: string;
   redirection: string;
   modal_type: "success" | "warning";
+  color?: "success" | "warning" | "primary" | "secondary";
   variant?: "filled" | "border" | "empty";
-  children: React.ReactNode;
+  label?: string;
   token: string;
 }
 
@@ -28,8 +29,9 @@ export default function AproveRequestModal({
   message,
   redirection,
   modal_type,
-  variant,
-  children,
+  color = "success",
+  variant = "filled",
+  label = "Aprobar",
   token,
 }: Props) {
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -47,33 +49,35 @@ export default function AproveRequestModal({
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` }
       });
-      setToast({ message: 'Comprobante enviado exitosamente.', type: 'success' });
+      setToast({ message: 'Estado actualizado exitosamente.', type: 'success' });
+      
       // Wait for toast to be visible before navigation
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // Redirect to specified URL or reload current page
-      if (redirection) {
-        window.location.href = redirection;
-      } else {
-        window.location.reload();
-      }
+      setTimeout(() => {
+        if (redirection) {
+          window.location.href = redirection;
+        } else {
+          window.location.reload();
+        }
+      }, 2000);
     } catch (error) {
       console.error('Error en la solicitud:', error);
+      setToast({ message: 'Error al actualizar el estado.', type: 'error' });
     }
   }, [request_id, redirection]);
 
   return (
     <>
+      {toast && <Toast message={toast.message} type={toast.type} />}
       <ModalWrapper
         title={title}
         message={message}
-        color={modal_type}
+        color={color}
         modal_type={modal_type}
-        onConfirm={handleConfirm}
         variant={variant}
-        triggerElement={children}
-      />
-      {toast && <Toast message={toast.message} type={toast.type} />}
+        onConfirm={handleConfirm}
+      >
+        {label}
+      </ModalWrapper>
     </>
   );
 }

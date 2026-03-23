@@ -88,12 +88,12 @@ export default function ReceiptActions({
         message="¿Está seguro de que deseas aprobar este comprobante?"
         redirection="/dashboard"
         modal_type="success"
+        color="success"
         variant="filled"
+        label="Aprobar"
         disabled={disabled} 
         token={token}
-      >
-        Aprobar
-      </ApproveReceiptStatus>
+      />
 
       {/* Reject Receipt Button */}
       <RejectReceiptStatus
@@ -102,12 +102,12 @@ export default function ReceiptActions({
         message="¿Está seguro de que deseas rechazar este comprobante?"
         redirection="/dashboard"
         modal_type="warning"
+        color="warning"
         variant="filled"
+        label="Rechazar"
         disabled={disabled} 
         token={token}
-      >
-        Rechazar
-      </RejectReceiptStatus>
+      />
 
       {/* Confirmation Modal */}
       <Modal

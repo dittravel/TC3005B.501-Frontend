@@ -145,6 +145,9 @@
   .card-title {
     @apply w-full px-4 py-3 flex flex-col gap-2 justify-between items-start bg-card-hover border border-border rounded-md mb-4;
   }
+  .card-content-grid {
+    @apply grid grid-cols-1 md:grid-cols-[3fr_1fr] gap-8 items-center;
+  }
   .routes-wrapper {
     @apply bg-card-hover border border-border rounded-md w-full h-full overflow-hidden;
   }

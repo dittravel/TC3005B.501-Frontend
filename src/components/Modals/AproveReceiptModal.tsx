@@ -3,9 +3,10 @@
  * the accounts payable module.
  */
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { apiRequest } from "@utils/apiClient";
 import ModalWrapper from "@/components/Modals/ModalWrapper";
+import Toast from '@/components/Utils/Toast';
 
 interface Props {
   receipt_id: number;
@@ -13,8 +14,9 @@ interface Props {
   message: string;
   redirection: string;
   modal_type: "success" | "warning";
+  color?: "success" | "warning" | "primary" | "secondary";
   variant?: "filled" | "border" | "empty";
-  children: React.ReactNode;
+  label?: string;
   token: string;
 }
 
@@ -24,10 +26,12 @@ export default function AproveRequestModal({
   message,
   redirection,
   modal_type,
-  variant,
-  children,
+  color = "success",
+  variant = "filled",
+  label = "Aprobar",
   token
 }: Props) {
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   /**
    * Handles confirmation action for approving a receipt.
@@ -38,29 +42,35 @@ export default function AproveRequestModal({
       // API call to validate receipt
       const url = `/api/accounts-payable/validate-receipt/${receipt_id}`;
       await apiRequest(url, { method: "PUT", data: { approval: 1 }, headers: { Authorization: `Bearer ${token}` } });
-      alert(`Comprobante enviado exitosamente.`);
+      setToast({ message: 'Comprobante aprobado exitosamente.', type: 'success' });
 
       // Redirect or reload after success
-      if (redirection) {
-        window.location.href = redirection;
-      } else {
-        window.location.reload();
-      }
+      setTimeout(() => {
+        if (redirection) {
+          window.location.href = redirection;
+        } else {
+          window.location.reload();
+        }
+      }, 2000);
     } catch (error) {
       console.error("Error en la solicitud:", error);
+      setToast({ message: 'Error al aprobar el comprobante.', type: 'error' });
     }
   }, [receipt_id, redirection]);
 
   return (
-    <ModalWrapper
-      title={title}
-      message={message}
-      color={modal_type}
-      modal_type={modal_type}
-      onConfirm={handleConfirm}
-      variant={variant}
-    >
-      {children}
-    </ModalWrapper>
+    <>
+      {toast && <Toast message={toast.message} type={toast.type} />}
+      <ModalWrapper
+        title={title}
+        message={message}
+        color={color}
+        modal_type={modal_type}
+        variant={variant}
+        onConfirm={handleConfirm}
+      >
+        {label}
+      </ModalWrapper>
+    </>
   );
 }

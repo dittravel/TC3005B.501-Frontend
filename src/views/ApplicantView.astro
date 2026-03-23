@@ -4,6 +4,7 @@
  */
 
 import Button from "@/components/Buttons/Button";
+import Card from "@/components/Utils/Card";
 import TextHeader from "@components/Layout/TextHeader.astro";
 import CancelRequestModal from "@/components/Modals/CancelRequestModal";
 import Tag from "@/components/Utils/Tag";
@@ -77,53 +78,49 @@ const { userName } = Astro.props;
             const isNotCancelable = request.status === "Comprobación gastos del viaje" || request.status === "Validación de comprobantes";
             const mustBeChecked = request.status === "Comprobación gastos del viaje";
             return (
-              <div class="content-wrapper">
-                <div class="grid grid-cols-[1fr] md:grid-cols-[2fr_1fr] gap-8 md:gap-8">
-                  <a href={`/detalles-solicitud/${request.request_id}`}>
-                    <div>
-                      <Tag text={`Solicitud #${request.request_id}`} type="secondary" />
-                      <div class="text-sm text-text-primary grid grid-cols-[2fr_3fr] gap-y-1 mt-4">
-                        <p><span class="font-semibold">País Destino:</span> {request.destination_country}</p>
-                        <p>
-                          <span class="font-semibold">Estado:</span> 
-                          <Tag text={request.status} type={colorDesign[request.status] || "default"} />
-                        </p>
-                        <p><span class="font-semibold">Fechas:</span> {request.beginning_date} - {request.ending_date}</p>
-                        <p><span class="font-semibold">Responsable:</span> Eduardo Porto Morales</p>
-                      </div>
-                    </div>
-                  </a>
+              <Card
+                href={`/detalles-solicitud/${request.request_id}`}
+                tag={{ text: `Solicitud #${request.request_id}`, type: 'secondary' }}
+                status={{ text: request.status, type: colorDesign[request.status] || 'default' }}
+              >
+                <div class="card-content-grid">
+                  <div class="space-y-1 text-sm text-text-primary">
+                    <p><span class="font-semibold">País Destino:</span> {request.destination_country}</p>
+                    <p><span class="font-semibold">Fechas:</span> {request.beginning_date} - {request.ending_date}</p>
+                    <p><span class="font-semibold">Responsable:</span> Eduardo Porto Morales</p>
+                  </div>
                   <div class="flex flex-col gap-2">
-                  <a href={`/editar-solicitud/${request.request_id}`} class="w-full">
-                    <Button color="secondary" disabled={!isEditable} variant="filled" size="medium" customSizeClass="w-full">
-                      Editar
-                    </Button>
-                  </a>
-                  <a href={`/comprobar-solicitud/${request.request_id}`} class="w-full">
-                    <Button color="secondary" disabled={!mustBeChecked} variant="filled" size="medium" customSizeClass="w-full">
-                      Comprobar Gastos
-                    </Button>
-                  </a>
-                  <CancelRequestModal
-                    client:only="react"
-                    id={request.request_id}
-                    disabled={isNotCancelable}
-                    token={getCookie("token", Astro.cookies) || ""}
-                  >
-                    <Button color="warning" disabled={isNotCancelable} variant="filled" size="medium" customSizeClass="w-full">
-                      Cancelar
-                    </Button>
-                  </CancelRequestModal>
+                    <a href={`/editar-solicitud/${request.request_id}`} class="block">
+                      <Button color="secondary" disabled={!isEditable} variant="filled" size="medium" className="w-full">
+                        Editar
+                      </Button>
+                    </a>
+                    <a href={`/comprobar-solicitud/${request.request_id}`} class="block">
+                      <Button color="secondary" disabled={!mustBeChecked} variant="filled" size="medium" className="w-full">
+                        Comprobar Gastos
+                      </Button>
+                    </a>
+                    <CancelRequestModal
+                      client:only="react"
+                      id={request.request_id}
+                      token={getCookie("token", Astro.cookies) || ""}
+                      disabled={isNotCancelable}
+                      color="warning"
+                      variant="filled"
+                      label="Cancelar"
+                    />
+                  </div>
                 </div>
-                </div>
-              </div>
+              </Card>
             );
           })}
         </div>
       ) : (
-        <div class="card text-center text-text-secondary font-semibold">
-          No tienes viajes agendados
-        </div>
+        <Card className="text-center py-8">
+          <p class="text-text-secondary font-semibold">
+            No tienes viajes agendados
+          </p>
+        </Card>
       )}
     </section>
 

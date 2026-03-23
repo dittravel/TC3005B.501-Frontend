@@ -4,6 +4,8 @@
  * Conditionally displays XML upload field only for domestic trips.
  */
 
+import Checkbox from "@/components/Utils/Checkbox";
+
 interface Props {
   onPdfChange?: (file: File | null) => void;
   onXmlChange?: (file: File | null) => void;
@@ -60,15 +62,14 @@ export default function UploadFiles({
   };
 
   return (
-    <div className="space-y-4">
-      <label className="flex items-center gap-2 text-text-primary">
-        <input
-          type="checkbox"
-          checked={isInternational}
-          onChange={(e) => setIsInternational(e.target.checked)}
-        />
-        Es viaje internacional
-      </label>
+    <div className="space-y-4 w-full md:w-1/3">
+
+      <Checkbox
+        label="Comprobante internacional"
+        name="isInternational"
+        checked={isInternational}
+        onChange={(e) => setIsInternational(e.target.checked)}
+      />
 
       {/* PDF file upload - always visible */}
       <div>

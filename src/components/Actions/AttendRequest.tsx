@@ -45,7 +45,7 @@ export default function AttendRequest({ request_id, token }: Props) {
       await apiRequest(url, {
         method: "PUT",
         data: {
-          imposedFee: parsedFee,
+          imposed_fee: parsedFee,
         },
         headers: { Authorization: `Bearer ${token}` }
       });

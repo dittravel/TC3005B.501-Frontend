@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - New Reminder component for displaying important notes and reminders in the UI
 
+- New Card component for consistent styling of content cards across the application
+
 ### Changed
 
 - Refactored `src/components/` to include subdirectories for better organization (e.g., `Forms`, `Layout`, `Utils`).
@@ -22,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated import paths to reflect the new directory structure.
 
 - Forms now use the new Input, Select, and TextArea components for consistent styling and behavior.
+
+- Modal Wrapper now uses labels for creating buttons instead of children, removing the need of creating buttons, making it easier to use.
 
 ## [0.4.0] - 2025-06-20: XML Parsing
 
