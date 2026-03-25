@@ -54,24 +54,10 @@ export default function ComprobacionesList({ data, title = "Comprobaciones", sub
                 key={request.request_id}
                 tag={{ text: `Solicitud #${request.request_id}`, type: 'secondary' }}
                 status={statusTag}
+                href={`/comprobar-solicitud/${request.request_id}`}
               >
-                <div className="card-content-grid">
+                <div className="flex flex-col gap-4">
                   <div className="space-y-3">
-                    {stats.total === 0 ? (
-                      <p className="text-sm text-text-secondary">No se han enviado comprobantes</p>
-                    ) : (
-                      <>
-                        <div className="flex items-center justify-between">
-                          <p className="text-sm text-text-secondary">{stats.accepted}/{stats.total} Aceptadas</p>
-                        </div>
-                        <div className="w-full h-2 bg-card rounded overflow-hidden flex">
-                          <div className="bg-success-300 h-full" style={{ width: `${percent(stats.accepted)}%` }} />
-                          <div className="bg-warning-300 h-full" style={{ width: `${percent(stats.rejected)}%` }} />
-                          <div className="bg-alert-400 h-full" style={{ width: `${percent(stats.pending)}%` }} />
-                        </div>
-                      </>
-                    )}
-
                     <div className="text-sm text-text-primary space-y-1">
                       <p>
                         <span className="font-semibold">Lugar:</span> {request.destination_country}
@@ -80,22 +66,24 @@ export default function ComprobacionesList({ data, title = "Comprobaciones", sub
                         <span className="font-semibold">Fechas:</span> {request.beginning_date} - {request.ending_date}
                       </p>
                       <p>
-                        <span className="font-semibold">Responsable:</span> Eduardo Porto Morales
+                        <span className="font-semibold">Responsable:</span> {request.assigned_to_name || 'Sin asignar'}
                       </p>
                     </div>
-                  </div>
 
-                  <div className="flex flex-col gap-2 w-full">
-                    <a href={`/comprobar-solicitud/${request.request_id}`} className="block">
-                      <Button
-                        color="secondary"
-                        variant="filled"
-                        size="medium"
-                        className="w-full"
-                      >
-                        Ver Comprobantes
-                      </Button>
-                    </a>
+                    {stats.total === 0 ? (
+                      <p className="text-sm text-text-secondary">No se han enviado comprobantes</p>
+                    ) : (
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm text-text-secondary">{stats.accepted}/{stats.total} Aceptadas</p>
+                        </div>
+                        <div className="w-full h-2 bg-card rounded-full overflow-hidden flex">
+                          <div className="bg-success-300 h-full" style={{ width: `${percent(stats.accepted)}%` }} />
+                          <div className="bg-warning-300 h-full" style={{ width: `${percent(stats.rejected)}%` }} />
+                          <div className="bg-alert-400 h-full" style={{ width: `${percent(stats.pending)}%` }} />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </Card>

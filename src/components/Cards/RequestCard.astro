@@ -5,6 +5,8 @@
  * Card component for displaying request information.
  */
 
+import { formatDate } from '@utils/dateFormatter';
+
 const { request, urlBase, subtitle } = Astro.props;
 ---
 
@@ -19,9 +21,9 @@ const { request, urlBase, subtitle } = Astro.props;
       <div class="flex flex-col justify-between min-h-16">
         <div>
           <span class="inline font-medium text-text-secondary">Del:</span> 
-          <p class="inline">{request.beginning_date}</p>
+          <p class="inline">{formatDate(request.beginning_date)}</p>
           <span class="inline font-medium text-text-secondary ml-2">al:</span> 
-          <p class="inline">{request.ending_date}</p>
+          <p class="inline">{formatDate(request.ending_date)}</p>
         </div>
         <p class="text-xs text-text-secondary">Estado actual: {request.request_status}</p>
       </div>

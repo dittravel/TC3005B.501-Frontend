@@ -8,7 +8,10 @@
 import Card from '@/components/Utils/Card';
 import Button from '@/components/Buttons/Button';
 import ValidateReceiptStatus from '@/components/Modals/ValidateReceiptStatus';
+import DeleteReceiptModal from '@/components/Modals/DeleteReceiptModal';
 import type { TagType } from '@/types/card';
+import { useState } from 'react';
+import { formatDate } from '@/utils/dateFormatter';
 
 interface Props {
   expenses: any[];
@@ -23,10 +26,21 @@ const stateColors: Record<string, TagType> = {
 };
 
 export default function ExpenseReceiptsList({ expenses, requestId, token }: Props) {
+  const [expensesList, setExpensesList] = useState(expenses);
+
+  /**
+   * Handler for successful receipt deletion
+   * Removes the deleted expense from the list
+   * @param receipt_id - The ID of the deleted receipt
+   */
+  const handleDeleteSuccess = (receipt_id: number) => {
+    setExpensesList(prev => prev.filter(exp => exp.receipt_id !== receipt_id));
+  };
+
   return (
     <section className="space-y-6 w-full">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-text-primary">Comprobantes ({expenses.length})</h2>
+        <h2 className="text-xl font-bold text-text-primary">Comprobantes ({expensesList.length})</h2>
         <a href={`/subir-comprobante/${requestId}`} className="w-auto">
           <Button color="secondary" variant="filled" size="medium">
             Agregar Comprobante
@@ -34,44 +48,108 @@ export default function ExpenseReceiptsList({ expenses, requestId, token }: Prop
         </a>
       </div>
 
-      {expenses.length > 0 ? (
+      {expensesList.length > 0 ? (
         <div className="space-y-4">
-          {expenses.map((expense: any, index: number) => (
-            <Card
-              key={expense.receipt_id}
-              tag={{ text: `Comprobante #${index + 1}`, type: 'secondary' }}
-              status={{ text: expense.validation, type: (stateColors[expense.validation] || 'default') as TagType }}
-            >
-              <div className="card-content-grid">
-                <div className="space-y-2">
-                  <p className="text-sm text-text-primary">
-                    <span className="font-semibold">ID:</span> {expense.receipt_id}
-                  </p>
-                  <p className="text-sm text-text-primary">
-                    <span className="font-semibold">Tipo de gasto:</span> {expense.receipt_type_name}
-                  </p>
-                  <p className="text-sm text-text-primary">
-                    <span className="font-semibold">Monto:</span> ${expense.amount} {expense.currency || 'MXN'}
-                  </p>
-                </div>
+          {expensesList.map((expense: any, index: number) => {
+            const hasPdf = expense.pdf_id && expense.pdf_name;
+            const hasXml = expense.xml_id && expense.xml_name;
+            const apiBaseUrl = import.meta.env.PUBLIC_API_BASE_URL;
 
-                {expense.validation === 'Rechazado' && (
-                  <div className="flex flex-col gap-2 w-full">
-                    <a href={`/resubir-comprobante/${requestId}?replace=${expense.receipt_id}`} className="block">
-                      <Button
-                        color="warning"
-                        variant="border"
-                        size="medium"
-                        className="w-full"
-                      >
-                        Volver a subir
-                      </Button>
-                    </a>
+            return (
+              <Card
+                key={expense.receipt_id}
+                tag={{ text: `Comprobante #${expense.receipt_id}`, type: 'secondary' }}
+                status={{ text: expense.validation, type: (stateColors[expense.validation] || 'default') as TagType }}
+              >
+                <div className="card-content-grid">
+                  <div className="space-y-2">
+                    <p className="text-sm text-text-primary">
+                      <span className="font-semibold">Tipo de gasto:</span> {expense.receipt_type_name}
+                    </p>
+                    <p className="text-sm text-text-primary">
+                      <span className="font-semibold">Monto:</span> ${expense.amount} {expense.currency || 'MXN'}
+                    </p>
+                    <p className="text-sm text-text-primary">
+                      <span className="font-semibold">Fecha de creación:</span> {formatDate(expense.submission_date)}
+                    </p>
                   </div>
-                )}
-              </div>
-            </Card>
-          ))}
+
+                  {/* Download and Delete buttons */}
+                  <div className="flex flex-col gap-2 w-full">
+                    {hasPdf && (
+                      <div className="flex w-full bg-card-hover p-2 border border-border rounded-md gap-4 items-center justify-between">
+                        <div className="flex flex-col items-start justify-center gap-1">
+                          <p className="text-md font-semibold text-text-primary">PDF</p>
+                          <p className="text-xs text-text-primary">{expense.pdf_name}</p>
+                        </div>
+                        <a href={`${apiBaseUrl}/files/receipt-file/${expense.pdf_id}`}>
+                          <Button
+                            color="secondary"
+                            variant="border"
+                            size="small"
+                          >
+                            Descargar
+                          </Button>
+                        </a>
+                      </div>
+                    )}
+
+                    {hasXml && (
+                      <div className="flex w-full bg-card-hover p-2 border border-border rounded-md gap-4 items-center justify-between">
+                        <div className="flex flex-col items-start justify-center">
+                          <p className="text-md font-semibold text-text-primary">XML</p>
+                          <p className="text-xs text-text-primary truncate">{expense.xml_name}</p>
+                        </div>
+                        <a href={`${apiBaseUrl}/files/receipt-file/${expense.xml_id}`}>
+                          <Button
+                            color="secondary"
+                            variant="border"
+                            size="small"
+                          >
+                            Descargar
+                          </Button>
+                        </a>
+                      </div>
+                    )}
+
+                    {expense.validation !== 'Aprobado' && expense.validation !== 'Rechazado' && (
+                      <div className="flex gap-2 w-full">
+                        <a href={`/editar-comprobante/${expense.receipt_id}/${requestId}`} className="block w-full">
+                          <Button
+                            color="primary"
+                            variant="filled"
+                            className="w-full"
+                          >
+                            Editar
+                          </Button>
+                        </a>
+                        <DeleteReceiptModal
+                          receipt_id={expense.receipt_id}
+                          token={token}
+                          onSuccess={() => handleDeleteSuccess(expense.receipt_id)}
+                        />
+                      </div>
+                    )}
+
+                    {expense.validation === 'Rechazado' && (
+                      <div className="flex flex-col gap-2 w-full">
+                        <a href={`/resubir-comprobante/${requestId}?replace=${expense.receipt_id}`} className="block">
+                          <Button
+                            color="secondary"
+                            variant="filled"
+                            size="medium"
+                            className="w-full"
+                          >
+                            Volver a subir
+                          </Button>
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
         </div>
       ) : (
         <Card className="text-center py-8">
@@ -81,19 +159,17 @@ export default function ExpenseReceiptsList({ expenses, requestId, token }: Prop
         </Card>
       )}
 
-      <div className="flex justify-end mt-8">
-        <ValidateReceiptStatus
-          request_id={Number(requestId)}
-          title="Confirmar envío"
-          message="¿Está seguro de que desea mandar estos comprobantes?"
-          redirection="/dashboard"
-          modal_type="success"
-          color="success"
-          variant="filled"
-          label="Enviar a validar"
-          token={token}
-        />
-      </div>
+      <ValidateReceiptStatus
+        request_id={Number(requestId)}
+        title="Confirmar envío"
+        message="¿Está seguro de que desea mandar estos comprobantes?"
+        redirection="/dashboard"
+        modal_type="success"
+        color="success"
+        variant="filled"
+        label="Enviar a validar"
+        token={token}
+      />
     </section>
   );
 }

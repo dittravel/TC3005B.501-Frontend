@@ -47,14 +47,13 @@ const requests = await Promise.all(
   <div>
     <main>
       <TextHeader
-        title={`Comprobaciones pendientes de ${userName}`}
+        title={`Comprobantes pendientes de ${userName}`}
         subtitle="Aquí puedes conocer el estado de solicitudes en proceso de comprobación"
       />
       <ComprobacionesList
         client:only="react"
         data={requests}
-        title="Comprobaciones Pendientes"
-        subtitle="Estado de verificación de comprobantes"
+        title="Comprobantes Pendientes"
       />
     </main>
   </div>

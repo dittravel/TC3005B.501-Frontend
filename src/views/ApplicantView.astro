@@ -7,7 +7,6 @@ import Button from "@/components/Buttons/Button";
 import Card from "@/components/Utils/Card";
 import TextHeader from "@components/Layout/TextHeader.astro";
 import CancelRequestModal from "@/components/Modals/CancelRequestModal";
-import Tag from "@/components/Utils/Tag";
 import { getCookie } from "@data/cookies";
 import { apiRequest } from '@utils/apiClient';
 
@@ -64,7 +63,7 @@ const { userName } = Astro.props;
           <span class="px-2 align-middle text-primary-500">({requests.length})</span>
         </h2>
         <a href="/crear-solicitud">
-          <Button variant="filled" color="secondary" size="custom" customSizeClass="py-2 px-4 text-base font-bold">
+          <Button variant="filled" color="secondary">
             Crear Solicitud
           </Button>
         </a>
@@ -87,7 +86,7 @@ const { userName } = Astro.props;
                   <div class="space-y-1 text-sm text-text-primary">
                     <p><span class="font-semibold">País Destino:</span> {request.destination_country}</p>
                     <p><span class="font-semibold">Fechas:</span> {request.beginning_date} - {request.ending_date}</p>
-                    <p><span class="font-semibold">Responsable:</span> Eduardo Porto Morales</p>
+                    <p><span class="font-semibold">Responsable:</span> {request.assigned_to_name}</p>
                   </div>
                   <div class="flex flex-col gap-2">
                     <a href={`/editar-solicitud/${request.request_id}`} class="block">

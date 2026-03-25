@@ -10,15 +10,18 @@ import Select from "@/components/Utils/Select";
 import { SubmitTravelExpense } from "@/components/Forms/SubmitTravelExpense";
 import ModalWrapper from "@/components/Modals/ModalWrapper";
 import UploadReceiptFiles from "@/components/Forms/UploadReceiptFiles";
+import Toast from "@/components/Utils/Toast";
+import { apiRequest } from "@/utils/apiClient";
 
 interface Props {
   requestId: number;
   routes: any[]; // List of routes associated with the travel request
   token: string;
   receiptToReplace?: string | null;
+  receiptToEdit?: any; // Receipt data for editing
 }
 
-export default function ExpensesFormClient({ requestId, routes, token, receiptToReplace }: Props) {
+export default function ExpensesFormClient({ requestId, routes, token, receiptToReplace, receiptToEdit }: Props) {
   const [concepto, setConcepto] = useState("Transporte");
   const [monto, setMonto] = useState("");
   const [currency, setCurrency] = useState("");
@@ -29,84 +32,164 @@ export default function ExpensesFormClient({ requestId, routes, token, receiptTo
   const [lastReceiptId, setLastReceiptId] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [cfdiData, setCfdiData] = useState<any>(null);
-  const [cfdiDataEdited, setCfdiDataEdited] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [disabledButton, setDisabledButton] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [receiptIdToEdit, setReceiptIdToEdit] = useState<number | null>(null);
+
+  // Initialize form with receipt data if editing
+  useEffect(() => {
+    if (receiptToEdit) {
+      setIsEditing(true);
+      setReceiptIdToEdit(receiptToEdit.receipt_id);
+      setConcepto(receiptToEdit.receipt_type_name || "Transporte");
+      setMonto(receiptToEdit.amount?.toString() || "");
+      setCurrency(receiptToEdit.currency || "MXN");
+      setRouteId(receiptToEdit.route_id || routes?.[0]?.route_id || null);
+      setIsInternational(receiptToEdit.currency !== "MXN");
+    }
+  }, [receiptToEdit, routes]);
+
+  /**
+   * Sets a toast notification that automatically hides after the specified duration.
+   * Disables the submit button during the notification display.
+   * @param {string} message - The toast message
+   * @param {'success' | 'error'} type - The toast type
+   * @param {number} duration - How long to display the toast (default: 2000ms)
+   * @returns {void}
+   */
+  const handleSetToast = (message: string, type: 'success' | 'error', duration: number = 2000) => {
+    setDisabledButton(true);
+    setToast({ message, type });
+    setTimeout(() => {
+      setToast(null);
+      setDisabledButton(false);
+    }, duration);
+  };
 
   // Select MXN currency by default for national expenses
   useEffect(() => {
-    isInternational ? setCurrency("USD") : setCurrency("MXN");
+    if (!isInternational) {
+      setCurrency("MXN");
+    } else {
+      setCurrency("USD");
+      // Clear XML file and CFDI data
+      setXmlFile(null);
+      setCfdiData(null);
+    }
   }, [isInternational]);
 
   /**
    * Handles the submission of a travel expense.
    * Validates all required fields and file formats before submitting.
    * For international expenses, creates a default XML file if none is provided.
+   * Supports both creating new expenses and editing existing ones.
    * @returns {Promise<void>}
    */
   const handleSubmit = async () => {
     try {
+      setError(null);
       setSubmitting(true);
 
       // Validate that a route is selected
       if (!routeId) {
-        alert("Por favor, selecciona un destino válido.");
+        setError("Por favor, selecciona un destino válido.");
+        handleSetToast("Por favor, selecciona un destino válido.", "error");
         setSubmitting(false);
         return;
       }
 
       // Validate that all required fields are filled with valid data
-      if (!concepto || !monto || isNaN(parseFloat(monto)) || !pdfFile || (!isInternational && !xmlFile)) {
-        alert("Por favor, completa todos los campos correctamente.");
+      // For editing, files are optional. For creation, they are required.
+      if (!concepto || !monto || isNaN(parseFloat(monto))) {
+        setError("Por favor, completa todos los campos correctamente.");
+        handleSetToast("Por favor, completa todos los campos correctamente.", "error");
+        setSubmitting(false);
+        return;
+      }
+
+      // For new expenses, files are required
+      if (!isEditing && (!pdfFile || (!isInternational && !xmlFile))) {
+        setError("Por favor, adjunta todos los archivos requeridos.");
+        handleSetToast("Por favor, adjunta todos los archivos requeridos.", "error");
         setSubmitting(false);
         return;
       }
       
-      // Validate PDF file extension
+      // Validate PDF file extension if provided
       if (pdfFile && !pdfFile.name.toLowerCase().endsWith('.pdf')) {
-        alert("El archivo debe ser un PDF válido.");
+        setError("El archivo PDF debe tener extensión .pdf válida.");
+        handleSetToast("El archivo PDF debe tener extensión .pdf válida.", "error");
         setSubmitting(false);
         return;
       }
       
       // Validate XML file extension for national expenses
       if (!isInternational && xmlFile && !xmlFile.name.toLowerCase().endsWith('.xml')) {
-        alert("El archivo debe ser un XML válido.");
+        setError("El archivo XML debe tener extensión .xml válida.");
+        handleSetToast("El archivo XML debe tener extensión .xml válida.", "error");
         setSubmitting(false);
         return;
       }
 
-      // For international expenses, use default XML if none provided
-      let finalXmlFile = xmlFile;
-      if (isInternational && !xmlFile) {
-        const response = await fetch("/default.xml");
-        const blob = await response.blob();
-        finalXmlFile = new File([blob], "default.xml", { type: "application/xml" });
-        setXmlFile(finalXmlFile);
+      if (isEditing && receiptIdToEdit) {
+        // Update existing receipt
+        await apiRequest(`/applicant/update-receipt/${receiptIdToEdit}`, {
+          method: 'PUT',
+          data: {
+            route_id: routeId,
+            receipt_type_name: concepto,
+            amount: parseFloat(monto),
+            currency: currency
+          },
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        // If there are new files, upload them
+        if (pdfFile || xmlFile) {
+          setLastReceiptId(receiptIdToEdit);
+        } else {
+          // No files to update, just show success
+          handleSetToast("Comprobante actualizado exitosamente.", "success");
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          window.location.href = `/comprobar-solicitud/${requestId}`;
+        }
+      } else {
+        // Create new receipt
+        const { receipt_id } = await SubmitTravelExpense({
+          requestId,
+          routeId,
+          concepto,
+          monto: parseFloat(monto),
+          currency,
+          pdfFile: pdfFile!,
+          xmlFile: xmlFile || undefined,
+          token,
+          receiptToReplace,
+        });
+
+        // Show success and redirect
+        handleSetToast("Comprobante subido exitosamente.", "success");
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        window.location.href = `/comprobar-solicitud/${requestId}`;
       }
 
-      const { lastReceiptId } = await SubmitTravelExpense({
-        requestId,
-        routeId,
-        concepto,
-        monto: parseFloat(monto),
-        currency,
-        token,
-      });
-
-      // Store the last receipt ID for file upload
-      setLastReceiptId(lastReceiptId);
-
     } catch (err) {
+      console.error('Error in handleSubmit:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Error al procesar el comprobante. Intenta nuevamente.';
+      setError(errorMessage);
+      handleSetToast(errorMessage, "error");
       setSubmitting(false);
     }
   };
 
   // Handle CFDI data received from XML parsing
   const handleCfdiDataReceived = (data: any) => {
-    // Set the original CFDI data for reference
+    // Set the parsed CFDI data to state
     setCfdiData(data);
-    
-    // Create a separate data object for editing
-    setCfdiDataEdited(data);
 
     // Autofill fields
     if (data.total && !monto) {
@@ -115,179 +198,170 @@ export default function ExpensesFormClient({ requestId, routes, token, receiptTo
     }
   };
 
-  // Handles changes to CFDI data fields in the UI
-  // This allows the user to edit the parsed CFDI data before submission
-  const handleCfdiFieldChange = (field: string, value: string) => {
-    // Maintain the original cfdiData for reference and only update edited values
-    setCfdiDataEdited((prev: any) => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
   const handleRouteChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = parseInt(e.target.value);
     setRouteId(value);
   };
 
   return (
-    <div className="space-y-8">
-      <div className="grid md:grid-cols-5 gap-4 mb-4">
-        <Select
-          name="routeId"
-          label="Destino"
-          value={routeId?.toString() || ""}
-          onChange={(e) => handleRouteChange(e)}
-          required={true}
-        >
-          <option value="">Selecciona un destino</option>
-          {routes?.map((route: any, idx: number) => (
-            <option key={idx} value={route.route_id || ""}>
-              {route.destination_city}, {route.destination_country} ({route.beginning_date} - {route.ending_date})
-            </option>
-          ))}
-        </Select>
+    <div>
+      <div className="card">
+        <div className="card-header">
+          <h2 className="card-title font-semibold">
+            {isEditing
+              ? "Editar Comprobante"
+              : receiptToReplace ?
+                "Volver a subir Comprobante"
+                : "Nuevo Comprobante"}
+          </h2>
+        </div>
+        <div className="grid md:grid-cols-4 gap-4 mb-4">
+          <Select
+            name="routeId"
+            label="Destino"
+            value={routeId?.toString() || ""}
+            onChange={(e) => handleRouteChange(e)}
+            required={true}
+          >
+            <option value="">Selecciona un destino</option>
+            {routes?.map((route: any, idx: number) => (
+              <option key={idx} value={route.route_id || ""}>
+                {route.destination_city}, {route.destination_country} ({route.beginning_date} - {route.ending_date})
+              </option>
+            ))}
+          </Select>
 
-        <Select
-          name="concepto"
-          label="Concepto"
-          value={concepto}
-          onChange={(e) => setConcepto(e.target.value)}
-          required={true}
-        >
-          <option>Transporte</option>
-          <option>Hospedaje</option>
-          <option>Comida</option>
-          <option>Caseta</option>
-          <option>Autobús</option>
-          <option>Vuelo</option>
-          <option>Otro</option>
-        </Select>
+          <Select
+            name="concepto"
+            label="Concepto"
+            value={concepto}
+            onChange={(e) => setConcepto(e.target.value)}
+            required={true}
+          >
+            <option>Transporte</option>
+            <option>Hospedaje</option>
+            <option>Comida</option>
+            <option>Caseta</option>
+            <option>Autobús</option>
+            <option>Vuelo</option>
+            <option>Otro</option>
+          </Select>
 
-        <Input
-          name="monto"
-          label="Monto"
-          type="number"
-          placeholder="Ej. 443.50"
-          value={monto}
-          onChange={(e) => setMonto(e.target.value)}
-          required={true}
+          <Input
+            name="monto"
+            label="Monto"
+            type="number"
+            placeholder="Ej. 443.50"
+            value={monto}
+            onChange={(e) => setMonto(e.target.value)}
+            required={true}
+          />
+
+          <Select
+            name="currency"
+            label="Moneda"
+            value={currency}
+            onChange={(e) => setCurrency(e.target.value)}
+            required={true}
+          >
+            <option value="MXN">MXN</option>
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="CAD">CAD</option>
+          </Select>
+        </div>
+
+        <UploadFiles
+          onPdfChange={setPdfFile}
+          onXmlChange={setXmlFile}
+          onXMLParsed={handleCfdiDataReceived}
+          isInternational={isInternational}
+          setIsInternational={setIsInternational}
         />
 
-        <Select
-          name="currency"
-          label="Moneda"
-          value={currency}
-          onChange={(e) => setCurrency(e.target.value)}
-          required={true}
-        >
-          <option value="MXN">MXN</option>
-          <option value="USD">USD</option>
-          <option value="EUR">EUR</option>
-          <option value="CAD">CAD</option>
-        </Select>
+        {/* Show CFDI data if xml was parsed successfully */}
+        {cfdiData && (
+          <div className="bg-background/50 border border-border rounded-lg p-4 mt-8">
+            <h3 className="font-semibold text-text-primary mb-4">Datos del Comprobante CFDI</h3>
+            <div className="grid md:grid-cols-2 gap-4">
+              <Input
+                name="rfcEmisor"
+                label="RFC Emisor"
+                type="text"
+                value={cfdiData.rfcEmisor || ""}
+                disabled
+              />
+              <Input
+                name="nombreEmisor"
+                label="Nombre Emisor"
+                type="text"
+                value={cfdiData.nombreEmisor || ""}
+                disabled
+              />
+              <Input
+                name="uuid"
+                label="UUID"
+                type="text"
+                value={cfdiData.uuid || ""}
+                disabled
+              />
+              <Input
+                name="fecha"
+                label="Fecha"
+                type="text"
+                value={cfdiData.fecha || ""}
+                disabled
+              />
+              <Input
+                name="subtotal"
+                label="Subtotal"
+                type="number"
+                value={cfdiData.subtotal || ""}
+                disabled
+              />
+              <Input
+                name="impuestos"
+                label="Impuestos"
+                type="number"
+                value={cfdiData.impuestos || ""}
+                disabled
+              />
+              <Input
+                name="moneda"
+                label="Moneda"
+                type="text"
+                value={cfdiData.moneda || ""}
+                disabled
+              />
+            </div>
+          </div>
+        )}
       </div>
 
-      <UploadFiles
-        onPdfChange={setPdfFile}
-        onXmlChange={setXmlFile}
-        onXMLParsed={handleCfdiDataReceived}
-        isInternational={isInternational}
-        setIsInternational={setIsInternational}
-      />
-
-      {/* Show CFDI data if xml was parsed successfully */}
-      {cfdiData && (
-        <div className="bg-background/50 border border-border rounded-lg p-4">
-          <h3 className="font-semibold text-text-primary mb-4">Datos del Comprobante CFDI</h3>
-          <div className="grid md:grid-cols-2 gap-4">
-            <Input
-              name="rfcEmisor"
-              label="RFC Emisor"
-              type="text"
-              value={cfdiDataEdited.rfcEmisor || ""}
-              onChange={(e) => handleCfdiFieldChange("rfcEmisor", e.target.value)}
-            />
-            <Input
-              name="nombreEmisor"
-              label="Nombre Emisor"
-              type="text"
-              value={cfdiDataEdited.nombreEmisor || ""}
-              onChange={(e) => handleCfdiFieldChange("nombreEmisor", e.target.value)}
-            />
-            <Input
-              name="uuid"
-              label="UUID"
-              type="text"
-              value={cfdiDataEdited.uuid || ""}
-              onChange={(e) => handleCfdiFieldChange("uuid", e.target.value)}
-            />
-            <Input
-              name="fecha"
-              label="Fecha"
-              type="text"
-              value={cfdiDataEdited.fecha || ""}
-              onChange={(e) => handleCfdiFieldChange("fecha", e.target.value)}
-            />
-            <Input
-              name="subtotal"
-              label="Subtotal"
-              type="number"
-              value={cfdiDataEdited.subtotal || ""}
-              onChange={(e) => handleCfdiFieldChange("subtotal", e.target.value)}
-            />
-            <Input
-              name="impuestos"
-              label="Impuestos"
-              type="number"
-              value={cfdiDataEdited.impuestos || ""}
-              onChange={(e) => handleCfdiFieldChange("impuestos", e.target.value)}
-            />
-            <Input
-              name="moneda"
-              label="Moneda"
-              type="text"
-              value={cfdiDataEdited.moneda || ""}
-              onChange={(e) => handleCfdiFieldChange("moneda", e.target.value)}
-            />
-          </div>
-        </div>
-      )}
-
+      {/* Action buttons */}
       <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
-        <a href={`/comprobar-solicitud/${requestId}`} className="w-full sm:w-auto">
-          <Button variant="border" color="primary" className="w-full sm:w-auto">
+        <a href={`/comprobar-solicitud/${requestId}`} className="md:auto">
+          <Button variant="filled" color="primary" className="w-full md:auto" disabled={disabledButton}>
             Cancelar
           </Button>
         </a>
-        <ModalWrapper
-          title="Subir comprobación"
-          message="¿Está seguro de que desea subir este Comprobante?"
-          modal_type="confirm"
-          color="success"
-          variant="filled"
-          onConfirm={handleSubmit}
-        >
-          Subir Comprobantes
-        </ModalWrapper>
+        <div>
+          <ModalWrapper
+            title={isEditing ? "Editar Comprobante" : "Subir Comprobante"}
+            message={isEditing ? "¿Está seguro de que desea guardar los cambios?" : "¿Está seguro de que desea subir este Comprobante?"}
+            modal_type="confirm"
+            color="success"
+            variant="filled"
+            onConfirm={handleSubmit}
+            disabled={disabledButton}
+          >
+            {isEditing ? "Guardar cambios" : "Subir Comprobantes"}
+          </ModalWrapper>
+        </div>
       </div>
 
-      {lastReceiptId !== null && (
-        <UploadReceiptFiles
-          token={token}
-          receiptId={lastReceiptId}
-          pdfFile={pdfFile}
-          xmlFile={xmlFile}
-          receiptToReplace={receiptToReplace}
-          onDone={() => {
-            alert("Subidos correctamente");
-            window.location.href = `/comprobar-solicitud/${requestId}`;
-          }}
-          onError={(err) => {
-            console.error("Error al subir archivos:", err);
-            setSubmitting(false);
-          }}
-        />
+      {toast && (
+        <Toast message={toast.message} type={toast.type} />
       )}
     </div>
   );
