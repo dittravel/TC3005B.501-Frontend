@@ -13,6 +13,7 @@ import Toast from "@/components/Utils/Toast";
 
 interface Props {
   request_id: number;
+  user_id: string | undefined;
   endpoint: string;
   role: number;
   title: string;
@@ -25,6 +26,7 @@ interface Props {
 
 export default function TravelRequestActionWrapper({
   request_id,
+  user_id,
   endpoint,
   role,
   title,
@@ -42,7 +44,7 @@ export default function TravelRequestActionWrapper({
 
   const handleConfirm = useCallback(async () => {
     try {
-      const url = `${endpoint}/${request_id}/${role}`;
+      const url = `${endpoint}/${request_id}/${user_id}`;
       await apiRequest(url, { 
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` }
@@ -66,7 +68,7 @@ export default function TravelRequestActionWrapper({
     } catch (error) {
       console.error("Error en la solicitud:", error);
     }
-  }, [request_id, endpoint, redirection, role]);
+  }, [request_id, user_id, endpoint, redirection, token]);
 
   return (
     <>

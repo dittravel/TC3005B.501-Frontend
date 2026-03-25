@@ -84,6 +84,7 @@ export default function ModalWrapper({
         color={color}
         size={size}
         disabled={disabled}
+        className="w-full"
       >
         {children}
       </Button>

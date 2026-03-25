@@ -9,6 +9,7 @@ import Card from '@/components/Utils/Card';
 import Button from '@/components/Buttons/Button';
 import Pagination from '@components/Table/Pagination';
 import type { UserRole } from "@type/roles";
+import { formatDate } from '@utils/dateFormatter';
 
 interface Props {
   data: any[];
@@ -58,8 +59,8 @@ export default function AuthorizerRequestsList({ data, type, role, title = "Soli
                 <div className="space-y-2 text-sm text-text-primary">
                   <p className="text-lg font-semibold">{request.destination_country}</p>
                   <p>
-                    <span className="font-medium">Inicio:</span> {request.beginning_date}
-                    <span className="font-medium ml-2">Fin:</span> {request.ending_date}
+                    <span className="font-medium">Inicio:</span> {formatDate(request.beginning_date)}
+                    <span className="font-medium ml-2">Fin:</span> {formatDate(request.ending_date)}
                   </p>
                 </div>
                 

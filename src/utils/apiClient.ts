@@ -87,10 +87,22 @@ export async function apiRequest<T = any>(
     const res = await fetch(`${baseUrl}${path}`, config);
 
     if (!res.ok) {
-      const errorJson = await res.json().catch(() => null);
+      let errorData: any;
+      const contentType = res.headers.get('content-type');
+      
+      if (contentType && contentType.includes('application/json')) {
+        try {
+          errorData = await res.json();
+        } catch {
+          errorData = { message: res.statusText };
+        }
+      } else {
+        errorData = { message: await res.text() };
+      }
+      
       throw {
         status: res.status,
-        response: errorJson || await res.text()
+        response: errorData
       };
     }
 

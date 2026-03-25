@@ -67,7 +67,7 @@ export function getSession(cookies?: APIContext["cookies"]): Session {
   }
 
   const username = realCookies.get("username")?.value || "";
-  const id = realCookies.get("user_id")?.value || "";
+  const id = realCookies.get("id")?.value || "";
   const department_id = realCookies.get("department_id")?.value || "";
   const role = realCookies.get("role")?.value || "";
   const token = realCookies.get("token")?.value || ""; 
@@ -80,7 +80,34 @@ type CookieKey = keyof Session;
 
 /**
  * Retrieves a specific value from the user session cookies based on the provided key.
+ * When called from client-side (React), reads directly from document.cookie
+ * When called from server-side (Astro), uses the provided cookies object
  */
 export function getCookie(key: CookieKey, cookies?: APIContext["cookies"]): string | UserRole | undefined {
+  // If cookies parameter is provided (server-side), use getSession
+  if (cookies) {
+    return getSession(cookies)[key];
+  }
+  
+  // Map Session keys to actual cookie names
+  const cookieNameMap: Record<CookieKey, string> = {
+    username: "username",
+    id: "id",
+    role: "role",
+    department_id: "department_id",
+    token: "token",
+  };
+  
+  const cookieName = cookieNameMap[key];
+  
+  // Try to get from document.cookie (client-side)
+  if (typeof document !== "undefined") {
+    const matches = document.cookie.split("; ").find(row => row.startsWith(cookieName + "="));
+    if (matches) {
+      return matches.split("=")[1];
+    }
+  }
+  
+  // Fallback to getSession with null cookies
   return getSession(cookies)[key];
 }

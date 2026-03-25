@@ -76,7 +76,7 @@ export default function RequestDraftList({ requests, token }: Props) {
                     id={request.request_id}
                     token={token}
                     color="warning"
-                    variant="border"
+                    variant="filled"
                     label="Eliminar"
                   />
                 </div>

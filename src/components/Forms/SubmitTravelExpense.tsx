@@ -1,9 +1,7 @@
 /**
  * SubmitTravelExpense Module
  * 
- * Provides functionality for submitting travel expense validations.
- * Maps expense concepts to receipt types and handles the submission and retrieval
- * of expense data from the API.
+ * Creates a receipt with XML/PDF files and expense details in a single request
  */
 
 import { apiRequest } from "@utils/apiClient";
@@ -25,19 +23,27 @@ interface SubmitExpenseParams {
   concepto: string;
   monto: number;
   currency: string;
+  pdfFile: File;
+  xmlFile?: File | null;
   token: string;
+  receiptToReplace?: string | null;
 }
 
 /**
  * Submits a travel expense for a specific request and retrieves the updated expense list.
  * Maps the expense concept to a receipt type ID and sends it to the API.
+ * If receiptToReplace is provided, deletes the old receipt and resets the request status to allow resubmission.
  * @param {SubmitExpenseParams} params - The expense submission parameters
  * @param {number} params.requestId - The travel request ID
  * @param {number} params.routeId - The route ID associated with the expense
  * @param {string} params.concepto - The expense concepto (e.g., "Transporte", "Hotel")
  * @param {number} params.monto - The expense amount in MXN
+ * @param {string} params.currency - The currency code (e.g., "MXN")
+ * @param {File} params.pdfFile - The PDF file of the receipt
+ * @param {File | null} [params.xmlFile] - The XML file of the receipt (optional)
  * @param {string} params.token - The authentication token
- * @returns {Promise<{ count: number; lastReceiptId: number | null }>} Object containing the expense count and last receipt ID
+ * @param {string | null} [params.receiptToReplace] - The ID of a previous receipt to delete when resubmitting
+ * @returns {Promise<{ receipt_id: number; count: number; cfdiData: any }>} Receipt id and expense count
  * @throws {Error} If the expense concepto is not found in the receipt type map
  */
 export async function SubmitTravelExpense({
@@ -46,47 +52,96 @@ export async function SubmitTravelExpense({
   concepto,
   monto,
   currency,
+  pdfFile,
+  xmlFile,
   token,
-}: SubmitExpenseParams): Promise<{ count: number; lastReceiptId: number | null }> {
+  receiptToReplace,
+}: SubmitExpenseParams): Promise<{ receipt_id: number; count: number; cfdiData: any }> {
   // Get the receipt type ID for the expense concepto
   const receipt_type_id = receiptTypeMap[concepto];
   if (!receipt_type_id) throw new Error(`Concepto inválido: ${concepto}`);
 
-  // Prepare the payload for creating the expense validation
-  const payload = {
-    receipts: [
-      {
-        receipt_type_id,
-        request_id: requestId,
-        route_id: routeId,
-        amount: monto,
-        currency,
-      },
-    ],
-  };
+  // Create FormData for file upload
+  const formData = new FormData();
+  
+  // Add files
+  formData.append("pdf", pdfFile);
+  if (xmlFile) formData.append("xml", xmlFile);
 
-  // Submit the expense validation to the API
-  await apiRequest("/applicant/create-expense-validation", {
+  // Add receipt details
+  formData.append("receipt_type_id", receipt_type_id.toString());
+  formData.append("request_id", requestId.toString());
+  formData.append("route_id", routeId.toString());
+  formData.append("amount", monto.toString());
+  formData.append("currency", currency);
+
+  const uploadRes = await fetch(`${import.meta.env.PUBLIC_API_BASE_URL}/applicant/create-expense-with-files`, {
     method: "POST",
-    data: payload,
-    headers: { Authorization: `Bearer ${token}` }
+    headers: {
+      "Authorization": `Bearer ${token}`
+    },
+    body: formData
   });
 
-  // Wait briefly for the server to process the creation
+  // Parse the response
+  if (!uploadRes.ok) {
+    const contentType = uploadRes.headers.get('content-type');
+    let errorData;
+    
+    if (contentType && contentType.includes('application/json')) {
+      try {
+        errorData = await uploadRes.json();
+      } catch {
+        errorData = { error: uploadRes.statusText };
+      }
+    } else {
+      const text = await uploadRes.text();
+      errorData = { error: text || uploadRes.statusText };
+    }
+    
+    throw new Error(errorData.error || `Upload failed with status ${uploadRes.status}`);
+  }
+
+  const uploadData = await uploadRes.json();
+
+  // Wait for the server to process
   await new Promise((res) => setTimeout(res, 500));
 
-  // Retrieve the updated list of expenses for the request
-  const res = await apiRequest(`/accounts-payable/get-expense-validations/${requestId}`, { 
+  // If replacing a previous receipt, delete it and reset request status to pending
+  if (receiptToReplace) {
+    try {
+      // Delete the previous receipt
+      await fetch(`${import.meta.env.PUBLIC_API_BASE_URL}/applicant/delete-receipt/${receiptToReplace}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // Reset the request status to 6 (Comprobación gastos del viaje) to allow revalidation
+      await apiRequest(`/applicant/update-request-status/${requestId}/6`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } catch (err) {
+      console.error("Error replacing receipt or updating status:", err);
+      // Don't throw - the new receipt was uploaded successfully
+    }
+  }
+
+  // Get the updated list of expenses for the request
+  const listRes = await apiRequest(`/accounts-payable/get-expense-validations/${requestId}`, { 
     method: "GET",
     headers: { Authorization: `Bearer ${token}` } 
   });
 
-  // Extract expenses from response and sort by receipt ID (newest first)
-  const expenses = res.Expenses ?? [];
+  // Extract expenses from response and count them
+  const expenses = listRes.Expenses ?? [];
   const count = expenses.length;
 
-  expenses.sort((a, b) => b.receipt_id - a.receipt_id);
-  const lastReceiptId = count > 0 ? expenses[0].receipt_id : null;
-
-  return { count, lastReceiptId };
+  return {
+    receipt_id: uploadData.receipt_id,
+    count,
+    cfdiData: uploadData.cfdiData
+  };
 }

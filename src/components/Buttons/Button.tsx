@@ -32,10 +32,13 @@ const getClasses = ({
   color,
   customSizeClass = "",
 }: Required<Pick<ButtonProps, 'variant' | 'size' | 'color' | 'customSizeClass'>>) => {
-  const base = "block rounded font-medium cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed";
+  const base = `
+    block rounded font-medium cursor-pointer
+    disabled:opacity-30 disabled:cursor-not-allowed
+  `;
   const variantMap = {
-    filled: "border-none",
-    border: "border-2 border-current bg-transparent",
+    filled: "border border-text-primary/20",
+    border: "border",
     empty: "border-none bg-transparent",
     link: "border-none bg-transparent hover:underline",
   };
@@ -46,10 +49,10 @@ const getClasses = ({
     custom: customSizeClass,
   };
   const colorMap = {
-    primary: "bg-primary-300 hover:bg-primary-300/80 text-white",
-    secondary: "bg-secondary hover:bg-secondary/80 text-white",
-    success: "bg-success-500 hover:bg-success-500/80 text-white",
-    warning: "bg-warning-300 hover:bg-warning-300/80 text-white",
+    primary: "border border-text-primary/20 bg-gray-600 text-white hover:opacity-80",
+    secondary: "border border-text-primary/20 bg-secondary text-white hover:opacity-80",
+    success: "border border-text-primary/20 bg-success-500 text-white hover:opacity-80",
+    warning: "border border-text-primary/20 bg-warning-300 text-white hover:opacity-80",
   };
 
   // Special handling for link variant
@@ -61,6 +64,17 @@ const getClasses = ({
       warning: "text-warning-500",
     };
     return `${base} ${sizeMap[size]} ${variantMap[variant]} ${linkColorMap[color]}`.trim();
+  }
+
+  // Special handling for border variant
+  if (variant === "border") {
+    const borderColorMap = {
+      primary: "border-text-primary/60 text-text-primary/60 hover:opacity-70",
+      secondary: "border-secondary text-secondary hover:opacity-70",
+      success: "border-success-500 text-success-500 hover:opacity-70",
+      warning: "border-warning-500 text-warning-500 hover:opacity-70",
+    };
+    return `${base} ${sizeMap[size]} ${variantMap[variant]} ${borderColorMap[color]}`.trim();
   }
 
   const sizeClass = sizeMap[size];

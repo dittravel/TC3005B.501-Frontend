@@ -46,7 +46,7 @@ export default function Input(props: BaseInputProps) {
 	const classes = `
     ${base}
     ${error ? 'border-warning-500' : 'border-border'}
-    ${disabled ? 'bg-neutral-50 cursor-not-allowed' : ''}
+    ${disabled ? 'opacity-60 cursor-not-allowed' : ''}
     ${className}
   `.trim();
 	const errorId = name ? `${name}-error` : undefined;

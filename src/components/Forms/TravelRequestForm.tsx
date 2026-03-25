@@ -686,7 +686,7 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
         <Button 
           type="button" 
           onClick={handleResetForm} 
-          variant="border"
+          variant="filled"
           color="primary"
           disabled={disabledButton}
         >
