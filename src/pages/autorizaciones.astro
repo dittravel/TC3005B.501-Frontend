@@ -13,15 +13,12 @@ const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
 const userName = getCookie("username", Astro.cookies) || "";
 const buttonLabel = roleLabels[role];
 
-const status = getCookie("role", Astro.cookies) === "N1" ? 3 : 2;
-
+// Fetch pending requests assigned to this user
 const requests = await (async () => {
   try {
-    return await apiRequest(
-      `/user/get-travel-requests/${getCookie("department_id", Astro.cookies)}/${status}`,
-      { cookies: Astro.cookies }
-    );
-  } catch {
+    const userId = getCookie("id", Astro.cookies);
+    return await apiRequest(`/authorizer/get-pending-requests/${userId}/0`, { cookies: Astro.cookies });
+  } catch (error) {
     return [];
   }
 })();

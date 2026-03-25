@@ -63,8 +63,9 @@ const userName = getCookie("username", Astro.cookies);
       />
       
       <section class="w-full">
-        <div class="flex flex-col justify-between mb-4">
-          <h2 class="text-xl font-bold text-text-primary">{`Usuarios del Sistema (${users.length})`}</h2>
+        <div class="flex justify-between items-start gap-4 mb-6">
+           <h2 class="text-xl font-bold text-text-primary">{`Usuarios del Sistema (${users.length})`}</h2>
+           <Button href="/crear-usuario" color="secondary">Crear Usuario</Button>
         </div>
 
         <div class="overflow-x-auto border border-border rounded-lg">

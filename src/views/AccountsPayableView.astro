@@ -8,13 +8,14 @@ import RequestSection from "@components/Cards/RequestSection.astro";
 
 import { getCookie } from "@data/cookies";
 import { apiRequest } from '@utils/apiClient';
-const deparment = getCookie("department_id", Astro.cookies);
+const userId = getCookie("id", Astro.cookies);
 
 // Get requests in "Por cotizar" and "Por comprobar" states for the user's department
 const requestsInCotizar = await (async () => {
   try {
-    return await apiRequest(`/user/get-travel-requests/${deparment}/4`, { cookies: Astro.cookies });
+    return await apiRequest(`/user/get-travel-requests/${userId}/4`, { cookies: Astro.cookies });
   } catch (error) {
+    console.error("Error fetching cotizar requests:", error);
     return [];
   }
 })()
@@ -22,7 +23,7 @@ const requestsInCotizar = await (async () => {
 // Get requests in "Por comprobar" state for the user's department
 const requestsInComprobar = await (async () => {
   try {
-    return await apiRequest(`/user/get-travel-requests/${deparment}/7`, { cookies: Astro.cookies });
+    return await apiRequest(`/user/get-travel-requests/${userId}/7`, { cookies: Astro.cookies });
   } catch (error) {
     return [];
   }
@@ -38,7 +39,7 @@ const { userName } = Astro.props;
       subtitle="Ditta Consulting"
     />
 
-    <div class="grid grid-cols-1 gap-8">
+    <div class="grid grid-cols-1 gap-20">
       <RequestSection
         title="Solicitudes por cotizar"
         requests={requestsInCotizar}

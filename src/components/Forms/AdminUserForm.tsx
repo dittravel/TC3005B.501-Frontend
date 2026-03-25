@@ -238,112 +238,117 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token }: C
    */
 
   return (
-    <div className="card">
+    <div>
       <Reminder text="Los campos obligatorios están marcados con un asterisco." />
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Username and Password */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Input
-            type="text"
-            name="user_name"
-            label="Nombre de Usuario"
-            value={formData.user_name}
-            onChange={handleInputChange}
-            error={errors.user_name}
-            placeholder="Ej: juan.perez"
-            required
-          />
-          {mode === 'create' && (
+      <form onSubmit={handleSubmit}>
+        <div className="card space-y-6">
+          {/* Form Header */}
+          <div className="card-header">
+            <h2 className="card-title font-semibold text-text-primary">Datos del usuario</h2>
+          </div>
+          {/* Username and Password */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Input
-              type="password"
-              name="password"
-              label="Contraseña"
-              value={formData.password}
+              type="text"
+              name="user_name"
+              label="Nombre de Usuario"
+              value={formData.user_name}
               onChange={handleInputChange}
-              error={errors.password}
-              placeholder="Contraseña segura"
+              error={errors.user_name}
+              placeholder="Ej: juan.perez"
               required
             />
-          )}
-        </div>
+            {mode === 'create' && (
+              <Input
+                type="password"
+                name="password"
+                label="Contraseña"
+                value={formData.password}
+                onChange={handleInputChange}
+                error={errors.password}
+                placeholder="Contraseña segura"
+                required
+              />
+            )}
+          </div>
 
-        {/* Email and Phone Number */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Email and Phone Number */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Input
+              type="email"
+              name="email"
+              label="Email"
+              value={formData.email}
+              onChange={handleInputChange}
+              error={errors.email}
+              placeholder="usuario@empresa.com"
+              required
+            />
+
+            <Input
+              type="tel"
+              name="phone_number"
+              label="Número de Teléfono"
+              value={formData.phone_number}
+              onChange={handleInputChange}
+              error={errors.phone_number}
+              placeholder="555-1234"
+            />
+          </div>
+
+          {/* Workstation */}
           <Input
-            type="email"
-            name="email"
-            label="Email"
-            value={formData.email}
+            type="text"
+            name="workstation"
+            label="Estación de Trabajo"
+            value={formData.workstation}
             onChange={handleInputChange}
-            error={errors.email}
-            placeholder="usuario@empresa.com"
+            error={errors.workstation}
+            placeholder="Ej: WS-001"
             required
           />
 
-          <Input
-            type="tel"
-            name="phone_number"
-            label="Número de Teléfono"
-            value={formData.phone_number}
-            onChange={handleInputChange}
-            error={errors.phone_number}
-            placeholder="555-1234"
-          />
+          {/* Role and Department */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Select
+              label="Rol"
+              name="role_id"
+              value={formData.role_id}
+              onChange={handleInputChange}
+              error={errors.role_id}
+              required
+            >
+              <option value="">Seleccionar rol</option>
+              {roles.map(role => (
+                <option key={role.id} value={role.id}>
+                  {role.name}
+                </option>
+              ))}
+            </Select>
+
+            <Select
+              label="Departamento"
+              name="department_id"
+              value={formData.department_id}
+              onChange={handleInputChange}
+              error={errors.department_id}
+              required
+            >
+              <option value="">Seleccionar departamento</option>
+              {departments.map(dep => (
+                <option key={dep.id} value={dep.id}>
+                  {dep.name}
+                </option>
+              ))}
+            </Select>
+          </div>
         </div>
-
-        {/* Workstation */}
-        <Input
-          type="text"
-          name="workstation"
-          label="Estación de Trabajo"
-          value={formData.workstation}
-          onChange={handleInputChange}
-          error={errors.workstation}
-          placeholder="Ej: WS-001"
-          required
-        />
-
-        {/* Role and Department */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Select
-            label="Rol"
-            name="role_id"
-            value={formData.role_id}
-            onChange={handleInputChange}
-            error={errors.role_id}
-            required
-          >
-            <option value="">Seleccionar rol</option>
-            {roles.map(role => (
-              <option key={role.id} value={role.id}>
-                {role.name}
-              </option>
-            ))}
-          </Select>
-
-          <Select
-            label="Departamento"
-            name="department_id"
-            value={formData.department_id}
-            onChange={handleInputChange}
-            error={errors.department_id}
-            required
-          >
-            <option value="">Seleccionar departamento</option>
-            {departments.map(dep => (
-              <option key={dep.id} value={dep.id}>
-                {dep.name}
-              </option>
-            ))}
-          </Select>
-        </div>
-
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
           <Button
             type="button"
             onClick={handleReset}
-            variant="border"
+            variant="filled"
             color="primary"
             disabled={isSubmitting}
           >
@@ -361,17 +366,17 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token }: C
               : (mode === 'edit' ? 'Actualizar Usuario' : 'Crear Usuario')}
           </Button>
         </div>
-      </form>
 
-      {toast && (
-        <div className="fixed top-4 right-4 z-50">
-          <Toast
-            message={toast.message}
-            type={toast.type}
-            duration={toast.type === 'success' ? 4000 : 6000}
-          />
-        </div>
-      )}
+        {toast && (
+          <div className="fixed top-4 right-4 z-50">
+            <Toast
+              message={toast.message}
+              type={toast.type}
+              duration={toast.type === 'success' ? 4000 : 6000}
+            />
+          </div>
+        )}
+      </form>
     </div>
   );
 }

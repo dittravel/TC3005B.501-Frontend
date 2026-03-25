@@ -26,20 +26,13 @@ const travelData = await (async () => {
     title="Agregar comprobante de gastos"
     subtitle="Adjunta los comprobantes relacionados con el destino del viaje"
   />
-  <section class="card">
-    <div class="space-y-6">
-      <div class="flex items-center justify-between">
-        <h2 class="text-xl font-bold text-text-primary">Agregar comprobantes</h2>
-        <Tag text={`Solicitud #${travelData.request_id}`} type="secondary" />
-      </div>
-
-      <ExpensesFormClient
-        client:only="react"
-        requestId={travelData.request_id}
-        routes={travelData.routes || []}
-        token={getCookie("token", Astro.cookies) || ""}
-        receiptToReplace={Astro.props.receiptToReplace}
-      />
-    </div>
+  <section>
+    <ExpensesFormClient
+      client:only="react"
+      requestId={travelData.request_id}
+      routes={travelData.routes || []}
+      token={getCookie("token", Astro.cookies) || ""}
+      receiptToReplace={Astro.props.receiptToReplace}
+    />
   </section>
 </div>
