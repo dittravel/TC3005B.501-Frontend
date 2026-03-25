@@ -51,5 +51,8 @@ export const SIDEBAR_CONFIG: Record<string, MenuItem[]> = {
   ],
   'Administrador': [
     { label: 'Dashboard', route: '/dashboard', icon: 'home' },
+    { label: 'Reglas de Autorización', route: '/reglas-autorizacion', icon: 'rule', category: 'Gestión'},
+    { label: 'Roles', route: '/roles', icon: 'people', category: 'Gestión' },
+    { label: 'Políticas de Reembolsos', route: '/politicas-reembolso', icon: 'policy', category: 'Gestión' }
   ]
 };

@@ -12,7 +12,7 @@ export const roleRoutes: Record<UserRole, string[]> = {
   'Cuentas por pagar': ['/dashboard', '/perfil-usuario', '/cotizaciones', '/comprobaciones', '/cotizar-solicitud/*', '/comprobar-gastos/*'],
   'N1': ['/dashboard', '/perfil-usuario', '/solicitudes-autorizador', '/crear-solicitud','/historial','/reembolso','/solicitudes-draft','/comprobar-gastos','/completar-draft/*','/editar-solicitud/*','/comprobar-solicitud/*','/autorizaciones','/detalles-solicitud/*','/autorizar-solicitud/*','/subir-comprobante/*','/editar-comprobante/*'],
   'N2': ['/dashboard', '/perfil-usuario', '/solicitudes-autorizador', '/crear-solicitud','/historial','/reembolso','/solicitudes-draft','/comprobar-gastos','/completar-draft/*','/editar-solicitud/*','/comprobar-solicitud/*','/autorizaciones','/detalles-solicitud/*','/autorizar-solicitud/*','/subir-comprobante/*','/editar-comprobante/*'],
-  'Administrador': ['/dashboard', '/perfil-usuario','/crear-usuario', '/editar-usuario/*'],
+  'Administrador': ['/dashboard', '/perfil-usuario','/crear-usuario', '/editar-usuario/*', '/reglas-autorizacion', '/roles', '/politicas-reembolso'],
 };
 
 // Flatten all routes into a single array for easy access control checks
