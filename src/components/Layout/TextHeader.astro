@@ -1,0 +1,14 @@
+---
+/**
+ * Author: Eduardo Porto Morales
+ * 
+ * This component is used to display a header with a title and subtitle 
+ * for the travel request pages.
+ **/
+const { title, subtitle } = Astro.props;
+---
+
+<section class="mb-8 w-full pb-4 border-b-2 border-secondary">
+  <h1 class="text-3xl font-bold text-text-primary">{title}</h1>
+  <p class="text-lg font-semibold text-text-secondary mt-2">{subtitle}</p>
+</section>

@@ -1,19 +1,18 @@
 ---
 /**
- * Author: Hector Julian Zarate Ramirez
- * Description: This script is used to create a page that shows the history of requests made by the user.
- **/
+ * This script is used to create a page that shows the history of requests made by the user.
+ */
 
 import MainLayout from "@layouts/MainLayout.astro";
-import History from "@components/History.tsx";
-import TextHeader from "@components/TextHeader.astro";
+import History from "@/components/RequestsLists/History";
+import TextHeader from "@components/Layout/TextHeader.astro";
 
 import type { UserRole } from "@type/roles";
 import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
-const userName = getCookie("username", Astro.cookies);
+const userName = getCookie("username", Astro.cookies) || "";
 const buttonLabel = roleLabels[role];
 
 import { apiRequest } from "@/utils/apiClient";
@@ -27,13 +26,9 @@ const requests = await (async () => {
 ---
 
 <MainLayout title="Historial" data={{ userName, buttonLabel, role }}>
-<div>
   <TextHeader
-    title={`HISTORIAL DEL VIAJES DE ${ userName.toUpperCase() }`}
+    title={`Historial de viajes de ${userName}`}
     subtitle="Aquí puedes ver el historial de solicitudes realizadas"
   />
-  <div class="items-center justify-center">
-    <History client:only="react" data={requests} />
-  </div>
-</div>
+  <History client:only="react" data={requests} />
 </MainLayout>

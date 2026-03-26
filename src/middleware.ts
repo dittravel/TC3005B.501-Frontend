@@ -1,7 +1,19 @@
+/**
+ * Middleware for route access control based on
+ * user roles and authentication status.
+ */
+
 import type { MiddlewareHandler } from 'astro';
 import { roleRoutes, allWhitelistedRoutes } from '@config/routeAccess';
 import { unauthorizedPage } from '@utils/unauthorizedPage';
 
+/**
+ * Helper function to check if a path matches any of the given patterns.
+ * Supports exact matches and wildcard patterns (e.g., '/admin/*').
+ * @param path The URL path to check
+ * @param patterns An array of route patterns to match against
+ * @returns True if the path matches any pattern, false otherwise
+ */
 function matchPath(path: string, patterns: string[]) {
   return patterns.some(pattern => {
     if (pattern.endsWith('/*')) {
@@ -10,8 +22,19 @@ function matchPath(path: string, patterns: string[]) {
     return path === pattern;
   });
 }
+
+// Public routes that do NOT require authentication
 export const publicRoutes = [ '/login', '/404' ];
 
+/**
+ * Middleware handler to enforce route access control based on user roles.
+ * It checks the requested path against public routes, extracts the user's role from cookies,
+ * and determines if the user is authorized to access the route.
+ * 
+ * @param context The middleware context containing the request and other information
+ * @param next The next middleware function to call if access is granted
+ * @returns A Response object if access is denied, or calls next() if access is granted
+ */
 export const onRequest: MiddlewareHandler = async (context, next) => {
   const { request } = context;
   const url = new URL(request.url);

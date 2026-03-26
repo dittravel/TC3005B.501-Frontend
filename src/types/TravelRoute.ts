@@ -1,5 +1,9 @@
+/**
+ * Structure of a travel route object in the application
+ */
+
 export interface TravelRoute {
-  route_index: number;
+  router_index: number;
   origin_country_name: string;
   origin_city_name: string;
   destination_country_name: string;

@@ -1,30 +1,29 @@
 ---
 /**
- * Authors: Gabriel Muñoz, José González
- * 
- * Description: This is the applicant view of the dashboard.
- **/
+ * Applicant view of the dashboard
+ */
 
-import MaterialIcon from "@components/MaterialIcon.astro";
-import Button from "@components/Button.astro";
-import TextHeader from "@components/TextHeader.astro";
-import CancelRequestModal from "@components/CancelRequestModal.tsx";
-
+import Button from "@/components/Buttons/Button";
+import Card from "@/components/Utils/Card";
+import TextHeader from "@components/Layout/TextHeader.astro";
+import CancelRequestModal from "@/components/Modals/CancelRequestModal";
 import { getCookie } from "@data/cookies";
 import { apiRequest } from '@utils/apiClient';
 
+// Color for each request status
 const colorDesign: { [key: string]: string } = {
-  'Primera Revisión': "text-orange-400",
-  'Segunda Revisión': "text-orange-500",
-  'Cotización del Viaje': "text-orange-600",
-  'Atención Agencia de Viajes': "text-orange-700",
-  'Comprobación gastos del viaje': "text-blue-500",
-  'Validación de comprobantes': "text-blue-600",
+  'Primera Revisión': "success",
+  'Segunda Revisión': "alert",
+  'Cotización del Viaje': "warning",
+  'Atención Agencia de Viajes': "primary",
+  'Comprobación gastos del viaje': "secondary",
+  'Validación de comprobantes': "special",
 };
 
+// Get user ID from cookies
 const user_id = getCookie("id", Astro.cookies);
 
-
+// Get user requests
 const requests = await (async () => {
   try {
     // Try to fetch requests with error handling
@@ -43,94 +42,86 @@ const requests = await (async () => {
     return [];
   }
 })();
+
+// Get username from astro props
 const { userName } = Astro.props;
 ---
 
 <div>
   <main>
+    {/* Header */}
     <TextHeader
-      title={`BIENVENIDO, ${userName.toUpperCase()}`}
-      subtitle="DITTA CONSULTING"
+      title={`Bienvenido, ${userName}`}
+      subtitle="Ditta Consulting"
     />
 
-    <section class="bg-white p-6 rounded-lg shadow w-full">
-      <h2 class="flex text-xl font-bold mb-4">
-        VIAJES EN PROCESO
-        <span class="px-2 align-middle text-primary-500">({requests.length})</span>
-      </h2>
+    <section>
+      {/* Title */}
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold text-text-primary">
+          Viajes en Proceso
+          <span class="px-2 align-middle text-primary-500">({requests.length})</span>
+        </h2>
+        <a href="/crear-solicitud">
+          <Button variant="filled" color="secondary">
+            Crear Solicitud
+          </Button>
+        </a>
+      </div>
 
+      {/* Request list */}
       {requests.length > 0 ? (
-        <div class="grid gap-4">
+        <div class="space-y-6">
           {requests.map((request: any) => {
             const isEditable = request.status === "Primera Revisión";
             const isNotCancelable = request.status === "Comprobación gastos del viaje" || request.status === "Validación de comprobantes";
             const mustBeChecked = request.status === "Comprobación gastos del viaje";
             return (
-              <div class="grid grid-cols-[2fr_2fr_1fr] gap-8">
-                <a href={`/detalles-solicitud/${request.request_id}`} class="col-span-2">
-                  <div class="col-span-2 space-y-2 content-wrapper">
-                    <p class="font-bold text-lg break-words">#{request.request_id}</p>
-                    <div class="text-sm text-gray-700 grid grid-cols-[2fr_3fr] gap-y-1">
-                      <p><span class="font-semibold">País Destino:</span> {request.destination_country}</p>
-                      <p>
-                        <span class="font-semibold">Estado:</span> 
-                        <span class={`ml-1 font-semibold text-sm rounded bg-yellow ${colorDesign[String(request.status)]}`}>
-                          {(request.status ? request.status.toUpperCase() : '')}
-                        </span>
-                      </p>
-                      <p><span class="font-semibold">Fechas:</span> {request.beginning_date} - {request.ending_date}</p>
-                      <p><span class="font-semibold">Responsable:</span> Eduardo Porto Morales</p>
-                    </div>
+              <Card
+                href={`/detalles-solicitud/${request.request_id}`}
+                tag={{ text: `Solicitud #${request.request_id}`, type: 'secondary' }}
+                status={{ text: request.status, type: colorDesign[request.status] || 'default' }}
+              >
+                <div class="card-content-grid">
+                  <div class="space-y-1 text-sm text-text-primary">
+                    <p><span class="font-semibold">País Destino:</span> {request.destination_country}</p>
+                    <p><span class="font-semibold">Fechas:</span> {request.beginning_date} - {request.ending_date}</p>
+                    <p><span class="font-semibold">Responsable:</span> {request.assigned_to_name}</p>
                   </div>
-                </a>
-                <div class="grid grid-cols-[1fr_auto] gap-4 items-center">
                   <div class="flex flex-col gap-2">
-                    <a href={`/editar-solicitud/${request.request_id}`}>
-                      <Button color="primary" disabled={!isEditable} variant="filled" size="medium" customSizeClass="w-full">
-                        EDITAR
+                    <a href={`/editar-solicitud/${request.request_id}`} class="block">
+                      <Button color="secondary" disabled={!isEditable} variant="filled" size="medium" className="w-full">
+                        Editar
                       </Button>
                     </a>
-                    <a href={`/comprobar-solicitud/${request.request_id}`}>
-                      <Button color="secondary" disabled={!mustBeChecked} variant="filled" size="medium" customSizeClass="w-full">
-                        COMPROBAR GASTOS
+                    <a href={`/comprobar-solicitud/${request.request_id}`} class="block">
+                      <Button color="secondary" disabled={!mustBeChecked} variant="filled" size="medium" className="w-full">
+                        Comprobar Gastos
                       </Button>
                     </a>
-                  </div>
-                  <div class="flex justify-end items-center h-full">
-                    <span class="flex items-center justify-center w-6 h-6">                        
-                      <CancelRequestModal
-                        client:only="react"
-                        id={request.request_id}
-                        disabled={isNotCancelable}
-                        token={getCookie("token", Astro.cookies)}
-                      >
-                        <div>
-                          <MaterialIcon
-                            icon="delete"
-                            color="black"
-                            style="cursor: pointer"
-                          />
-                        </div>
-                      </CancelRequestModal>
-                    </span>
+                    <CancelRequestModal
+                      client:only="react"
+                      id={request.request_id}
+                      token={getCookie("token", Astro.cookies) || ""}
+                      disabled={isNotCancelable}
+                      color="warning"
+                      variant="filled"
+                      label="Cancelar"
+                    />
                   </div>
                 </div>
-              </div>
+              </Card>
             );
           })}
         </div>
       ) : (
-        <div class="bg-gray-100 p-6 rounded-lg shadow w-full text-center text-gray-500 font-semibold">
-          NO TIENES VIAJES AGENDADOS
-        </div>
+        <Card className="text-center py-8">
+          <p class="text-text-secondary font-semibold">
+            No tienes viajes agendados
+          </p>
+        </Card>
       )}
     </section>
-
-    <a href="/crear-solicitud" class="mt-8 flex justify-center">
-      <Button variant="filled" color="secondary" size="custom" customSizeClass="w-128 py-3 text-base font-bold">
-        SOLICITA UN NUEVO VIAJE
-      </Button>
-    </a>
 
   </main>
 </div>

@@ -1,18 +1,17 @@
 ---
 /**
-* Authors: Eduardo Porto Morales
-* Description: This page allows the user to view and manage their draft requests.
-**/
+ * This page allows the user to view and manage their draft requests.
+ */
 
 import MainLayout from "@layouts/MainLayout.astro";
-import RequestDraft from "@components/RequestDraft.astro";
+import RequestDraft from "@components/Cards/RequestDraft.astro";
 import type { UserRole } from "@type/roles";
 
 import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
-const userName = getCookie("username", Astro.cookies);
+const userName = getCookie("username", Astro.cookies) || "";
 const buttonLabel = roleLabels[role];
 
 import { apiRequest } from '@utils/apiClient';
@@ -25,6 +24,6 @@ const requests = await (async () => {
 })()
 ---
 
-<MainLayout title="Dashboard" data={{ userName, buttonLabel, role }}>
+<MainLayout title="Draft Solicitudes" data={{ userName, buttonLabel, role }}>
   <RequestDraft userName={userName} requests={requests} />
 </MainLayout>

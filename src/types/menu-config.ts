@@ -1,49 +1,58 @@
+/**
+ * Menu configuration for the sidebar navigation.
+ * This file defines the structure of the menu items
+ * for different user roles in the application.
+ */
+
 export interface MenuItem {
   label: string;
   route: string;
   icon: string;
+  category?: string;
 }
 
 export const SIDEBAR_CONFIG: Record<string, MenuItem[]> = {
   'Solicitante': [
-    { label: 'DASHBOARD', route: '/dashboard', icon: 'home' },
-    { label: 'CREAR SOLICITUD', route: '/crear-solicitud', icon: 'flight' },
-    { label: 'DRAFT SOLICITUDES', route: '/solicitudes-draft', icon: 'draft' },
-    { label: 'COMPROBAR GASTOS', route: '/comprobar-gastos', icon: 'payments' },
-    { label: 'REEMBOLSOS', route: '/reembolso', icon: 'paid' },
-    { label: 'HISTORIAL DE VIAJES', route: '/historial', icon: 'inventory' }
+    { label: 'Dashboard', route: '/dashboard', icon: 'home' },
+    { label: 'Crear Solicitud', route: '/crear-solicitud', icon: 'note_add', category: 'Viajes' },
+    { label: 'Draft Solicitudes', route: '/solicitudes-draft', icon: 'edit_document', category: 'Viajes' },
+    { label: 'Historial De Viajes', route: '/historial', icon: 'history', category: 'Viajes' },
+    { label: 'Comprobar Gastos', route: '/comprobar-gastos', icon: 'receipt', category: 'Gastos' },
+    { label: 'Reembolsos', route: '/reembolso', icon: 'currency_exchange', category: 'Gastos' }
   ],
   'N1': [
-    { label: 'DASHBOARD', route: '/dashboard', icon: 'home' },
-    { label: 'AUTORIZACIONES', route: '/autorizaciones', icon: 'check_box' },
-    { label: 'SOLICITUDES', route: '/solicitudes-autorizador', icon: 'check_box' },
-    { label: 'CREAR SOLICITUD', route: '/crear-solicitud', icon: 'flight' },
-    { label: 'DRAFT SOLICITUDES', route: '/solicitudes-draft', icon: 'draft' },
-    { label: 'COMPROBAR GASTOS', route: '/comprobar-gastos', icon: 'payments' },
-    { label: 'REEMBOLSOS', route: '/reembolso', icon: 'paid' },
-    { label: 'HISTORIAL DE VIAJES', route: '/historial', icon: 'inventory' }
+    { label: 'Dashboard', route: '/dashboard', icon: 'home' },
+    { label: 'Autorizaciones', route: '/autorizaciones', icon: 'check_box', category: 'Autorizaciones' },
+    { label: 'Mis Solicitudes', route: '/solicitudes-autorizador', icon: 'airplane_ticket', category: 'Viajes' },
+    { label: 'Crear Solicitud', route: '/crear-solicitud', icon: 'note_add', category: 'Viajes' },
+    { label: 'Draft Solicitudes', route: '/solicitudes-draft', icon: 'edit_document', category: 'Viajes' },
+    { label: 'Historial De Viajes', route: '/historial', icon: 'history', category: 'Viajes' },
+    { label: 'Comprobar Gastos', route: '/comprobar-gastos', icon: 'receipt', category: 'Gastos' },
+    { label: 'Reembolsos', route: '/reembolso', icon: 'currency_exchange', category: 'Gastos' }
   ],
   'N2': [
-    { label: 'DASHBOARD', route: '/dashboard', icon: 'home' },
-    { label: 'AUTORIZACIONES', route: '/autorizaciones', icon: 'check_box' },
-    { label: 'SOLICITUDES', route: '/solicitudes-autorizador', icon: 'check_box' },
-    { label: 'CREAR SOLICITUD', route: '/crear-solicitud', icon: 'flight' },
-    { label: 'DRAFT SOLICITUDES', route: '/solicitudes-draft', icon: 'draft' },
-    { label: 'COMPROBAR GASTOS', route: '/comprobar-gastos', icon: 'payments' },
-    { label: 'REEMBOLSOS', route: '/reembolso', icon: 'paid' },
-    { label: 'HISTORIAL DE VIAJES', route: '/historial', icon: 'inventory' }
+    { label: 'Dashboard', route: '/dashboard', icon: 'home' },
+    { label: 'Autorizaciones', route: '/autorizaciones', icon: 'check_box', category: 'Autorizaciones' },
+    { label: 'Mis Solicitudes', route: '/solicitudes-autorizador', icon: 'airplane_ticket', category: 'Viajes' },
+    { label: 'Crear Solicitud', route: '/crear-solicitud', icon: 'note_add', category: 'Viajes' },
+    { label: 'Draft Solicitudes', route: '/solicitudes-draft', icon: 'edit_document', category: 'Viajes' },
+    { label: 'Historial De Viajes', route: '/historial', icon: 'history', category: 'Viajes' },
+    { label: 'Comprobar Gastos', route: '/comprobar-gastos', icon: 'receipt', category: 'Gastos' },
+    { label: 'Reembolsos', route: '/reembolso', icon: 'currency_exchange', category: 'Gastos' }
   ],
   'Cuentas por pagar': [
-    { label: 'DASHBOARD', route: '/dashboard', icon: 'home' },
-    { label: 'COTIZACIONES', route: '/cotizaciones', icon: 'paid' },
-    { label: 'COMPROBACIONES', route: '/comprobaciones', icon: 'receipt' }
+    { label: 'Dashboard', route: '/dashboard', icon: 'home' },
+    { label: 'Cotizaciones', route: '/cotizaciones', icon: 'price_change', category: 'Pagos' },
+    { label: 'Comprobantes', route: '/comprobaciones', icon: 'receipt', category: 'Pagos' }
   ],
   'Agencia de viajes': [
-    { label: 'DASHBOARD', route: '/dashboard', icon: 'home' },
-    { label: 'ATENCIONES', route: '/atenciones', icon: 'breaking_news_alt_1' }
+    { label: 'Dashboard', route: '/dashboard', icon: 'home' },
+    { label: 'Atenciones', route: '/atenciones', icon: 'luggage', category: 'Gestión' }
   ],
   'Administrador': [
-    { label: 'DASHBOARD', route: '/dashboard', icon: 'home' },
-    { label: 'CREAR USUARIO', route: '/crear-usuario', icon: 'manage_accounts' }
+    { label: 'Dashboard', route: '/dashboard', icon: 'home' },
+    { label: 'Reglas de Autorización', route: '/reglas-autorizacion', icon: 'rule', category: 'Gestión'},
+    { label: 'Roles', route: '/roles', icon: 'people', category: 'Gestión' },
+    { label: 'Políticas de Reembolsos', route: '/politicas-reembolso', icon: 'policy', category: 'Gestión' }
   ]
 };

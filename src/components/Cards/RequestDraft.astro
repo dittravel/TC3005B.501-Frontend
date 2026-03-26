@@ -1,0 +1,29 @@
+---
+/**
+ * Authors: Eduardo Porto Morales
+ * 
+ * This is the draft request component. It displays the user's requests 
+ * and allows them to edit or delete them.
+ */
+
+import TextHeader from "@components/Layout/TextHeader.astro";
+import RequestDraftList from "@components/RequestsLists/RequestDraftList";
+import { getCookie } from "@data/cookies";
+
+var { userName, requests } = Astro.props;
+---
+
+<div>
+  <main>
+    <TextHeader
+      title={`Draft de viajes de ${userName}`}
+      subtitle="Aquí puedes ver los draft de solicitudes por completar"
+    />
+    
+    <RequestDraftList 
+      client:only="react"
+      requests={requests} 
+      token={getCookie("token", Astro.cookies) || ""}
+    />
+  </main>
+</div>

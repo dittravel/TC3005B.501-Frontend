@@ -1,3 +1,7 @@
+# API Endpoints
+
+This document provides a summary of the API endpoints available in the application, including their methods, expected responses, and error handling. Each endpoint is designed to perform specific operations related to travel requests, user information, and expense validations.
+
 **attend-travel-request/{userId}**
 
 method: PUT

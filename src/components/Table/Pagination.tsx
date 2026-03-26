@@ -1,7 +1,5 @@
 /**
- * Author: Eduardo Porto Morales
- * 
- * Description: Make reusable pagination for list of lists
+ * Reusable pagination for list of lists
  */
 
 import { useState, useEffect } from "react";
@@ -13,6 +11,16 @@ interface PaginationProps {
   maxVisible?: number;
 }
 
+/**
+ * Pagination component that provides navigation controls for paginated data.
+ * It displays a set of page numbers and allows users to navigate between them.
+ * The component also includes controls to jump to the previous or next block of pages.
+ * @param totalPages - The total number of pages available.
+ * @param page - The current active page number.
+ * @param setPage - A function to update the current page number.
+ * @param maxVisible - The maximum number of page buttons to display at once (default is 5).
+ * @returns A JSX element representing the pagination controls.
+ */
 export default function Pagination({
   totalPages,
   page,
@@ -50,7 +58,7 @@ export default function Pagination({
       <button
         onClick={handlePrevBlock}
         disabled={blockStart === 1}
-        className="px-3 py-1 rounded border border-neutral-500 text-primary-500 hover:bg-blue-100 disabled:opacity-50"
+        className="px-3 py-1 rounded border border-border text-secondary-500 hover:bg-secondary/10 disabled:opacity-50"
       >
         {"«"}
       </button>
@@ -59,10 +67,10 @@ export default function Pagination({
         <button
           key={n}
           onClick={() => setPage(n)}
-          className={`px-4 py-2 rounded border border-neutral-500 transition min-w-12 ${
+          className={`px-4 py-2 rounded transition min-w-12 ${
             page === n
-              ? "bg-primary-500 text-white"
-              : "bg-white text-primary-500 hover:bg-blue-100"
+              ? "bg-secondary text-white border border-secondary"
+              : "bg-card text-text-primary border border-border hover:bg-secondary/10"
           }`}
         >
           {n}
@@ -72,7 +80,7 @@ export default function Pagination({
       <button
         onClick={handleNextBlock}
         disabled={blockStart + maxVisible > totalPages}
-        className="px-3 py-1 rounded border border-neutral-500 text-primary-500 hover:bg-blue-100 disabled:opacity-50"
+        className="px-3 py-1 rounded border border-border text-secondary-500 hover:bg-secondary/10 disabled:opacity-50"
       >
         {"»"}
       </button>

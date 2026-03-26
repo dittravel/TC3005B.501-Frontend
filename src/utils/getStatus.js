@@ -1,3 +1,10 @@
+/**
+ * Get Request Status
+ * 
+ * This function returns the label and CSS class for a given request status,
+ * which can be used to display the status with appropriate styling in the UI.
+ */
+
 export function getStatusProps(status) {
     switch (status.toLowerCase()) {
       case "aprobado":

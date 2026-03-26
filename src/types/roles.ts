@@ -1,1 +1,5 @@
+/**
+ * User roles in the application
+ */
+
 export type UserRole = 'Solicitante' | 'Agencia de viajes' | 'Cuentas por pagar' | 'N1' | 'N2' | 'Administrador';

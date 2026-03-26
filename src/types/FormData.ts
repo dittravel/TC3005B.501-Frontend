@@ -1,7 +1,13 @@
+/**
+ * Form Data
+ * 
+ * Structure representing the data collected from a travel request form
+ */
+
 import type { TravelRoute } from './TravelRoute';
 
 export interface FormData {
-  route_index: number;
+  router_index: number;
   notes: string;
   requested_fee: number | string;
   imposed_fee: number | string;

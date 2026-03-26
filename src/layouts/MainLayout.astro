@@ -1,8 +1,18 @@
 ---
+/**
+ * MainLayout
+ * 
+ * This layout component defines the overall structure of the page, including the header, 
+ * sidebar, main content area, and an optional messages sidebar.
+ * 
+ * It also includes styles for the grid layout and a conditional class to adjust the layout
+ * when messages are shown.
+ */
+
 import '@styles/global.css' 
-import PageHeader from "@components/PageHeader.astro";
-import SideBar from "@components/Sidebar.astro";
-import Messages from "@/components/Messages.astro"
+import PageHeader from "@components/Layout/PageHeader.astro";
+import SideBar from "@components/Layout/Sidebar.astro";
+import Messages from "@/components/UI/Messages.astro"
 import type { UserRole } from "@type/roles";
 
 interface Props {
@@ -19,7 +29,7 @@ const { title, data, showMessages = false } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="utf-8" />
     <meta name="description" content="Astro description" />
@@ -34,6 +44,7 @@ const { title, data, showMessages = false } = Astro.props;
         <PageHeader
           userName={data.userName}
           buttonLabel={data.buttonLabel}
+          showNotifications={showMessages}
         />
       </header>
 
@@ -42,7 +53,7 @@ const { title, data, showMessages = false } = Astro.props;
       </aside>
 
       <section id="content">
-        <div class="p-12">
+        <div class="p-4 md:p-12">
           <slot />
         </div>
       </section>
@@ -54,43 +65,35 @@ const { title, data, showMessages = false } = Astro.props;
       )}
     </div>
 
-    <style>
-      #app {
-        display: grid;
-        grid-template-areas:
-          "header header header"
-          "sidebar content messages";
-        grid-template-columns: auto 1fr 0;
-        grid-template-rows: auto 1fr;
-        height: 100vh;
-      }
+    {/* Inline script to include it directly in the HTML document */}
+    <script is:inline>
+      const sidebar = document.getElementById('sidebar');
+      const messages = document.getElementById('messages');
+      
+      // Initialize sidebar and messages state based on screen size
+      const initElementsState = () => {
+        if (sidebar) {
+          if (window.innerWidth >= 768) {
+            sidebar.classList.add('open');
+          } else {
+            sidebar.classList.remove('open');
+          }
+        }
 
-      #app.list-messages {
-        grid-template-columns: auto 1fr 16rem;
-      }
+        if (messages) {
+          if (window.innerWidth >= 768) {
+            messages.classList.add('open');
+          } else {
+            messages.classList.remove('open');
+          }
+        }
+      };
 
-      #page-header {
-        grid-area: header;
-      }
+      // Set initial state
+      initElementsState();
 
-      #sidebar {
-        grid-area: sidebar;
-      }
-
-      #content {
-        grid-area: content;
-        height: 100%;
-        overflow-y: auto;
-      }
-
-      #messages {
-        grid-area: messages;
-        background: white;
-        border-left: 1px solid #D6D8DE;
-        box-shadow: -2px 0 4px rgba(0, 0, 0, 0.05);
-        padding: 1.5rem;
-        overflow-y: auto;
-      }
-    </style>
+      // Handle resize
+      window.addEventListener('resize', initElementsState);
+    </script>
   </body>
 </html>

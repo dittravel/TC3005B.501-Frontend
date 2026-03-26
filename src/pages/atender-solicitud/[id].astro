@@ -1,20 +1,20 @@
 ---
 /**
- * Author: Eduardo Porto Morales
- * 
+ * This page renders the details of a specific travel request for approval.
  */
+
 export const prerender = false;
 
 import MainLayout from "@layouts/MainLayout.astro";
-import RequestDetail from "@components/RequestDetail.astro";
-import AproveRequest from "@components/ValidateReceiptStatus";
+import RequestDetail from "@components/Cards/RequestDetail.astro";
+import AproveRequestModal from "@/components/Modals/AproveRequestModal";
 import type { UserRole } from "@type/roles";
 
 import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
-const userName = getCookie("username", Astro.cookies);
+const userName = getCookie("username", Astro.cookies) || "";
 const buttonLabel = roleLabels[role];
 
 import { apiRequest } from "@/utils/apiClient";
@@ -26,7 +26,6 @@ try {
 } catch (error) {
   request = null;
   throw new Error(`No request found with ID ${id}`);
-  return Astro.redirect('/404');
 }
 
 ---
@@ -34,21 +33,21 @@ try {
 <MainLayout title={`Solicitud #${request.request_id}`} data={{ userName, buttonLabel, role }} >
   <RequestDetail
     request={request}
-    title={`SOLICITUD #${request.request_id}`}
-    subtitle="Detalles de la Solicitud a Atender"
+    title={`Solicitud #${request.request_id}`}
+    subtitle="Detalles de la solicitud a atender"
   />
   <div class="flex justify-end gap-4 mt-8">
-    <AproveRequest
+    <AproveRequestModal
       client:only="react"
-      ={request.request_id}
-      title="Confirmar envío"
+      request_id={request.request_id}
+      title="Confirmar aprobación"
       message="¿Está seguro de aprobar esta solicitud?"
       redirection="/dashboard"
       modal_type="success"
+      color="success"
       variant="filled"
-      token={getCookie("token", Astro.cookies)}
-    >
-      Aprobar
-    </AproveRequest>
+      label="Aprobar"
+      token={getCookie("token", Astro.cookies) || ""}
+    />
   </div>
 </MainLayout>

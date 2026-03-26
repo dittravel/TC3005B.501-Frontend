@@ -5,16 +5,16 @@
  * Description: This is the travel agent view of the application.
  **/
 
-import TextHeader from "@components/TextHeader.astro";
+import TextHeader from "@components/Layout/TextHeader.astro";
 import { getRequestPriority } from "@utils/getPriorityDates";
 import { getCookie } from "@data/cookies";
 import { apiRequest } from '@utils/apiClient';
-import RequestSection from "@components/RequestSection.astro";
+import RequestSection from "@components/Cards/RequestSection.astro";
 
 const { userName} = Astro.props;
 const requests = await (async () => {
   try {
-    return await apiRequest(`/user/get-travel-requests/${getCookie("department_id", Astro.cookies)}/5`, { cookies: Astro.cookies });
+    return await apiRequest(`/user/get-travel-requests/${getCookie("id", Astro.cookies)}/5`, { cookies: Astro.cookies });
   } catch (error) {
     return [];
   }
@@ -25,16 +25,16 @@ const requests = await (async () => {
 <div>
   <main>
     <TextHeader
-      title={`BIENVENIDO, ${userName.toUpperCase()}`}
-      subtitle="DITTA CONSULTING"
+      title={`Bienvenido, ${userName}`}
+      subtitle="Ditta Consulting"
     />
-      <RequestSection
-        title="SOLICITUDES POR ATENDER"
-        requests={requests}
-        anchor="atenciones"
-        urlBase="atender-solicitud"
-        subtitle="Esta solicitud está esperando ser atendida."
-        emptyMessage="NO HAY SOLICITUDES POR ATENDER"
-      />
+    <RequestSection
+      title="Solicitudes por atender"
+      requests={requests}
+      anchor="atenciones"
+      urlBase="atender-solicitud"
+      subtitle="Esta solicitud está esperando ser atendida."
+      emptyMessage="No hay solicitudes por atender"
+    />
   </main>
 </div>

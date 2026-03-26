@@ -5,15 +5,15 @@
  * Description: This is the authorizer view of the dashboard.
  **/
 
-import TextHeader from "@components/TextHeader.astro";
-import RequestSection from "@components/RequestSection.astro";
+import TextHeader from "@components/Layout/TextHeader.astro";
+import RequestSection from "@components/Cards/RequestSection.astro";
 import {apiRequest} from "@utils/apiClient";
 import { getCookie } from "@data/cookies";
 
 const requests = await (async () => {
   try {
-    const status = getCookie("role", Astro.cookies) === "N1" ? 3 : 2;
-    return await apiRequest(`/user/get-travel-requests/${getCookie("department_id", Astro.cookies)}/${status}`, { cookies: Astro.cookies });
+    const userId = getCookie("id", Astro.cookies);
+    return await apiRequest(`/authorizer/get-pending-requests/${userId}/0`, { cookies: Astro.cookies });
   } catch (error) {
     return [];
   }
@@ -24,16 +24,16 @@ const { userName } = Astro.props;
 <div>
   <main>
     <TextHeader
-      title={`BIENVENIDO, ${userName.toUpperCase()}`}
-      subtitle="DITTA CONSULTING"
+      title={`Bienvenido, ${userName}`}
+      subtitle="Ditta Consulting"
     />
       <RequestSection
-        title="SOLICITUDES POR AUTORIZAR"
+        title="Solicitudes por autorizar"
         requests={requests}
         anchor="autorizaciones"
         urlBase="autorizar-solicitud"
         subtitle="Esta solicitud está esperando ser autorizada."
-        emptyMessage="NO HAY SOLICITUDES POR AUTORIZAR"
+        emptyMessage="No hay solicitudes por autorizar"
       />
   </main>
 </div>

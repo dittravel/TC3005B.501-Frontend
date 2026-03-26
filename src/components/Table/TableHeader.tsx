@@ -1,7 +1,6 @@
 /**
- * Author: Diego Ortega Fernández
- *
- **/
+ * TableHeader component
+ */
 
 interface Column {
   key: string;
@@ -12,15 +11,20 @@ interface Props {
   columns: Column[];
 }
 
+/**
+ * TableHeader component that renders the header of a table based on the provided columns.
+ * @param columns - An array of column definitions, each with a key and label.
+ * @returns A JSX element representing the table header.
+ */
 export default function TableHeader({ columns }: Props) {
   return (
-    <thead>
-      <tr className="bg-gray-200">
+    <thead className="bg-secondary">
+      <tr>
         {columns.map((col) => (
             <th
               key={col.key}
-              className={`px-4 py-3 font-bold text-md text-gray-700 ${
-                col.key === 'action' ? 'text-center' : 'text-left'
+              className={`px-4 py-3 text-left text-xs font-medium text-white ${
+                col.key === 'action' ? 'text-center' : ''
               }`}
               >
               {col.label}

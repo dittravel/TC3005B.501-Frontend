@@ -1,11 +1,43 @@
-# Changelog
+# Changelog :clipboard:
 
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),  
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] - Post-Trip Flow
+## [0.4.1] - 2025-06-22: Src Cleanup and Refactoring
+
+### Added
+
+- New tag component for consistent labeling
+
+- New Input, Select, and TextArea components for form inputs
+
+- New Reminder component for displaying important notes and reminders in the UI
+
+- New Card component for consistent styling of content cards across the application
+
+### Changed
+
+- Refactored `src/components/` to include subdirectories for better organization (e.g., `Forms`, `Layout`, `Utils`).
+
+- Updated import paths to reflect the new directory structure.
+
+- Forms now use the new Input, Select, and TextArea components for consistent styling and behavior.
+
+- Modal Wrapper now uses labels for creating buttons instead of children, removing the need of creating buttons, making it easier to use.
+
+## [0.4.0] - 2025-06-20: XML Parsing
+
+### Added
+
+- CFDI data preview after uploading XML files in the expense form (`components/UploadReceiptFiles.tsx` and `components/UploadFiles.tsx`)
+
+### Changed
+
+- `ExpensesForm` now shows CFDI data if an XML file is uploaded and parsed successfully
+
+## [0.3.0] - Post-Trip Flow
 
 ### Added
 
@@ -13,7 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Expense Approval
 - Expense Validation
 
-## [0.2.0]: 2025-05-16: Request Follow-Up
+## [0.2.0] - 2025-05-16: Request Follow-Up
 
 ### Added
 
