@@ -1,0 +1,39 @@
+---
+/**
+* Authorization Rules Creation Page
+*/
+
+import TextHeader from "@components/Layout/TextHeader.astro";
+import MainLayout from "@layouts/MainLayout.astro";
+import AuthRuleForm from "@/components/Forms/AuthRuleForm";
+
+import type { UserRole } from "@type/roles";
+import { getCookie } from "@data/cookies";
+import { roleLabels } from "@config/role-labels";
+import { apiRequest } from "@/utils/apiClient";
+
+const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
+const buttonLabel = roleLabels[role];
+const userName = getCookie("username", Astro.cookies) || "";
+
+// Get user list
+const users = await apiRequest("/admin/get-user-list", { cookies: Astro.cookies });
+
+// Get token
+const token = getCookie("token", Astro.cookies) || "";
+---
+
+<MainLayout title="Crear regla de autorización" data={{ userName, buttonLabel, role }}>
+  <TextHeader
+    title="Crear regla de autorización"
+    subtitle="Define una nueva regla de autorización para los viajes"
+  />
+  <main>
+    <AuthRuleForm
+      client:only="react"
+      mode="create"
+      users={users}
+      token={token}
+    />
+  </main>
+</MainLayout>

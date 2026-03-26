@@ -36,6 +36,11 @@ export const statusColorMap: Record<string, TagType> = {
   
   // Default fallback
   'Desconocido': 'secondary',
+
+  // Auth Rules
+  'Internacional': 'success',
+  'Nacional': 'primary',
+  'Nacional e Internacional': 'alert',
 };
 
 /**

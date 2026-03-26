@@ -63,7 +63,14 @@ export function getSession(cookies?: APIContext["cookies"]): Session {
 
   if (!realCookies) {
     console.warn("[WARN] No cookies available, returning mock session");
-    return mockSession;
+    // return mockSession;
+    return {
+      username: "",
+      id: "",
+      department_id: "",
+      role: "" as UserRole,
+      token: "",
+    }
   }
 
   const username = realCookies.get("username")?.value || "";

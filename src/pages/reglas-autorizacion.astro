@@ -5,14 +5,74 @@
 
 import TextHeader from '@components/Layout/TextHeader.astro';
 import MainLayout from "@layouts/MainLayout.astro";
+import AuthRulesList from "@components/RequestsLists/AuthRulesList";
+
 import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
 import type { UserRole } from "@type/roles";
-import AuthRulesList from "@components/RequestsLists/AuthRulesList";
+import { apiRequest } from "@/utils/apiClient";
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
 const buttonLabel = roleLabels[role];
 const userName = getCookie("username", Astro.cookies) || "";
+
+// Get user list
+const users = await (async () => {
+  try {
+    return await apiRequest(`/admin/get-user-list`, {
+      cookies: Astro.cookies
+    });
+  } catch (error) {
+    console.error("Error al cargar los usuarios:", error);
+    return [];
+  }
+})();
+
+// Get auth rules list
+const authRules = [
+  {
+    "id": 1,
+    "name": "Regla por Defecto",
+    "is_default": true,
+    "niveles_autorizacion": 2,
+    "automatico": false,
+    "niveles": [
+      {
+        "nivel": 1,
+        "tipo": "jefe_directo",
+        "userId": null,
+        "userName": null
+      },
+      {
+        "nivel": 2,
+        "tipo": "usuario",
+        "userId": 1,
+        "userName": "diego.hernandez"
+      }
+    ],
+    "travel_type": "Nacional",
+    "min_duration": 0,
+    "max_duration": 2,
+    "min_amount": 100,
+    "max_amount": 200
+  },
+  {
+    "id": 2,
+    "name": "Viajes internacionales cortos",
+    "is_default": false,
+    "niveles_autorizacion": 3,
+    "automatico": true,
+    "niveles": [],
+    "travel_type": "Internacional",
+    "min_duration": 1,
+    "max_duration": 3,
+    "min_amount": 0,
+    "max_amount": 1000
+  }
+]
+
+// Get token
+const token = getCookie("token", Astro.cookies) || "";
 ---
 
 <MainLayout title="Reglas de Autorización" data={{userName, buttonLabel, role}}>
@@ -20,24 +80,13 @@ const userName = getCookie("username", Astro.cookies) || "";
     title="Reglas de Autorización"
     subtitle="Configura las reglas de autorización del sistema"
   />
-  <AuthRulesList
-    client:load
-    data = {[
-      {
-        id: 1,
-        name: "Regla 1",
-        description: "Descripción de la regla 1",
-        conditions: "Condiciones de la regla 1",
-        actions: "Acciones de la regla 1",
-      },
-      {
-        id: 2,
-        name: "Regla 2",
-        description: "Descripción de la regla 2",
-        conditions: "Condiciones de la regla 2",
-        actions: "Acciones de la regla 2",
-      },
-    ]}
-  />
+  <main>
+    <AuthRulesList
+      client:load
+      data={authRules}
+      users={users}
+      token={token}
+    />
+  </main>
 </MainLayout>
 
