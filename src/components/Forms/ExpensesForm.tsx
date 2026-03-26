@@ -13,6 +13,13 @@ import UploadReceiptFiles from "@/components/Forms/UploadReceiptFiles";
 import Toast from "@/components/Utils/Toast";
 import { apiRequest } from "@/utils/apiClient";
 
+const CURRENCY_SERIES: Record<string, string> = {
+  USD: 'SF43718',
+  EUR: 'SF46410',
+  CAD: 'SF60632',
+  JPY: 'SF46406',
+};
+
 interface Props {
   requestId: number;
   routes: any[]; // List of routes associated with the travel request
@@ -37,6 +44,7 @@ export default function ExpensesFormClient({ requestId, routes, token, receiptTo
   const [disabledButton, setDisabledButton] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [receiptIdToEdit, setReceiptIdToEdit] = useState<number | null>(null);
+  const [mxnEquivalent, setMxnEquivalent] = useState("");
 
   // Initialize form with receipt data if editing
   useEffect(() => {
@@ -67,6 +75,33 @@ export default function ExpensesFormClient({ requestId, routes, token, receiptTo
       setDisabledButton(false);
     }, duration);
   };
+
+  // Fetch MXN equivalent when monto or currency changes
+  useEffect(() => {
+    const seriesId = CURRENCY_SERIES[currency];
+    // If no valid currency or monto, clear equivalent
+    if (!seriesId || !monto || isNaN(parseFloat(monto))) {
+      setMxnEquivalent("");
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        const baseUrl = import.meta.env.PUBLIC_API_BASE_URL;
+        const res = await fetch(`${baseUrl}/exchange-rate?series=${seriesId}`);
+        const json = await res.json();
+        if (json.success && json.data?.rate) {
+          const equivalent = parseFloat(monto) * json.data.rate;
+          // Format of MXN string, example: "≈ $111.50 MXN"
+          setMxnEquivalent(`≈ $${equivalent.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`);
+        }
+      } catch {
+        setMxnEquivalent("");
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [monto, currency]);
 
   // Select MXN currency by default for national expenses
   useEffect(() => {
@@ -255,6 +290,7 @@ export default function ExpensesFormClient({ requestId, routes, token, receiptTo
             value={monto}
             onChange={(e) => setMonto(e.target.value)}
             required={true}
+            altText={mxnEquivalent}
           />
 
           <Select
@@ -268,6 +304,7 @@ export default function ExpensesFormClient({ requestId, routes, token, receiptTo
             <option value="USD">USD</option>
             <option value="EUR">EUR</option>
             <option value="CAD">CAD</option>
+            <option value="JPY">JPY</option>
           </Select>
         </div>
 
