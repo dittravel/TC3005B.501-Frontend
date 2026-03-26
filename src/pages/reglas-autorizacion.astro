@@ -29,47 +29,18 @@ const users = await (async () => {
 })();
 
 // Get auth rules list
-const authRules = [
-  {
-    "id": 1,
-    "name": "Regla por Defecto",
-    "is_default": true,
-    "niveles_autorizacion": 2,
-    "automatico": false,
-    "niveles": [
-      {
-        "nivel": 1,
-        "tipo": "jefe_directo",
-        "userId": null,
-        "userName": null
-      },
-      {
-        "nivel": 2,
-        "tipo": "usuario",
-        "userId": 1,
-        "userName": "diego.hernandez"
-      }
-    ],
-    "travel_type": "Nacional",
-    "min_duration": 0,
-    "max_duration": 2,
-    "min_amount": 100,
-    "max_amount": 200
-  },
-  {
-    "id": 2,
-    "name": "Viajes internacionales cortos",
-    "is_default": false,
-    "niveles_autorizacion": 3,
-    "automatico": true,
-    "niveles": [],
-    "travel_type": "Internacional",
-    "min_duration": 1,
-    "max_duration": 3,
-    "min_amount": 0,
-    "max_amount": 1000
+const authRules = await (async () => {
+  try {
+    return await apiRequest(`/admin/get-auth-rules`, {
+      cookies: Astro.cookies
+    });
+  } catch (error) {
+    console.error("Error al cargar las reglas de autorización:", error);
+    return [];
   }
-]
+})();
+
+console.log("Auth Rules:", authRules);
 
 // Get token
 const token = getCookie("token", Astro.cookies) || "";

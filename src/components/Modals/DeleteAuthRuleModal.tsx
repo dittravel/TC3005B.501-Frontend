@@ -37,7 +37,7 @@ export default function DeleteReceiptModal({
     setIsDeleting(true);
     try {
       const response = await fetch(
-        `${import.meta.env.PUBLIC_API_BASE_URL}/applicant/delete-auth-rule/${rule_id}`,
+        `${import.meta.env.PUBLIC_API_BASE_URL}/admin/delete-auth-rule/${rule_id}`,
         {
           method: 'DELETE',
           headers: {

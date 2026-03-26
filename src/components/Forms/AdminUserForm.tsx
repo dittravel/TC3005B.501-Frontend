@@ -19,6 +19,7 @@ interface FormData {
   workstation: string;
   email: string;
   phone_number: string;
+  boss_id?: number | '';
 }
 
 interface FormErrors {
@@ -27,7 +28,7 @@ interface FormErrors {
 
 interface CreateUserFormProps {
   mode: 'create' | 'edit';
-  user_data?: any; 
+  user_data?: any;
   redirectTo?: string;
   token: string; 
 }
@@ -57,7 +58,8 @@ const initialFormData: FormData = {
   password: '',
   workstation: '',
   email: '',
-  phone_number: ''
+  phone_number: '',
+  boss_id: ''
 };
 
 /**
@@ -72,9 +74,30 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token }: C
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
+  // State for boss list based on selected department
+  const [bossData, setBossData] = useState<any[]>([]);
+
+  const fetchBosses = async (departmentId: number) => {
+    try {
+      const bosses = await apiRequest(`/admin/get-boss-list/${departmentId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      // Filer out the current user
+      if (mode === 'edit' && user_data) {
+        const filteredBosses = bosses.filter((boss: any) => boss.user_id !== user_data.user_id);
+        setBossData(filteredBosses);
+      } else {
+        setBossData(bosses);
+      }
+    } catch (error) {
+      console.error("Error fetching boss list:", error);
+      setBossData([]);
+    }
+  };
+
   // Initialize form data based on mode and user data
   const [formData, setFormData] = useState<FormData>(() => {
-    if (mode === 'edit' && user_data) {
+    if (mode === 'edit' && user_data) {      
       return {
         role_id: roles.find(r => r.name === user_data.role_name)?.id ?? '',
         department_id: departments.find(d => d.name === user_data.department_name)?.id ?? '',
@@ -82,11 +105,21 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token }: C
         password: '',
         workstation: user_data.workstation,
         email: user_data.email,
-        phone_number: user_data.phone_number || ''
+        phone_number: user_data.phone_number || '',
+        boss_id: user_data.boss_id ?? ''
       };
     }
     return initialFormData;
   });
+  
+  // Fetch boss list when department changes
+  useEffect(() => {
+    if (formData.department_id) {
+      fetchBosses(formData.department_id);
+    } else {
+      setBossData([]);
+    }
+  }, [formData.department_id, token]);
 
   /**
    * Validates the form fields and sets error messages.
@@ -140,8 +173,9 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token }: C
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'role_id' || name === 'department_id' ?
-        (value === '' ? '' : parseInt(value)) : value
+      [name]: ['role_id', 'department_id', 'boss_id'].includes(name)
+        ? (value === '' ? '' : parseInt(value))
+        : value
     }));
 
     if (errors[name]) {
@@ -296,20 +330,18 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token }: C
             />
           </div>
 
-          {/* Workstation */}
-          <Input
-            type="text"
-            name="workstation"
-            label="Estación de Trabajo"
-            value={formData.workstation}
-            onChange={handleInputChange}
-            error={errors.workstation}
-            placeholder="Ej: WS-001"
-            required
-          />
-
-          {/* Role and Department */}
+          {/* Workstation and Role */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Input
+              type="text"
+              name="workstation"
+              label="Estación de Trabajo"
+              value={formData.workstation}
+              onChange={handleInputChange}
+              error={errors.workstation}
+              placeholder="Ej: WS-001"
+              required
+            />
             <Select
               label="Rol"
               name="role_id"
@@ -325,7 +357,10 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token }: C
                 </option>
               ))}
             </Select>
+          </div>
 
+          {/* Department and Boss */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Select
               label="Departamento"
               name="department_id"
@@ -338,6 +373,20 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token }: C
               {departments.map(dep => (
                 <option key={dep.id} value={dep.id}>
                   {dep.name}
+                </option>
+              ))}
+            </Select>
+            <Select
+              label="Jefe"
+              name="boss_id"
+              value={formData.boss_id || ''}
+              onChange={handleInputChange}
+              error={errors.boss_id}
+            >
+              <option value="">Sin jefe</option>
+              {bossData && bossData.map((boss: any) => (
+                <option key={boss.user_id} value={boss.user_id}>
+                  {boss.user_name}
                 </option>
               ))}
             </Select>

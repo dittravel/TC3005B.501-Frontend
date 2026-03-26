@@ -39,6 +39,7 @@ export default function AuthRulesList({ data, users, token, itemsPerPage = 5 }: 
       <DefaultAuthRule
         users={users}
         defaultRule={defaultRule}
+        token={token}
       />
       {/* Header with total count of rules */}
       <div className="flex items-center justify-between">
@@ -74,11 +75,11 @@ export default function AuthRulesList({ data, users, token, itemsPerPage = 5 }: 
                   <div className="space-y-2">
                     <p>
                       <span className="font-semibold">Niveles:</span>{" "}
-                      {request.niveles_autorizacion ?? "–"}
+                      {request.num_levels ?? "–"}
                     </p>
                     <p>
                       <span className="font-semibold">Automático:</span>{" "}
-                      {request.automatico ? "Sí" : "No"}
+                      {request.automatic ? "Sí" : "No"}
                     </p>
                   </div>
                   <div className="space-y-2">
@@ -126,7 +127,7 @@ export default function AuthRulesList({ data, users, token, itemsPerPage = 5 }: 
       ) : (
         <Card className="text-center py-8">
           <p className="text-text-secondary font-semibold">
-            No cuentas con viajes completados, rechazados o cancelados
+            No existen reglas de autorización adicionales
           </p>
         </Card>
       )}

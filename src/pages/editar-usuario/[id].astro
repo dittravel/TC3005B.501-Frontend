@@ -16,6 +16,7 @@ const buttonLabel = roleLabels[role];
 const userName = getCookie("username", Astro.cookies) || "";
 const { id } = Astro.params;
 
+// Fetch user data
 let user_data = null;
 try {
   user_data = await apiRequest(`/user/get-user-data/${id}`, { cookies: Astro.cookies });
