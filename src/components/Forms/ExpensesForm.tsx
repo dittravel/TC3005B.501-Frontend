@@ -13,6 +13,14 @@ import UploadReceiptFiles from "@/components/Forms/UploadReceiptFiles";
 import Toast from "@/components/Utils/Toast";
 import { apiRequest } from "@/utils/apiClient";
 
+interface CurrencyOption {
+  currency: string;
+  name: string;
+  country: string;
+  banxico_series_id: string | null;
+  frequency: string;
+}
+
 interface Props {
   requestId: number;
   routes: any[]; // List of routes associated with the travel request
@@ -37,6 +45,23 @@ export default function ExpensesFormClient({ requestId, routes, token, receiptTo
   const [disabledButton, setDisabledButton] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [receiptIdToEdit, setReceiptIdToEdit] = useState<number | null>(null);
+  const [mxnEquivalent, setMxnEquivalent] = useState("");
+  const [currencies, setCurrencies] = useState<CurrencyOption[]>([]);
+
+  // Fetch currency catalog from the backend on mount
+  useEffect(() => {
+    const fetchCurrencies = async () => {
+      try {
+        const baseUrl = import.meta.env.PUBLIC_API_BASE_URL;
+        const res = await fetch(`${baseUrl}/exchange-rate/catalog`);
+        const json = await res.json();
+        if (json.success) setCurrencies(json.data);
+      } catch {
+        // Silently fail — fallback options are shown in the Select
+      }
+    };
+    fetchCurrencies();
+  }, []);
 
   // Initialize form with receipt data if editing
   useEffect(() => {
@@ -67,6 +92,33 @@ export default function ExpensesFormClient({ requestId, routes, token, receiptTo
       setDisabledButton(false);
     }, duration);
   };
+
+  // Fetch MXN equivalent when monto or currency changes
+  useEffect(() => {
+    const seriesId = currencies.find(c => c.currency === currency)?.banxico_series_id;
+    // If no valid currency, monto, or series (e.g. MXN has no series), clear equivalent
+    if (!seriesId || !monto || isNaN(parseFloat(monto))) {
+      setMxnEquivalent("");
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        const baseUrl = import.meta.env.PUBLIC_API_BASE_URL;
+        const res = await fetch(`${baseUrl}/exchange-rate?series=${seriesId}`);
+        const json = await res.json();
+        if (json.success && json.data?.rate) {
+          const equivalent = parseFloat(monto) * json.data.rate;
+          // Format of MXN string, example: "≈ $111.50 MXN"
+          setMxnEquivalent(`≈ $${equivalent.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`);
+        }
+      } catch {
+        setMxnEquivalent("");
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [monto, currency, currencies]);
 
   // Select MXN currency by default for national expenses
   useEffect(() => {
@@ -255,6 +307,7 @@ export default function ExpensesFormClient({ requestId, routes, token, receiptTo
             value={monto}
             onChange={(e) => setMonto(e.target.value)}
             required={true}
+            altText={mxnEquivalent}
           />
 
           <Select
@@ -264,10 +317,22 @@ export default function ExpensesFormClient({ requestId, routes, token, receiptTo
             onChange={(e) => setCurrency(e.target.value)}
             required={true}
           >
-            <option value="MXN">MXN</option>
-            <option value="USD">USD</option>
-            <option value="EUR">EUR</option>
-            <option value="CAD">CAD</option>
+            {currencies.length > 0 ? (
+              currencies.map(c => (
+                <option key={c.currency} value={c.currency}>
+                  {c.currency} — {c.name}
+                </option>
+              ))
+            ) : (
+              // Fallback while currencies are loading
+              <>
+                <option value="MXN">MXN — Mexican Peso</option>
+                <option value="USD">USD — US Dollar</option>
+                <option value="EUR">EUR — Euro</option>
+                <option value="CAD">CAD — Canadian Dollar</option>
+                <option value="JPY">JPY — Japanese Yen</option>
+              </>
+            )}
           </Select>
         </div>
 
