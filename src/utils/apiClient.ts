@@ -45,23 +45,17 @@ interface ApiOptions {
   cookies?: import("astro").APIContext["cookies"];
 }
 
-/**
- * Makes an API request to the backend with the given path and options.
- * It automatically includes the JWT token from cookies for authentication.
- * The function also handles SSL certificate issues in development environments.
- * 
- * @param path - The API endpoint path (e.g., '/applicant/get-user-requests/1')
- * @param options - Optional configuration for the request, including method, data, headers, and cookies
- * @returns A promise that resolves to the response data from the API
- * @throws An error if the request fails or if the response is not ok
- */
+const BASE_URL = import.meta.env.PUBLIC_API_BASE_URL || 'https://localhost:3000/api';
+
+
 export async function apiRequest<T = any>(
   path: string,
   options: ApiOptions = {}
 ): Promise<T> {
-  const baseUrl = import.meta.env.PUBLIC_API_BASE_URL;
-  const { method = 'GET', data, headers = {}, cookies } = options;
+  const { method = 'GET', data, headers, cookies } = options;
 
+  const url = `${BASE_URL}${path}`;
+  
   let token = "";
   try {
     const session = getSession(cookies); 
@@ -84,12 +78,13 @@ export async function apiRequest<T = any>(
   try {
     // For Node.js in development, the NODE_TLS_REJECT_UNAUTHORIZED env var handles this
     // For browsers, we can't directly modify SSL validation behavior
-    const res = await fetch(`${baseUrl}${path}`, config);
+    // ^eso que?
+    const res = await fetch(url, config);
 
     if (!res.ok) {
       let errorData: any;
       const contentType = res.headers.get('content-type');
-      
+
       if (contentType && contentType.includes('application/json')) {
         try {
           errorData = await res.json();
@@ -99,14 +94,19 @@ export async function apiRequest<T = any>(
       } else {
         errorData = { message: await res.text() };
       }
-      
+
       throw {
         status: res.status,
         response: errorData
       };
     }
 
-    return await res.json();
+    const text = await res.text();
+    try {
+      return JSON.parse(text);
+    } catch {
+      return text as any;
+    }
   } catch (error) {
     console.error("API request failed:", error);
     throw {
