@@ -78,7 +78,6 @@ export async function apiRequest<T = any>(
   try {
     // For Node.js in development, the NODE_TLS_REJECT_UNAUTHORIZED env var handles this
     // For browsers, we can't directly modify SSL validation behavior
-    // ^eso que?
     const res = await fetch(url, config);
 
     if (!res.ok) {
