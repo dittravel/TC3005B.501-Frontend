@@ -40,8 +40,6 @@ const authRules = await (async () => {
   }
 })();
 
-console.log("Auth Rules:", authRules);
-
 // Get token
 const token = getCookie("token", Astro.cookies) || "";
 ---
