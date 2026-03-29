@@ -59,6 +59,7 @@ export const roleRoutes: Record<UserRole, string[]> = {
     '/dashboard',
     '/perfil-usuario',
     '/crear-usuario','/editar-usuario/*',
+    '/importar-datos',
     '/reglas-autorizacion','/crear-regla','/editar-regla/*',
     '/roles',
     '/politicas-reembolso'
