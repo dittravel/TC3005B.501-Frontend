@@ -32,8 +32,8 @@ export default function AuthRulesList({ data, itemsPerPage = 5 }: Props) {
         <h2 className="text-xl font-semibold text-text-primary">
           Reglas de Autorización ({data.length})
         </h2>
-        <Button variant="filled" color="secondary">
-          Crear Regla
+        <Button variant="filled" color="secondary" href="/crear-regla">
+          + Crear Regla
         </Button>
       </div>
       {data.length > 0 ? (
