@@ -36,12 +36,22 @@ const users = await (async () => {
   }
 })();
 
+// Order users by user_id
+if (users && users.length > 0) {
+  users.sort((a: User, b: User) => a.user_id - b.user_id);
+}
+
 // Get user info from cookies
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
 const userName = getCookie("username", Astro.cookies);
 ---
 
 <div>
+  <ImportUsersButton 
+    client:load
+    endpoint="/admin/import-data"
+    token={getCookie("token", Astro.cookies) || ""}
+  />
   {/* Error message */}
   {errorMessage ? (
     <div class="bg-warning-50 border border-warning-500 text-warning-500 px-4 py-3 rounded mb-4">

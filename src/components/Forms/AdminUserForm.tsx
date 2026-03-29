@@ -30,26 +30,10 @@ interface CreateUserFormProps {
   mode: 'create' | 'edit';
   user_data?: any;
   redirectTo?: string;
+  departments?: any[];
+  roles?: any[];
   token: string; 
 }
-
-const roles = [
-  { id: 1, name: 'Solicitante' },
-  { id: 2, name: 'Agencia de viajes' },
-  { id: 3, name: 'Cuentas por pagar' },
-  { id: 4, name: 'N1' },
-  { id: 5, name: 'N2' },
-  { id: 6, name: 'Administrador' }
-];
-
-const departments = [
-  { id: 1, name: 'Finanzas' },
-  { id: 2, name: 'Recursos Humanos' },
-  { id: 3, name: 'IT' },
-  { id: 4, name: 'Marketing' },
-  { id: 5, name: 'Operaciones' },
-  { id: 6, name: 'Administración' }
-];
 
 const initialFormData: FormData = {
   role_id: '',
@@ -69,7 +53,7 @@ const initialFormData: FormData = {
  * @param {string} props.redirectTo - URL to redirect after successful form submission.
  * @param {string} props.token - Authorization token for API requests.
  */
-export default function CreateUserForm({ mode, user_data, redirectTo, token }: CreateUserFormProps) {
+export default function CreateUserForm({ mode, user_data, redirectTo, token, departments = [], roles = [] }: CreateUserFormProps) {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -99,8 +83,8 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token }: C
   const [formData, setFormData] = useState<FormData>(() => {
     if (mode === 'edit' && user_data) {      
       return {
-        role_id: roles.find(r => r.name === user_data.role_name)?.id ?? '',
-        department_id: departments.find(d => d.name === user_data.department_name)?.id ?? '',
+        role_id: roles.find(r => r.role_name === user_data.role_name)?.role_id ?? '',
+        department_id: departments.find(d => d.department_name === user_data.department_name)?.department_id ?? '',
         user_name: user_data.user_name,
         password: '',
         workstation: user_data.workstation,
@@ -352,8 +336,8 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token }: C
             >
               <option value="">Seleccionar rol</option>
               {roles.map(role => (
-                <option key={role.id} value={role.id}>
-                  {role.name}
+                <option key={role.role_id} value={role.role_id}>
+                  {role.role_name}
                 </option>
               ))}
             </Select>
@@ -371,8 +355,8 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token }: C
             >
               <option value="">Seleccionar departamento</option>
               {departments.map(dep => (
-                <option key={dep.id} value={dep.id}>
-                  {dep.name}
+                <option key={dep.department_id} value={dep.department_id}>
+                  {dep.department_name}
                 </option>
               ))}
             </Select>
