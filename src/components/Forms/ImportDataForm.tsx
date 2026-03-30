@@ -9,13 +9,11 @@ import ImportDataButton from "@/components/Buttons/ImportDataButton";
 // Example XML structure to show in the UI as a reference
 const exampleXml = 
 `<Organizacion name="Mi Empresa">
-  <Departamento name="Finanzas">
-    <CentroCosto name="CC-FN-01" nombre="Viajes"/>
+  <Departamento name="Finanzas" cost_center="CC-FN-01">
     <Empleado usuario="laura.flores" rol="Autorizador" />
     <Empleado usuario="andres.gomez" rol="Solicitante" jefe_usuario="laura.flores" />
   </Departamento>
-  <Departamento name="Recursos Humanos">
-    <CentroCosto name="CC-RH-01" nombre="Capacitación"/>
+  <Departamento name="Recursos Humanos" cost_center="CC-RH-01">
     <Empleado usuario="miguel.de.cervantes" rol="Autorizador" />
   </Departamento>
 </Organizacion>`;

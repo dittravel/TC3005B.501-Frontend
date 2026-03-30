@@ -21,11 +21,11 @@ interface ImportResponse {
   message: string;
   summary?: {
     departments: {
-      created: string[];
+      created: Array<{ name: string, cost_center: string }>;
       skipped: string[];
     };
     costCenters: {
-      created: Array<{ name: string; department: string }>;
+      created: string[];
       skipped: string[];
     };
     users: {
@@ -176,16 +176,16 @@ export default function ImportDataButton({ endpoint, token }: Props) {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {/* Departments */}
             <SummaryCard title="Departamentos">
-              <SummaryItem label="Creados" items={importData.summary.departments.created} type="success" />
+              <SummaryItem
+                label="Creados"
+                items={importData.summary.departments.created.map(d => `${d.name} (CC: ${d.cost_center})`)}
+                type="success"
+              />
               <SummaryItem label="Omitidos" items={importData.summary.departments.skipped} type="warning" />
             </SummaryCard>
             {/* Cost Centers */}
             <SummaryCard title="Centros de Costo">
-              <SummaryItem
-                label="Creados"
-                items={importData.summary.costCenters.created.map(cc => cc.name)}
-                type="success"
-              />
+              <SummaryItem label="Creados" items={importData.summary.costCenters.created} type="success" />
               <SummaryItem label="Omitidos" items={importData.summary.costCenters.skipped} type="warning" />
             </SummaryCard>
             {/* Users */}
