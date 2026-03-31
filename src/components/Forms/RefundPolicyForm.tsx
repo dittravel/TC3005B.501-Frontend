@@ -39,6 +39,7 @@ interface RefundPolicyProps {
 }
 
 
+// Renders the default refund policy form and paginated list of existing policies.
 export default function RefundPolicyForm({ role, data, itemsPerPage = 5, token }: RefundPolicyProps) {
   const [page, setPage] = useState(1);
   const totalPages = Math.ceil(data.length / itemsPerPage);
@@ -46,7 +47,7 @@ export default function RefundPolicyForm({ role, data, itemsPerPage = 5, token }
   const end = start + itemsPerPage;
   const pageRequests = data.slice(start, end);
 
-  // Refund policy form state
+  // Default refund policy form state
   const [refundPolicyData, setRefundPolicyData] = useState<DefaultReturnPolicyFormData>({
     minAmount: 0,
     maxAmount: 1,
@@ -55,18 +56,19 @@ export default function RefundPolicyForm({ role, data, itemsPerPage = 5, token }
     validateAgainstPredefinedInput: false
   });
 
-  // Verificar
   const [refundPolicyErrors, setRefundPolicyErrors] = useState<Record<string, boolean>>({});
 
   const [selectedValidations, setSelectedValidations] = useState<Set<string | number>>(new Set());
 
-  // Default refund policy handlers
+  // Updates numeric form fields and clears field-level error state.
   const handleRefundPolicyChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setRefundPolicyData(prev => ({ ...prev, [name]: value }));
+    const numericValue = Number(value);
+    setRefundPolicyData(prev => ({ ...prev, [name]: numericValue }));
     setRefundPolicyErrors(prev => ({ ...prev, [name]: false }));
   };
 
+  // Syncs checkbox selections with the corresponding validation flags in form state.
   const handleValidationChange = (values: Set<string | number>) => {
     setSelectedValidations(new Set(values));
     setRefundPolicyData(prev => ({
@@ -76,10 +78,10 @@ export default function RefundPolicyForm({ role, data, itemsPerPage = 5, token }
     }));
   };
 
+  // Validates and submits the default refund policy form.
   const handleRefundPolicySubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Validate required fields
     const errors: Record<string, boolean> = {};
     Object.entries(refundPolicyData).forEach(([key, value]) => {
       if (typeof value === 'number' && value === 0) {
@@ -87,19 +89,22 @@ export default function RefundPolicyForm({ role, data, itemsPerPage = 5, token }
       }
     });
 
-    // Verificar
-    // if (selectedValidations.size === 0) {
-    //   alert('Por favor seleccione al menos una validación');
-    //   return;
-    // }
-
     if (Object.keys(errors).length > 0) {
       setRefundPolicyErrors(errors);
       alert('Por favor complete todos los campos requeridos');
       return;
     }
 
-    // Success message
+    if (refundPolicyData.minAmount >= refundPolicyData.maxAmount) {
+      setRefundPolicyErrors(prev => ({
+        ...prev,
+        minAmount: true,
+        maxAmount: true
+      }));
+      alert('El monto mínimo debe ser menor al monto máximo');
+      return;
+    }
+
     alert('Información de política de reembolso guardada correctamente');
     setRefundPolicyData({
       minAmount: 0,
@@ -135,6 +140,7 @@ export default function RefundPolicyForm({ role, data, itemsPerPage = 5, token }
               value={refundPolicyData.minAmount}
               onChange={handleRefundPolicyChange}
               min={0}
+              //max={refundPolicyData.maxAmount > 0 ? refundPolicyData.maxAmount - 1 : undefined}
             />
             <label className="text-sm font-medium text-text-primary">
               y
@@ -145,7 +151,7 @@ export default function RefundPolicyForm({ role, data, itemsPerPage = 5, token }
               required={true}
               value={refundPolicyData.maxAmount}
               onChange={handleRefundPolicyChange}
-              min={1}
+              min={Math.max(1, refundPolicyData.minAmount + 1)}
             />
             <span className="text-sm font-medium text-text-primary">MXN</span>
           </div>
@@ -184,7 +190,7 @@ export default function RefundPolicyForm({ role, data, itemsPerPage = 5, token }
         </form>
       </div>
 
-      {/* Refund Policy History Section */}
+      {/* Refund Policies Section */}
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-text-primary">
           Políticas de Reembolso ({data.length})
@@ -263,7 +269,7 @@ export default function RefundPolicyForm({ role, data, itemsPerPage = 5, token }
       ) : (
         <Card className="text-center py-8">
           <p className="text-text-secondary font-semibold">
-            No cuentas con viajes completados, rechazados o cancelados
+            No cuentas con políticas de reembolso creadas
           </p>
         </Card>
       )}
