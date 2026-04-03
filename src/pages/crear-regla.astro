@@ -1,0 +1,32 @@
+---
+/**
+ * crear-regla.astro
+ *
+ * Admin-only page for creating a new authorization rule.
+ */
+
+ import TextHeader from '@components/Layout/TextHeader.astro';
+ import MainLayout from "@layouts/MainLayout.astro";
+ import { getCookie } from "@data/cookies";
+ import { roleLabels } from "@config/role-labels";
+ import type { UserRole } from "@type/roles";
+ import CreateAuthRuleForm from "@/components/Forms/CreateAuthRuleForm";
+
+ const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
+ const buttonLabel = roleLabels[role];
+ const userName = getCookie("username", Astro.cookies) || "";
+
+ if (role !== "Administrador") {
+    return Astro.redirect("/404");
+ }
+ ---
+
+ <MainLayout title="Crear Regla de Autorización" data={{userName, buttonLabel, role}}>
+    <TextHeader
+        title="Crear Regla de Autorización"
+        subtitle="Define los niveles de autorización y condiciones para esta regla"
+    />
+    <main>
+        <CreateAuthRuleForm client:only="react" />
+    </main>
+</MainLayout>
