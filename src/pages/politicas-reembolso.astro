@@ -23,6 +23,7 @@ const userName = getCookie("username", Astro.cookies) || "";
     />
     <main>
       <RefundPolicyForm
+        token=""
         role={role}
         client:only="react"
         data = {[
