@@ -19,7 +19,7 @@ const buttonLabel = roleLabels[role];
 import { apiRequest } from "@/utils/apiClient";
 
 // Status corresponding to TravelAgency
-const status = 5;
+const status = 4;
 const requests = await (async () => {
   try {
     return await apiRequest(`/user/get-travel-requests/${getCookie("id", Astro.cookies)}/${status}`, { cookies: Astro.cookies });
