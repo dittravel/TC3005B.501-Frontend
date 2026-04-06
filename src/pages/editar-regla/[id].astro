@@ -1,0 +1,40 @@
+---
+/**
+ * Auth Rules Edit Page
+ */
+
+import TextHeader from "@components/Layout/TextHeader.astro";
+import MainLayout from "@layouts/MainLayout.astro";
+
+import type { UserRole } from "@type/roles";
+import { getCookie } from "@data/cookies";
+import { roleLabels } from "@config/role-labels";
+import { apiRequest } from "@/utils/apiClient";
+import CreateAuthRuleForm from "@/components/Forms/CreateAuthRuleForm";
+
+const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
+const buttonLabel = roleLabels[role];
+const userName = getCookie("username", Astro.cookies) || "";
+
+// Get token
+const token = getCookie("token", Astro.cookies) || "";
+
+// Get auth rule details
+const { id } = Astro.params;
+const rule = await apiRequest(`/admin/auth-rules/${id}`, { cookies: Astro.cookies });
+---
+
+<MainLayout title="Editar regla de autorización" data={{ userName, buttonLabel, role }}>
+  <TextHeader
+    title="Editar regla de autorización"
+    subtitle="Modifica las condiciones y niveles de autorización"
+  />
+  <main>
+    <CreateAuthRuleForm
+      client:only="react"
+      mode="edit"
+      data={rule}
+      token={token}
+    />
+  </main>
+</MainLayout>

@@ -5,65 +5,112 @@
  */
 
 import { useState } from "react";
+import { getStatusTagType } from "@/utils/statusMapper";
+
+import DefaultAuthRule from "@/components/Forms/DefaultAuthRule";
+import DeleteAuthRuleModal from "@/components/Modals/DeleteAuthRuleModal";
+
 import Pagination from "@/components/Table/Pagination";
 import Card from "@/components/Utils/Card";
-import { getStatusTagType } from "@/utils/statusMapper";
-import DefaultAuthRule from "@/components/Forms/DefaultAuthRule";
 import Button from "@/components/Buttons/Button";
 
 interface Props {
   data: any[];
+  token: string;
   itemsPerPage?: number;
 }
 
-export default function AuthRulesList({ data, itemsPerPage = 5 }: Props) {
+export default function AuthRulesList({ data, token, itemsPerPage = 5 }: Props) {
+  // Separate default and non-default rules
+  const defaultRule = data.find(rule => rule.is_default);
+  const rules = data.filter(rule => !rule.is_default);
+
+  // Pagination state
   const [page, setPage] = useState(1);
   const totalPages = Math.ceil(data.length / itemsPerPage);
   const start = (page - 1) * itemsPerPage;
   const end = start + itemsPerPage;
-  const pageRequests = data.slice(start, end);
+  const pageRequests = rules.slice(start, end);
 
   return (
     <div className="space-y-6">
       {/* Default Auth Rule */}
-      <DefaultAuthRule />
+      <DefaultAuthRule
+        defaultRule={defaultRule}
+        token={token}
+      />
       {/* Header with total count of rules */}
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-text-primary">
-          Reglas de Autorización ({data.length})
+          Reglas de Autorización ({rules.length})
         </h2>
-        <Button variant="filled" color="secondary" href="/crear-regla">
-          + Crear Regla
+        <Button
+          variant="filled"
+          color="secondary"
+          href="/crear-regla"
+        >
+          Crear Regla
         </Button>
       </div>
-      {data.length > 0 ? (
+      {rules.length > 0 ? (
         <div className="space-y-6">
-          {pageRequests.map((request: any) => (
+          {pageRequests.map((rule: any, index: number) => (
             <Card
-              key={request.request_id}
-              href={`/detalles-solicitud/${request.request_id}`}
-              tag={{ text: `Solicitud #${request.request_id}`, type: 'secondary' }}
+              key={rule.rule_id}
+              tag={{ text: `#${rule.rule_id}`, type: 'secondary' }}
               status={{
-                text: request.status || 'Desconocido',
-                type: getStatusTagType(request.status),
+                text: rule.travel_type || 'Desconocido',
+                type: getStatusTagType(rule.travel_type),
               }}
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-1">
-                  <p className="text-sm text-text-primary">
-                    <span className="font-semibold">Origen:</span> {request.origin_country}
-                  </p>
-                  <p className="text-sm text-text-primary">
-                    <span className="font-semibold">Destino:</span> {request.destination_country}
-                  </p>
+              <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr_1fr] gap-8">
+                {/* Name */}
+                <h2 className="flex items-center gap-2 text-lg font-semibold text-text-primary">
+                  {rule.rule_name}
+                </h2>
+                {/* Details */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-text-primary">
+                  <div className="space-y-2">
+                    <p>
+                      <span className="font-semibold">Niveles:</span>{" "}
+                      {rule.num_levels ?? "–"}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Automático:</span>{" "}
+                      {rule.automatic ? "Sí" : "No"}
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <p>
+                      <span className="font-semibold">Duración:</span>{" "}
+                      {rule.min_duration ?? 0}–{rule.max_duration ?? "-"} día(s)
+                    </p>
+                    <p>
+                      <span className="font-semibold">Monto:</span>{" "}
+                      ${rule.min_amount ?? 0}–{rule.max_amount ?? "-"} MXN
+                    </p>
+                  </div>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-text-primary">
-                    <span className="font-semibold">Fecha Inicio:</span> {request.beginning_date}
-                  </p>
-                  <p className="text-sm text-text-primary">
-                    <span className="font-semibold">Fecha Fin:</span> {request.ending_date}
-                  </p>
+                {/* Actions */}
+                <div>
+                  <div className="w-full flex flex-row gap-2">
+                    <Button
+                      variant="filled"
+                      color="primary"
+                      className="w-full"
+                      href={`/editar-regla/${rule.rule_id}`}
+                    >
+                      <span className="flex justify-center">
+                        Editar
+                      </span>
+                    </Button>
+                    <DeleteAuthRuleModal
+                      title="Eliminar Regla"
+                      message="¿Estás seguro de que deseas eliminar esta regla de autorización?"
+                      token={token}
+                      rule_id={rule.rule_id}
+                    />
+                  </div>
                 </div>
               </div>
             </Card>
@@ -78,7 +125,7 @@ export default function AuthRulesList({ data, itemsPerPage = 5 }: Props) {
       ) : (
         <Card className="text-center py-8">
           <p className="text-text-secondary font-semibold">
-            No cuentas con viajes completados, rechazados o cancelados
+            No existen reglas de autorización adicionales
           </p>
         </Card>
       )}

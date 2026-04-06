@@ -7,12 +7,63 @@
 import type { UserRole } from '@type/roles';
 
 export const roleRoutes: Record<UserRole, string[]> = {
-  'Solicitante': ['/dashboard', '/perfil-usuario','/crear-solicitud','/historial','/reembolso','/solicitudes-draft','/comprobar-gastos','/completar-draft/*','/editar-solicitud/*','/comprobar-solicitud/*','/detalles-solicitud/*','/subir-comprobante/*','/resubir-comprobante/*','/editar-comprobante/*'],
-  'Agencia de viajes': ['/dashboard', '/perfil-usuario', '/atenciones', '/atender-solicitud/*'],
-  'Cuentas por pagar': ['/dashboard', '/perfil-usuario', '/cotizaciones', '/comprobaciones', '/cotizar-solicitud/*', '/comprobar-gastos/*'],
-  'N1': ['/dashboard', '/perfil-usuario', '/solicitudes-autorizador', '/crear-solicitud','/historial','/reembolso','/solicitudes-draft','/comprobar-gastos','/completar-draft/*','/editar-solicitud/*','/comprobar-solicitud/*','/autorizaciones','/detalles-solicitud/*','/autorizar-solicitud/*','/subir-comprobante/*','/editar-comprobante/*'],
-  'N2': ['/dashboard', '/perfil-usuario', '/solicitudes-autorizador', '/crear-solicitud','/historial','/reembolso','/solicitudes-draft','/comprobar-gastos','/completar-draft/*','/editar-solicitud/*','/comprobar-solicitud/*','/autorizaciones','/detalles-solicitud/*','/autorizar-solicitud/*','/subir-comprobante/*','/editar-comprobante/*'],
-  'Administrador': ['/dashboard', '/perfil-usuario','/crear-usuario', '/editar-usuario/*', '/reglas-autorizacion', '/roles', '/politicas-reembolso', '/crear-regla'],
+  'Solicitante': [
+    '/dashboard',
+    '/perfil-usuario',
+    '/crear-solicitud',
+    '/historial',
+    '/reembolso',
+    '/solicitudes-draft',
+    '/comprobar-gastos',
+    '/completar-draft/*',
+    '/editar-solicitud/*',
+    '/comprobar-solicitud/*',
+    '/detalles-solicitud/*',
+    '/subir-comprobante/*',
+    '/resubir-comprobante/*',
+    '/editar-comprobante/*'
+  ],
+  'Agencia de viajes': [
+    '/dashboard',
+    '/perfil-usuario',
+    '/atenciones',
+    '/atender-solicitud/*'
+  ],
+  'Cuentas por pagar': [
+    '/dashboard',
+    '/perfil-usuario',
+    '/cotizaciones',
+    '/comprobaciones',
+    '/cotizar-solicitud/*',
+    '/comprobar-gastos/*'
+  ],
+  'Autorizador': [
+    '/dashboard',
+    '/perfil-usuario',
+    '/solicitudes-autorizador',
+    '/crear-solicitud',
+    '/historial',
+    '/reembolso',
+    '/solicitudes-draft',
+    '/comprobar-gastos',
+    '/completar-draft/*',
+    '/editar-solicitud/*',
+    '/comprobar-solicitud/*',
+    '/autorizaciones',
+    '/detalles-solicitud/*',
+    '/autorizar-solicitud/*',
+    '/subir-comprobante/*',
+    '/editar-comprobante/*'
+  ],
+  'Administrador': [
+    '/dashboard',
+    '/perfil-usuario',
+    '/crear-usuario','/editar-usuario/*',
+    '/importar-datos',
+    '/reglas-autorizacion','/crear-regla','/editar-regla/*',
+    '/roles',
+    '/politicas-reembolso'
+  ],
 };
 
 // Flatten all routes into a single array for easy access control checks

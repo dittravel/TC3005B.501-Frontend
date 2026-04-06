@@ -36,6 +36,22 @@ export const statusColorMap: Record<string, TagType> = {
   
   // Default fallback
   'Desconocido': 'secondary',
+
+  // Auth Rules
+  'Internacional': 'success',
+  'Nacional': 'primary',
+  'Nacional e Internacional': 'alert',
+
+  // User Roles
+  'Administrador': 'primary',
+  'Autorizador': 'success',
+  'Solicitante': 'default',
+  'Agencia de viajes': 'warning',
+  'Cuentas por pagar': 'alert',
+
+  // Email Action Results
+  'approved': 'success',
+  'declined': 'alert',
 };
 
 /**
