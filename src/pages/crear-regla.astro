@@ -27,6 +27,10 @@ if (role !== "Administrador") {
       subtitle="Define los niveles de autorización y condiciones para esta regla"
   />
   <main>
-    <CreateAuthRuleForm client:only="react" />
+    <CreateAuthRuleForm
+      client:only="react"
+      mode="create"
+      token={getCookie("token", Astro.cookies) || ""}
+    />
   </main>
 </MainLayout>

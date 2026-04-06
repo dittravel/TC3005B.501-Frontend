@@ -13,19 +13,18 @@ import Checkbox from "@/components/Utils/Checkbox";
 import { apiRequest } from "@/utils/apiClient";
 
 interface Props {
-  users: any[];
   defaultRule?: any;
   token: string;
 }
 
-export default function DefaultAuthRule({ users, defaultRule, token }: Props) {
-  const [niveles, setNiveles] = useState(0);
+export default function DefaultAuthRule({ defaultRule, token }: Props) {
+  const [niveles, setNiveles] = useState(1);
   const [automatico, setAutomatico] = useState(false);
   const [autorizadores, setAutorizadores] = useState<string[]>([]);
 
-  // Track if "Usuario Especifico" is selected for each level
-  const [isUserSelected, setIsUserSelected] = useState<boolean[]>([]);
-  const [selectedUsers, setSelectedUsers] = useState<(string | null)[]>([]);
+  // Track if "Nivel Superior" is selected for each level
+  const [isSuperiorSelected, setIsSuperiorSelected] = useState<boolean[]>([]);
+  const [selectedLevels, setSelectedLevels] = useState<(string | null)[]>([]);
 
   // Load default rule data
   useEffect(() => {
@@ -38,31 +37,31 @@ export default function DefaultAuthRule({ users, defaultRule, token }: Props) {
 
     // Initialize arrays to track type of authorizer and users
     const nextAutorizadores: string[] = [];
-    const nextIsUserSelected: boolean[] = [];
-    const nextSelectedUsers: (string | null)[] = [];
+    const nextIsSuperiorSelected: boolean[] = [];
+    const nextSelectedLevels: (string | null)[] = [];
 
-    // For each level, determine type and/or user
+    // For each level, determine type and number of leveks
     for (let i = 0; i < nivelesFromRule; i++) {
       // Find config for this level in the default rule data
-      const nivelConfig = defaultRule.levels?.find((n: any) => n.level === i + 1);
+      const nivelConfig = defaultRule.levels?.find((n: any) => n.level_number === i + 1);
 
       // If there is a config for this level, set array values
       if (nivelConfig) {
-        nextAutorizadores[i] = nivelConfig.type || "";
-        const isUsuario = nivelConfig.type === "Usuario";
-        nextIsUserSelected[i] = isUsuario;
-        nextSelectedUsers[i] = isUsuario ? (nivelConfig.user_id || "") : "";
+        nextAutorizadores[i] = nivelConfig.level_type || "";
+        const isSuperior = nivelConfig.level_type === "Nivel Superior";
+        nextIsSuperiorSelected[i] = isSuperior;
+        nextSelectedLevels[i] = isSuperior ? (nivelConfig.superior_level_number || "") : "";
       } else {
         // If no config for this level, set defaults
         nextAutorizadores[i] = "";
-        nextIsUserSelected[i] = false;
-        nextSelectedUsers[i] = "";
+        nextIsSuperiorSelected[i] = false;
+        nextSelectedLevels[i] = "";
       }
     }
 
     setAutorizadores(nextAutorizadores);
-    setIsUserSelected(nextIsUserSelected);
-    setSelectedUsers(nextSelectedUsers);
+    setIsSuperiorSelected(nextIsSuperiorSelected);
+    setSelectedLevels(nextSelectedLevels);
   }, [defaultRule]);
 
   // Handle changes to the niveles input
@@ -76,14 +75,14 @@ export default function DefaultAuthRule({ users, defaultRule, token }: Props) {
     }
 
     // update user selection tracking
-    setIsUserSelected(prev => {
+    setIsSuperiorSelected(prev => {
       const next = [...prev];
       if (value < next.length) return next.slice(0, value);
       while (next.length < value) next.push(false);
       return next;
     });
 
-    setSelectedUsers(prev => {
+    setSelectedLevels(prev => {
       const next = [...prev];
       if (value < next.length) return next.slice(0, value);
       while (next.length < value) next.push("");
@@ -91,19 +90,19 @@ export default function DefaultAuthRule({ users, defaultRule, token }: Props) {
     });
   }
 
-  // Handle type selection for each level to track if "Usuario Especifico" is selected
+  // Handle type selection for each level
   function handleTypeSelect(index: number, e: React.ChangeEvent<HTMLSelectElement>) {
     const value = e.target.value;
 
-    setIsUserSelected(prev => {
+    setIsSuperiorSelected(prev => {
       const next = [...prev];
-      next[index] = value === "Usuario";
+      next[index] = value === "Nivel Superior";
       return next;
     });
 
-    // If changing away from "Usuario Especifico", clear the user selection for that level
-    if (value !== "Usuario") {
-      setSelectedUsers(prev => {
+    // If changing away from "Nivel Superior", clear the selection for that level
+    if (value !== "Nivel Superior") {
+      setSelectedLevels(prev => {
         const next = [...prev];
         next[index] = "";
         return next;
@@ -111,12 +110,12 @@ export default function DefaultAuthRule({ users, defaultRule, token }: Props) {
     }
   }
 
-  // Handle changes to the user select inputs when "Usuario Especifico" is selected
+  // Handle changes to the user select inputs when "Nivel Superior" is selected
   function handleUserSelect(index: number, e: React.ChangeEvent<HTMLSelectElement>) {
-    const userId = e.target.value;
-    setSelectedUsers(prev => {
+    const superiorLevelNumber = e.target.value;
+    setSelectedLevels(prev => {
       const next = [...prev];
-      next[index] = userId || null;
+      next[index] = superiorLevelNumber || null;
       return next;
     });
   }
@@ -133,33 +132,33 @@ export default function DefaultAuthRule({ users, defaultRule, token }: Props) {
     setAutomatico(e.target.checked);
     // Clear selections
     setAutorizadores([]);
-    setIsUserSelected([]);
-    setSelectedUsers([]);
+    setIsSuperiorSelected([]);
+    setSelectedLevels([]);
   }
 
   // Handle save changes
   async function handleSave() {
     // Create data to send to backend
     const data = {
-      name: "Regla por Defecto",
+      rule_name: "Regla por Defecto",
       is_default: true,
       num_levels: niveles,
       automatic: automatico,
       niveles: autorizadores.map((type, index) => ({
-        level: index + 1,
-        type,
-        user_id: isUserSelected[index] ? selectedUsers[index] : null,
+        level_number: index + 1,
+        level_type: type,
+        superior_level_number: isSuperiorSelected[index] ? selectedLevels[index] : null
       })),
     };
 
-    if (!defaultRule || !defaultRule.id) {
+    if (!defaultRule || !defaultRule.rule_id) {
       alert("No se encontró la regla por defecto para actualizar");
       return;
     }
 
     // Send data to backend
     try {
-      const response = await apiRequest(`/admin/update-auth-rule/${defaultRule.id}`, {
+      const response = await apiRequest(`/admin/update-auth-rule/${defaultRule.rule_id}`, {
         method: 'PUT',
         data: data,
         headers: {
@@ -192,8 +191,8 @@ export default function DefaultAuthRule({ users, defaultRule, token }: Props) {
           name="niveles_autorizacion"
           type="number"
           placeholder="Número"
-          altText="Ingresa un valor entre 0 y 10"
-          min={0}
+          altText="Ingresa un valor entre 1 y 10"
+          min={1}
           max={10}
           required
           value={niveles}
@@ -223,7 +222,7 @@ export default function DefaultAuthRule({ users, defaultRule, token }: Props) {
               <div className="">
                 <div>
                   {[...Array(niveles)].map((_, index) => (
-                    <div key={index} className={isUserSelected[index] ? "grid grid-cols-2 gap-2 mb-4" : "grid grid-cols-1 mb-4"}>
+                    <div key={index} className={isSuperiorSelected[index] ? "grid grid-cols-2 gap-2 mb-4" : "grid grid-cols-1 mb-4"}>
                       {/* Select type of authorizer for this level */}
                       <Select
                         key={index}
@@ -237,23 +236,21 @@ export default function DefaultAuthRule({ users, defaultRule, token }: Props) {
                       >
                         <option value="">Selecciona un autorizador</option>
                         <option value="Jefe">Jefe Directo</option>
-                        <option value="Departamento">Jefe de Departamento</option>
-                        <option value="Usuario">Usuario (Especificar)</option>
+                        <option value="Aleatorio">Autorizador Aleatorio</option>
+                        <option value="Nivel Superior">Nivel Superior</option>
                       </Select>
-                      {/* If "Usuario Especifico" is selected, show user select */}
-                      {isUserSelected[index] && (
+                      {/* If "Superior level" is selected, show level select */}
+                      {isSuperiorSelected[index] && (
                         <Select
-                          label="Usuario"
+                          label="Nivel"
                           name={`usuario_${index + 1}`}
-                          value={selectedUsers[index] || ""}
+                          value={selectedLevels[index] || ""}
                           onChange={(e) => handleUserSelect(index, e)}
                         >
-                          <option value="">Selecciona un usuario</option>
-                          {users.map((user: any) => (
-                            <option key={user.user_id} value={user.user_id}>
-                              {user.user_name}
-                            </option>
-                          ))}
+                          <option value="">Selecciona el nivel que debe aprobar</option>
+                          <option value="1">1</option>
+                          <option value="2">2</option>
+                          <option value="3">3</option>
                         </Select>
                       )}
                     </div>

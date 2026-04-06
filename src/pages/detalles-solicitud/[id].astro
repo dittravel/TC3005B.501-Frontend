@@ -12,13 +12,14 @@ import type { UserRole } from "@type/roles";
 import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
 
+const { id } = Astro.params;
+
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
 const userName = getCookie("username", Astro.cookies) || "";
 const buttonLabel = roleLabels[role];
 
 import { apiRequest } from "@/utils/apiClient";
 
-const { id } = Astro.params;
 let request = null;
 try {
   request = await apiRequest(`/applicant/get-user-request/${id}`, { cookies: Astro.cookies });
