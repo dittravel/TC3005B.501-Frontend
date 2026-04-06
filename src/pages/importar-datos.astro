@@ -1,0 +1,40 @@
+---
+/**
+* Import External Data Page
+* 
+* This page allows administrators to import organizational data from an XML file
+*/
+
+import MainLayout from "@layouts/MainLayout.astro";
+import TextHeader from "@components/Layout/TextHeader.astro";
+import ImportDataForm from "@/components/Forms/ImportDataForm";
+
+import type { UserRole } from "@type/roles";
+import { getCookie } from "@data/cookies";
+import { roleLabels } from "@config/role-labels";
+
+const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
+const userName = getCookie("username", Astro.cookies) || "";
+const buttonLabel = roleLabels[role];
+
+const token = getCookie("token", Astro.cookies);
+---
+
+<MainLayout title="Roles" data={{userName, buttonLabel, role}}>
+  <TextHeader
+    title="Importar Datos"
+    subtitle="Importa datos organizacionales desde un archivo XML"
+  />
+  {role === "Administrador" ? (
+    <main>
+      <ImportDataForm
+        client:load
+        endpoint="/admin/import-data"
+        token={token}
+      />
+    </main>
+  ) : (
+    <p class="text-gray-600 mt-4">No tienes permisos para importar datos.</p>
+  )}
+</div>
+</MainLayout>

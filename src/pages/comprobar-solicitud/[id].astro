@@ -14,11 +14,12 @@ import type { UserRole } from "@type/roles";
 import { getCookie } from "@data/cookies";
 import { apiRequest } from "@/utils/apiClient";
 
+const { id } = Astro.params;
+
 const userName = getCookie("username", Astro.cookies) || "";
 const role = getCookie("role", Astro.cookies) as UserRole;
 const buttonLabel = role;
 
-const { id } = Astro.params;
 let request = null;
 try {
   request = await apiRequest(`/accounts-payable/get-expense-validations/${id}`, { cookies: Astro.cookies });

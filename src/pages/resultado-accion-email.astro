@@ -1,0 +1,86 @@
+---
+/**
+* Email Action Result Page
+* Shows the result of an email action
+*/
+
+import Layout from "@layouts/Layout.astro";
+import Tag from "@components/Utils/Tag";
+import Button from "@components/Buttons/Button";
+import { getStatusTagType } from "@utils/statusMapper";
+
+const url = new URL(Astro.request.url);
+const action = url.searchParams.get('action') || 'unknown';
+const requestId = url.searchParams.get('requestId') || '';
+
+// Determine message based on action
+let title = '';
+let message = '';
+let isSuccess = false;
+
+if (action === 'approve') {
+  title = 'Solicitud Aprobada';
+  message = `La solicitud #${requestId} ha sido aprobada correctamente.`;
+  isSuccess = true;
+} else if (action === 'decline') {
+  title = 'Solicitud Rechazada';
+  message = `La solicitud #${requestId} ha sido rechazada.`;
+  isSuccess = false;
+} else if (action === 'expired') {
+  title = 'Enlace Expirado o Ya Utilizado';
+  message = 'Parece que ya se realizó una acción en esta solicitud. El enlace ya no es válido.';
+  isSuccess = false;
+} else if (action === 'unauthorized') {
+  title = 'Acceso no Autorizado';
+  message = 'No tienes permiso para realizar esta acción.';
+  isSuccess = false;
+} else {
+  title = 'Acción Completada';
+  message = 'Tu acción ha sido procesada correctamente.';
+  isSuccess = true;
+}
+---
+
+<Layout title={title}>
+  <div class="flex flex-col justify-center items-center h-screen w-full bg-background px-5">
+    {/* Header with Logo */}
+    <div class="flex justify-between items-center w-full absolute top-0 left-0 p-5 md:px-16 md:py-8">
+      <img
+        src="/logo_texto_dittravel_color.png"
+        class="h-20 w-auto drop-shadow-lg"
+        alt="Logo Dittravel"
+      />
+    </div>
+    
+    {/* Result Card */}
+    <div class="w-full md:w-100 max-w-md">
+      <div class="card flex flex-col items-center space-y-6">
+        {/* Status */}
+        <Tag 
+          text={isSuccess ? 'Éxito' : 'Error'}
+          size="large" 
+          type={getStatusTagType(isSuccess ? 'approved' : 'declined')}
+        />
+        
+        {/* Title */}
+        <h1 class="text-2xl font-bold text-center text-text-primary">
+          {title}
+        </h1>
+        
+        {/* Message */}
+        <p class="text-center text-text-secondary">
+          {message}
+        </p>
+        
+        {/* Action Button */}
+        <Button 
+          variant="link" 
+          color="secondary"
+          href="/dashboard"
+        >
+          Volver al Inicio
+        </Button>
+      </div>
+    </div>
+  </div>
+</Layout>

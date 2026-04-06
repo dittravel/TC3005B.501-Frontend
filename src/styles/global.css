@@ -146,10 +146,13 @@
     @apply bg-card-hover p-4 rounded-xl w-full h-full border border-border space-y-4;
   }
   .card-title {
-    @apply w-full px-4 py-3 flex flex-col gap-2 justify-between items-start bg-card-hover border border-border rounded-md mb-4;
+    @apply w-full px-4 py-3 flex flex-col gap-1 justify-between items-start bg-card-hover border border-border rounded-md mb-4;
   }
   .card-title h2 {
     @apply text-lg font-semibold text-text-primary;
+  }
+  .card-title p {
+    @apply text-sm text-text-secondary;
   }
   .card-content-grid {
     @apply grid grid-cols-1 md:grid-cols-[3fr_1fr] gap-8 items-center;

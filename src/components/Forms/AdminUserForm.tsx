@@ -19,6 +19,7 @@ interface FormData {
   workstation: string;
   email: string;
   phone_number: string;
+  boss_id?: number | '';
 }
 
 interface FormErrors {
@@ -27,28 +28,12 @@ interface FormErrors {
 
 interface CreateUserFormProps {
   mode: 'create' | 'edit';
-  user_data?: any; 
+  user_data?: any;
   redirectTo?: string;
+  departments?: any[];
+  roles?: any[];
   token: string; 
 }
-
-const roles = [
-  { id: 1, name: 'Solicitante' },
-  { id: 2, name: 'Agencia de viajes' },
-  { id: 3, name: 'Cuentas por pagar' },
-  { id: 4, name: 'N1' },
-  { id: 5, name: 'N2' },
-  { id: 6, name: 'Administrador' }
-];
-
-const departments = [
-  { id: 1, name: 'Finanzas' },
-  { id: 2, name: 'Recursos Humanos' },
-  { id: 3, name: 'IT' },
-  { id: 4, name: 'Marketing' },
-  { id: 5, name: 'Operaciones' },
-  { id: 6, name: 'Administración' }
-];
 
 const initialFormData: FormData = {
   role_id: '',
@@ -57,7 +42,8 @@ const initialFormData: FormData = {
   password: '',
   workstation: '',
   email: '',
-  phone_number: ''
+  phone_number: '',
+  boss_id: ''
 };
 
 /**
@@ -67,26 +53,57 @@ const initialFormData: FormData = {
  * @param {string} props.redirectTo - URL to redirect after successful form submission.
  * @param {string} props.token - Authorization token for API requests.
  */
-export default function CreateUserForm({ mode, user_data, redirectTo, token }: CreateUserFormProps) {
+export default function CreateUserForm({ mode, user_data, redirectTo, token, departments = [], roles = [] }: CreateUserFormProps) {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
+  // State for boss list based on selected department
+  const [bossData, setBossData] = useState<any[]>([]);
+
+  const fetchBosses = async (departmentId: number) => {
+    try {
+      const bosses = await apiRequest(`/admin/get-boss-list/${departmentId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      // Filer out the current user
+      if (mode === 'edit' && user_data) {
+        const filteredBosses = bosses.filter((boss: any) => boss.user_id !== user_data.user_id);
+        setBossData(filteredBosses);
+      } else {
+        setBossData(bosses);
+      }
+    } catch (error) {
+      console.error("Error fetching boss list:", error);
+      setBossData([]);
+    }
+  };
+
   // Initialize form data based on mode and user data
   const [formData, setFormData] = useState<FormData>(() => {
-    if (mode === 'edit' && user_data) {
+    if (mode === 'edit' && user_data) {      
       return {
-        role_id: roles.find(r => r.name === user_data.role_name)?.id ?? '',
-        department_id: departments.find(d => d.name === user_data.department_name)?.id ?? '',
+        role_id: roles.find(r => r.role_name === user_data.role_name)?.role_id ?? '',
+        department_id: departments.find(d => d.department_name === user_data.department_name)?.department_id ?? '',
         user_name: user_data.user_name,
         password: '',
         workstation: user_data.workstation,
         email: user_data.email,
-        phone_number: user_data.phone_number || ''
+        phone_number: user_data.phone_number || '',
+        boss_id: user_data.boss_id ?? ''
       };
     }
     return initialFormData;
   });
+  
+  // Fetch boss list when department changes
+  useEffect(() => {
+    if (formData.department_id) {
+      fetchBosses(formData.department_id);
+    } else {
+      setBossData([]);
+    }
+  }, [formData.department_id, token]);
 
   /**
    * Validates the form fields and sets error messages.
@@ -140,8 +157,9 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token }: C
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'role_id' || name === 'department_id' ?
-        (value === '' ? '' : parseInt(value)) : value
+      [name]: ['role_id', 'department_id', 'boss_id'].includes(name)
+        ? (value === '' ? '' : parseInt(value))
+        : value
     }));
 
     if (errors[name]) {
@@ -296,20 +314,18 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token }: C
             />
           </div>
 
-          {/* Workstation */}
-          <Input
-            type="text"
-            name="workstation"
-            label="Estación de Trabajo"
-            value={formData.workstation}
-            onChange={handleInputChange}
-            error={errors.workstation}
-            placeholder="Ej: WS-001"
-            required
-          />
-
-          {/* Role and Department */}
+          {/* Workstation and Role */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Input
+              type="text"
+              name="workstation"
+              label="Estación de Trabajo"
+              value={formData.workstation}
+              onChange={handleInputChange}
+              error={errors.workstation}
+              placeholder="Ej: WS-001"
+              required
+            />
             <Select
               label="Rol"
               name="role_id"
@@ -320,12 +336,15 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token }: C
             >
               <option value="">Seleccionar rol</option>
               {roles.map(role => (
-                <option key={role.id} value={role.id}>
-                  {role.name}
+                <option key={role.role_id} value={role.role_id}>
+                  {role.role_name}
                 </option>
               ))}
             </Select>
+          </div>
 
+          {/* Department and Boss */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Select
               label="Departamento"
               name="department_id"
@@ -336,8 +355,22 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token }: C
             >
               <option value="">Seleccionar departamento</option>
               {departments.map(dep => (
-                <option key={dep.id} value={dep.id}>
-                  {dep.name}
+                <option key={dep.department_id} value={dep.department_id}>
+                  {dep.department_name}
+                </option>
+              ))}
+            </Select>
+            <Select
+              label="Jefe"
+              name="boss_id"
+              value={formData.boss_id || ''}
+              onChange={handleInputChange}
+              error={errors.boss_id}
+            >
+              <option value="">Sin jefe</option>
+              {bossData && bossData.map((boss: any) => (
+                <option key={boss.user_id} value={boss.user_id}>
+                  {boss.user_name}
                 </option>
               ))}
             </Select>
