@@ -27,6 +27,8 @@ function matchPath(path: string, patterns: string[]) {
 export const publicRoutes = [
   // Default public routes
   '/login',
+  '/forgot-password',
+  '/reset-password',
   '/404',
   // Routes acceded by email links
   // NOTE: Only authenticated users can access these,

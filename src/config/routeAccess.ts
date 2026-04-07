@@ -66,5 +66,15 @@ export const roleRoutes: Record<UserRole, string[]> = {
   ],
 };
 
+// Public routes not tied to any role — must be reachable without authentication
+const publicOnlyRoutes: string[] = [
+  '/login',
+  '/forgot-password',
+  '/reset-password',
+];
+
 // Flatten all routes into a single array for easy access control checks
-export const allWhitelistedRoutes: string[] = Object.values(roleRoutes).flat();
+export const allWhitelistedRoutes: string[] = [
+  ...Object.values(roleRoutes).flat(),
+  ...publicOnlyRoutes,
+];

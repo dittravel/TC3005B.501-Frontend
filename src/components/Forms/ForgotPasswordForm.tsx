@@ -12,7 +12,7 @@ import Input from "@/components/Utils/Input";
 import { apiRequest } from "@utils/apiClient";
 
 export default function ForgotPasswordForm() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -25,7 +25,7 @@ export default function ForgotPasswordForm() {
     try {
       await apiRequest("/user/forgot-password", {
         method: "POST",
-        data: { username },
+        data: { email },
       });
       setSubmitted(true);
     } catch {
@@ -45,7 +45,7 @@ export default function ForgotPasswordForm() {
               Recuperar contraseña
             </h2>
             <p className="text-sm text-text-secondary">
-              Ingresa tu nombre de usuario y te enviaremos un enlace de recuperación.
+              Ingresa tu correo electrónico y te enviaremos un enlace de recuperación.
             </p>
           </div>
 
@@ -64,12 +64,12 @@ export default function ForgotPasswordForm() {
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-6 w-full">
               <Input
-                name="username"
-                type="text"
+                name="email"
+                type="email"
                 required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Usuario"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Correo electrónico"
               />
 
               <Button
