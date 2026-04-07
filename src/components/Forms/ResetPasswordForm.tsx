@@ -30,6 +30,11 @@ export default function ResetPasswordForm() {
     e.preventDefault();
     setErrorMessage("");
 
+    if (newPassword.length < 8) {
+      setErrorMessage("La contraseña debe tener al menos 8 caracteres.");
+      return;
+    }
+
     if (newPassword !== confirmPassword) {
       setErrorMessage("Las contraseñas no coinciden.");
       return;
