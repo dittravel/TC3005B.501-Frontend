@@ -8,6 +8,7 @@ import MainLayout from "@layouts/MainLayout.astro";
 import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
 import type { UserRole } from "@type/roles";
+import RoleConfigurationForm from "@/components/Forms/RoleConfigurationForm";
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
 const buttonLabel = roleLabels[role];
@@ -20,6 +21,32 @@ const userName = getCookie("username", Astro.cookies) || "";
       title="Roles"
       subtitle="Configura los roles y permisos del sistema"
     />
+    <main>
+      <RoleConfigurationForm
+        role={role}
+        client:only="react"
+        data = {[
+          {
+            id: 1,
+            name: "Viajes económicos",
+            minAmount: 1000,
+            maxAmount: 2999,
+            maxDays: 20,
+            validateAgainstInvoice: false,
+            validateAgainstPredefinedInput: false,
+          },
+          {
+            id: 2,
+            name: "Viajes costosos",
+            minAmount: 3000,
+            maxAmount: 5999,
+            maxDays: 30,
+            validateAgainstInvoice: true,
+            validateAgainstPredefinedInput: true,
+          },
+        ]}
+      />
+    </main>
   </div>
 </MainLayout>
 
