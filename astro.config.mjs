@@ -15,7 +15,7 @@ export default defineConfig({
   base: '/',
   output: "server",
   adapter: node({
-    mode: 'standalone'
+    mode: 'middleware'
   }),
   server: {
     open: '/login',
@@ -43,6 +43,11 @@ export default defineConfig({
   },
   env: {
     schema: {
+      SERVER_API_BASE_URL: envField.string({
+        default: 'https://host.docker.internal:3000/api',
+        context: 'server',
+        access: 'secret',
+      }),
       PUBLIC_API_BASE_URL: envField.string({
         context: 'server',
         access: 'public',

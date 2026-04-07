@@ -49,20 +49,23 @@ export default function LoginForm() {
 
       // Clear error message on successful login
       setErrorMessage("");
-    
-      alert("Inicio de sesión exitoso");
 
-      // Set authentication cookies to persist user session and credentials
-      document.cookie = `token=${response.token}; path=/; secure; SameSite=Strict`;
-      document.cookie = `role=${response.role}; path=/`;
-      document.cookie = `username=${response.username}; path=/`;
-      document.cookie = `user_id=${response.user_id}; path=/`;
-      document.cookie = `department_id=${response.department_id}; path=/`;
+      // Persist session cookies in the frontend domain for Astro/React reads.
+      const isHttps = window.location.protocol === "https:";
+      const secureAttr = isHttps ? "; Secure" : "";
+      const commonAttrs = `; Path=/; SameSite=Lax${secureAttr}`;
+      const oneHour = 60 * 60;
+
+      document.cookie = `token=${encodeURIComponent(response.token)}${commonAttrs}; Max-Age=${oneHour}`;
+      document.cookie = `role=${encodeURIComponent(response.role)}${commonAttrs}; Max-Age=${oneHour}`;
+      document.cookie = `username=${encodeURIComponent(response.username)}${commonAttrs}; Max-Age=${oneHour}`;
+      document.cookie = `id=${encodeURIComponent(response.user_id)}${commonAttrs}; Max-Age=${oneHour}`;
+      document.cookie = `department_id=${encodeURIComponent(response.department_id)}${commonAttrs}; Max-Age=${oneHour}`;
       window.location.href = "/dashboard";
 
     } catch (error: any) {
       // Extract error message from API response or use default message
-      const msg = error?.response?.data?.error || "Error al iniciar sesión";
+      const msg = error?.response?.error || "Error al iniciar sesión";
       setErrorMessage(msg);
     }
   };

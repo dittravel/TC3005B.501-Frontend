@@ -45,6 +45,17 @@ interface ApiOptions {
   cookies?: import("astro").APIContext["cookies"];
 }
 
+class ApiError extends Error {
+  status: number;
+  response: any;
+
+  constructor(status: number, response: any) {
+    super(response?.error || response?.message || `API request failed with status ${status}`);
+    this.status = status;
+    this.response = response;
+  }
+}
+
 /**
  * Makes an API request to the backend with the given path and options.
  * It automatically includes the JWT token from cookies for authentication.
@@ -59,7 +70,14 @@ export async function apiRequest<T = any>(
   path: string,
   options: ApiOptions = {}
 ): Promise<T> {
-  const baseUrl = import.meta.env.PUBLIC_API_BASE_URL;
+  const serverBaseUrls = [
+    import.meta.env.SERVER_API_BASE_URL,
+    import.meta.env.PUBLIC_API_BASE_URL,
+    'https://backend:3000/api',
+    'https://host.docker.internal:3000/api',
+    'https://localhost:3000/api',
+  ].filter(Boolean);
+  const baseUrl = isServer ? serverBaseUrls[0] : import.meta.env.PUBLIC_API_BASE_URL;
   const { method = 'GET', data, headers = {}, cookies } = options;
 
   let token = "";
@@ -82,36 +100,46 @@ export async function apiRequest<T = any>(
   };
 
   try {
-    // For Node.js in development, the NODE_TLS_REJECT_UNAUTHORIZED env var handles this
-    // For browsers, we can't directly modify SSL validation behavior
-    const res = await fetch(`${baseUrl}${path}`, config);
+    // Try alternative server URLs to reduce transient container-network failures.
+    const targets = isServer ? serverBaseUrls : [baseUrl];
+    let lastError: any;
 
-    if (!res.ok) {
-      let errorData: any;
-      const contentType = res.headers.get('content-type');
-      
-      if (contentType && contentType.includes('application/json')) {
-        try {
-          errorData = await res.json();
-        } catch {
-          errorData = { message: res.statusText };
+    for (const targetBase of targets) {
+      try {
+        const res = await fetch(`${targetBase}${path}`, config);
+
+        if (!res.ok) {
+          let errorData: any;
+          const contentType = res.headers.get('content-type');
+
+          if (contentType?.includes('application/json')) {
+            try {
+              errorData = await res.json();
+            } catch {
+              errorData = { message: res.statusText };
+            }
+          } else {
+            errorData = { message: await res.text() };
+          }
+
+          throw new ApiError(res.status, errorData);
         }
-      } else {
-        errorData = { message: await res.text() };
+
+        return await res.json();
+      } catch (err) {
+        if (err instanceof ApiError && err.status < 500) {
+          throw err;
+        }
+        lastError = err;
       }
-      
-      throw {
-        status: res.status,
-        response: errorData
-      };
     }
 
-    return await res.json();
+    throw lastError;
   } catch (error) {
     console.error("API request failed:", error);
-    throw {
-      message: 'Network or fetch error',
-      detail: error
-    };
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new Error(`Network or fetch error: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
