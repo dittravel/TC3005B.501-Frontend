@@ -24,6 +24,15 @@ export default function UserProfile({ userData, departmentUsers = [], token }: P
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Get today's date in local timezone format (YYYY-MM-DD)
+  const getLocalDateString = () => {
+    const date = new Date();
+    // Adjust for local timezone offset
+    // getMonth + 1 because getMonth() returns 0-11
+    // Pad month and day with leading zeros if needed
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  };
+
   // Autocomplete absence preferences when user data changes
   useEffect(() => {
     if (userData.role_name !== 'Solicitante') {
@@ -131,7 +140,7 @@ export default function UserProfile({ userData, departmentUsers = [], token }: P
                 name="out_of_office_start_date"
                 label="Fecha de inicio de ausencia"
                 type="date"
-                min={new Date().toISOString().split('T')[0]}
+                min={getLocalDateString()}
                 value={startDate}
                 onChange={e => setStartDate(e.target.value)}
               />
@@ -139,7 +148,7 @@ export default function UserProfile({ userData, departmentUsers = [], token }: P
                 name="out_of_office_end_date"
                 label="Fecha de fin de ausencia"
                 type="date"
-                min={startDate ? startDate : new Date().toISOString().split('T')[0]}
+                min={startDate ? startDate : getLocalDateString()}
                 value={endDate}
                 onChange={e => setEndDate(e.target.value)}
               />

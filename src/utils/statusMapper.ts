@@ -48,6 +48,10 @@ export const statusColorMap: Record<string, TagType> = {
   'Solicitante': 'default',
   'Agencia de viajes': 'warning',
   'Cuentas por pagar': 'alert',
+
+  // Email Action Results
+  'approved': 'success',
+  'declined': 'alert',
 };
 
 /**
