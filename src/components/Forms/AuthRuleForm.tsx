@@ -15,11 +15,10 @@ type Mode = "create" | "edit";
 interface Props {
   mode: Mode;
   data?: any; // Optional data for edit mode
-  users: any[]; // List of users for user-specific authorizers
   token: string;
 }
 
-export default function AuthRuleForm({ mode, data, users, token }: Props) {
+export default function AuthRuleForm({ mode, data, token }: Props) {
   // Form state
   const [niveles, setNiveles] = useState(0);
   const [automatico, setAutomatico] = useState(false);
