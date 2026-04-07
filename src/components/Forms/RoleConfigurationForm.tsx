@@ -57,25 +57,35 @@ export default function RoleConfigurationForm({ role, data, itemsPerPage = 5, to
     //const [selectedValidations, setSelectedValidations] = useState<Set<string | number>>(new Set());
 
     const roleContent: Record<string, { user: string; userDescription: string, travelRequest: string, travelRequestDescription: string, receipt: string, receiptDescription: string, refund: string, refundDescription: string }> = {
-        authorizer: {
+        admin: {
             user: 'Usuarios',
             userDescription: '• Ver usuarios \n• Crear usuarios \n• Editar usuarios \n• Eliminar usuarios',
+            travelRequest: '',
+            travelRequestDescription: '',
+            receipt: '',
+            receiptDescription: '',
+            refund: '',
+            refundDescription: ''
+        },
+        authorizer: {
+            user: 'Usuarios',
+            userDescription: '• Ver usuarios',
             travelRequest: 'Solicitudes de viaje',
-            travelRequestDescription: '• Ver solicitudes',
+            travelRequestDescription: '• Ver solicitudes \n• Crear solicitudes \n• Editar solicitudes \n• Eliminar solicitudes \n• Aprobar/Rechazar solicitudes \n• Definir monto a autorizar \n• Finalizar viajes \n• Cancelar viajes \n• Rechazar viajes',
             receipt: 'Comprobantes',
-            receiptDescription: '• Crear comprobantes',
+            receiptDescription: '• Ver comprobantes \n• Aprobar comprobantes',
             refund: 'Reembolsos',
-            refundDescription: '• Solicitar reembolsos'
+            refundDescription: '• Solicitar reembolsos \n• Aprobar reembolsos'
         },
         applicant: {
             user: 'Usuarios',
             userDescription: 'Este rol no tiene permisos para visualizar o editar información de usuarios en el sistema.',
             travelRequest: 'Solicitudes de viaje',
-            travelRequestDescription: '• Ver solicitudes',
+            travelRequestDescription: '• Ver solicitudes \n• Ver viajes \n• Crear viajes \n• Editar viajes \n• Ver vuelos \n• Ver hoteles',
             receipt: 'Comprobantes',
-            receiptDescription: '• Crear comprobantes',
+            receiptDescription: '• Crear comprobantes \n• Editar comprobantes',
             refund: 'Reembolsos',
-            refundDescription: '• Solicitar reembolsos'
+            refundDescription: 'Este rol no tiene permisos para visualizar o editar reembolsos en el sistema.'
         },
         accountsToPay: {
             user: 'Usuarios',
@@ -83,19 +93,19 @@ export default function RoleConfigurationForm({ role, data, itemsPerPage = 5, to
             travelRequest: 'Solicitudes de viaje',
             travelRequestDescription: '• Ver solicitudes',
             receipt: 'Comprobantes',
-            receiptDescription: '• Crear comprobantes',
+            receiptDescription: '• Ver comprobantes \n• Crear comprobantes \n• Editar comprobantes \n• Eliminar comprobantes \n• Aprobar comprobantes',
             refund: 'Reembolsos',
-            refundDescription: '• Solicitar reembolsos'
+            refundDescription: '• Solicitar reembolsos \n• Aprobar reembolsos'
         },
         travelAgency: {
             user: 'Usuarios',
             userDescription: 'Este rol no tiene permisos para visualizar o editar información de usuarios en el sistema.',
             travelRequest: 'Solicitudes de viaje',
-            travelRequestDescription: '• Ver solicitudes',
+            travelRequestDescription: '• Ver viajes \n• Editar viajes \n• Ver vuelos \n• Ver hoteles \n• Finalizar viajes \n• Cancelar viajes',
             receipt: 'Comprobantes',
-            receiptDescription: '• Crear comprobantes',
+            receiptDescription: 'Este rol no tiene permisos para visualizar o editar comprobantes en el sistema.',
             refund: 'Reembolsos',
-            refundDescription: '• Solicitar reembolsos'
+            refundDescription: 'Este rol no tiene permisos para visualizar o editar reembolsos en el sistema.'
         },
     };
 
@@ -171,6 +181,7 @@ export default function RoleConfigurationForm({ role, data, itemsPerPage = 5, to
                             className="border border-border-primary rounded-md px-3 py-2 text-sm text-text-primary bg-background-primary focus:outline-none focus:ring-2 focus:ring-secondary"
                         >
                             <option value="" disabled>Selecciona un rol</option>
+                            <option value="admin">Administrador</option>
                             <option value="authorizer">Autorizador</option>
                             <option value="applicant">Solicitante</option>
                             <option value="accountsToPay">Cuentas por pagar</option>
@@ -206,6 +217,7 @@ export default function RoleConfigurationForm({ role, data, itemsPerPage = 5, to
                         className="border border-border-primary rounded-md px-3 py-2 text-sm text-text-primary bg-background-primary focus:outline-none focus:ring-2 focus:ring-secondary"
                     >
                         <option value="" >Selecciona un rol</option>
+                        <option value="admin">Administrador</option>
                         <option value="authorizer">Autorizador</option>
                         <option value="applicant">Solicitante</option>
                         <option value="accountsToPay">Cuentas por pagar</option>
@@ -214,120 +226,77 @@ export default function RoleConfigurationForm({ role, data, itemsPerPage = 5, to
                 </div>
 
                 {selectedDefinedRole && roleContent[selectedDefinedRole] && (
-                    <div className="flex flex-col card-secondary">
-                        <div className="flex flex-col gap-4">
-                            <h2 className="font-semibold text-text-primary">
-                                {roleContent[selectedDefinedRole].user}
-                            </h2>
-                            <p className="text-sm text-text-secondary whitespace-pre-line">
-                                {roleContent[selectedDefinedRole].userDescription}
-                            </p>
-                            <h2 className="font-semibold text-text-primary">
-                                {roleContent[selectedDefinedRole].travelRequest}
-                            </h2>
-                            <p className="text-sm text-text-secondary whitespace-pre-line">
-                                {roleContent[selectedDefinedRole].travelRequestDescription}
-                            </p>
-                            <h2 className="font-semibold text-text-primary">
-                                {roleContent[selectedDefinedRole].receipt}
-                            </h2>
-                            <p className="text-sm text-text-secondary whitespace-pre-line">
-                                {roleContent[selectedDefinedRole].receiptDescription}
-                            </p>
-                            <h2 className="font-semibold text-text-primary">
-                                {roleContent[selectedDefinedRole].refund}
-                            </h2>
-                            <p className="text-sm text-text-secondary whitespace-pre-line">
-                                {roleContent[selectedDefinedRole].refundDescription}
-                            </p>
+                    selectedDefinedRole === 'admin' ? (
+                        <div className="flex flex-col card-secondary">
+                            <div className="flex flex-col gap-4">
+                                <h2 className="font-semibold text-text-primary">
+                                    {roleContent[selectedDefinedRole].user}
+                                </h2>
+                                <p className="text-sm text-text-secondary whitespace-pre-line">
+                                    {roleContent[selectedDefinedRole].userDescription}
+                                </p>
+                                <h2 className="font-semibold text-text-primary">
+                                    {"Datos"}
+                                </h2>
+                                <p className="text-sm text-text-secondary whitespace-pre-line">
+                                    {"• Importar datos"}
+                                </p>
+                                <h2 className="font-semibold text-text-primary">
+                                    {"Reglas autorización"}
+                                </h2>
+                                <p className="text-sm text-text-secondary whitespace-pre-line">
+                                    {"• Ver reglas de autorización \n• Crear reglas de autorización \n• Editar reglas de autorización \n• Eliminar reglas de autorización"}
+                                </p>
+                                <h2 className="font-semibold text-text-primary">
+                                    {"Roles del sistema"}
+                                </h2>
+                                <p className="text-sm text-text-secondary whitespace-pre-line">
+                                    {"• Ver roles por defecto/del sistema/personalizados \n• Crear roles personalizados \n• Editar roles por defecto/personalizados \n• Eliminar roles personalizados "}
+                                </p>
+                                <h2 className="font-semibold text-text-primary">
+                                    {"Políticas de reembolso"}
+                                </h2>
+                                <p className="text-sm text-text-secondary whitespace-pre-line">
+                                    {"• Ver políticas de reembolso \n• Crear políticas de reembolso \n• Editar políticas de reembolso \n• Eliminar políticas de reembolso"}
+                                </p>
+                            </div>
                         </div>
-                    </div>
+                    ) : (
+                        <div className="flex flex-col card-secondary">
+                            <div className="flex flex-col gap-4">
+                                <h2 className="font-semibold text-text-primary">
+                                    {roleContent[selectedDefinedRole].user}
+                                </h2>
+                                <p className="text-sm text-text-secondary whitespace-pre-line">
+                                    {roleContent[selectedDefinedRole].userDescription}
+                                </p>
+
+                                <h2 className="font-semibold text-text-primary">
+                                    {roleContent[selectedDefinedRole].travelRequest}
+                                </h2>
+                                <p className="text-sm text-text-secondary whitespace-pre-line">
+                                    {roleContent[selectedDefinedRole].travelRequestDescription}
+                                </p>
+
+                                <h2 className="font-semibold text-text-primary">
+                                    {roleContent[selectedDefinedRole].receipt}
+                                </h2>
+                                <p className="text-sm text-text-secondary whitespace-pre-line">
+                                    {roleContent[selectedDefinedRole].receiptDescription}
+                                </p>
+
+                                <h2 className="font-semibold text-text-primary">
+                                    {roleContent[selectedDefinedRole].refund}
+                                </h2>
+                                <p className="text-sm text-text-secondary whitespace-pre-line">
+                                    {roleContent[selectedDefinedRole].refundDescription}
+                                </p>
+                            </div>
+                        </div>
+                    )
                 )}
             </div>
-
-            {/* Created Roles Section */}
-            <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-text-primary">
-                    Políticas de Reembolso ({data.length})
-                </h2>
-                <Button variant="filled" color="secondary">
-                    + Crear Política
-                </Button>
-            </div>
-            {data.length > 0 ? (
-                <div className="space-y-6">
-                    {pageRequests.map((request: any) => (
-                        <Card
-                            key={request.request_id}
-                            //href={`/detalles-politica-reembolso/${request.request_id}`}
-                            tag={{ text: `Política #${request.request_id}`, type: 'secondary' }}
-                            status={{
-                                text: request.status || 'Desconocido',
-                                type: getStatusTagType(request.status),
-                            }}
-                        >
-                            <div className="grid grid-cols-1 md:grid-cols-[1fr_3fr_auto] gap-8">
-                                <div className="flex flex-row items-center gap-2">
-                                    <p className="text-lm text-text-primary">
-                                        <span className="font-semibold">{request.name}</span>
-                                    </p>
-                                </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                    <div className="space-y-1">
-                                        <p className="text-sm text-text-primary">
-                                            Monto entre <span className="font-semibold"> {request.minAmount} </span>
-                                            y <span className="font-semibold"> {request.maxAmount}  </span>
-                                            MXN
-                                        </p>
-                                        <p className="text-sm text-text-primary">
-                                            Tiempo máximo <span className="font-semibold"> {request.maxDays} </span> días
-                                        </p>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <p className="text-sm text-text-primary">
-                                            Validado contra factura:
-                                            <span className='font-semibold'>{!request.validateAgainstInvoice ? ' No' : ' Si'}</span>
-                                        </p>
-                                        <p className="text-sm text-text-primary">
-                                            Validado contra insumo preferido:
-                                            <span className='font-semibold'>{!request.validateAgainstInvoice ? ' No' : ' Si'}</span>
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="flex flex-row items-center justify-end gap-2">
-                                    <Button
-                                        color="primary"
-                                        variant="filled"
-                                        size="medium"
-                                        className="w-full"
-                                    >
-                                        Editar
-                                    </Button>
-                                    {/* <CancelRefundPolicyModal
-                    id={request.request_id}
-                    token={token}
-                    color="warning"
-                    variant="filled"
-                    label="Eliminar"
-                  /> */}
-                                </div>
-                            </div>
-                        </Card>
-                    ))}
-                    <Pagination
-                        totalPages={totalPages}
-                        page={page}
-                        setPage={setPage}
-                        maxVisible={5}
-                    />
-                </div>
-            ) : (
-                <Card className="text-center py-8">
-                    <p className="text-text-secondary font-semibold">
-                        No cuentas con políticas de reembolso creadas
-                    </p>
-                </Card>
-            )}
+            
         </div>
     );
 }
