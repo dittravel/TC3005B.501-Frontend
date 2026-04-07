@@ -195,7 +195,7 @@ export default function RefundPolicyForm({ role, data, itemsPerPage = 5, token }
         <h2 className="text-xl font-semibold text-text-primary">
           Políticas de Reembolso ({data.length})
         </h2>
-        <Button variant="filled" color="secondary">
+        <Button variant="filled" color="secondary"  href="/edit-politica-rembolso">
           + Crear Política
         </Button>
       </div>
@@ -245,6 +245,7 @@ export default function RefundPolicyForm({ role, data, itemsPerPage = 5, token }
                     variant="filled"
                     size="medium"
                     className="w-full"
+                    href={`/edit-politica-rembolso`}
                   >
                     Editar
                   </Button>
