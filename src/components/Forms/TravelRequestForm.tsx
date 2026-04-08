@@ -687,13 +687,18 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
         {/* Department Info */}
         {deptData && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {(() => {
+              const costCenterName = deptData.cost_center_name || deptData.costs_center || '';
+
+              return (
+                <>
             <Select
-              name="costs_center"
+              name="cost_center_name"
               label="Centro de Costos"
-              value={deptData.costs_center}
+              value={costCenterName}
               disabled
             >
-              <option value={deptData.costs_center}>{deptData.costs_center}</option>
+              <option value={costCenterName}>{costCenterName}</option>
             </Select>
             <Select
               name="department_name"
@@ -703,6 +708,9 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
             >
               <option value={deptData.department_name}>{deptData.department_name}</option>
             </Select>
+                </>
+              );
+            })()}
           </div>
         )}
       </div>
