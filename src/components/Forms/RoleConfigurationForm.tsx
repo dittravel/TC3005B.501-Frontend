@@ -164,7 +164,7 @@ export default function RoleConfigurationForm({ role, data, itemsPerPage = 5, to
                 <div className="card-title">
                     <h3 className="text-lg font-bold text-text-primary">Configuración por defecto</h3>
                     <p className="text-sm text-text-secondary">
-                        Este sera el rol apliado por defecto para los usuarios del sistema.
+                        Este será el rol aplicado por defecto para los usuarios del sistema.
                     </p>
                 </div>
 
