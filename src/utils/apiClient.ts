@@ -66,15 +66,19 @@ class ApiError extends Error {
  * @returns A promise that resolves to the response data from the API
  * @throws An error if the request fails or if the response is not ok
  */
+
 export async function apiRequest<T = any>(
   path: string,
   options: ApiOptions = {}
 ): Promise<T> {
+  const runtimeServerApiBase =
+    isServer && typeof process !== 'undefined' ? process.env.SERVER_API_BASE_URL : undefined;
   const serverBaseUrls = [
+    runtimeServerApiBase,
     import.meta.env.SERVER_API_BASE_URL,
-    import.meta.env.PUBLIC_API_BASE_URL,
     'https://backend:3000/api',
     'https://host.docker.internal:3000/api',
+    import.meta.env.PUBLIC_API_BASE_URL,
     'https://localhost:3000/api',
   ].filter(Boolean);
   const baseUrl = isServer ? serverBaseUrls[0] : import.meta.env.PUBLIC_API_BASE_URL;

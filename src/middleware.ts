@@ -24,7 +24,23 @@ function matchPath(path: string, patterns: string[]) {
 }
 
 // Public routes that do NOT require authentication
-export const publicRoutes = [ '/login', '/404' ];
+export const publicRoutes = [
+  // Default public routes
+  '/login',
+  '/forgot-password',
+  '/reset-password',
+  '/404',
+  // Routes acceded by email links
+  // NOTE: Only authenticated users can access these,
+  // but we allow them to be accessed without a role
+  // for email links to work
+  '/detalles-solicitud/*',
+  '/comprobar-solicitud/*',
+  '/atender-solicitud/*',
+  'cotizar-solicitud/*',
+  '/presupuesto-viaje/*',
+  '/resultado-accion-email',
+];
 
 /**
  * Middleware handler to enforce route access control based on user roles.
@@ -50,8 +66,13 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   const roleMatch = cookieHeader.match(/(?:^|;\s*)role=([^;]+)/);
   const role = roleMatch ? decodeURIComponent(roleMatch[1]) : '';
   const tokenMatch = cookieHeader.match(/(?:^|;\s*)token=([^;]+)/);
-  const isAuthenticated = !!tokenMatch || !!role;
+  const isAuthenticated = !!tokenMatch;
   const html = unauthorizedPage(pathname, isAuthenticated);
+
+  // If token is missing, force re-authentication instead of rendering protected pages.
+  if (!tokenMatch) {
+    return Response.redirect(new URL('/login', request.url), 302);
+  }
 
   // 2.1 If no role is found, redirect to login page
   if (!role) {

@@ -13,7 +13,7 @@ const userId = getCookie("id", Astro.cookies);
 // Get requests in "Por cotizar" and "Por comprobar" states for the user's department
 const requestsInCotizar = await (async () => {
   try {
-    return await apiRequest(`/user/get-travel-requests/${userId}/4`, { cookies: Astro.cookies });
+    return await apiRequest(`/user/get-travel-requests/${userId}/3`, { cookies: Astro.cookies });
   } catch (error) {
     console.error("Error fetching cotizar requests:", error);
     return [];
@@ -23,7 +23,7 @@ const requestsInCotizar = await (async () => {
 // Get requests in "Por comprobar" state for the user's department
 const requestsInComprobar = await (async () => {
   try {
-    return await apiRequest(`/user/get-travel-requests/${userId}/7`, { cookies: Astro.cookies });
+    return await apiRequest(`/user/get-travel-requests/${userId}/6`, { cookies: Astro.cookies });
   } catch (error) {
     return [];
   }

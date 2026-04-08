@@ -8,8 +8,10 @@ RUN pnpm install --frozen-lockfile
 
 FROM deps AS build
 ARG PUBLIC_API_BASE_URL=https://localhost:3000/api
+ARG SERVER_API_BASE_URL=https://backend:3000/api
 ARG PUBLIC_IS_DEV=false
 ENV PUBLIC_API_BASE_URL=$PUBLIC_API_BASE_URL
+ENV SERVER_API_BASE_URL=$SERVER_API_BASE_URL
 ENV PUBLIC_IS_DEV=$PUBLIC_IS_DEV
 COPY . .
 RUN pnpm run build

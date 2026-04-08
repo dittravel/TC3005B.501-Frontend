@@ -16,6 +16,7 @@ const buttonLabel = roleLabels[role];
 const userName = getCookie("username", Astro.cookies) || "";
 const { id } = Astro.params;
 
+// Fetch user data
 let user_data = null;
 try {
   user_data = await apiRequest(`/user/get-user-data/${id}`, { cookies: Astro.cookies });
@@ -23,6 +24,30 @@ try {
   user_data = null;
   throw new Error(`No user found with ID ${id}`);
 }
+
+// Get departments
+const departments = await (async () => {
+  try {
+    return await apiRequest(`/admin/get-departments`, {
+      headers: { Authorization: `Bearer ${getCookie("token", Astro.cookies) || ""}` },
+    });
+  } catch (error) {
+    console.error("Error al cargar las reglas de autorización:", error);
+    return [];
+  }
+})();
+
+// Get roles
+const roles = await (async () => {
+  try {
+    return await apiRequest(`/admin/get-roles`, {
+      headers: { Authorization: `Bearer ${getCookie("token", Astro.cookies) || ""}` },
+    });
+  } catch (error) {
+    console.error("Error al cargar las reglas de autorización:", error);
+    return [];
+  }
+})();
 ---
 
 <MainLayout title="Editar usuario" data={{userName, buttonLabel, role}}>
@@ -37,6 +62,8 @@ try {
       user_data={user_data}
       redirectTo="/dashboard"
       token={getCookie("token", Astro.cookies) || ""}
+      departments={departments}
+      roles={roles}
     />
   </div>
 </MainLayout>

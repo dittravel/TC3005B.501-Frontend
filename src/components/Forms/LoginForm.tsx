@@ -158,9 +158,12 @@ export default function LoginForm() {
 
             <div className="w-full border-t border-border"></div>
 
-            <p className="text-sm text-text-secondary">
-              ¿Olvidaste tu contraseña? Contacta a un administrador para restablecerla.
-            </p>
+            <a
+              href="/forgot-password"
+              className="text-sm text-text-secondary hover:text-text-primary transition-colors text-center"
+            >
+              ¿Olvidaste tu contraseña?
+            </a>
 
             {/* Error Message */}
             {errorMessage && (

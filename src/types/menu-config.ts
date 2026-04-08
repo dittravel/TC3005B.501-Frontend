@@ -20,17 +20,7 @@ export const SIDEBAR_CONFIG: Record<string, MenuItem[]> = {
     { label: 'Comprobar Gastos', route: '/comprobar-gastos', icon: 'receipt', category: 'Gastos' },
     { label: 'Reembolsos', route: '/reembolso', icon: 'currency_exchange', category: 'Gastos' }
   ],
-  'N1': [
-    { label: 'Dashboard', route: '/dashboard', icon: 'home' },
-    { label: 'Autorizaciones', route: '/autorizaciones', icon: 'check_box', category: 'Autorizaciones' },
-    { label: 'Mis Solicitudes', route: '/solicitudes-autorizador', icon: 'airplane_ticket', category: 'Viajes' },
-    { label: 'Crear Solicitud', route: '/crear-solicitud', icon: 'note_add', category: 'Viajes' },
-    { label: 'Draft Solicitudes', route: '/solicitudes-draft', icon: 'edit_document', category: 'Viajes' },
-    { label: 'Historial De Viajes', route: '/historial', icon: 'history', category: 'Viajes' },
-    { label: 'Comprobar Gastos', route: '/comprobar-gastos', icon: 'receipt', category: 'Gastos' },
-    { label: 'Reembolsos', route: '/reembolso', icon: 'currency_exchange', category: 'Gastos' }
-  ],
-  'N2': [
+  'Autorizador': [
     { label: 'Dashboard', route: '/dashboard', icon: 'home' },
     { label: 'Autorizaciones', route: '/autorizaciones', icon: 'check_box', category: 'Autorizaciones' },
     { label: 'Mis Solicitudes', route: '/solicitudes-autorizador', icon: 'airplane_ticket', category: 'Viajes' },
@@ -51,8 +41,9 @@ export const SIDEBAR_CONFIG: Record<string, MenuItem[]> = {
   ],
   'Administrador': [
     { label: 'Dashboard', route: '/dashboard', icon: 'home' },
+    { label: 'Importar Datos', route: '/importar-datos', icon: 'file_upload', category: 'Gestión' },
     { label: 'Reglas de Autorización', route: '/reglas-autorizacion', icon: 'rule', category: 'Gestión'},
     { label: 'Roles', route: '/roles', icon: 'people', category: 'Gestión' },
-    { label: 'Políticas de Reembolsos', route: '/politicas-reembolso', icon: 'policy', category: 'Gestión' }
+    { label: 'Políticas de Reembolsos', route: '/politicas-reembolso', icon: 'policy', category: 'Gestión' },
   ]
 };
