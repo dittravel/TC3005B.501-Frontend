@@ -102,8 +102,6 @@ export default function ReceiptsList({ expenses, token }: Props) {
                       <ReceiptActions
                         receipt_id={receipt.receipt_id}
                         disabled={false}
-                        onApprove={() => {}} // This was implemented in a wrong way, empty for now
-                        onReject={() => {}}
                         token={token}
                       />
                     )}
