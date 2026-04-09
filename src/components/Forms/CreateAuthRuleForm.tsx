@@ -40,7 +40,7 @@ export default function CreateAuthRuleForm({ token, mode, data }: Props) {
       setAutomatico(data.automatic || false);
       setAutorizadores(data.levels?.map((n: any) => n.level_type) || []);
       setIsSuperiorSelected(
-        data.levels?.map((n: any) => n.superior_level_number !== null) || []
+        data.levels?.map((n: any) => n.level_type === "Nivel_Superior") || []
       );
       setSelectedLevels(
         data.levels?.map((n: any) => n.superior_level_number || null) || []
@@ -81,11 +81,11 @@ export default function CreateAuthRuleForm({ token, mode, data }: Props) {
 
     setIsSuperiorSelected((prev) => {
       const next = [...prev];
-      next[index] = value === "Nivel Superior";
+      next[index] = value === "Nivel_Superior";
       return next;
     });
 
-    if (value !== "Nivel Superior") {
+    if (value !== "Nivel_Superior") {
       setSelectedLevels((prev) => {
         const next = [...prev];
         next[index] = "";
@@ -120,7 +120,7 @@ export default function CreateAuthRuleForm({ token, mode, data }: Props) {
       max_duration: Number(diasMax),
       min_amount: Number(montoMin),
       max_amount: Number(montoMax),
-      niveles: autorizadores.map((type, index) => ({
+      levels: autorizadores.map((type, index) => ({
         level_number: index + 1,
         level_type: type,
         superior_level_number: isSuperiorSelected[index] ? selectedLevels[index] : null,
@@ -192,7 +192,7 @@ export default function CreateAuthRuleForm({ token, mode, data }: Props) {
         </div>
         {niveles > 0 && niveles < 11 && (
           <div className="flex flex-col card-secondary mt-4">
-            <div className="flex flex-col gap-4 md:w-1/2">
+            <div className="flex flex-col gap-4">
               <h3 className="font-semibold text-text-primary">Autorizadores por nivel</h3>
               <div className="flex flex-col gap-1">
                 <Checkbox
@@ -230,7 +230,7 @@ export default function CreateAuthRuleForm({ token, mode, data }: Props) {
                         <option value="">Selecciona un autorizador</option>
                         <option value="Jefe">Jefe Directo</option>
                         <option value="Aleatorio">Autorizador Aleatorio</option>
-                        <option value="Nivel Superior">Nivel Superior</option>
+                        <option value="Nivel_Superior">Nivel Superior</option>
                       </Select>
                       {isSuperiorSelected[index] && (
                         <Select

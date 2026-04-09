@@ -107,7 +107,7 @@ export async function SubmitTravelExpense({
   // Wait for the server to process
   await new Promise((res) => setTimeout(res, 500));
 
-  // If replacing a previous receipt, delete it and reset request status to pending
+  // If replacing a previous receipt, delete it
   if (receiptToReplace) {
     try {
       // Delete the previous receipt
@@ -117,14 +117,8 @@ export async function SubmitTravelExpense({
           Authorization: `Bearer ${token}`,
         },
       });
-
-      // Reset the request status to 6 (Comprobación gastos del viaje) to allow revalidation
-      await apiRequest(`/applicant/update-request-status/${requestId}/6`, {
-        method: "PUT",
-        headers: { Authorization: `Bearer ${token}` },
-      });
     } catch (err) {
-      console.error("Error replacing receipt or updating status:", err);
+      console.error("Error replacing receipt:", err);
       // Don't throw - the new receipt was uploaded successfully
     }
   }

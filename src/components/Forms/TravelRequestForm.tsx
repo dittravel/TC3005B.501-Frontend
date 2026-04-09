@@ -672,7 +672,6 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
           value={formData.requested_fee === 0 ? '' : formData.requested_fee}
           onChange={handleGeneralChange}
           required
-          error={error ? 'Campo requerido' : ''}
         />
         <Textarea
           name="notes"
