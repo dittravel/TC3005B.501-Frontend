@@ -43,7 +43,7 @@ export default function Modal({
         <h2 className="text-lg font-bold mb-2">{title}</h2>
         <p className="mb-4">{message}</p>
         <div className="flex justify-end gap-2">
-          <Button variant="border" color="primary" onClick={onClose}>
+          <Button variant="filled" color="primary" onClick={onClose}>
             Cancelar
           </Button>
           {onConfirm && (

@@ -44,7 +44,7 @@ export default function AproveRequestModal({
    */
   const handleConfirm = useCallback(async () => {
     try {
-      const url = `/travel-agent/attend-travel-request/${request_id}`;
+      const url = `/travel-agent/complete-service-assignment/${request_id}`;
       await apiRequest(url, { 
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` }

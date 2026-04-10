@@ -1,0 +1,367 @@
+---
+/**
+ * Refund Policies Page - Create/Edit
+ */
+import TextHeader from '@components/Layout/TextHeader.astro';
+import MainLayout from "@layouts/MainLayout.astro";
+import { getCookie } from "@data/cookies";
+import { roleLabels } from "@config/role-labels";
+import type { UserRole } from "@type/roles";
+
+const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
+const buttonLabel = roleLabels[role];
+const userName = getCookie("username", Astro.cookies) || "";
+
+// aqui vendria informacion de una politica ya creada o empezar desde cero
+const politica = {
+  id: 1,
+  nombre: "Viajes económicos",
+  montoMin: 1000,
+  montoMax: 2999,
+  tiempoMaximo: 20,
+  validarFactura: true,
+  validarInsumo: true,
+};
+---
+
+<MainLayout title="Políticas de reembolso" data={{ userName, buttonLabel, role }}>
+  <div>
+    <TextHeader
+      title={`Política #${politica.id} ${politica.nombre}`}
+      subtitle="Gestiona los parámetros de la política de reembolso seleccionada"
+    />
+  </div>
+
+  <div class="politica-container">
+    <form id="politica-form" novalidate>
+
+      <!-- cuadro 0 . nombre de la politica -->
+      <div class="seccion-card">
+        <h2 class="seccion-titulo">0.- Nombre de la política</h2>
+        <div class="nombre-row">
+          <label for="nombre-politica" class="monto-label">Nombre</label>
+          <input
+            type="text"
+            id="nombre-politica"
+            name="nombre"
+            class="input-field input-nombre"
+            value={politica.nombre}
+            placeholder="Ej. Viajes económicos"
+            maxlength="80"
+            required
+          />
+        </div>
+      </div>
+
+      <!-- cuadro 1 . monton min y max de reembolso -->
+      <div class="seccion-card">
+        <h2 class="seccion-titulo">1.- Selecciona el monto del reembolso</h2>
+        <div class="monto-row">
+          <span class="monto-label">Monto entre</span>
+          <input
+            type="number"
+            id="monto-min"
+            name="montoMin"
+            class="input-field input-numero"
+            value={politica.montoMin}
+            min="0"
+            required
+          />
+          <span class="monto-label">y</span>
+          <input
+            type="number"
+            id="monto-max"
+            name="montoMax"
+            class="input-field input-numero"
+            value={politica.montoMax}
+            min="0"
+            required
+          />
+          <span class="monto-currency">MXN</span>
+        </div>
+      </div>
+
+      <!-- cuadro 2 . tiempo max para solicitar reembolso -->
+      <div class="seccion-card">
+        <h2 class="seccion-titulo">2.- Tiempo máximo para solicitar reembolso</h2>
+        <div class="tiempo-row">
+          <span class="monto-label">Tiempo máximo</span>
+          <input
+            type="number"
+            id="tiempo-maximo"
+            name="tiempoMaximo"
+            class="input-field input-numero"
+            value={politica.tiempoMaximo}
+            min="1"
+            required
+          />
+          <span class="monto-label">días</span>
+        </div>
+      </div>
+
+      <!-- cuadro 3 . validaciones con checkbox -->
+      <div class="seccion-card">
+        <h2 class="seccion-titulo">3.- Validaciones adicionales</h2>
+        <div class="validaciones-list">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              name="validarFactura"
+              checked={politica.validarFactura}
+              class="checkbox-input"
+            />
+            <span class="checkbox-custom"></span>
+            <span class="checkbox-text">Validar contra factura</span>
+          </label>
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              name="validarInsumo"
+              checked={politica.validarInsumo}
+              class="checkbox-input"
+            />
+            <span class="checkbox-custom"></span>
+            <span class="checkbox-text">Validar contra insumo predefinido</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- botones de eliminar, cancelar, guardar -->
+      <div class="acciones-row">
+        <button type="button" id="btn-eliminar" class="btn btn-eliminar">
+          Eliminar
+        </button>
+        <div class="acciones-right">
+          <button type="button" id="btn-cancelar" class="btn btn-cancelar">
+            Cancelar
+          </button>
+          <button type="submit" id="btn-guardar" class="btn btn-guardar">
+            Guardar
+          </button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</MainLayout>
+
+<!-- estilos -->
+
+<style>
+  .politica-container {
+    padding: 0 1.5rem 2rem;
+    max-width: 900px;
+  }
+
+  /* cuadros */
+  .seccion-card {
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  }
+
+  .seccion-titulo {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  /* estilo cuadro 0 */
+  .nombre-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .input-nombre {
+    flex: 1;
+    max-width: 400px;
+    border-radius: 8px;
+    padding: 0.4rem 0.875rem;
+  }
+
+  /* estilo cuadro 1 */
+  .monto-row,
+  .tiempo-row {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    flex-wrap: wrap;
+  }
+
+  .monto-label {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+  }
+
+  .monto-currency {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+  }
+
+  /* inputs */
+  .input-field {
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.875rem;
+    color: var(--color-text-primary);
+    background: var(--color-card);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .input-field:focus {
+    border-color: var(--color-secondary-300);
+    box-shadow: 0 0 0 3px rgba(51, 107, 250, 0.12);
+  }
+
+  .input-numero {
+    width: 80px;
+    text-align: center;
+    -moz-appearance: textfield;
+  }
+
+  .input-numero::-webkit-inner-spin-button,
+  .input-numero::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* checkboxes */
+  .validaciones-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .checkbox-input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .checkbox-custom {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--color-border);
+    border-radius: 3px;
+    background: var(--color-card);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, border-color 0.15s;
+    position: relative;
+  }
+
+  .checkbox-input:checked + .checkbox-custom {
+    background: var(--color-secondary);
+    border-color: var(--color-secondary);
+  }
+
+  .checkbox-input:checked + .checkbox-custom::after {
+    content: "";
+    position: absolute;
+    width: 4px;
+    height: 8px;
+    border: 2px solid var(--color-text-inverted);
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg) translate(-1px, -1px);
+  }
+
+  .checkbox-text {
+    font-size: 0.875rem;
+    color: var(--color-text-primary);
+  }
+
+  /* botones bonitos */
+  .acciones-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+  }
+
+  .acciones-right {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .btn {
+    padding: 0.5rem 1.25rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+
+  .btn:hover {
+    opacity: 0.88;
+  }
+
+  .btn:active {
+    transform: scale(0.97);
+  }
+
+  .btn-eliminar {
+    background: var(--color-warning-300);
+    color: var(--color-text-inverted);
+  }
+
+  .btn-cancelar {
+    background: var(--color-primary-300);
+    color: var(--color-text-inverted);
+  }
+
+  .btn-guardar {
+    background: var(--color-success-300);
+    color: var(--color-text-inverted);
+  }
+</style>
+
+
+<!-- para conectar con backend -->
+<script>
+  // save
+  const form = document.getElementById("politica-form") as HTMLFormElement;
+  form?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(form));
+    console.log("Guardando política:", data);
+    // llamar a API/endpoint aquí
+  });
+
+  // cancel - regresa a pagina de politicas reembolso
+  document.getElementById("btn-cancelar")?.addEventListener("click", () => {
+    history.back();
+  });
+
+  // delete
+  document.getElementById("btn-eliminar")?.addEventListener("click", () => {
+    const confirmado = confirm("¿Estás seguro de que deseas eliminar esta política?");
+    if (confirmado) {
+      console.log("Eliminando política...");
+      // llamar a API/endpoint aquí
+    }
+  });
+</script>

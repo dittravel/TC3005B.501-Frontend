@@ -1,0 +1,75 @@
+---
+/**
+ * Roles Page
+ * 
+ * Administrator-only view for visualizing, creating, editing, and deleting system roles.
+ */
+
+import TextHeader from '@components/Layout/TextHeader.astro';
+import MainLayout from "@layouts/MainLayout.astro";
+import { getCookie } from "@data/cookies";
+import { roleLabels } from "@config/role-labels";
+import type { UserRole } from "@type/roles";
+import RolesList from "@/components/Forms/RolesList";
+import RoleConfigurationForm from "@/components/Forms/RoleConfigurationForm";
+// import { apiRequest } from "@/utils/apiClient";
+
+const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
+const buttonLabel = roleLabels[role];
+const userName = getCookie("username", Astro.cookies) || "";
+const token = getCookie("token", Astro.cookies) || "";
+---
+
+<MainLayout title="Roles" data={{ userName, buttonLabel, role }}>
+  <div>
+    <TextHeader
+      title="Roles del sistema"
+      subtitle="Configura los roles y permisos del sistema"
+    />
+    <main>
+      <div class="mb-8">
+        <RoleConfigurationForm
+          role={role}
+          client:only="react"
+          data={[
+            {
+              id: 1,
+              name: "Viajes económicos",
+              minAmount: 1000,
+              maxAmount: 2999,
+              maxDays: 20,
+              validateAgainstInvoice: false,
+              validateAgainstPredefinedInput: false,
+            },
+            {
+              id: 2,
+              name: "Viajes costosos",
+              minAmount: 3000,
+              maxAmount: 5999,
+              maxDays: 30,
+              validateAgainstInvoice: true,
+              validateAgainstPredefinedInput: true,
+            },
+          ]}
+        />
+      </div>
+      {/* AQUI VA LA LLAMADA A LA API */}
+      <RolesList
+        token={token}
+        client:only="react"
+        data={[
+          {
+            id: 1,
+            name: "Solicitante",
+            permissions: ["Crear solicitudes", "Crear comprobantes", "Solicitar reembolsos"],
+          },
+          {
+            id: 2,
+            name: "Autorizador",
+            permissions: ["Autorizar/Rechazar solicitudes", "Ver solicitudes"],
+          },
+        ]}
+      />
+    </main>
+  </div>
+</MainLayout>

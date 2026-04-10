@@ -12,6 +12,7 @@ import RequestDetail from '@components/Cards/RequestDetail.astro';
 import TravelRequestActionWrapper from '@/components/Actions/TravelRequestActionWrapper';
 
 const role = getCookie('role', Astro.cookies);
+const userId = getCookie('id', Astro.cookies);
 let role_number = 0;
 if (role === 'N1') {
   role_number = 5;
@@ -33,6 +34,22 @@ const id = request.request_id;
       <TravelRequestActionWrapper
         client:only="react"
         request_id={id}
+        user_id={userId}
+        endpoint="/authorizer/decline-travel-request"
+        role={role_number}
+        title="Rechazar autorización"
+        message="¿Está seguro de que desea rechazar esta solicitud?"
+        redirection="/dashboard"
+        modal_type="warning"
+        token={getCookie("token", Astro.cookies) || ""}
+      >
+        Rechazar
+      </TravelRequestActionWrapper>
+      
+      <TravelRequestActionWrapper
+        client:only="react"
+        request_id={id}
+        user_id={userId}
         endpoint="/authorizer/authorize-travel-request"
         role={role_number}
         title="Confirmar autorización"
@@ -41,21 +58,7 @@ const id = request.request_id;
         modal_type="success"
         token={getCookie("token", Astro.cookies) || ""}
         >
-        Aceptar
-      </TravelRequestActionWrapper>
-
-      <TravelRequestActionWrapper
-        client:only="react"
-        request_id={id}
-        endpoint="/authorizer/decline-travel-request"
-        role={role_number}
-        title="Rechazar autorización"
-        message="¿Está seguro de que desea rechazar esta solicitud?"
-        redirection="/dashboard"
-        modal_type="warning"
-        token={getCookie("token", Astro.cookies) || ""}
-        >
-        Rechazar
+        Autorizar
       </TravelRequestActionWrapper>
     </div>
   </div>

@@ -24,7 +24,23 @@ function matchPath(path: string, patterns: string[]) {
 }
 
 // Public routes that do NOT require authentication
-export const publicRoutes = [ '/login', '/404' ];
+export const publicRoutes = [
+  // Default public routes
+  '/login',
+  '/forgot-password',
+  '/reset-password',
+  '/404',
+  // Routes acceded by email links
+  // NOTE: Only authenticated users can access these,
+  // but we allow them to be accessed without a role
+  // for email links to work
+  '/detalles-solicitud/*',
+  '/comprobar-solicitud/*',
+  '/atender-solicitud/*',
+  'cotizar-solicitud/*',
+  '/presupuesto-viaje/*',
+  '/resultado-accion-email',
+];
 
 /**
  * Middleware handler to enforce route access control based on user roles.

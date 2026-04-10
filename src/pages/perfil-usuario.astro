@@ -6,6 +6,7 @@
 import MainLayout from "@layouts/MainLayout.astro";
 import Typography from "@components/Utils/Typography.astro";
 import TextHeader from "@components/Layout/TextHeader.astro";
+import UserProfile from "@components/Forms/UserProfile";
 
 import type { UserRole } from "@type/roles";
 import { getCookie } from "@data/cookies";
@@ -15,8 +16,15 @@ import { apiRequest } from "@/utils/apiClient";
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
 const userName = getCookie("username", Astro.cookies) || "";
 const userId = getCookie("id", Astro.cookies);
+const token = getCookie("token", Astro.cookies);
 const buttonLabel = roleLabels[role];
+
 const userData = await apiRequest(`/user/get-user-data/${userId}`, { cookies: Astro.cookies });
+
+let departmentUsers = [];
+if (role !== "Solicitante") {
+  departmentUsers = await apiRequest(`/user/get-substitute-users/${userId}`, { cookies: Astro.cookies });
+}
 ---
 
 <MainLayout title="Perfil de Usuario" data={{userName, buttonLabel, role}}>
@@ -24,61 +32,12 @@ const userData = await apiRequest(`/user/get-user-data/${userId}`, { cookies: As
     title="Perfil de usuario"
     subtitle="Aquí puedes ver tu información personal."
   />
-
-  <!-- Personal Information Section -->
-  <div class="bg-card rounded-lg p-6 border border-border mb-8">
-    <Typography variant="subHeader" class="mb-6">Información Personal</Typography>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div>
-        <Typography variant="paragraph" size="small" class="text-text-secondary">ID Empleado</Typography>
-        <Typography variant="paragraph">{userData.user_id}</Typography>
-      </div>
-
-      <div>
-        <Typography variant="paragraph" size="small" class="text-text-secondary">Nombre</Typography>
-        <Typography variant="paragraph">{userData.user_name}</Typography>
-      </div>
-
-      <div>
-        <Typography variant="paragraph" size="small" class="text-text-secondary">Correo Electrónico</Typography>
-        <Typography variant="paragraph">{userData.email}</Typography>
-      </div>
-
-      <div>
-        <Typography variant="paragraph" size="small" class="text-text-secondary">Número Telefónico</Typography>
-        <Typography variant="paragraph">{userData.phone_number}</Typography>
-      </div>
-
-      <div>
-        <Typography variant="paragraph" size="small" class="text-text-secondary">Creación de Cuenta</Typography>
-        <Typography variant="paragraph">{new Date(userData.creation_date).toLocaleDateString()}</Typography>
-      </div>
-
-      <div>
-        <Typography variant="paragraph" size="small" class="text-text-secondary">Centro de Costos</Typography>
-        <Typography variant="paragraph">{userData.costs_center}</Typography>
-      </div>
-    </div>
-  </div>
-
-  <!-- Position Information Section -->
-  <div class="bg-card rounded-lg p-6 border border-border">
-    <Typography variant="subHeader" class="mb-6">Información de Empleado</Typography>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div>
-        <Typography variant="paragraph" size="small" class="text-text-secondary">Departamento</Typography>
-        <Typography variant="paragraph">{userData.department_name}</Typography>
-      </div>
-
-      <div>
-        <Typography variant="paragraph" size="small" class="text-text-secondary">Rol</Typography>
-        <Typography variant="paragraph">{userData.role_name}</Typography>
-      </div>
-
-      <div>
-        <Typography variant="paragraph" size="small" class="text-text-secondary">Estación de Trabajo</Typography>
-        <Typography variant="paragraph">{userData.workstation}</Typography>
-      </div>
-    </div>
-  </div>
+  <main>
+    <UserProfile
+      client:load
+      userData={userData} 
+      departmentUsers={departmentUsers}
+      token={token}
+    />
+  </main>
 </MainLayout>
