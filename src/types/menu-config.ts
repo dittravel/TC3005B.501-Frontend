@@ -45,5 +45,6 @@ export const SIDEBAR_CONFIG: Record<string, MenuItem[]> = {
     { label: 'Reglas de Autorización', route: '/reglas-autorizacion', icon: 'rule', category: 'Gestión'},
     { label: 'Roles', route: '/roles', icon: 'people', category: 'Gestión' },
     { label: 'Políticas de Reembolsos', route: '/politicas-reembolso', icon: 'policy', category: 'Gestión' },
+    { label: 'Exportar datos contables', route: '/exportar-datos-contables', icon: 'draft', category: 'Gestión'}
   ]
 };
