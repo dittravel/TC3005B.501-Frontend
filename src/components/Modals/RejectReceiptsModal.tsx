@@ -46,7 +46,7 @@ export default function RejectReceiptStatus({
       const url = `/accounts-payable/validate-receipt/${receipt_id}`;
       await apiRequest(url, { 
         method: "PUT", 
-        data: { "approval": 0 },
+        data: { "approval": "Rechazado" },
         headers: { Authorization: `Bearer ${token}` }
       });
       setToast({ message: 'Comprobante rechazado exitosamente.', type: 'success' });

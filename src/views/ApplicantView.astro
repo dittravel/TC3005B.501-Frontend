@@ -12,8 +12,7 @@ import { apiRequest } from '@utils/apiClient';
 
 // Color for each request status
 const colorDesign: { [key: string]: string } = {
-  'Primera Revisión': "success",
-  'Segunda Revisión': "alert",
+  'Revisión': "success",
   'Cotización del Viaje': "warning",
   'Atención Agencia de Viajes': "primary",
   'Comprobación gastos del viaje': "secondary",
@@ -73,8 +72,8 @@ const { userName } = Astro.props;
       {requests.length > 0 ? (
         <div class="space-y-6">
           {requests.map((request: any) => {
-            const isEditable = request.status === "Primera Revisión";
-            const isNotCancelable = request.status === "Comprobación gastos del viaje" || request.status === "Validación de comprobantes";
+            const isEditable = request.status === "Revisión";
+            const isNotCancelable = request.status !== "Revisión";
             const mustBeChecked = request.status === "Comprobación gastos del viaje";
             return (
               <Card
