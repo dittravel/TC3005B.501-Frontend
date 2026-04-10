@@ -133,10 +133,6 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token, dep
       newErrors.email = 'El email debe tener un formato válido';
     }
 
-    if (!formData.workstation.trim()) {
-      newErrors.workstation = 'La estación de trabajo es requerida';
-    }
-
     if (!formData.role_id) {
       newErrors.role_id = 'El rol es requerido';
     }
@@ -324,7 +320,6 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token, dep
               onChange={handleInputChange}
               error={errors.workstation}
               placeholder="Ej: WS-001"
-              required
             />
             <Select
               label="Rol"
