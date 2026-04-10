@@ -23,14 +23,14 @@ const token = getCookie("token", Astro.cookies);
 <MainLayout title="Roles" data={{userName, buttonLabel, role}}>
   <TextHeader
     title="Importar Datos"
-    subtitle="Importa datos organizacionales desde un archivo XML"
+    subtitle="Importa datos organizacionales externos"
   />
   {role === "Administrador" ? (
     <main>
       <ImportDataForm
         client:load
         endpoint="/admin/import-data"
-        token={token}
+        token={token || ""}
       />
     </main>
   ) : (
