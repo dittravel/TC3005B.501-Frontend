@@ -14,4 +14,6 @@ export interface TravelRoute {
   ending_time: string;
   plane_needed: boolean;
   hotel_needed: boolean;
+  selected_flight: null;
+  selected_hotel: null;
 }
