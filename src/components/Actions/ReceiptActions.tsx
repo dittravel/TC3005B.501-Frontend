@@ -14,18 +14,10 @@ import RejectReceiptStatus from "@/components/Modals/RejectReceiptsModal";
 interface ReceiptProps {
   receipt_id: number;
   disabled: boolean;
-  onApprove: (id: number) => void;
-  onReject: (id: number) => void;
   token: string;
 }
 
-export default function ReceiptActions({
-  receipt_id,
-  disabled,
-  onApprove,
-  onReject,
-  token,
-}: ReceiptProps) {
+export default function ReceiptActions({ receipt_id, disabled, token }: ReceiptProps) {
   const [showModal, setShowModal] = useState(false);
   const [action, setAction] = useState<"approve" | "reject" | null>(null);
   const [loading, setLoading] = useState(false);
@@ -46,8 +38,7 @@ export default function ReceiptActions({
    * @returns {Promise<void>}
    */
   const confirmAction = async () => {
-    // Convert action to approval value: 1 for approve, 0 for reject
-    const approval = action === "approve" ? 1 : 0;
+    const approval = action === "approve" ? "Aprobado" : "Rechazado";
 
     try {
       setLoading(true);
@@ -67,7 +58,7 @@ export default function ReceiptActions({
 
       // Execute appropriate callback based on action result
       if (res.ok) {
-        approval === 1 ? onApprove(receipt_id) : onReject(receipt_id);
+        alert(`Comprobante ${approval.toLowerCase()} exitosamente.`);
       } else {
         alert(data.error || "No se pudo actualizar.");
       }

@@ -62,7 +62,8 @@ export const roleRoutes: Record<UserRole, string[]> = {
     '/importar-datos',
     '/reglas-autorizacion','/crear-regla','/editar-regla/*',
     '/roles','/crear-rol','/editar-rol/*',
-    '/politicas-reembolso', '/edit-politica-rembolso'
+    '/politicas-reembolso', '/edit-politica-rembolso',
+    '/exportar-datos-contables'
   ],
 };
 

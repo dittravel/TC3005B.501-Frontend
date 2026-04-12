@@ -48,7 +48,7 @@ export default function DefaultAuthRule({ defaultRule, token }: Props) {
       // If there is a config for this level, set array values
       if (nivelConfig) {
         nextAutorizadores[i] = nivelConfig.level_type || "";
-        const isSuperior = nivelConfig.level_type === "Nivel Superior";
+        const isSuperior = nivelConfig.level_type === "Nivel_Superior";
         nextIsSuperiorSelected[i] = isSuperior;
         nextSelectedLevels[i] = isSuperior ? (nivelConfig.superior_level_number || "") : "";
       } else {
@@ -96,12 +96,12 @@ export default function DefaultAuthRule({ defaultRule, token }: Props) {
 
     setIsSuperiorSelected(prev => {
       const next = [...prev];
-      next[index] = value === "Nivel Superior";
+      next[index] = value === "Nivel_Superior";
       return next;
     });
 
     // If changing away from "Nivel Superior", clear the selection for that level
-    if (value !== "Nivel Superior") {
+    if (value !== "Nivel_Superior") {
       setSelectedLevels(prev => {
         const next = [...prev];
         next[index] = "";
@@ -144,7 +144,7 @@ export default function DefaultAuthRule({ defaultRule, token }: Props) {
       is_default: true,
       num_levels: niveles,
       automatic: automatico,
-      niveles: autorizadores.map((type, index) => ({
+      levels: autorizadores.map((type, index) => ({
         level_number: index + 1,
         level_type: type,
         superior_level_number: isSuperiorSelected[index] ? selectedLevels[index] : null
@@ -237,7 +237,7 @@ export default function DefaultAuthRule({ defaultRule, token }: Props) {
                         <option value="">Selecciona un autorizador</option>
                         <option value="Jefe">Jefe Directo</option>
                         <option value="Aleatorio">Autorizador Aleatorio</option>
-                        <option value="Nivel Superior">Nivel Superior</option>
+                        <option value="Nivel_Superior">Nivel Superior</option>
                       </Select>
                       {/* If "Superior level" is selected, show level select */}
                       {isSuperiorSelected[index] && (
