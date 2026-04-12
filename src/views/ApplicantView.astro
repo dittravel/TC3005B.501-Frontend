@@ -9,6 +9,7 @@ import TextHeader from "@components/Layout/TextHeader.astro";
 import CancelRequestModal from "@/components/Modals/CancelRequestModal";
 import { getCookie } from "@data/cookies";
 import { apiRequest } from '@utils/apiClient';
+import { getSocietyName } from "@data/societyHelper";
 
 // Color for each request status
 const colorDesign: { [key: string]: string } = {
@@ -21,6 +22,7 @@ const colorDesign: { [key: string]: string } = {
 
 // Get user ID from cookies
 const user_id = getCookie("id", Astro.cookies);
+const societyName = await getSocietyName(Astro);
 
 // Get user requests
 const requests = await (async () => {
@@ -51,7 +53,7 @@ const { userName } = Astro.props;
     {/* Header */}
     <TextHeader
       title={`Bienvenido, ${userName}`}
-      subtitle="Ditta Consulting"
+      subtitle={societyName}
     />
 
     <section>

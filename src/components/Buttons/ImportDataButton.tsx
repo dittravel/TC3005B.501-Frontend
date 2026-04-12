@@ -20,6 +20,11 @@ interface ImportResponse {
   success: boolean;
   message: string;
   summary?: {
+    societies: {
+      created: string[];
+      updated: string[];
+      skipped: string[];
+    };
     departments: {
       created: Array<{ name: string, cost_center: string }>;
       updated: Array<{ name: string, old_cost_center_id: string | null, new_cost_center_id: string | null }>;
@@ -176,7 +181,23 @@ export default function ImportDataButton({ endpoint, token }: Props) {
       {showSummary && importData && importData.summary && (
         <div>
           <h2 className="text-xl font-semibold mb-4">Resumen de Importación</h2>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+            {/* Societies */}
+            {importData.summary.societies && (
+              <SummaryCard title="Sociedades">
+                <SummaryItem
+                  label="Creadas"
+                  items={importData.summary.societies.created}
+                  type="success"
+                />
+                <SummaryItem
+                  label="Actualizadas"
+                  items={importData.summary.societies.updated}
+                  type="success"
+                />
+                <SummaryItem label="Omitidas" items={importData.summary.societies.skipped} type="warning" />
+              </SummaryCard>
+            )}
             {/* Departments */}
             <SummaryCard title="Departamentos">
               <SummaryItem

@@ -12,6 +12,7 @@ import { apiRequest } from "@/utils/apiClient";
 import Button from "@/components/Buttons/Button";
 import Tag from "@/components/Utils/Tag";
 import { getStatusTagType } from "@/utils/statusMapper";
+import { getSocietyName } from "@data/societyHelper";
 
 // Define the User interface
 interface User {
@@ -42,6 +43,9 @@ if (users && users.length > 0) {
   users.sort((a: User, b: User) => a.user_id - b.user_id);
 }
 
+// Get society info for displaying welcome message
+const societyName = await getSocietyName(Astro);
+
 // Get user info from cookies
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
 const userName = getCookie("username", Astro.cookies);
@@ -67,7 +71,7 @@ const userName = getCookie("username", Astro.cookies);
     <>
       <TextHeader
         title={`Bienvenido, ${userName}`}
-        subtitle="Ditta Consulting"
+        subtitle={societyName}
       />
       
       <section class="w-full">

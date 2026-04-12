@@ -36,7 +36,7 @@ if (isServer && isDevelopment && typeof process !== 'undefined') {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 }
 
-type HTTP = 'GET' | 'POST' | 'PUT';
+type HTTP = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
 interface ApiOptions {
   method?: HTTP;
@@ -84,7 +84,7 @@ export async function apiRequest<T = any>(
       if (res.status === 401 || res.status === 403) {
         console.warn("Unauthorized request - token may be invalid or expired");
         try {
-          await fetch(`${baseUrl}/user/logout`, {
+          await fetch(`${BASE_URL}/user/logout`, {
             method: 'POST',
             credentials: 'include',
           });

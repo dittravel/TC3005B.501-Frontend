@@ -35,13 +35,8 @@ export default function LoginForm() {
    */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Clear any existing session before login
-    await apiRequest("/user/logout", {
-      method: "GET",
-    });
 
     try {
-
       const response = await apiRequest("/user/login", {
         method: "POST",
         data: { username, password },
@@ -49,15 +44,7 @@ export default function LoginForm() {
 
       // Clear error message on successful login
       setErrorMessage("");
-    
-      alert("Inicio de sesión exitoso");
 
-      // Set authentication cookies to persist user session and credentials
-      document.cookie = `token=${response.token}; path=/; secure; SameSite=Strict`;
-      document.cookie = `role=${response.role}; path=/`;
-      document.cookie = `username=${response.username}; path=/`;
-      document.cookie = `user_id=${response.user_id}; path=/`;
-      document.cookie = `department_id=${response.department_id}; path=/`;
       window.location.href = "/dashboard";
 
     } catch (error: any) {
@@ -92,10 +79,11 @@ export default function LoginForm() {
       {/* Main Container */}
       <div className="w-full md:w-100">
         {/* Login Form Container */}
-        <div className="p-2 md:p-8
-                        flex flex-col justify-center items-center
-                        rounded-xl gap-10
-                        md:shadow-lg md:bg-card md:border-border md:border-1"
+        <div className="
+          p-2 md:p-8
+          flex flex-col justify-center items-center
+          rounded-xl gap-10
+          md:shadow-lg md:bg-card md:border-border md:border-1"
         >
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="flex flex-col gap-6">

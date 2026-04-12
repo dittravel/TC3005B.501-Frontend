@@ -21,14 +21,14 @@ export default function TableHeader({ columns }: Props) {
     <thead className="bg-secondary">
       <tr>
         {columns.map((col) => (
-            <th
-              key={col.key}
-              className={`px-4 py-3 text-left text-xs font-medium text-white ${
-                col.key === 'action' ? 'text-center' : ''
-              }`}
-              >
-              {col.label}
-            </th>
+          <th
+            key={col.key}
+            className={`px-4 py-3 text-left text-xs font-medium text-white ${
+              col.key === 'actions' ? 'text-center w-1/3' : ''
+            }`}
+          >
+            {col.label}
+          </th>
         ))}
       </tr>
     </thead>
