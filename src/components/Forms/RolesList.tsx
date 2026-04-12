@@ -9,6 +9,8 @@ import { useState } from "react";
 import Pagination from "@/components/Table/Pagination";
 import Card from "@/components/Utils/Card";
 import Button from "@/components/Buttons/Button";
+import CancelRoleModal from "@/components/Modals/CancelRoleModel";
+
 
 interface Props {
   data: any[];
@@ -35,7 +37,7 @@ export default function RolesList({ data, token, itemsPerPage = 5 }: Props) {
           variant="filled"
           color="secondary"
           href="/crear-rol"
-        >
+          >
           + Crear Rol
         </Button>
       </div>
@@ -60,7 +62,7 @@ export default function RolesList({ data, token, itemsPerPage = 5 }: Props) {
                   <p>
                     {rol.permissions && rol.permissions.length > 0
                       ? rol.permissions.slice(0, 3).join(", ") +
-                        (rol.permissions.length > 3 ? "..." : "")
+                      (rol.permissions.length > 3 ? "..." : "")
                       : "Sin permisos asignados"}
                   </p>
                 </div>
@@ -70,15 +72,16 @@ export default function RolesList({ data, token, itemsPerPage = 5 }: Props) {
                   <Button
                     variant="filled"
                     color="primary"
+                    href={`/editar-rol/${rol.role_id}`}
                   >
                     Editar
                   </Button>
-                  <Button
-                    variant="filled"
-                    color="warning"
-                  >
-                    Eliminar
-                  </Button>
+                  <CancelRoleModal
+                    title="Eliminar Rol"
+                    message="¿Estás seguro de que deseas eliminar este rol?"
+                    token={token}
+                    role_id={rol.role_id}
+                  />
                 </div>
 
               </div>

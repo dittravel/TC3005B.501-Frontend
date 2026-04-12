@@ -30,27 +30,8 @@ const token = getCookie("token", Astro.cookies) || "";
       <div class="mb-8">
         <RoleConfigurationForm
           role={role}
+          token={token}
           client:only="react"
-          data={[
-            {
-              id: 1,
-              name: "Viajes económicos",
-              minAmount: 1000,
-              maxAmount: 2999,
-              maxDays: 20,
-              validateAgainstInvoice: false,
-              validateAgainstPredefinedInput: false,
-            },
-            {
-              id: 2,
-              name: "Viajes costosos",
-              minAmount: 3000,
-              maxAmount: 5999,
-              maxDays: 30,
-              validateAgainstInvoice: true,
-              validateAgainstPredefinedInput: true,
-            },
-          ]}
         />
       </div>
       {/* AQUI VA LA LLAMADA A LA API */}
