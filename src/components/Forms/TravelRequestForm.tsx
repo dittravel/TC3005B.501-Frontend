@@ -39,7 +39,9 @@ const emptyRoute: TravelRoute = {
   ending_date: '',
   ending_time: '',
   plane_needed: false,
-  hotel_needed: false
+  hotel_needed: false,
+  selected_flight: null,
+  selected_hotel: null
 };
 
 const initialFormState: FormData = {
