@@ -1,0 +1,40 @@
+---
+/**
+ * Role Edit Page
+ */
+
+import TextHeader from "../../components/Layout/TextHeader.astro";
+import MainLayout from "../../layouts/MainLayout.astro";
+
+import type { UserRole } from "../../types/roles";
+import { getCookie } from "../../data/cookies";
+import { roleLabels } from "../../config/role-labels";
+import { apiRequest } from "../../utils/apiClient";
+import CreateRoleForm from "../../components/Forms/CreateRoleForm";
+
+const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
+const buttonLabel = roleLabels[role];
+const userName = getCookie("username", Astro.cookies) || "";
+
+// Get token
+const token = getCookie("token", Astro.cookies) || "";
+
+// Get role details
+const { id } = Astro.params;
+const roleDetails = await apiRequest(`/admin/roles/${id}`, { cookies: Astro.cookies });
+---
+
+<MainLayout title="Editar Rol" data={{ userName, buttonLabel, role }}>
+  <TextHeader
+    title="Editar Rol"
+    subtitle="Modifica el nombre y permisos del rol"
+  />
+  <main>
+    <CreateRoleForm
+      client:only="react"
+      mode="edit"
+      data={roleDetails}
+      token={token}
+    />
+  </main>
+</MainLayout>
