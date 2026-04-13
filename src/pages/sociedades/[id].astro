@@ -1,0 +1,81 @@
+---
+/**
+ * Generic page for creating or editing a society
+ * - /sociedades/nueva → Create new society
+ * - /sociedades/123 → Edit society with ID 123
+ */
+
+import TextHeader from "@components/Layout/TextHeader.astro";
+import MainLayout from "@layouts/MainLayout.astro";
+import SocietyForm from "@components/Forms/SocietyForm";
+import { getCookie } from "@data/cookies";
+import { roleLabels } from "@config/role-labels";
+import type { UserRole } from "@type/roles";
+import { apiRequest } from "@/utils/apiClient";
+
+const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
+const buttonLabel = roleLabels[role];
+const userName = getCookie("username", Astro.cookies) || "";
+const token = getCookie("token", Astro.cookies) || "";
+const { id } = Astro.params;
+
+// Determine if we're creating or editing
+const isCreating = id === "nueva";
+const isEditing = id && id !== "nueva";
+
+let data = null;
+if (isEditing) {
+  try {
+    console.log(`[DEBUG] Fetching society with ID: ${id}`);
+    data = await apiRequest(`/societies/${id}`, { cookies: Astro.cookies });
+    console.log(`[DEBUG] Society data fetched:`, data);
+  } catch (error) {
+    console.error(`[ERROR] Failed to fetch society ${id}:`, error);
+    data = null;
+    throw error;
+  }
+}
+
+// Get society groups
+const societyGroups = await (async () => {
+  try {
+    return await apiRequest(`/society-groups`, {
+      cookies: Astro.cookies
+    });
+  } catch (error) {
+    console.error("Error loading society groups:", error);
+    return [];
+  }
+})();
+
+// Get currencies
+const currencies = await (async () => {
+  try {
+    const response = await apiRequest(`/exchange-rate/catalog`, {
+      cookies: Astro.cookies
+    });
+    return Array.isArray(response) ? response : (response?.data || []);
+  } catch (error) {
+    console.error("Error loading currencies:", error);
+    return [];
+  }
+})();
+---
+
+<MainLayout title={isCreating ? "Crear Sociedad" : "Editar Sociedad"} data={{userName, buttonLabel, role}}>
+  <div>
+    <TextHeader
+      title={isCreating ? "Crear nueva sociedad" : "Editar Sociedad"}
+      subtitle={isCreating ? "Complete el formulario con los datos de la nueva sociedad" : "Modifica los campos necesarios para actualizar la información de la sociedad"}
+    />
+    <SocietyForm
+      client:load
+      mode={isCreating ? "create" : "edit"}
+      data={data}
+      societyGroups={societyGroups}
+      currencies={currencies}
+      token={token}
+      redirectTo="/sociedades"
+    />
+  </div>
+</MainLayout>
