@@ -8,10 +8,12 @@
  * Svg icons obtained from Heroicons (https://heroicons.com/)
  */
 
-import React from 'react';
+import React, {useState} from 'react';
 import Button from '@/components/Buttons/Button';
 import Input from '@/components/Utils/Input';
 import Checkbox from '@/components/Utils/Checkbox';
+import FlightSearchForm from '@/components/Forms/FlightSearchForm';
+import HotelSearchForm from '@/components/Forms/HotelSearchForm';
 import type { TravelRoute } from '@/types/TravelRoute';
 
 interface RouteInputGroupProps {
@@ -30,6 +32,9 @@ interface RouteInputGroupProps {
  * @returns {JSX.Element} Rendered route input form group
  */
 const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, index, onRemove, isRemovable }) => {
+  const [flightSearchOpen, setFlightSearchOpen] = useState(false);
+  const [hotelSearchOpen, setHotelSearchOpen] = useState(false);
+  
   /**
    * Handles input changes for all input fields in the route form.
    * Converts checkbox values to boolean and regular input values to string.
@@ -40,6 +45,15 @@ const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, inde
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
     onChange(index, name, type === 'checkbox' ? checked : value);
+
+    // Opens or closes the flight and hotel searches based on the checkbox and its state
+    if (type === 'checkbox') {
+      if (name === 'plane_needed') {
+        setFlightSearchOpen(checked);
+      } else if (name === 'hotel_needed') {
+        setHotelSearchOpen(checked);
+      }
+    }
   };
 
   // Get today's date in ISO format for date input minimum constraint
@@ -187,18 +201,43 @@ const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, inde
             Servicios Adicionales
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Checkbox
-              name="plane_needed"
-              label="¿Requiere Avión?"
-              checked={route.plane_needed}
-              onChange={handleInputChange}
-            />
-            <Checkbox
-              name="hotel_needed"
-              label="¿Requiere Hotel?"
-              checked={route.hotel_needed}
-              onChange={handleInputChange}
-            />
+            <div>
+              <Checkbox
+                name="plane_needed"
+                label="¿Requiere Avión?"
+                checked={route.plane_needed}
+                onChange={handleInputChange}
+              />
+              
+              {route.plane_needed && flightSearchOpen && (
+                <FlightSearchForm
+                  route={route}
+                  routeIndex={index}
+                  onSelectFlight={(flight) => {
+                    onChange(index, 'selected_flight', flight);
+                  }}
+                />
+              )}
+            </div>
+
+            <div>
+              <Checkbox
+                name="hotel_needed"
+                label="¿Requiere Hotel?"
+                checked={route.hotel_needed}
+                onChange={handleInputChange}
+              />
+
+              {route.hotel_needed && hotelSearchOpen && (
+                <HotelSearchForm
+                  route={route}
+                  routeIndex={index}
+                  onSelectHotel={(hotel) => {
+                    onChange(index, 'selected_hotel', hotel);
+                  }}
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>
