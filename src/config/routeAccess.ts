@@ -66,6 +66,7 @@ export const roleRoutes: Record<UserRole, string[]> = {
     '/exportar-datos-contables',
     '/sociedades', '/sociedades/*',
     '/grupos-sociedades', '/grupos-sociedades/*',
+    '/bitacora',
   ],
 };
 
