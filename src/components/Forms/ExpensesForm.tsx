@@ -34,6 +34,7 @@ export default function ExpensesFormClient({ requestId, routes, token, receiptTo
   const [monto, setMonto] = useState("");
   const [currency, setCurrency] = useState("");
   const [routeId, setRouteId] = useState<number | null>(routes?.[0]?.route_id || null);
+  const [receiptDate, setReceiptDate] = useState<string>("");
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [xmlFile, setXmlFile] = useState<File | null>(null);
   const [isInternational, setIsInternational] = useState(false);
@@ -46,22 +47,37 @@ export default function ExpensesFormClient({ requestId, routes, token, receiptTo
   const [isEditing, setIsEditing] = useState(false);
   const [receiptIdToEdit, setReceiptIdToEdit] = useState<number | null>(null);
   const [mxnEquivalent, setMxnEquivalent] = useState("");
+  const [societyCurrency, setSocietyCurrency] = useState("MXN");
   const [currencies, setCurrencies] = useState<CurrencyOption[]>([]);
 
-  // Fetch currency catalog from the backend on mount
+  // Fetch currency catalog and user's society currency on mount
   useEffect(() => {
-    const fetchCurrencies = async () => {
+    const fetchData = async () => {
       try {
         const baseUrl = import.meta.env.PUBLIC_API_BASE_URL;
-        const res = await fetch(`${baseUrl}/exchange-rate/catalog`);
-        const json = await res.json();
-        if (json.success) setCurrencies(json.data);
+
+        // Fetch currencies
+        const resC = await fetch(`${baseUrl}/exchange-rate/catalog`);
+        const jsonC = await resC.json();
+        if (jsonC.success) setCurrencies(jsonC.data);
+
+        // Fetch user's society currency
+        const resS = await fetch(`${baseUrl}/societies/current`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const jsonS = await resS.json();
+        if (jsonS.local_currency) {
+          console.log('[ExpensesForm] Setting society currency:', jsonS.local_currency);
+          setSocietyCurrency(jsonS.local_currency);
+        } else {
+          // console.log('[ExpensesForm] No local_currency in response');
+        }
       } catch {
-        // Silently fail — fallback options are shown in the Select
+        // Silently fail — fallback to defaults
       }
     };
-    fetchCurrencies();
-  }, []);
+    fetchData();
+  }, [token]);
 
   // Initialize form with receipt data if editing
   useEffect(() => {
@@ -73,6 +89,7 @@ export default function ExpensesFormClient({ requestId, routes, token, receiptTo
       setCurrency(receiptToEdit.currency || "MXN");
       setRouteId(receiptToEdit.route_id || routes?.[0]?.route_id || null);
       setIsInternational(receiptToEdit.currency !== "MXN");
+      setReceiptDate(receiptToEdit.receipt_date.split('T')[0] || ""); // Format date to YYYY-MM-DD
     }
   }, [receiptToEdit, routes]);
 
@@ -93,24 +110,51 @@ export default function ExpensesFormClient({ requestId, routes, token, receiptTo
     }, duration);
   };
 
-  // Fetch MXN equivalent when monto or currency changes
+  // Fetch equivalent when monto, currency, or date changes
   useEffect(() => {
-    const seriesId = currencies.find(c => c.currency === currency)?.banxico_series_id;
-    // If no valid currency, monto, or series (e.g. MXN has no series), clear equivalent
-    if (!seriesId || !monto || isNaN(parseFloat(monto))) {
+    // Validate monto
+    if (!monto || isNaN(parseFloat(monto))) {
       setMxnEquivalent("");
+      return;
+    }
+
+    // If currency matches society currency, no conversion needed (1:1)
+    if (currency === societyCurrency) {
+      setMxnEquivalent(`≈ $${parseFloat(monto).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${societyCurrency}`);
       return;
     }
 
     const timer = setTimeout(async () => {
       try {
         const baseUrl = import.meta.env.PUBLIC_API_BASE_URL;
-        const res = await fetch(`${baseUrl}/exchange-rate?series=${seriesId}`);
-        const json = await res.json();
-        if (json.success && json.data?.rate) {
-          const equivalent = parseFloat(monto) * json.data.rate;
-          // Format of MXN string, example: "≈ $111.50 MXN"
-          setMxnEquivalent(`≈ $${equivalent.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`);
+
+        // Helper to get series ID and fetch rate for a currency
+        const fetchCurrencyRate = async (curr: string) => {
+          if (curr === 'MXN') return 1; // MXN is the base, no need to fetch
+
+          const series = currencies.find(c => c.currency === curr)?.banxico_series_id;
+          if (!series) return null;
+
+          const url = receiptDate
+            ? `${baseUrl}/exchange-rate?series=${series}&date=${receiptDate}`
+            : `${baseUrl}/exchange-rate?series=${series}`;
+
+          const res = await fetch(url);
+          const json = await res.json();
+          return json.success && json.data?.rate ? parseFloat(json.data.rate) : null;
+        };
+
+        // Get rates for both currencies
+        const fromRate = await fetchCurrencyRate(currency);
+        const toRate = await fetchCurrencyRate(societyCurrency);
+
+        if (fromRate !== null && toRate !== null) {
+          // Cross-rate conversion fromCurrency/MXN / toCurrency/MXN = fromCurrency/toCurrency
+          const finalRate = fromRate / toRate;
+          const equivalent = parseFloat(monto) * finalRate;
+          setMxnEquivalent(`≈ $${equivalent.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${societyCurrency}`);
+        } else {
+          setMxnEquivalent("");
         }
       } catch {
         setMxnEquivalent("");
@@ -118,7 +162,7 @@ export default function ExpensesFormClient({ requestId, routes, token, receiptTo
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [monto, currency, currencies]);
+  }, [monto, currency, receiptDate, currencies, societyCurrency]);
 
   // Select MXN currency by default for national expenses
   useEffect(() => {
@@ -193,7 +237,8 @@ export default function ExpensesFormClient({ requestId, routes, token, receiptTo
             route_id: routeId,
             receipt_type_name: concepto,
             amount: parseFloat(monto),
-            currency: currency
+            currency: currency,
+            receipt_date: receiptDate,
           },
           headers: {
             'Authorization': `Bearer ${token}`
@@ -217,6 +262,7 @@ export default function ExpensesFormClient({ requestId, routes, token, receiptTo
           concepto,
           monto: parseFloat(monto),
           currency,
+          receiptDate: receiptDate,
           pdfFile: pdfFile!,
           xmlFile: xmlFile || undefined,
           token,
@@ -247,6 +293,13 @@ export default function ExpensesFormClient({ requestId, routes, token, receiptTo
     if (data.total && !monto) {
       setMonto(data.total.toString());
       setCurrency(data.moneda || "MXN");
+    }
+
+    // Autofill receipt date if available and not already set
+    if (data.fecha && !receiptDate) {
+      // Format date from CFDI (typically ISO format) to YYYY-MM-DD
+      const dateStr = data.fecha.split('T')[0];
+      setReceiptDate(dateStr);
     }
   };
 
@@ -334,6 +387,15 @@ export default function ExpensesFormClient({ requestId, routes, token, receiptTo
               </>
             )}
           </Select>
+
+          <Input
+            name="receipt_date"
+            label="Fecha del Comprobante"
+            type="date"
+            value={receiptDate}
+            onChange={(e) => setReceiptDate(e.target.value)}
+            required={true}
+          />
         </div>
 
         <UploadFiles
