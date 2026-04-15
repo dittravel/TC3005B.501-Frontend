@@ -11,6 +11,7 @@ import { SubmitTravelExpense } from "@/components/Forms/SubmitTravelExpense";
 import ModalWrapper from "@/components/Modals/ModalWrapper";
 import UploadReceiptFiles from "@/components/Forms/UploadReceiptFiles";
 import Toast from "@/components/Utils/Toast";
+import Reminder from "@/components/Utils/Reminder";
 import { apiRequest } from "@/utils/apiClient";
 
 interface CurrencyOption {
@@ -47,6 +48,7 @@ export default function ExpensesFormClient({ requestId, routes, token, receiptTo
   const [receiptIdToEdit, setReceiptIdToEdit] = useState<number | null>(null);
   const [mxnEquivalent, setMxnEquivalent] = useState("");
   const [currencies, setCurrencies] = useState<CurrencyOption[]>([]);
+  const [cfdiValidation, setCfdiValidation] = useState<any>(null);
 
   // Fetch currency catalog from the backend on mount
   useEffect(() => {
@@ -340,9 +342,23 @@ export default function ExpensesFormClient({ requestId, routes, token, receiptTo
           onPdfChange={setPdfFile}
           onXmlChange={setXmlFile}
           onXMLParsed={handleCfdiDataReceived}
+          onCFDIValidation={setCfdiValidation}
           isInternational={isInternational}
           setIsInternational={setIsInternational}
+          token={token}
         />
+
+        {/* CFDI validation result shown as soon as the user picks the XML */}
+        {cfdiValidation?.validationResult && (
+          <Reminder
+            text={
+              cfdiValidation.validationResult.valid
+                ? "CFDI validado correctamente."
+                : "El CFDI no pudo ser validado."
+            }
+            type={cfdiValidation.validationResult.valid ? "success" : "warning"}
+          />
+        )}
 
         {/* Show CFDI data if xml was parsed successfully */}
         {cfdiData && (
