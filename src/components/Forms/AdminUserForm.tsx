@@ -14,6 +14,7 @@ import Toast from '@/components/Utils/Toast';
 interface FormData {
   role_id: number | '';
   department_id: number | '';
+  society_id: number | '';
   user_name: string;
   password: string;
   workstation: string;
@@ -32,12 +33,14 @@ interface CreateUserFormProps {
   redirectTo?: string;
   departments?: any[];
   roles?: any[];
+  societies?: any[];
   token: string; 
 }
 
 const initialFormData: FormData = {
   role_id: '',
   department_id: '',
+  society_id: '',
   user_name: '',
   password: '',
   workstation: '',
@@ -53,7 +56,7 @@ const initialFormData: FormData = {
  * @param {string} props.redirectTo - URL to redirect after successful form submission.
  * @param {string} props.token - Authorization token for API requests.
  */
-export default function CreateUserForm({ mode, user_data, redirectTo, token, departments = [], roles = [] }: CreateUserFormProps) {
+export default function CreateUserForm({ mode, user_data, redirectTo, token, departments = [], roles = [], societies = [] }: CreateUserFormProps) {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -81,10 +84,11 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token, dep
 
   // Initialize form data based on mode and user data
   const [formData, setFormData] = useState<FormData>(() => {
-    if (mode === 'edit' && user_data) {      
+    if (mode === 'edit' && user_data) {
       return {
         role_id: roles.find(r => r.role_name === user_data.role_name)?.role_id ?? '',
         department_id: departments.find(d => d.department_name === user_data.department_name)?.department_id ?? '',
+        society_id: user_data.society_id ?? '',
         user_name: user_data.user_name,
         password: '',
         workstation: user_data.workstation,
@@ -141,6 +145,10 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token, dep
       newErrors.department_id = 'El departamento es requerido';
     }
 
+    if (!formData.society_id) {
+      newErrors.society_id = 'La sociedad es requerida';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -153,7 +161,7 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token, dep
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: ['role_id', 'department_id', 'boss_id'].includes(name)
+      [name]: ['role_id', 'department_id', 'society_id', 'boss_id'].includes(name)
         ? (value === '' ? '' : parseInt(value))
         : value
     }));
@@ -366,6 +374,25 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token, dep
               {bossData && bossData.map((boss: any) => (
                 <option key={boss.user_id} value={boss.user_id}>
                   {boss.user_name}
+                </option>
+              ))}
+            </Select>
+          </div>
+
+          {/* Society */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Select
+              label="Sociedad"
+              name="society_id"
+              value={String(formData.society_id)}
+              onChange={handleInputChange}
+              error={errors.society_id}
+              required
+            >
+              <option value="">Seleccionar sociedad</option>
+              {societies && societies.map((society: any) => (
+                <option key={society.id} value={String(society.id)}>
+                  {society.description}
                 </option>
               ))}
             </Select>

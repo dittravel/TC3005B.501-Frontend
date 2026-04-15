@@ -6,12 +6,15 @@
  **/
 
 import TextHeader from "@components/Layout/TextHeader.astro";
-import { getRequestPriority } from "@utils/getPriorityDates";
-import { getCookie } from "@data/cookies";
-import { apiRequest } from '@utils/apiClient';
 import RequestSection from "@components/Cards/RequestSection.astro";
 
+import { getCookie } from "@data/cookies";
+import { apiRequest } from '@utils/apiClient';
+import { getSocietyName } from "@data/societyHelper";
+
 const { userName} = Astro.props;
+const societyName = await getSocietyName(Astro);
+
 const requests = await (async () => {
   try {
     return await apiRequest(`/user/get-travel-requests/${getCookie("id", Astro.cookies)}/4`, { cookies: Astro.cookies });
@@ -26,7 +29,7 @@ const requests = await (async () => {
   <main>
     <TextHeader
       title={`Bienvenido, ${userName}`}
-      subtitle="Ditta Consulting"
+      subtitle={societyName}
     />
     <RequestSection
       title="Solicitudes por atender"

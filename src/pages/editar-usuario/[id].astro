@@ -48,6 +48,18 @@ const roles = await (async () => {
     return [];
   }
 })();
+
+// Get societies
+const societies = await (async () => {
+  try {
+    return await apiRequest(`/societies`, {
+      cookies: Astro.cookies
+    });
+  } catch (error) {
+    console.error("Error loading societies:", error);
+    return [];
+  }
+})();
 ---
 
 <MainLayout title="Editar usuario" data={{userName, buttonLabel, role}}>
@@ -64,6 +76,7 @@ const roles = await (async () => {
       token={getCookie("token", Astro.cookies) || ""}
       departments={departments}
       roles={roles}
+      societies={societies}
     />
   </div>
 </MainLayout>

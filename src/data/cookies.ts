@@ -27,6 +27,8 @@ export type Session = {
   role: UserRole;
   department_id?: string;
   token: string;
+  society_id?: string;
+  society_group_id?: string;
 };
 
 // Mock session for development/testing when cookies are not available
@@ -77,9 +79,11 @@ export function getSession(cookies?: APIContext["cookies"]): Session {
   const id = realCookies.get("id")?.value || "";
   const department_id = realCookies.get("department_id")?.value || "";
   const role = realCookies.get("role")?.value || "";
-  const token = realCookies.get("token")?.value || ""; 
-  
-  const session: Session = { username, id, department_id, role: role as UserRole, token };
+  const token = realCookies.get("token")?.value || "";
+  const society_id = realCookies.get("society_id")?.value || "";
+  const society_group_id = realCookies.get("society_group_id")?.value || "";
+
+  const session: Session = { username, id, department_id, role: role as UserRole, token, society_id, society_group_id };
   return session;
 }
 
@@ -103,6 +107,8 @@ export function getCookie(key: CookieKey, cookies?: APIContext["cookies"]): stri
     role: "role",
     department_id: "department_id",
     token: "token",
+    society_id: "society_id",
+    society_group_id: "society_group_id",
   };
   
   const cookieName = cookieNameMap[key];

@@ -10,6 +10,7 @@
 
 import TextHeader from '@components/Layout/TextHeader.astro';
 import Button from '@/components/Buttons/Button';
+import TravelSearchCard from '@/components/Cards/TravelSearchCard';
 const { request, title, subtitle } = Astro.props;
 
 ---
@@ -132,6 +133,18 @@ const { request, title, subtitle } = Astro.props;
         ))}
       </div>
     </div>
+
+    {/* Travel Search Card */}
+    <TravelSearchCard
+      route={request.routes[0]}
+      routeIndex={0}
+      onSelectFlight={(flight) => {
+        console.log('Flight selected:', flight);
+      }}
+      onSelectHotel={(hotel) => {
+        console.log('Hotel selected:', hotel);
+      }}
+    />
 
     {/* Notes Section */}
     {request.notes && (
