@@ -213,9 +213,9 @@ const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, inde
                 <FlightSearchForm
                   route={route}
                   routeIndex={index}
-                  onSelectFlight={(flight) => {
-                    onChange(index, 'selected_flight', flight);
-                  }}
+                  // onSelectFlight={(flight) => {
+                  //   onChange(index, 'selected_flight', flight);
+                  // }}
                 />
               )}
             </div>

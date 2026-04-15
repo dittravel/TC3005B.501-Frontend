@@ -8,11 +8,12 @@
 import React, { useEffect, useState } from 'react';
 import type { TravelRoute } from '@/types/TravelRoute';
 import Button from '../Buttons/Button';
+import { set } from 'node_modules/cypress/types/lodash';
 
 interface FlightSearchFormProps {
   route: TravelRoute;
   routeIndex: number;
-  onSelectFlight: (flight: any) => void;
+  // onSelectFlight: (flight: any) => void;
   tripType?: 'one_way' | 'round';
   ticketType?: 'economy' | 'premium_economy' | 'business' | 'first';
 }
@@ -68,16 +69,16 @@ const actualDummyFlights = [
   },
 ];
 
-const FlightSearchForm = ({ route, routeIndex, onSelectFlight, tripType, ticketType }: FlightSearchFormProps) => {
-  const storageKey = `flight-trip-type-${routeIndex}`;
+const FlightSearchForm = ({ route, routeIndex, tripType, ticketType }: FlightSearchFormProps) => {
+  // const storageKey = `flight-trip-type-${routeIndex}`;
   const [selectedTripType, setSelectedTripType] = useState<'one_way' | 'round'>(tripType || 'one_way');
   const [selectedTicketType, setSelectedTicketType] = useState<'economy' | 'premium_economy' | 'business' | 'first'>(ticketType || 'economy');
   const [selectedDepartureAirport, setSelectedDepartureAirport] = useState<string>('');
   const [selectedArrivalAirport, setSelectedArrivalAirport] = useState<string>('');
   const [shownFlights, setShownFlights] = useState(false);
-  // const [flights, setFlights] = useState<any[]>([]);
-  // const [loadingFlights, setLoadingFlights] = useState(false);
-  // const [searchError, setSearchError] = useState<string | null>(null);
+  const [flights, setFlights] = useState<any[]>([]);
+  const [loadingFlights, setLoadingFlights] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const [selectedFlight, setSelectedFlight] = useState<any>(null);
 
   // Handle trip type change
@@ -90,19 +91,13 @@ const FlightSearchForm = ({ route, routeIndex, onSelectFlight, tripType, ticketT
     setSelectedTicketType(event.target.value as 'economy' | 'premium_economy' | 'business' | 'first');
   };
 
-  const handleChooseFlight = (flight: any) => {
-    setSelectedFlight(flight);
-    onSelectFlight({ ...flight, tripType: selectedTripType, ticketType: selectedTicketType, route });
-  }
+  const handleDepartureAirportChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedDepartureAirport(event.target.value);
+  };
 
-  const handleSubmitFlight = (flight: any) => {
-    if (!selectedFlight) {
-      alert('Por favor selecciona un vuelo antes de continuar.');
-      return;
-    }
-    onSelectFlight({ ...selectedFlight, price: selectedFlight.price });
-    console.log("Precio vuelo:", selectedFlight.price);
-  }
+  const handleArrivalAirportChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedArrivalAirport(event.target.value);
+  };
 
   const handleSearch = () => {
     if (!selectedTripType || !selectedTicketType || !selectedDepartureAirport || !selectedArrivalAirport) {
@@ -111,22 +106,22 @@ const FlightSearchForm = ({ route, routeIndex, onSelectFlight, tripType, ticketT
     }
 
     // Show dummy flight options when search is clicked
-    setShownFlights(true);
-    onSelectFlight({ tripType: selectedTripType, ticketType: selectedTicketType, route });
-
-    // setSearchError(null);
-    // setLoadingFlights(true);
-    // setShownFlights(false);
+    setLoadingFlights(true);
+    setSearchError(null);
+    setShownFlights(false);
 
     const payload = {
-      origen: `${route.origin_city_name}, ${route.origin_country_name}`,
-      destino: `${route.destination_city_name}, ${route.destination_country_name}`,
-      fechaDeparture: route.beginning_date,
-      fechaLlegada: route.ending_date,
+      origin: selectedDepartureAirport,
+      destination: selectedArrivalAirport,
+      departureDate: route.beginning_date,
+      returnDate: route.ending_date,
       tripType: selectedTripType,
-      ticketType: selectedTicketType,
+      cabinClass: selectedTicketType,
+      pageSize: 10,
     };
     console.log("Buscando vuelos con payload:", payload);
+
+    // onSelectFlight({ tripType: selectedTripType, ticketType: selectedTicketType, route });
 
     // try {
     //   API CALL
@@ -138,6 +133,20 @@ const FlightSearchForm = ({ route, routeIndex, onSelectFlight, tripType, ticketT
     // } finally {
     //   setLoadingFlights(false);
     // }
+  }
+
+  const handleChooseFlight = (flight: any) => {
+    setSelectedFlight(flight);
+    // onSelectFlight({ ...flight, tripType: selectedTripType, ticketType: selectedTicketType, route });
+  }
+
+  const handleSubmitFlight = (flight: any) => {
+    if (!selectedFlight) {
+      alert('Por favor selecciona un vuelo antes de continuar.');
+      return;
+    }
+    //onSelectFlight({ ...selectedFlight, price: selectedFlight.price });
+    console.log("Precio vuelo:", selectedFlight.price);
   }
 
   return (
@@ -204,7 +213,7 @@ const FlightSearchForm = ({ route, routeIndex, onSelectFlight, tripType, ticketT
             <select
               id={`departure-airport-${routeIndex}`}
               value={selectedDepartureAirport}
-              onChange={(e) => setSelectedDepartureAirport(e.target.value)}
+              onChange={handleDepartureAirportChange}
               className="w-full appearance-none rounded-md border border-gray-300 bg-white px-4 py-2.5 pr-10 text-sm text-gray-800 shadow-sm transition focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
             >
               <option value="">Selecciona un aeropuerto</option>
@@ -233,7 +242,7 @@ const FlightSearchForm = ({ route, routeIndex, onSelectFlight, tripType, ticketT
             <select
               id={`arrival-airport-${routeIndex}`}
               value={selectedArrivalAirport}
-              onChange={(e) => setSelectedArrivalAirport(e.target.value)}
+              onChange={handleArrivalAirportChange}
               className="w-full appearance-none rounded-md border border-gray-300 bg-white px-4 py-2.5 pr-10 text-sm text-gray-800 shadow-sm transition focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
             >
               <option disabled value="">Selecciona un aeropuerto</option>
