@@ -21,6 +21,7 @@ export default function DefaultAuthRule({ defaultRule, token }: Props) {
   const [niveles, setNiveles] = useState(1);
   const [automatico, setAutomatico] = useState(false);
   const [autorizadores, setAutorizadores] = useState<string[]>([]);
+  const [errors, setErrors] = useState<string[]>([]);
 
   // Track if "Nivel Superior" is selected for each level
   const [isSuperiorSelected, setIsSuperiorSelected] = useState<boolean[]>([]);
@@ -32,39 +33,23 @@ export default function DefaultAuthRule({ defaultRule, token }: Props) {
   useEffect(() => {
     if (!defaultRule) return;
 
-    // Levels of authorization
-    const nivelesFromRule = defaultRule.num_levels ?? 0;
-    setNiveles(nivelesFromRule);
-    setDias(defaultRule.days_to_validate);
-    setAutomatico(defaultRule.automatic);
+    // Initialize form state from defaultRule properties
+    const numLevels = defaultRule.num_levels || 0;
+    setNiveles(numLevels);
+    setDias(defaultRule.days_to_validate || 5);
+    setAutomatico(defaultRule.automatic || false);
 
-    // Initialize arrays to track type of authorizer and users
-    const nextAutorizadores: string[] = [];
-    const nextIsSuperiorSelected: boolean[] = [];
-    const nextSelectedLevels: (string | null)[] = [];
+    // Load levels data
+    const levels = defaultRule.levels || [];
 
-    // For each level, determine type and number of leveks
-    for (let i = 0; i < nivelesFromRule; i++) {
-      // Find config for this level in the default rule data
-      const nivelConfig = defaultRule.levels?.find((n: any) => n.level_number === i + 1);
-
-      // If there is a config for this level, set array values
-      if (nivelConfig) {
-        nextAutorizadores[i] = nivelConfig.level_type || "";
-        const isSuperior = nivelConfig.level_type === "Nivel_Superior";
-        nextIsSuperiorSelected[i] = isSuperior;
-        nextSelectedLevels[i] = isSuperior ? (nivelConfig.superior_level_number || "") : "";
-      } else {
-        // If no config for this level, set defaults
-        nextAutorizadores[i] = "";
-        nextIsSuperiorSelected[i] = false;
-        nextSelectedLevels[i] = "";
-      }
-    }
-
-    setAutorizadores(nextAutorizadores);
-    setIsSuperiorSelected(nextIsSuperiorSelected);
-    setSelectedLevels(nextSelectedLevels);
+    // Initialize authorizers array based on levels data
+    setAutorizadores(levels.map((n: any) => n.level_type) || []);
+    setIsSuperiorSelected(
+      defaultRule.levels?.map((n: any) => n.level_type === "Nivel_Superior") || []
+    );
+    setSelectedLevels(
+      defaultRule.levels?.map((n: any) => n.superior_level_number || null) || []
+    );
   }, [defaultRule]);
 
   // Handle changes to the niveles input
@@ -251,6 +236,7 @@ export default function DefaultAuthRule({ defaultRule, token }: Props) {
                         label={`Autorización ${index + 1}`}
                         name={`nivel_${index + 1}`}
                         value={autorizadores[index] || ""}
+                        required
                         onChange={(e) => {
                           handleAuthSelect(index, e);
                           handleTypeSelect(index, e);
@@ -267,6 +253,7 @@ export default function DefaultAuthRule({ defaultRule, token }: Props) {
                           label="Nivel"
                           name={`usuario_${index + 1}`}
                           value={selectedLevels[index] || ""}
+                          required
                           onChange={(e) => handleUserSelect(index, e)}
                         >
                           <option value="">Selecciona el nivel que debe aprobar</option>

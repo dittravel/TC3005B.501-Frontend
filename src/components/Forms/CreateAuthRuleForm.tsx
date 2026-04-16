@@ -190,32 +190,32 @@ export default function CreateAuthRuleForm({ token, mode, data }: Props) {
         <div className="card-title">
           <h2>2. Niveles de Autorización</h2>
         </div>
-<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Input
-          label="Niveles de autorización"
-          name="niveles_autorizacion"
-          type="number"
-          placeholder="Número"
-          altText="Ingresa un valor entre 1 y 10"
-          min={1}
-          max={10}
-          required
-          value={niveles}
-          onChange={(e) => handleNivelesChange(e)}
-        />
-        <Input
-          label="Días de comprobación"
-          name="dias_comprobacion"
-          type="number"
-          placeholder="Número"
-          altText="Ingresa un valor entre 5 y 30"
-          min={5}
-          max={30}
-          required
-          value={dias}
-          onChange={(e) => handleDiasChange(e)}
-        />
-      </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Input
+            label="Niveles de autorización"
+            name="niveles_autorizacion"
+            type="number"
+            placeholder="Número"
+            altText="Ingresa un valor entre 1 y 10"
+            min={1}
+            max={10}
+            required
+            value={niveles}
+            onChange={(e) => handleNivelesChange(e)}
+          />
+          <Input
+            label="Días de comprobación"
+            name="dias_comprobacion"
+            type="number"
+            placeholder="Número"
+            altText="Ingresa un valor entre 5 y 30"
+            min={5}
+            max={30}
+            required
+            value={dias}
+            onChange={(e) => handleDiasChange(e)}
+          />
+        </div>
         {niveles > 0 && niveles < 11 && (
           <div className="flex flex-col card-secondary mt-4">
             <div className="flex flex-col gap-4">
