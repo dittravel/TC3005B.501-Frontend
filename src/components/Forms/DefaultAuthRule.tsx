@@ -10,146 +10,81 @@ import Input from "@/components/Utils/Input";
 import Button from "@/components/Buttons/Button";
 import Select from "@/components/Utils/Select";
 import Checkbox from "@/components/Utils/Checkbox";
+import Toast from "@/components/Utils/Toast";
 import { apiRequest } from "@/utils/apiClient";
+import { useAuthRuleForm } from "@/hooks/useAuthRuleForm";
+import { init } from "astro/virtual-modules/prefetch.js";
 
 interface Props {
   defaultRule?: any;
   token: string;
 }
 
+/**
+ * Default Auth Rule
+ * Displays and allows editing of the default authorization rule for the system.
+ * @param {defaultRule} - The default rule data to populate the form with
+ * @param {token} - Authentication token for API requests
+ * @returns JSX Element representing the default auth rule form
+ */
 export default function DefaultAuthRule({ defaultRule, token }: Props) {
-  const [niveles, setNiveles] = useState(1);
-  const [automatico, setAutomatico] = useState(false);
-  const [autorizadores, setAutorizadores] = useState<string[]>([]);
-  const [errors, setErrors] = useState<string[]>([]);
+  // Loading and error states
+  const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
-  // Track if "Nivel Superior" is selected for each level
-  const [isSuperiorSelected, setIsSuperiorSelected] = useState<boolean[]>([]);
-  const [selectedLevels, setSelectedLevels] = useState<(string | null)[]>([]);
-
-  const [dias, setDias] = useState(5);
+  // Use custom hook to manage form state and logic
+  const {
+    formData,
+    handleChange,
+    handleLevelTypeChange,
+    handleSuperiorLevelChange,
+    validateForm,
+    initializeFormData
+  } = useAuthRuleForm(true);
 
   // Load default rule data
   useEffect(() => {
+    // If no default rule is provided, dont populate the form
     if (!defaultRule) return;
-
-    // Initialize form state from defaultRule properties
-    const numLevels = defaultRule.num_levels || 0;
-    setNiveles(numLevels);
-    setDias(defaultRule.days_to_validate || 5);
-    setAutomatico(defaultRule.automatic || false);
-
-    // Load levels data
-    const levels = defaultRule.levels || [];
-
-    // Initialize authorizers array based on levels data
-    setAutorizadores(levels.map((n: any) => n.level_type) || []);
-    setIsSuperiorSelected(
-      defaultRule.levels?.map((n: any) => n.level_type === "Nivel_Superior") || []
-    );
-    setSelectedLevels(
-      defaultRule.levels?.map((n: any) => n.superior_level_number || null) || []
-    );
+    initializeFormData(defaultRule);
   }, [defaultRule]);
-
-  // Handle changes to the niveles input
-  function handleNivelesChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const value = Number(e.target.value);
-    setNiveles(value);
-    
-
-    // If the new value is less than the current number of autorizadores, trim the array
-    if (value < autorizadores.length) {
-      setAutorizadores(autorizadores.slice(0, value));
+  
+  // Clear toast after 3 seconds
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => {
+        setToast(null);
+      }, 3000);
+      return () => clearTimeout(timer);
     }
+  }, [toast]);
 
-    // update user selection tracking
-    setIsSuperiorSelected(prev => {
-      const next = [...prev];
-      if (value < next.length) return next.slice(0, value);
-      while (next.length < value) next.push(false);
-      return next;
-    });
-
-    setSelectedLevels(prev => {
-      const next = [...prev];
-      if (value < next.length) return next.slice(0, value);
-      while (next.length < value) next.push("");
-      return next;
-    });
-  }
-
-  function handleDiasChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const value = Number(e.target.value);
-    setDias(value);
-  }
-
-  // Handle type selection for each level
-  function handleTypeSelect(index: number, e: React.ChangeEvent<HTMLSelectElement>) {
-    const value = e.target.value;
-
-    setIsSuperiorSelected(prev => {
-      const next = [...prev];
-      next[index] = value === "Nivel_Superior";
-      return next;
-    });
-
-    // If changing away from "Nivel Superior", clear the selection for that level
-    if (value !== "Nivel_Superior") {
-      setSelectedLevels(prev => {
-        const next = [...prev];
-        next[index] = "";
-        return next;
-      });
-    }
-  }
-
-  // Handle changes to the user select inputs when "Nivel Superior" is selected
-  function handleUserSelect(index: number, e: React.ChangeEvent<HTMLSelectElement>) {
-    const superiorLevelNumber = e.target.value;
-    setSelectedLevels(prev => {
-      const next = [...prev];
-      next[index] = superiorLevelNumber || null;
-      return next;
-    });
-  }
-
-  // Handle changes to the autorizadores select inputs
-  function handleAuthSelect(index: number, e: React.ChangeEvent<HTMLSelectElement>) {
-    const newAutorizadores = [...autorizadores];
-    newAutorizadores[index] = e.target.value;
-    setAutorizadores(newAutorizadores);
-  }
-
-  // Handle automatic checkbox change
-  function handleAutomaticChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setAutomatico(e.target.checked);
-    // Clear selections
-    setAutorizadores([]);
-    setIsSuperiorSelected([]);
-    setSelectedLevels([]);
-  }
-
-  // Handle save changes
-  async function handleSave() {
-    // Create data to send to backend
-    const data = {
-      rule_name: "Regla por Defecto",
-      is_default: true,
-      num_levels: niveles,
-      days_to_validate: dias,
-      automatic: automatico,
-      levels: autorizadores.map((type, index) => ({
-        level_number: index + 1,
-        level_type: type,
-        superior_level_number: isSuperiorSelected[index] ? selectedLevels[index] : null
-      })),
-    };
-
+  // Handle submit of the form
+  const handleSubmit = async () => {
     if (!defaultRule || !defaultRule.rule_id) {
-      alert("No se encontró la regla por defecto para actualizar");
+      setToast({ 
+        message: "No se encontró la regla por defecto",
+        type: "error"
+      });
       return;
     }
+
+    // Validate form
+    const validation = validateForm();
+    if (!validation.isValid) {
+      setToast({ 
+        message: validation.error || "Por favor corrige los errores en el formulario",
+        type: "error"
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    // Prepare data (remove levels if automatic is selected)
+    const data = formData.automatic
+      ? { ...formData, levels: [] }
+      : formData;
 
     // Send data to backend
     try {
@@ -160,15 +95,26 @@ export default function DefaultAuthRule({ defaultRule, token }: Props) {
           Authorization: `Bearer ${token}`
         }
       });
+
       if (response.success) {
-        alert("Regla por defecto actualizada exitosamente");
-        window.location.reload();
+        setToast({ 
+          message: "Regla por defecto actualizada exitosamente",
+          type: "success"
+        });
       } else {
-        alert("Error al actualizar la regla por defecto");
+        setToast({ 
+          message: response.message || "Error al actualizar la regla por defecto",
+          type: "error"
+        });
       }
     } catch (error) {
+      setToast({ 
+        message: "Error al guardar la regla por defecto",
+        type: "error"
+      });
       console.error("Error saving default auth rule:", error);
-      alert("Error al actualizar la regla por defecto");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -183,30 +129,30 @@ export default function DefaultAuthRule({ defaultRule, token }: Props) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Input
           label="Niveles de autorización"
-          name="niveles_autorizacion"
+          name="num_levels"
           type="number"
           placeholder="Número"
           altText="Ingresa un valor entre 1 y 10"
           min={1}
           max={10}
           required
-          value={niveles}
-          onChange={(e) => handleNivelesChange(e)}
+          value={formData.num_levels}
+          onChange={handleChange}
         />
         <Input
-          label="Días de comprobación"
-          name="dias"
+          label="Días para validar comprobantes"
+          name="days_to_validate"
           type="number"
           placeholder="Número"
           altText="Ingresa un valor entre 5 y 30"
           min={5}
           max={30}
           required
-          value={dias}
-          onChange={(e) => handleDiasChange(e)}
+          value={formData.days_to_validate}
+          onChange={handleChange}
         />
       </div>
-      {niveles > 0 && niveles < 11 && (
+      {formData.num_levels > 0 && formData.num_levels < 11 && (
         <div className="flex flex-col card-secondary">
           <div className="flex flex-col gap-4">
             <h2 className="font-semibold text-text-primary">
@@ -215,46 +161,46 @@ export default function DefaultAuthRule({ defaultRule, token }: Props) {
             <div className="flex flex-col gap-1">
               <Checkbox
                 label="Automático"
-                name="automatico"
+                name="automatic"
                 value="automatico"
-                checked={automatico}
-                onChange={(e) => handleAutomaticChange(e)}
+                checked={formData.automatic}
+                onChange={handleChange}
               />
               <p className="text-sm text-text-secondary">
                 Si seleccionas esta opción, el sistema asignará automáticamente a los 
                 autorizadores correspondientes según la jerarquía organizacional.
               </p>
             </div>
-            {!automatico && (
-              <div className="">
-                <div>
-                  {[...Array(niveles)].map((_, index) => (
-                    <div key={index} className={isSuperiorSelected[index] ? "grid grid-cols-2 gap-2 mb-4" : "grid grid-cols-1 mb-4"}>
+            {!formData.automatic && (
+              <div>
+                {formData.levels.map((level, index) => {
+                  const isSuperiorSelected = level.level_type === "Nivel_Superior";
+                  return (
+                    <div 
+                      key={index} 
+                      className={isSuperiorSelected ? "grid grid-cols-2 gap-2 mb-4" : "grid grid-cols-1 mb-4"}
+                    >
                       {/* Select type of authorizer for this level */}
                       <Select
-                        key={index}
                         label={`Autorización ${index + 1}`}
                         name={`nivel_${index + 1}`}
-                        value={autorizadores[index] || ""}
+                        value={level.level_type || ""}
                         required
-                        onChange={(e) => {
-                          handleAuthSelect(index, e);
-                          handleTypeSelect(index, e);
-                        }}
+                        onChange={(e) => handleLevelTypeChange(index, e.target.value)}
                       >
                         <option value="">Selecciona un autorizador</option>
                         <option value="Jefe">Jefe Directo</option>
                         <option value="Aleatorio">Autorizador Aleatorio</option>
                         <option value="Nivel_Superior">Nivel Superior</option>
                       </Select>
-                      {/* If "Superior level" is selected, show level select */}
-                      {isSuperiorSelected[index] && (
+                      {/* If "Nivel_Superior" is selected, show level select */}
+                      {isSuperiorSelected && (
                         <Select
                           label="Nivel"
                           name={`usuario_${index + 1}`}
-                          value={selectedLevels[index] || ""}
+                          value={level.superior_level_number || ""}
                           required
-                          onChange={(e) => handleUserSelect(index, e)}
+                          onChange={(e) => handleSuperiorLevelChange(index, e.target.value)}
                         >
                           <option value="">Selecciona el nivel que debe aprobar</option>
                           <option value="1">1</option>
@@ -263,27 +209,30 @@ export default function DefaultAuthRule({ defaultRule, token }: Props) {
                         </Select>
                       )}
                     </div>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
             )}
           </div>
         </div>
       )}
+      {toast && (<Toast message={toast.message} type={toast.type} />)}
       <div className="flex justify-end gap-2">
         <Button
           variant="border"
           color="primary"
-          onClick={() => {window.location.reload()}}
+          onClick={() => window.location.reload()}
+          disabled={loading}
         >
-          Reestablecer
+          Recargar
         </Button>
         <Button
           variant="filled"
           color="secondary"
-          onClick={handleSave}
+          onClick={handleSubmit}
+          disabled={loading}
         >
-          Guardar cambios
+          {loading ? "Guardando..." : "Guardar cambios"}
         </Button>
       </div>
     </div>
