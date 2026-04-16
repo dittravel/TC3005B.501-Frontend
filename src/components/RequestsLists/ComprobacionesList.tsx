@@ -35,6 +35,7 @@ function getStatusTag(stats: any): CardTag {
   };
 }
 
+// Calculate remaining days to validate a receipt
 function getRemainingDays(request: any) {
   const totalDays = request.days_to_validate;
 
@@ -43,7 +44,10 @@ function getRemainingDays(request: any) {
   const start = new Date(request.beginning_date);
   const today = new Date();
 
+  // Calculate the difference in days
   const diffTime = today.getTime() - start.getTime();
+
+  // Convert milliseconds to days
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
   const remaining = totalDays - diffDays;
@@ -85,7 +89,7 @@ export default function ComprobacionesList({ data, title = "Comprobaciones", sub
                         <span className="font-semibold">Responsable:</span> {request.assigned_to_name || 'Sin asignar'}
                       </p>
                       <p>
-                        <span className="font-semibold">Días restantes:</span> {getRemainingDays(request) || 'Sin asignar'}
+                        <span className="font-semibold">Días restantes para validar:</span> {getRemainingDays(request)}
                       </p>
                     </div>
 
