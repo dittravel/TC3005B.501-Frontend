@@ -5,7 +5,6 @@
  */
 
 import Card from '@/components/Utils/Card';
-import Button from '@/components/Buttons/Button';
 import type { CardTag } from '@/types/card';
 
 interface Props {
@@ -39,9 +38,9 @@ function getStatusTag(stats: any): CardTag {
 function getRemainingDays(request: any) {
   const totalDays = request.days_to_validate;
 
-  if (!totalDays || !request.beginning_date) return 'Sin asignar';
+  if (!totalDays || !request.creation_date) return 'Sin asignar';
 
-  const start = new Date(request.beginning_date);
+  const start = new Date(request.creation_date);
   const today = new Date();
 
   // Calculate the difference in days
