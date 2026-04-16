@@ -1,48 +1,38 @@
 /**
- * RefundForm Component
+ * Role Configuration Form Component
  * 
- * Provides a form for employees to view their current reimbursement balance, submit bank information,
- * and request reimbursements for verified receipts.
+ * Form component for configuring user roles in the system. 
+ * It allows administrators to set a default role for new users 
+ * and view descriptions of predefined roles. The form includes 
+ * validation to ensure required fields are completed before submission.
  * 
- * Displays a history of past reimbursements with status.
- * Validates form inputs and provides user feedback on submission.
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FormEvent, ChangeEvent } from 'react';
 import Button from '@/components/Buttons/Button';
 import Input from '@/components/Utils/Input';
-import Textarea from '@/components/Utils/Textarea';
-import SelectGroup from '@/components/Utils/SelectGroup';
-import Tag from '@/components/Utils/Tag';
 import type { UserRole } from '@/types/roles';
-import Pagination from "@/components/Table/Pagination";
-import Card from "@/components/Utils/Card";
-import { getStatusTagType } from "@/utils/statusMapper";
 import DefaultAuthRule from "@/components/Forms/DefaultAuthRule";
 import CancelRefundPolicyModal from '../Modals/CancelRefundPolicyModal';
 // import CancelRefundPolicyModal from '@/components/Modals/CancelRefundPolicyModal';
+import { apiRequest } from '@/utils/apiClient';
 
 
 interface DefaultRoleConfigurationFormData {
     defaultRole: string;
 }
 
-interface RoleConfigurationProps {
-    role: UserRole;
-    data: any[];
-    itemsPerPage?: number;
+type RoleConfigurationErrors = Partial<Record<keyof DefaultRoleConfigurationFormData, string>>;
+
+interface Props {
     token: string;
+    defaultRole?: any;
 }
 
 
 // Renders the default refund policy form and paginated list of existing policies.
-export default function RoleConfigurationForm({ role, data, itemsPerPage = 5, token }: RoleConfigurationProps) {
-    const [page, setPage] = useState(1);
-    const totalPages = Math.ceil(data.length / itemsPerPage);
-    const start = (page - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
-    const pageRequests = data.slice(start, end);
+export default function RoleConfigurationForm({ token, defaultRole }: Props) {
 
     // Default refund policy form state
     const [roleConfigurationData, setRoleConfigurationData] = useState<DefaultRoleConfigurationFormData>({
@@ -51,10 +41,15 @@ export default function RoleConfigurationForm({ role, data, itemsPerPage = 5, to
 
     const [selectedDefinedRole, setSelectedDefinedRole] = useState<string>('');
 
+    const [roleConfigurationErrors, setRoleConfigurationErrors] = useState<RoleConfigurationErrors>({});
 
-    const [roleConfigurationErrors, setRoleConfigurationErrors] = useState<Record<string, boolean>>({});
-
-    //const [selectedValidations, setSelectedValidations] = useState<Set<string | number>>(new Set());
+    // Load default role configuration data on component 
+    useEffect(() => {
+        if (!defaultRole) return;
+        setRoleConfigurationData({
+            defaultRole: defaultRole.name || ''
+        });
+    }, [defaultRole]);
 
     const roleContent: Record<string, { user: string; userDescription: string, travelRequest: string, travelRequestDescription: string, receipt: string, receiptDescription: string, refund: string, refundDescription: string }> = {
         admin: {
@@ -110,38 +105,21 @@ export default function RoleConfigurationForm({ role, data, itemsPerPage = 5, to
     };
 
     // Updates numeric form fields and clears field-level error state.
-    const handleRoleConfigurationChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        const numericValue = Number(value);
-        setRoleConfigurationData(prev => ({ ...prev, [name]: numericValue }));
-        setRoleConfigurationErrors(prev => ({ ...prev, [name]: false }));
-    };
-
-    // Syncs checkbox selections with the corresponding validation flags in form state.
-    //   const handleValidationChange = (values: Set<string | number>) => {
-    //     setSelectedValidations(new Set(values));
-    //     setRoleConfigurationData(prev => ({
-    //       ...prev,
-    //     }));
-    //   };
-
-    // Dropdown change handler for default role selection, updates form state and clears errors.
-    const handleSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const handleRoleConfigurationChange = (e: ChangeEvent<HTMLSelectElement>) => {
         const { name, value } = e.target;
         setRoleConfigurationData(prev => ({ ...prev, [name]: value }));
-        setRoleConfigurationErrors(prev => ({ ...prev, [name]: false }));
+        setRoleConfigurationErrors(prev => ({ ...prev, [name]: '' }));
     };
 
     // Validates and submits the default refund policy form.
-    const handleRoleConfigurationSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const handleRoleConfigurationSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const errors: Record<string, boolean> = {};
-        Object.entries(roleConfigurationData).forEach(([key, value]) => {
-            if (typeof value === 'number' && value === 0) {
-                errors[key] = true;
-            }
-        });
+        const errors: RoleConfigurationErrors = {};
+
+        if (!roleConfigurationData.defaultRole) {
+            errors.defaultRole = 'Selecciona un rol por defecto';
+        }
 
         if (Object.keys(errors).length > 0) {
             setRoleConfigurationErrors(errors);
@@ -149,11 +127,35 @@ export default function RoleConfigurationForm({ role, data, itemsPerPage = 5, to
             return;
         }
 
-        alert('Información de configuración de roles guardada correctamente');
+        // Create data to send to backend
+        const data = {
+            default_role: roleConfigurationData.defaultRole
+        };
+
+        try {
+            const response = await apiRequest(`/admin/update-role/${defaultRole.role_id}`, {
+                method: 'PUT',
+                data: data,
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            if (response.success) {
+                alert("Rol por defecto actualizada exitosamente");
+                window.location.reload();
+            } else {
+                alert("Error al actualizar el rol por defecto");
+            }
+        } catch (error) {
+            console.error("Error saving default role:", error);
+            alert("Error al actualizar el rol por defecto");
+        }
+
+
         setRoleConfigurationData({
             defaultRole: ''
         });
-        // setSelectedValidations(new Set());
+        setRoleConfigurationErrors({});
     };
 
     return (
@@ -177,7 +179,7 @@ export default function RoleConfigurationForm({ role, data, itemsPerPage = 5, to
                             id="defaultRole"
                             name="defaultRole"
                             value={roleConfigurationData.defaultRole}
-                            onChange={handleSelectChange}
+                            onChange={handleRoleConfigurationChange}
                             className="border border-border-primary rounded-md px-3 py-2 text-sm text-text-primary bg-background-primary focus:outline-none focus:ring-2 focus:ring-secondary"
                         >
                             <option value="" disabled>Selecciona un rol</option>
@@ -188,6 +190,11 @@ export default function RoleConfigurationForm({ role, data, itemsPerPage = 5, to
                             <option value="travelAgency">Agencia de viajes</option>
                         </select>
                     </div>
+
+                    {roleConfigurationErrors.defaultRole && (
+                        <p className="text-sm text-red-500">{roleConfigurationErrors.defaultRole}</p>
+                    )}
+
                     <div className="flex justify-end">
                         <Button variant="filled" color="secondary">
                             Guardar Rol por Defecto
@@ -296,7 +303,7 @@ export default function RoleConfigurationForm({ role, data, itemsPerPage = 5, to
                     )
                 )}
             </div>
-            
+
         </div>
     );
 }

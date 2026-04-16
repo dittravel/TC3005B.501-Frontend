@@ -20,6 +20,9 @@ interface Props {
   variant?: "filled" | "border" | "empty";
   label?: string;
   token: string;
+  method?: "PUT" | "DELETE";
+  successMessage?: string;
+  errorMessage?: string;
   redirectTo?: string;
 }
 
@@ -32,6 +35,9 @@ export default function UltimateWrapper({
   color = "warning",
   variant = "filled",
   label = "Eliminar",
+  method = "PUT",
+  successMessage = "Usuario desactivado exitosamente.",
+  errorMessage = "Error al desactivar el usuario.",
   token,
   redirectTo = "/dashboard"
 }: Props) {
@@ -41,16 +47,16 @@ export default function UltimateWrapper({
     try {
       const url = `${endpoint}/${user_id}`;
       await apiRequest(url, { 
-        method: "PUT",
+        method: method,
         headers: { Authorization: `Bearer ${token}` }
       });
-      setToast({ message: 'Usuario desactivado exitosamente.', type: 'success' });
+      setToast({ message: successMessage, type: 'success' });
       setTimeout(() => {
         window.location.href = redirectTo;
       }, 2000);
     } catch (error) {
       console.error("Error en la solicitud:", error);
-      setToast({ message: 'Error al desactivar el usuario.', type: 'error' });
+      setToast({ message: errorMessage, type: 'error' });
     }
   }, [endpoint, redirectTo]);
   

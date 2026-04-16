@@ -8,7 +8,9 @@ import RequestSection from "@components/Cards/RequestSection.astro";
 
 import { getCookie } from "@data/cookies";
 import { apiRequest } from '@utils/apiClient';
+import { getSocietyName } from "@data/societyHelper";
 const userId = getCookie("id", Astro.cookies);
+const societyName = await getSocietyName(Astro);
 
 // Get requests in "Por cotizar" and "Por comprobar" states for the user's department
 const requestsInCotizar = await (async () => {
@@ -36,7 +38,7 @@ const { userName } = Astro.props;
   <main>
     <TextHeader
       title={`Bienvenido, ${userName}`}
-      subtitle="Ditta Consulting"
+      subtitle={societyName}
     />
 
     <div class="grid grid-cols-1 gap-20">

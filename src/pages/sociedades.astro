@@ -1,0 +1,80 @@
+---
+/**
+ * Society Groups and Society Page
+ * 
+ * This page displays the society groups and societies in the system.
+ */
+
+import TextHeader from '@components/Layout/TextHeader.astro';
+import MainLayout from "@layouts/MainLayout.astro";
+import SocietyGroupsTable from "@components/Table/SocietyGroupsTable";
+import SocietiesTable from "@components/Table/SocietiesTable";
+
+import { getCookie } from "@data/cookies";
+import { roleLabels } from "@config/role-labels";
+import type { UserRole } from "@type/roles";
+import { apiRequest } from "@/utils/apiClient";
+
+const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
+const buttonLabel = roleLabels[role];
+const userName = getCookie("username", Astro.cookies) || "";
+const token = getCookie("token", Astro.cookies) || "";
+const societyGroupId = getCookie("society_group_id", Astro.cookies) || "";
+
+// Get society groups
+let isDefaultGroup = false;
+const societyGroups = await (async () => {
+  try {
+    const groups = await apiRequest(`/society-groups`, {
+      cookies: Astro.cookies
+    });
+    // Check if user is in the default group
+    const defaultGroup = groups.find((g: any) => g.is_default);
+    if (defaultGroup && societyGroupId && parseInt(societyGroupId) === defaultGroup.id) {
+      isDefaultGroup = true;
+    }
+    return groups;
+  } catch (error) {
+    console.error("Error al cargar los grupos de sociedades:", error);
+    return [];
+  }
+})();
+
+// Get societies
+const societies = await (async () => {
+  try {
+    return await apiRequest(`/societies`, {
+      cookies: Astro.cookies
+    });
+  } catch (error) {
+    console.error("Error al cargar las sociedades:", error);
+    return [];
+  }
+})();
+---
+
+<MainLayout title="Sociedades" data={{userName, buttonLabel, role}}>
+  <TextHeader
+    title="Sociedades"
+    subtitle="Configura las sociedades del sistema"
+  />
+  <main>
+    <div class="flex flex-col gap-8">
+      {isDefaultGroup && (
+        <SocietyGroupsTable
+          client:load
+          data={societyGroups}
+          token={token}
+          role={role}
+        />
+      )}
+      <SocietiesTable
+        client:load
+        data={societies}
+        token={token}
+        role={role}
+      />
+    </div>
+  </main>
+</MainLayout>
+

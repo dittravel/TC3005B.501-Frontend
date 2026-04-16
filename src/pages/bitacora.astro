@@ -1,0 +1,49 @@
+---
+/**
+ * Bitácora de acciones críticas
+ *
+ * Página exclusiva para el rol Administrador.
+ * Muestra el registro de auditoría de todas las acciones críticas del sistema.
+ */
+
+import TextHeader from '@components/Layout/TextHeader.astro';
+import MainLayout from "@layouts/MainLayout.astro";
+import BitacoraTable from "@components/Table/BitacoraTable";
+
+import { getCookie } from "@data/cookies";
+import { roleLabels } from "@config/role-labels";
+import type { UserRole } from "@type/roles";
+import { apiRequest } from "@/utils/apiClient";
+
+const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
+const buttonLabel = roleLabels[role];
+const userName = getCookie("username", Astro.cookies) || "";
+
+let initialData: any[] = [];
+let initialMeta = { count: 0, total_count: 0, has_more: false, filters: {} };
+
+try {
+  const response = await apiRequest(`/audit-log/get-logs?limit=50&offset=0&include_metadata=true`, {
+    cookies: Astro.cookies,
+  });
+  initialData = response.data ?? [];
+  initialMeta = response.meta ?? initialMeta;
+} catch (error) {
+  console.error("Error al cargar la bitácora:", error);
+}
+---
+
+<MainLayout title="Bitácora" data={{ userName, buttonLabel, role }}>
+  <TextHeader
+    title="Bitácora de acciones"
+    subtitle="Registro de auditoría de todas las acciones críticas del sistema"
+  />
+  <main>
+    <BitacoraTable
+      client:only="react"
+      initialData={initialData}
+      initialMeta={initialMeta}
+      role={role}
+    />
+  </main>
+</MainLayout>

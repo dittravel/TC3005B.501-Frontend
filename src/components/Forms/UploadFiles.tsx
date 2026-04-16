@@ -10,8 +10,10 @@ interface Props {
   onPdfChange?: (file: File | null) => void;
   onXmlChange?: (file: File | null) => void;
   onXMLParsed?: (cfdiData: any) => void;
+  onCFDIValidation?: (result: any) => void;
   isInternational: boolean;
   setIsInternational: (value: boolean) => void;
+  token?: string;
 }
 
 /**
@@ -26,8 +28,10 @@ export default function UploadFiles({
   onPdfChange,
   onXmlChange,
   onXMLParsed,
+  onCFDIValidation,
   isInternational,
   setIsInternational,
+  token,
 }: Props) {
 
   // Handle XML file changes
@@ -36,28 +40,49 @@ export default function UploadFiles({
   const handleXmlChange = async (file: File | null) => {
     onXmlChange?.(file);
 
-    // If a file is selected, send it to the backend for parsing
-    if (file) {
-      try {
-        // Create a form data object to send the file
-        const formData = new FormData();
-        formData.append("xml", file);
+    // Clear previous validation when file is removed
+    if (!file) {
+      onCFDIValidation?.(null);
+      return;
+    }
 
-        // Use the same API endpoint as UploadReceiptFiles to parse the XML and extract CFDI data for preview
-        const response = await fetch(`${import.meta.env.PUBLIC_API_BASE_URL}/files/parse-xml-preview`, {
+    try {
+      const previewForm = new FormData();
+      previewForm.append("xml", file);
+
+      const validateForm = new FormData();
+      validateForm.append("xml", file);
+
+      const requests: Promise<Response>[] = [
+        fetch(`${import.meta.env.PUBLIC_API_BASE_URL}/files/parse-xml-preview`, {
           method: "POST",
-          body: formData,
-        });
+          body: previewForm,
+        }),
+      ];
 
-        const data = await response.json();
-
-        // If the response is successful and contains CFDI data, pass it to the parent component for preview
-        if (response.ok) {
-          onXMLParsed?.(data.cfdiData);
-        }
-      } catch (error) {
-        console.error("Error parsing XML preview:", error);
+      if (token) {
+        requests.push(
+          fetch(`${import.meta.env.PUBLIC_API_BASE_URL}/cfdi/validate`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+            body: validateForm,
+          })
+        );
       }
+
+      const [previewRes, validateRes] = await Promise.all(requests);
+
+      if (previewRes.ok) {
+        const previewData = await previewRes.json();
+        onXMLParsed?.(previewData.cfdiData);
+      }
+
+      if (validateRes) {
+        const validateData = await validateRes.json();
+        onCFDIValidation?.(validateData);
+      }
+    } catch (error) {
+      console.error("Error procesando XML:", error);
     }
   };
 
