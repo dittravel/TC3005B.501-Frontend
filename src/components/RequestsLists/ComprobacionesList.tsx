@@ -5,7 +5,6 @@
  */
 
 import Card from '@/components/Utils/Card';
-import Button from '@/components/Buttons/Button';
 import type { CardTag } from '@/types/card';
 
 interface Props {
@@ -33,6 +32,26 @@ function getStatusTag(stats: any): CardTag {
     text: isPending ? 'Pendiente' : isAccepted ? 'Aceptada' : isRejected ? 'Rechazada' : 'Mixta',
     type: isPending ? 'warning' : isAccepted ? 'success' : isRejected ? 'alert' : 'default'
   };
+}
+
+// Calculate remaining days to validate a receipt
+function getRemainingDays(request: any) {
+  const totalDays = request.days_to_validate;
+
+  if (!totalDays || !request.creation_date) return 'Sin asignar';
+
+  const start = new Date(request.creation_date);
+  const today = new Date();
+
+  // Calculate the difference in days
+  const diffTime = today.getTime() - start.getTime();
+
+  // Convert milliseconds to days
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+  const remaining = totalDays - diffDays;
+
+  return remaining > 0 ? remaining : 0;
 }
 
 export default function ComprobacionesList({ data, title = "Comprobaciones", subtitle }: Props) {
@@ -67,6 +86,9 @@ export default function ComprobacionesList({ data, title = "Comprobaciones", sub
                       </p>
                       <p>
                         <span className="font-semibold">Responsable:</span> {request.assigned_to_name || 'Sin asignar'}
+                      </p>
+                      <p>
+                        <span className="font-semibold">Días restantes para validar:</span> {getRemainingDays(request)}
                       </p>
                     </div>
 

@@ -44,6 +44,7 @@ export const SIDEBAR_CONFIG: Record<string, MenuItem[]> = {
     { label: 'Sociedades', route: '/sociedades', icon: 'workspaces', category: 'Sistema' },
     { label: 'Importar Datos', route: '/importar-datos', icon: 'file_upload', category: 'Sistema' },
     { label: 'Exportar datos contables', route: '/exportar-datos-contables', icon: 'draft', category: 'Sistema'},
+    { label: 'Bitácora', route: '/bitacora', icon: 'history', category: 'Sistema' },
     { label: 'Reglas de Autorización', route: '/reglas-autorizacion', icon: 'rule', category: 'Gestión'},
     { label: 'Roles', route: '/roles', icon: 'people', category: 'Gestión' },
     { label: 'Políticas de Reembolsos', route: '/politicas-reembolso', icon: 'policy', category: 'Gestión' },
