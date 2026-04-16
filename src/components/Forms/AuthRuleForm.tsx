@@ -27,7 +27,8 @@ export default function AuthRuleForm({ mode, data, token }: Props) {
   // Track if "Usuario Especifico" is selected for each level
   const [isUserSelected, setIsUserSelected] = useState<boolean[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<(string | null)[]>([]);
-  
+  const [dias, setDias] = useState(5);
+
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,6 +36,7 @@ export default function AuthRuleForm({ mode, data, token }: Props) {
     const payload = {
       niveles_autorizacion: niveles,
       automatico,
+      days_to_validate: dias,
       niveles: Array.from({ length: niveles }, (_, i) => ({
         tipo: autorizadores[i],
         userId: isUserSelected[i] ? selectedUsers[i] : null,

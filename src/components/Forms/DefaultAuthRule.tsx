@@ -26,6 +26,8 @@ export default function DefaultAuthRule({ defaultRule, token }: Props) {
   const [isSuperiorSelected, setIsSuperiorSelected] = useState<boolean[]>([]);
   const [selectedLevels, setSelectedLevels] = useState<(string | null)[]>([]);
 
+  const [dias, setDias] = useState(5);
+
   // Load default rule data
   useEffect(() => {
     if (!defaultRule) return;
@@ -33,6 +35,7 @@ export default function DefaultAuthRule({ defaultRule, token }: Props) {
     // Levels of authorization
     const nivelesFromRule = defaultRule.num_levels ?? 0;
     setNiveles(nivelesFromRule);
+    setDias(defaultRule.days_to_validate);
     setAutomatico(defaultRule.automatic);
 
     // Initialize arrays to track type of authorizer and users
@@ -68,6 +71,7 @@ export default function DefaultAuthRule({ defaultRule, token }: Props) {
   function handleNivelesChange(e: React.ChangeEvent<HTMLInputElement>) {
     const value = Number(e.target.value);
     setNiveles(value);
+    
 
     // If the new value is less than the current number of autorizadores, trim the array
     if (value < autorizadores.length) {
@@ -88,6 +92,11 @@ export default function DefaultAuthRule({ defaultRule, token }: Props) {
       while (next.length < value) next.push("");
       return next;
     });
+  }
+
+  function handleDiasChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const value = Number(e.target.value);
+    setDias(value);
   }
 
   // Handle type selection for each level
@@ -143,6 +152,7 @@ export default function DefaultAuthRule({ defaultRule, token }: Props) {
       rule_name: "Regla por Defecto",
       is_default: true,
       num_levels: niveles,
+      days_to_validate: dias,
       automatic: automatico,
       levels: autorizadores.map((type, index) => ({
         level_number: index + 1,
@@ -185,7 +195,7 @@ export default function DefaultAuthRule({ defaultRule, token }: Props) {
           Esta regla se aplica a todas las solicitudes que no coincidan con ninguna regla definida.
         </p>
       </div>
-      <div className="md:w-1/2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Input
           label="Niveles de autorización"
           name="niveles_autorizacion"
@@ -197,6 +207,18 @@ export default function DefaultAuthRule({ defaultRule, token }: Props) {
           required
           value={niveles}
           onChange={(e) => handleNivelesChange(e)}
+        />
+        <Input
+          label="Días de comprobación"
+          name="dias"
+          type="number"
+          placeholder="Número"
+          altText="Ingresa un valor entre 5 y 30"
+          min={5}
+          max={30}
+          required
+          value={dias}
+          onChange={(e) => handleDiasChange(e)}
         />
       </div>
       {niveles > 0 && niveles < 11 && (

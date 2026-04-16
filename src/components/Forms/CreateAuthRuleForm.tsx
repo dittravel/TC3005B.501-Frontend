@@ -31,12 +31,14 @@ export default function CreateAuthRuleForm({ token, mode, data }: Props) {
   const [diasMax, setDiasMax] = useState("");
   const [montoMin, setMontoMin] = useState("");
   const [montoMax, setMontoMax] = useState("");
+  const [dias, setDias] = useState(5);
 
   // Pre-fill form fields in edit mode
   useEffect(() => {
     if (mode === "edit" && data) {
       setRuleName(data.rule_name || "");
       setNiveles(data.num_levels || 1);
+      setDias(data.days_to_validate || 5);
       setAutomatico(data.automatic || false);
       setAutorizadores(data.levels?.map((n: any) => n.level_type) || []);
       setIsSuperiorSelected(
@@ -52,6 +54,8 @@ export default function CreateAuthRuleForm({ token, mode, data }: Props) {
       setMontoMax(data.max_amount?.toString() || "");
     }
   }, [mode, data]);
+
+  console.log(autorizadores);
 
   function handleNivelesChange(e: React.ChangeEvent<HTMLInputElement>) {
     const value = Number(e.target.value);
@@ -109,11 +113,21 @@ export default function CreateAuthRuleForm({ token, mode, data }: Props) {
     setAutorizadores(newAutorizadores);
   }
 
+  function handleDiasChange(e: React.ChangeEvent<HTMLInputElement>) {
+  const value = Number(e.target.value);
+
+  // Validación opcional (según tu UI: 5–30)
+  if (value < 5 || value > 30) return;
+
+  setDias(value);
+}
+
   async function handleSubmit() {
     const payload = {
       rule_name: ruleName,
       is_default: false,
       num_levels: niveles,
+      days_to_validate: dias,
       automatic: automatico,
       travel_type: tipoViaje,
       min_duration: Number(diasMin),
@@ -176,20 +190,32 @@ export default function CreateAuthRuleForm({ token, mode, data }: Props) {
         <div className="card-title">
           <h2>2. Niveles de Autorización</h2>
         </div>
-        <div className="md:w-1/2">
-          <Input
-            label="Numero de niveles de autorización"
-            name="niveles_autorizacion"
-            type="number"
-            placeholder="Número"
-            altText="Ingresa un valor entre 1 y 10"
-            min={1}
-            max={10}
-            required
-            value={niveles}
-            onChange={handleNivelesChange}
-          />
-        </div>
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Input
+          label="Niveles de autorización"
+          name="niveles_autorizacion"
+          type="number"
+          placeholder="Número"
+          altText="Ingresa un valor entre 1 y 10"
+          min={1}
+          max={10}
+          required
+          value={niveles}
+          onChange={(e) => handleNivelesChange(e)}
+        />
+        <Input
+          label="Días de comprobación"
+          name="dias_comprobacion"
+          type="number"
+          placeholder="Número"
+          altText="Ingresa un valor entre 5 y 30"
+          min={5}
+          max={30}
+          required
+          value={dias}
+          onChange={(e) => handleDiasChange(e)}
+        />
+      </div>
         {niveles > 0 && niveles < 11 && (
           <div className="flex flex-col card-secondary mt-4">
             <div className="flex flex-col gap-4">
