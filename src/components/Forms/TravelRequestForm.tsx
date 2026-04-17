@@ -10,15 +10,13 @@ import { useState, useEffect } from 'react';
 import { apiRequest } from '@utils/apiClient';
 import type { TravelRoute } from '@/types/TravelRoute';
 import type { FormData } from '@/types/FormData';
-import type { DepartmentData } from '@/types/DepartmentData';
 import RouteInputGroup from '@/components/Forms/RouteInputGroup';
 import Input from '@/components/Utils/Input';
-import Select from '@/components/Utils/Select';
 import Textarea from '@/components/Utils/Textarea';
 import Reminder from '@/components/Utils/Reminder';
 import Toast from '@/components/Utils/Toast';
 import Button from '@/components/Buttons/Button';
-import ToggleRow from '../../components/Utils/ToggleRow';
+import Checkbox from '@/components/Utils/Checkbox';
 
 interface Props {
   data?: FormData;
@@ -55,7 +53,6 @@ const initialFormState: FormData = {
 };
 
 export default function TravelRequestForm({ data, mode, request_id, user_id, role, token }: Props) {
-  const [deptData, setDeptData] = useState<DepartmentData | null>(null);
   const [formData, setFormData] = useState<FormData>(initialFormState);
   const [error, setError] = useState<string | null>(null);
   const [disabledButton, setDisabledButton] = useState<boolean>(false);
@@ -78,24 +75,6 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
     }
   }, [data]);
 
-  /**
-   * Fetches department information for the current user.
-   */
-  useEffect(() => {
-    async function fetchDepartmentInfo() {
-      try {
-        const response = await apiRequest(`/applicant/get-cc/${user_id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        setDeptData(response);
-      } catch (err) {
-        // TODO: Implement proper error handling for department fetch failures
-      }
-    }
-    fetchDepartmentInfo();
-  }, [user_id, token]);
 
   /**
    * Handles updates to individual route fields.
@@ -680,65 +659,35 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
           </h2>
         </div>
       {/* Checkbox */}
-      <ToggleRow
-        label="¿Requiere Anticipo?"
+      <Checkbox
         name="requires_advance"
+        label="¿Requiere Anticipo?"
         checked={formData.requires_advance || false}
         onChange={handleGeneralChange}
       />
+      {/* Only show requested fee and notes if "requires_advance" is true */}
+      {formData.requires_advance && (
+        <div className="space-y-6">
+          <Input
+            name="requested_fee"
+            label="Anticipo Esperado"
+            placeholder="Ej: 1500.00"
+            type="number"
+            value={formData.requested_fee === 0 ? '' : formData.requested_fee}
+            onChange={handleGeneralChange}
+          />
 
-        {/* Campos condicionales */}
-        {formData.requires_advance && (
-          <>
-            <Input
-              name="requested_fee"
-              label="Anticipo Esperado (MXN)"
-              placeholder="Anticipo Esperado (MXN)"
-              type="number"
-              value={formData.requested_fee === 0 ? '' : formData.requested_fee}
-              onChange={handleGeneralChange}
-            />
-
-            <Textarea
-              name="notes"
-              label="Observaciones / Comentarios"
-              placeholder="Escribe tus observaciones aquí..."
-              value={formData.notes}
-              onChange={handleGeneralChange}
-              rows={4}
-            />
-          </>
-        )}
-        {/* Department Info */}
-        {deptData && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {(() => {
-              const costCenterName = deptData.cost_center_name || deptData.costs_center || '';
-
-              return (
-                <>
-            <Select
-              name="cost_center_name"
-              label="Centro de Costos"
-              value={costCenterName}
-              disabled
-            >
-              <option value={costCenterName}>{costCenterName}</option>
-            </Select>
-            <Select
-              name="department_name"
-              label="Departamento"
-              value={deptData.department_name}
-              disabled
-            >
-              <option value={deptData.department_name}>{deptData.department_name}</option>
-            </Select>
-                </>
-              );
-            })()}
-          </div>
-        )}
-      </div>
+          <Textarea
+            name="notes"
+            label="Observaciones / Comentarios"
+            placeholder="Escribe tus observaciones aquí..."
+            value={formData.notes}
+            onChange={handleGeneralChange}
+            rows={4}
+          />
+        </div>
+      )}
+     </div>
 
       {/* Error and Info Messages */}
       { error && (

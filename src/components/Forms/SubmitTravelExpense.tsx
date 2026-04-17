@@ -23,6 +23,7 @@ interface SubmitExpenseParams {
   concepto: string;
   monto: number;
   currency: string;
+  receiptDate?: string | null;
   pdfFile: File;
   xmlFile?: File | null;
   token: string;
@@ -52,6 +53,7 @@ export async function SubmitTravelExpense({
   concepto,
   monto,
   currency,
+  receiptDate,
   pdfFile,
   xmlFile,
   token,
@@ -74,6 +76,7 @@ export async function SubmitTravelExpense({
   formData.append("route_id", routeId.toString());
   formData.append("amount", monto.toString());
   formData.append("currency", currency);
+  if (receiptDate) formData.append("receipt_date", receiptDate);
 
   const uploadRes = await fetch(`${import.meta.env.PUBLIC_API_BASE_URL}/applicant/create-expense-with-files`, {
     method: "POST",
