@@ -22,4 +22,5 @@ export interface FormData {
   plane_needed: boolean;
   hotel_needed: boolean;
   routes: TravelRoute[];
+  requires_advance: boolean;
 }

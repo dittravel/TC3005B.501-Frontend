@@ -7,6 +7,7 @@
 
 export interface BaseInputProps {
   label?: string;
+  checked?: boolean; 
   name: string;
   placeholder?: string;
   value?: string | number;
@@ -22,10 +23,12 @@ export interface BaseInputProps {
   min?: string | number;
   max?: string | number;
   altText?: string;
+  accept?: string;
 }
 
 export type InputTypes =
 | 'text'
+| 'checkbox'
 | 'email'
 | 'tel'
 | 'url'
@@ -33,9 +36,11 @@ export type InputTypes =
 | 'number'
 | 'date'
 | 'time'
+| 'file'
 
 export const InputPatterns: Record<InputTypes, string | undefined> = {
   text: undefined,
+  checkbox: undefined,
   email: '^[^ @]+@[^ @]+\\.[^ @]+$',
   tel: '^\\+?[0-9 \\-]{7,15}$',
   url: 'https?://.+',
@@ -43,4 +48,5 @@ export const InputPatterns: Record<InputTypes, string | undefined> = {
   number: '^\\d+$',
   date: '^\\d{4}-\\d{2}-\\d{2}$',
   time: undefined,
+  file: undefined,
 };  

@@ -24,6 +24,7 @@ interface ModalWrapperProps {
   onClose?: () => void;
   children?: React.ReactNode;
   triggerElement?: React.ReactNode;
+  className?: string;
 }
 
 /**
@@ -44,6 +45,7 @@ export default function ModalWrapper({
   onConfirm,
   children,
   triggerElement,
+  className
 }: ModalWrapperProps) {
   const [isOpen, setIsOpen] = useState(show);
 
@@ -84,7 +86,7 @@ export default function ModalWrapper({
         color={color}
         size={size}
         disabled={disabled}
-        className="w-full"
+        className={className}
       >
         {children}
       </Button>

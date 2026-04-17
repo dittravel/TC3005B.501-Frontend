@@ -7,16 +7,15 @@
 
 import Card from '@/components/Utils/Card';
 import Button from '@/components/Buttons/Button';
-import ValidateReceiptStatus from '@/components/Modals/ValidateReceiptStatus';
-import DeleteReceiptModal from '@/components/Modals/DeleteReceiptModal';
+import UltimateWrapper from '@/components/Modals/UltimateWrapper';
 import type { TagType } from '@/types/card';
-import { useState } from 'react';
 import { formatDate } from '@/utils/dateFormatter';
 
 interface Props {
   expenses: any[];
   requestId: string | number;
   token: string;
+  deadlineStatus?: any;
 }
 
 const stateColors: Record<string, TagType> = {
@@ -25,32 +24,73 @@ const stateColors: Record<string, TagType> = {
   'Pendiente': 'warning'
 };
 
-export default function ExpenseReceiptsList({ expenses, requestId, token }: Props) {
-  const [expensesList, setExpensesList] = useState(expenses);
+/**
+ * Expense Receipts List Component
+ * Renders a list of expense receipts with options to view, edit, 
+ * delete, or re-upload based on their validation status.
+ * @param expenses - Array of expense receipts to display
+ * @param requestId - ID of the associated request
+ * @param token - Authentication token for API requests
+ * @param deadlineStatus - Status of the authorization deadline
+ * @returns JSX Element
+ */
+export default function ExpenseReceiptsList({ 
+  expenses, 
+  requestId,
+  token,
+  deadlineStatus
+}: Props) {
+  // Determine if the deadline has passed for uploading receipts
+  const expired = (() => {
+    // If no deadline status, assume not expired
+    if (!deadlineStatus) return false;
 
-  /**
-   * Handler for successful receipt deletion
-   * Removes the deleted expense from the list
-   * @param receipt_id - The ID of the deleted receipt
-   */
-  const handleDeleteSuccess = (receipt_id: number) => {
-    setExpensesList(prev => prev.filter(exp => exp.receipt_id !== receipt_id));
-  };
+    const days = 
+      deadlineStatus.days_remaining ??
+      null;
+    if (days === null) return false; // If no days info, assume not expired
+    return days <= 0;
+  })();
 
   return (
     <section className="space-y-6 w-full">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-text-primary">Comprobantes ({expensesList.length})</h2>
-        <a href={`/subir-comprobante/${requestId}`} className="w-auto">
-          <Button color="secondary" variant="filled" size="medium">
-            Agregar Comprobante
-          </Button>
-        </a>
+        <h2 className="text-xl font-bold text-text-primary">Comprobantes ({expenses.length})</h2>
+        {!expired ? (
+          <div className="flex gap-4">
+            {expenses.length > 0 && !expenses.some((e: any) => e.validation === 'Rechazado') && (
+              <UltimateWrapper
+                id={Number(requestId)}
+                endpoint="/applicant/send-expense-validation"
+                title="Confirmar envío"
+                message="¿Está seguro de que deseas mandar estos comprobantes?"
+                redirectTo="/dashboard"
+                modal_type="success"
+                color="success"
+                variant="filled"
+                label="Enviar a validar"
+                token={token}
+                successMessage="Comprobantes enviados exitosamente."
+              />
+            )}
+            <a href={`/subir-comprobante/${requestId}`} className="w-auto">
+              <Button color="secondary" variant="filled" size="medium">
+                Agregar Comprobante
+              </Button>
+            </a>
+          </div>
+        ) : (
+          <div className="flex flex-col items-end gap-2">
+            <p className="text-sm text-alert font-semibold">
+              El plazo para subir comprobantes ha expirado.
+            </p>
+          </div>
+        )}
       </div>
 
-      {expensesList.length > 0 ? (
+      {expenses.length > 0 ? (
         <div className="space-y-4">
-          {expensesList.map((expense: any, index: number) => {
+          {expenses.map((expense: any) => {
             const hasPdf = expense.pdf_id && expense.pdf_name;
             const hasXml = expense.xml_id && expense.xml_name;
             const apiBaseUrl = import.meta.env.PUBLIC_API_BASE_URL;
@@ -123,15 +163,25 @@ export default function ExpenseReceiptsList({ expenses, requestId, token }: Prop
                             Editar
                           </Button>
                         </a>
-                        <DeleteReceiptModal
-                          receipt_id={expense.receipt_id}
+                        <UltimateWrapper
+                          id={expense.receipt_id}
+                          endpoint="/applicant/delete-receipt"
+                          title="Eliminar Comprobante"
+                          message="¿Está seguro de que desea eliminar este comprobante?"
+                          modal_type="warning"
+                          color="warning"
+                          variant="filled"
+                          label="Eliminar"
+                          method="DELETE"
+                          successMessage="Comprobante eliminado exitosamente."
                           token={token}
-                          onSuccess={() => handleDeleteSuccess(expense.receipt_id)}
+                          redirectTo={`/comprobar-solicitud/${requestId}`}
+                          className="w-full"
                         />
                       </div>
                     )}
 
-                    {expense.validation === 'Rechazado' && (
+                    {expense.validation === 'Rechazado' && !expired && (
                       <div className="flex flex-col gap-2 w-full">
                         <a href={`/resubir-comprobante/${requestId}?replace=${expense.receipt_id}`} className="block">
                           <Button
@@ -144,6 +194,10 @@ export default function ExpenseReceiptsList({ expenses, requestId, token }: Prop
                           </Button>
                         </a>
                       </div>
+                    )}
+
+                    {expense.validation === 'Rechazado' && expired && (
+                      <div className="text-sm text-alert">Plazo de reenvío cerrado</div>
                     )}
                   </div>
                 </div>
@@ -158,18 +212,6 @@ export default function ExpenseReceiptsList({ expenses, requestId, token }: Prop
           </p>
         </Card>
       )}
-
-      <ValidateReceiptStatus
-        request_id={Number(requestId)}
-        title="Confirmar envío"
-        message="¿Está seguro de que desea mandar estos comprobantes?"
-        redirection="/dashboard"
-        modal_type="success"
-        color="success"
-        variant="filled"
-        label="Enviar a validar"
-        token={token}
-      />
     </section>
   );
 }
