@@ -189,17 +189,41 @@ const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, inde
           </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Checkbox
-              name="plane_needed"
-              label="¿Requiere Avión?"
-              checked={route.plane_needed}
-              onChange={handleInputChange}
-            />
-            <Checkbox
-              name="hotel_needed"
-              label="¿Requiere Hotel?"
-              checked={route.hotel_needed}
-              onChange={handleInputChange}
-            />
+                name="plane_needed"
+                label="¿Requiere Avión?"
+                checked={route.plane_needed}
+                onChange={handleInputChange}
+              />
+              
+              {route.plane_needed && flightSearchOpen && (
+                <FlightSearchForm
+                  route={route}
+                  routeIndex={index}
+                  // onSelectFlight={(flight) => {
+                  //   onChange(index, 'selected_flight', flight);
+                  // }}
+                />
+              )}
+            </div>
+
+            <div>
+              <Checkbox
+                name="hotel_needed"
+                label="¿Requiere Hotel?"
+                checked={route.hotel_needed}
+                onChange={handleInputChange}
+              />
+
+              {route.hotel_needed && hotelSearchOpen && (
+                <HotelSearchForm
+                  route={route}
+                  routeIndex={index}
+                  onSelectHotel={(hotel) => {
+                    onChange(index, 'selected_hotel', hotel);
+                  }}
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>

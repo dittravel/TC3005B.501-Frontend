@@ -4,13 +4,15 @@ import HotelSearchForm from '@/components/Forms/HotelSearchForm';
 import type { TravelRoute } from '@/types/TravelRoute';
 
 interface TravelSearchCardProps {
+  token: string;
   route: TravelRoute;
   routeIndex: number;
   onSelectFlight?: (flight: any) => void;
+  onChange: (index: number, name: string, value: any) => void;
   onSelectHotel?: (hotel: any) => void;
 }
 
-const TravelSearchCard = ({ route, routeIndex, onSelectFlight, onSelectHotel }: TravelSearchCardProps) => {
+const TravelSearchCard = ({ token, route, routeIndex, onSelectFlight, onSelectHotel, onChange }: TravelSearchCardProps) => {
   const [isFlightSearchOpen, setIsFlightSearchOpen] = useState(false);
   const [isHotelSearchOpen, setIsHotelSearchOpen] = useState(false);
 
@@ -27,6 +29,7 @@ const TravelSearchCard = ({ route, routeIndex, onSelectFlight, onSelectHotel }: 
         <div>
           <button
             onClick={() => setIsFlightSearchOpen(!isFlightSearchOpen)}
+            type='button'
             className="route-title rounded-lg mt-4 w-full text-white text-left"
           >
             <span className="text-base font-semibold">Form para buscar Vuelos</span>
@@ -34,12 +37,12 @@ const TravelSearchCard = ({ route, routeIndex, onSelectFlight, onSelectHotel }: 
 
           {isFlightSearchOpen && (
             <FlightSearchForm
+              token={token}
               route={route}
               routeIndex={routeIndex}
-              onSelectFlight={(flight) => {
-                if (onSelectFlight) onSelectFlight(flight);
-                setIsFlightSearchOpen(false);
-              }}
+              // onSelectFlight={(flight) => {
+              //   onChange(routeIndex, 'selected_flight', flight);
+              // }}
             />
           )}
         </div>
