@@ -10,6 +10,7 @@
 
 import TextHeader from '@components/Layout/TextHeader.astro';
 import Button from '@/components/Buttons/Button';
+import { getCookie } from "@data/cookies";
 import TravelSearchCard from '@/components/Cards/TravelSearchCard';
 const { request, title, subtitle } = Astro.props;
 
@@ -144,6 +145,7 @@ const { request, title, subtitle } = Astro.props;
       onSelectHotel={(hotel) => {
         console.log('Hotel selected:', hotel);
       }}
+      token={getCookie("token", Astro.cookies) || ""}
     />
 
     {/* Notes Section */}

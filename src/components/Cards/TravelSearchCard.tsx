@@ -4,6 +4,7 @@ import HotelSearchForm from '@/components/Forms/HotelSearchForm';
 import type { TravelRoute } from '@/types/TravelRoute';
 
 interface TravelSearchCardProps {
+  token: string;
   route: TravelRoute;
   routeIndex: number;
   onSelectFlight?: (flight: any) => void;
@@ -11,7 +12,7 @@ interface TravelSearchCardProps {
   onSelectHotel?: (hotel: any) => void;
 }
 
-const TravelSearchCard = ({ route, routeIndex, onSelectFlight, onSelectHotel, onChange }: TravelSearchCardProps) => {
+const TravelSearchCard = ({ token, route, routeIndex, onSelectFlight, onSelectHotel, onChange }: TravelSearchCardProps) => {
   const [isFlightSearchOpen, setIsFlightSearchOpen] = useState(false);
   const [isHotelSearchOpen, setIsHotelSearchOpen] = useState(false);
 
@@ -36,6 +37,7 @@ const TravelSearchCard = ({ route, routeIndex, onSelectFlight, onSelectHotel, on
 
           {isFlightSearchOpen && (
             <FlightSearchForm
+              token={token}
               route={route}
               routeIndex={routeIndex}
               // onSelectFlight={(flight) => {
