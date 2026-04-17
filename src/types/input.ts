@@ -7,6 +7,7 @@
 
 export interface BaseInputProps {
   label?: string;
+  checked?: boolean; 
   name: string;
   placeholder?: string;
   value?: string | number;
@@ -27,6 +28,7 @@ export interface BaseInputProps {
 
 export type InputTypes =
 | 'text'
+| 'checkbox'
 | 'email'
 | 'tel'
 | 'url'
@@ -38,6 +40,7 @@ export type InputTypes =
 
 export const InputPatterns: Record<InputTypes, string | undefined> = {
   text: undefined,
+  checkbox: undefined,
   email: '^[^ @]+@[^ @]+\\.[^ @]+$',
   tel: '^\\+?[0-9 \\-]{7,15}$',
   url: 'https?://.+',

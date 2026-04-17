@@ -18,6 +18,7 @@ import Textarea from '@/components/Utils/Textarea';
 import Reminder from '@/components/Utils/Reminder';
 import Toast from '@/components/Utils/Toast';
 import Button from '@/components/Buttons/Button';
+import ToggleRow from '../../components/Utils/ToggleRow';
 
 interface Props {
   data?: FormData;
@@ -49,6 +50,7 @@ const initialFormState: FormData = {
   notes: '',
   requested_fee: '',
   imposed_fee: 0,
+  requires_advance: false,
   routes: [{ ...emptyRoute, router_index: 0 }],
 };
 
@@ -123,15 +125,27 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
    * @param {React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>} e - The change event
    * @returns {void}
    */
-  const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setError(null);
-    const { name, value, type } = e.target;
-    const checked = (e.target as HTMLInputElement).checked;
-    setFormData((prev) => ({
+const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  setError(null);
+  const { name, value, type } = e.target;
+  const checked = (e.target as HTMLInputElement).checked;
+
+  setFormData((prev) => {
+    if (name === 'requires_advance' && !checked) {
+      return {
+        ...prev,
+        requires_advance: false,
+        requested_fee: '',
+        notes: ''
+      };
+    }
+
+    return {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
-    }));
-  };
+    };
+  });
+};
 
   /**
    * Adds a new empty route to the form.
@@ -301,8 +315,8 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
       !firstRoute.beginning_time ||
       !firstRoute.ending_date ||
       !firstRoute.ending_time ||
-      !formData.requested_fee ||
-      !formData.notes
+      formData.requires_advance && !formData.requested_fee ||
+      formData.requires_advance && !formData.notes
     ) {
       setError('Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.');
       handleSetToast('Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.', 'error');
@@ -319,6 +333,7 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
       notes: formData.notes,
       requested_fee: parseFloat(formData.requested_fee as string) || 0,
       imposed_fee: 0,
+      requires_advance: formData.requires_advance,
       travel_type: travelType,
       origin_country_name: firstRoute.origin_country_name,
       origin_city_name: firstRoute.origin_city_name,
@@ -465,8 +480,8 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
         firstRoute.beginning_time,
         firstRoute.ending_date,
         firstRoute.ending_time,
-        formData.requested_fee,
-        formData.notes,
+        formData.requires_advance && formData.requested_fee,
+        formData.requires_advance && formData.notes,
       ].some(field => !field);
 
       if (missingFields) {
@@ -580,8 +595,8 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
       !firstRoute.beginning_time ||
       !firstRoute.ending_date ||
       !firstRoute.ending_time ||
-      !formData.requested_fee ||
-      !formData.notes
+      formData.requires_advance && !formData.requested_fee ||
+      formData.requires_advance && !formData.notes
     ) {
       setError('Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.');
       handleSetToast('Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.', 'error');
@@ -664,27 +679,36 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
             2. Detalles Generales del Viaje
           </h2>
         </div>
+      {/* Checkbox */}
+      <ToggleRow
+        label="¿Requiere Anticipo?"
+        name="requires_advance"
+        checked={formData.requires_advance || false}
+        onChange={handleGeneralChange}
+      />
 
-        {/* Requested Fee and Notes */}
-        <Input
-          name="requested_fee"
-          label="Anticipo Esperado (MXN)"
-          placeholder="Anticipo Esperado (MXN)"
-          type="number"
-          value={formData.requested_fee === 0 ? '' : formData.requested_fee}
-          onChange={handleGeneralChange}
-          required
-        />
-        <Textarea
-          name="notes"
-          label="Observaciones / Comentarios"
-          placeholder="Escribe tus observaciones aquí..."
-          value={formData.notes}
-          onChange={handleGeneralChange}
-          required
-          rows={4}
-        />
+        {/* Campos condicionales */}
+        {formData.requires_advance && (
+          <>
+            <Input
+              name="requested_fee"
+              label="Anticipo Esperado (MXN)"
+              placeholder="Anticipo Esperado (MXN)"
+              type="number"
+              value={formData.requested_fee === 0 ? '' : formData.requested_fee}
+              onChange={handleGeneralChange}
+            />
 
+            <Textarea
+              name="notes"
+              label="Observaciones / Comentarios"
+              placeholder="Escribe tus observaciones aquí..."
+              value={formData.notes}
+              onChange={handleGeneralChange}
+              rows={4}
+            />
+          </>
+        )}
         {/* Department Info */}
         {deptData && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
