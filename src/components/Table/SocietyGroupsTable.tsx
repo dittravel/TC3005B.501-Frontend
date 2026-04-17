@@ -42,7 +42,7 @@ export default function SocietyGroupsTable({ data, token, role }: Props) {
         </Button>
         {!group.is_default && (
           <UltimateWrapper
-            user_id={group.id}
+            id={group.id}
             endpoint="/society-groups"
             title="¿Estás seguro de que deseas eliminar este grupo de sociedad?"
             message="Esta acción no se puede deshacer."
@@ -55,6 +55,7 @@ export default function SocietyGroupsTable({ data, token, role }: Props) {
             errorMessage="Error al eliminar el grupo de sociedad."
             token={token}
             method="DELETE"
+            className="w-full"
           />
         )}
       </div>

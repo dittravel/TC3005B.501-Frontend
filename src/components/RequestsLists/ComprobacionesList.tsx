@@ -5,6 +5,7 @@
  */
 
 import Card from '@/components/Utils/Card';
+import Button from '@/components/Buttons/Button';
 import type { CardTag } from '@/types/card';
 
 interface Props {
@@ -73,9 +74,8 @@ export default function ComprobacionesList({ data, title = "Comprobaciones", sub
                 key={request.request_id}
                 tag={{ text: `Solicitud #${request.request_id}`, type: 'secondary' }}
                 status={statusTag}
-                href={`/comprobar-solicitud/${request.request_id}`}
               >
-                <div className="flex flex-col gap-4">
+                <div className="card-content-grid">
                   <div className="space-y-3">
                     <div className="text-sm text-text-primary space-y-1">
                       <p>
@@ -106,6 +106,14 @@ export default function ComprobacionesList({ data, title = "Comprobaciones", sub
                         </div>
                       </div>
                     )}
+                  </div>
+
+                  <div className="flex flex-col gap-2 w-full">
+                    <a href={`/comprobar-solicitud/${request.request_id}`} className="block">
+                      <Button color="primary" variant="filled" size="medium" className="w-full">
+                        Ver Comprobantes
+                      </Button>
+                    </a>
                   </div>
                 </div>
               </Card>
