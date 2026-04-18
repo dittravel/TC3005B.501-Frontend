@@ -10,6 +10,7 @@
 
 import TextHeader from '@components/Layout/TextHeader.astro';
 import Button from '@/components/Buttons/Button';
+import { getCookie } from "@data/cookies";
 import TravelSearchCard from '@/components/Cards/TravelSearchCard';
 const { request, title, subtitle } = Astro.props;
 
@@ -135,7 +136,7 @@ const { request, title, subtitle } = Astro.props;
     </div>
 
     {/* Travel Search Card */}
-    <TravelSearchCard
+    <TravelSearchCard client:load
       route={request.routes[0]}
       routeIndex={0}
       onSelectFlight={(flight) => {
@@ -144,13 +145,14 @@ const { request, title, subtitle } = Astro.props;
       onSelectHotel={(hotel) => {
         console.log('Hotel selected:', hotel);
       }}
+      token={getCookie("token", Astro.cookies) || ""}
     />
 
     {/* Notes Section */}
     {request.notes && (
-      <div class="card">
-        <div class="card-title">
-          <h2 class="text-xl font-bold text-text-primary">
+      <div class="card mt-6">
+        <div class="card-title ">
+          <h2 class="text-xl font-bold text-text-primary ">
             Observaciones / Comentarios
           </h2>
         </div>

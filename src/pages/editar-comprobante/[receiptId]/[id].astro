@@ -25,10 +25,15 @@ const requestId = id;
 // Fetch receipt data for editing
 let receiptData = null;
 let travelData = null;
+let society = null;
+let currencies = [];
 
 try {
   receiptData = await apiRequest(`/applicant/get-receipt/${receiptId}`, { cookies: Astro.cookies });
   travelData = await apiRequest(`/user/get-travel-request/${requestId}`, { cookies: Astro.cookies });
+  society = await apiRequest("/societies/current", { cookies: Astro.cookies });
+  const currenciesRes = await apiRequest("/exchange-rate/catalog", { cookies: Astro.cookies });
+  currencies = currenciesRes.data || [];
 } catch (error) {
   console.error("Error fetching receipt or travel data:", error);
 }
@@ -50,7 +55,11 @@ if (!receiptData || !travelData) {
         requestId={travelData.request_id}
         routes={travelData.routes || []}
         token={getCookie("token", Astro.cookies) || ""}
-        receiptToEdit={receiptData}
+        mode="edit"
+        data={receiptData}
+        societyCurrency={society?.currency}
+        currencies={currencies}
+        redirectTo={`/comprobar-solicitud/${requestId}`}
       />
     </section>
   </div>

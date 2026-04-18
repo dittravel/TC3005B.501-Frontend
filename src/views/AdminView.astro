@@ -115,7 +115,7 @@ const userName = getCookie("username", Astro.cookies);
                   <td class="px-4 py-4">
                     <UltimateWrapper
                       client:only="react"
-                      user_id={user.user_id}
+                      id={user.user_id}
                       endpoint="/admin/delete-user"
                       title="Eliminar usuario"
                       message={`¿Estás seguro de que deseas eliminar al usuario ${user.user_name}? Esta acción no se puede deshacer.`}
