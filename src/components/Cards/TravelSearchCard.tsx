@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import FlightSearchForm from '@/components/Forms/FlightSearchForm';
 import HotelSearchForm from '@/components/Forms/HotelSearchForm';
 import type { TravelRoute } from '@/types/TravelRoute';
+import { Check } from '@mui/icons-material';
+import Checkbox from '../Utils/Checkbox';
 
 interface TravelSearchCardProps {
   token: string;
@@ -15,6 +17,18 @@ interface TravelSearchCardProps {
 const TravelSearchCard = ({ token, route, routeIndex, onSelectFlight, onSelectHotel, onChange }: TravelSearchCardProps) => {
   const [isFlightSearchOpen, setIsFlightSearchOpen] = useState(false);
   const [isHotelSearchOpen, setIsHotelSearchOpen] = useState(false);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
+
+    if (name === "plane_form") {
+      setIsFlightSearchOpen(checked);
+    }
+
+    if (name === "hotel_form") {
+      setIsHotelSearchOpen(checked);
+    }
+  };
 
   return (
     <div className="card">
@@ -24,50 +38,53 @@ const TravelSearchCard = ({ token, route, routeIndex, onSelectFlight, onSelectHo
         </h2>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Flight Search Section */}
-        <div>
-          <button
-            onClick={() => setIsFlightSearchOpen(!isFlightSearchOpen)}
-            type='button'
-            className="route-title rounded-lg mt-4 w-full text-white text-left"
-          >
-            <span className="text-base font-semibold">Form para buscar Vuelos</span>
-          </button>
+      <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+        {route.plane_needed === true && (
+          <>
+            {/* Flight Search Section */}
+            <Checkbox
+              name="plane_form"
+              label="Agregar Vuelo"
+              checked={isFlightSearchOpen}
+              onChange={handleInputChange}
+            />
 
-          {isFlightSearchOpen && (
-            <FlightSearchForm
-              token={token}
-              route={route}
-              routeIndex={routeIndex}
+            {isFlightSearchOpen && (
+              <FlightSearchForm
+                token={token}
+                route={route}
+                routeIndex={routeIndex}
               // onSelectFlight={(flight) => {
               //   onChange(routeIndex, 'selected_flight', flight);
               // }}
-            />
-          )}
-        </div>
+              />
+            )}
+          </>
+        )}
 
-        {/* Hotel Search Section */}
-        <div>
-          <button
-            onClick={() => setIsHotelSearchOpen(!isHotelSearchOpen)}
-            className="route-title rounded-lg mt-4 w-full text-white text-left"
-          >
-            <span className="text-base font-semibold">Form para buscar Hoteles</span>
-          </button>
-
-          {isHotelSearchOpen && (
-            <HotelSearchForm
-              route={route}
-              routeIndex={routeIndex}
-              onSelectHotel={(hotel) => {
-                if (onSelectHotel) onSelectHotel(hotel);
-                setIsHotelSearchOpen(false);
-              }}
+        {route.hotel_needed === true && (
+          <>
+            <Checkbox
+              name="hotel_form"
+              label="Agregar Hotel"
+              checked={isHotelSearchOpen}
+              onChange={handleInputChange}
             />
-          )}
-        </div>
+
+            {isHotelSearchOpen && (
+              <HotelSearchForm
+                route={route}
+                routeIndex={routeIndex}
+                onSelectHotel={(hotel) => {
+                  if (onSelectHotel) onSelectHotel(hotel);
+                  setIsHotelSearchOpen(false);
+                }}
+              />
+            )}
+          </>
+        )}
       </div>
+
     </div>
   );
 };
