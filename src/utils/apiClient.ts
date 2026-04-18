@@ -45,17 +45,47 @@ interface ApiOptions {
   cookies?: import("astro").APIContext["cookies"];
 }
 
-const BASE_URL = import.meta.env.PUBLIC_API_BASE_URL || 'https://localhost:3000/api';
+class ApiError extends Error {
+  status: number;
+  response: any;
 
+  constructor(status: number, response: any) {
+    super(response?.error || response?.message || `API request failed with status ${status}`);
+    this.status = status;
+    this.response = response;
+  }
+}
+
+/**
+ * Makes an API request to the backend with the given path and options.
+ * It automatically includes the JWT token from cookies for authentication.
+ * The function also handles SSL certificate issues in development environments.
+ * 
+ * @param path - The API endpoint path (e.g., '/applicant/get-user-requests/1')
+ * @param options - Optional configuration for the request, including method, data, headers, and cookies
+ * @returns A promise that resolves to the response data from the API
+ * @throws An error if the request fails or if the response is not ok
+ */
 
 export async function apiRequest<T = any>(
   path: string,
   options: ApiOptions = {}
 ): Promise<T> {
-  const { method = 'GET', data, headers, cookies } = options;
+  const runtimeServerApiBase =
+    isServer && typeof process !== 'undefined' ? process.env.SERVER_API_BASE_URL : undefined;
+  const serverBaseUrls = [
+    runtimeServerApiBase,
+    import.meta.env.SERVER_API_BASE_URL,
+    'https://backend:3000/api',
+    'https://host.docker.internal:3000/api',
+    import.meta.env.PUBLIC_API_BASE_URL,
+    'https://localhost:3000/api',
+  ].filter(Boolean);
+  const baseUrl = isServer
+    ? serverBaseUrls[0]
+    : import.meta.env.PUBLIC_API_BASE_URL || 'https://localhost:3000/api';
+  const { method = 'GET', data, headers = {}, cookies } = options;
 
-  const url = `${BASE_URL}${path}`;
-  
   let token = "";
   try {
     const session = getSession(cookies); 
@@ -76,63 +106,72 @@ export async function apiRequest<T = any>(
   };
 
   try {
-    // For Node.js in development, the NODE_TLS_REJECT_UNAUTHORIZED env var handles this
-    // For browsers, we can't directly modify SSL validation behavior
-    const res = await fetch(url, config);
+    // Try alternative server URLs to reduce transient container-network failures.
+    const targets = isServer ? serverBaseUrls : [baseUrl];
+    let lastError: any;
 
-    if (!res.ok) {
-      if (res.status === 401 || res.status === 403) {
-        console.warn("Unauthorized request - token may be invalid or expired");
+    for (const targetBase of targets) {
+      try {
+        const res = await fetch(`${targetBase}${path}`, config);
+
+        if (!res.ok) {
+          if ((res.status === 401 || res.status === 403) && !isServer) {
+            console.warn("Unauthorized request - token may be invalid or expired");
+            try {
+              await fetch(`${targetBase}/user/logout`, {
+                method: 'POST',
+                credentials: 'include',
+              });
+            } catch (e) {
+              console.error("Error during logout after unauthorized response:", e);
+            }
+
+            if (typeof window !== 'undefined') {
+              window.location.href = '/login';
+            }
+          }
+
+          let errorData: any;
+          const contentType = res.headers.get('content-type');
+
+          if (contentType?.includes('application/json')) {
+            try {
+              errorData = await res.json();
+            } catch {
+              errorData = { message: res.statusText };
+            }
+          } else {
+            errorData = { message: await res.text() };
+          }
+
+          throw new ApiError(res.status, errorData);
+        }
+
+        const contentType = res.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          return await res.json();
+        }
+
+        const text = await res.text();
         try {
-          await fetch(`${BASE_URL}/user/logout`, {
-            method: 'POST',
-            credentials: 'include',
-          });
-        } catch (e) {
-          console.error("Error during logout after unauthorized response:", e);
-        }
-
-        // Redirect to login page
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login';
-        }
-
-        throw {
-          status: res.status,
-          message: 'Unauthorized - redirecting to login'
-        }
-      }
-
-      let errorData: any;
-      const contentType = res.headers.get('content-type');
-
-      if (contentType && contentType.includes('application/json')) {
-        try {
-          errorData = await res.json();
+          return JSON.parse(text);
         } catch {
-          errorData = { message: res.statusText };
+          return text as T;
         }
-      } else {
-        errorData = { message: await res.text() };
+      } catch (err) {
+        if (err instanceof ApiError && err.status < 500) {
+          throw err;
+        }
+        lastError = err;
       }
-
-      throw {
-        status: res.status,
-        response: errorData
-      };
     }
 
-    const text = await res.text();
-    try {
-      return JSON.parse(text);
-    } catch {
-      return text as any;
-    }
+    throw lastError;
   } catch (error) {
     console.error("API request failed:", error);
-    throw {
-      message: 'Network or fetch error',
-      detail: error
-    };
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new Error(`Network or fetch error: ${error instanceof Error ? error.message : String(error)}`);
   }
 }

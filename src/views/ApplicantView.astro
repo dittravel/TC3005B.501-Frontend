@@ -26,6 +26,10 @@ const societyName = await getSocietyName(Astro);
 
 // Get user requests
 const requests = await (async () => {
+  if (!user_id) {
+    return [];
+  }
+
   try {
     // Try to fetch requests with error handling
     try {

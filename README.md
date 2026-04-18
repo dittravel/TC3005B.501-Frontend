@@ -94,6 +94,76 @@ pnpm install
 npm install
 ```
 
+### Dockerized Setup (Recommended)
+
+For full integration testing, run frontend and backend with Docker.
+
+#### 1. Start backend stack first
+
+From [../TC3005B.501-Backend](../TC3005B.501-Backend):
+
+```sh
+docker compose up -d --build
+```
+
+This is required because frontend Docker compose expects the backend Docker network and service.
+
+#### 2. Start frontend stack
+
+From the frontend root:
+
+```sh
+docker compose up -d --build
+```
+
+#### 3. Verify containers
+
+Backend project:
+
+```sh
+cd ../TC3005B.501-Backend
+docker compose ps
+```
+
+Frontend project:
+
+```sh
+cd ../TC3005B.501-Frontend
+docker compose ps
+```
+
+Expected frontend URL:
+
+- `https://localhost:4321`
+- `https://localhost:4321/login`
+
+#### 4. Smoke-check the dockerized version
+
+1. Open `https://localhost:4321/login`
+2. Login with a valid user (for example `admin.tec` / `123` or `andres.gomez` / `123`)
+3. Confirm redirect to `/dashboard`
+4. Confirm protected routes do not bounce back to login unexpectedly
+5. Check logs if needed:
+
+```sh
+docker compose logs -f frontend
+```
+
+#### 5. Stop services
+
+Frontend:
+
+```sh
+docker compose down
+```
+
+Backend:
+
+```sh
+cd ../TC3005B.501-Backend
+docker compose down
+```
+
 ### Running
 
 To run the Frontend, utilize whichever package manager you used for dependencies to run the project.

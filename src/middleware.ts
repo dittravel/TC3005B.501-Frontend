@@ -23,9 +23,24 @@ function matchPath(path: string, patterns: string[]) {
   });
 }
 
+function parseJwtPayload(token: string): Record<string, any> | null {
+  try {
+    const parts = token.split('.');
+    if (parts.length < 2) return null;
+
+    const base64 = parts[1].replaceAll('-', '+').replaceAll('_', '/');
+    const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '=');
+    const json = Buffer.from(padded, 'base64').toString('utf8');
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+}
+
 // Public routes that do NOT require authentication
 export const publicRoutes = [
   // Default public routes
+  '/',
   '/login',
   '/forgot-password',
   '/reset-password',
@@ -63,14 +78,36 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   
   // 2. Get role from cookies
   const cookieHeader = request.headers.get('cookie') || '';
-  const roleMatch = cookieHeader.match(/(?:^|;\s*)role=([^;]+)/);
+  const roleMatch = /(?:^|;\s*)role=([^;]+)/.exec(cookieHeader);
   const role = roleMatch ? decodeURIComponent(roleMatch[1]) : '';
-  const tokenMatch = cookieHeader.match(/(?:^|;\s*)token=([^;]+)/);
-  const isAuthenticated = !!tokenMatch || !!role;
+  const tokenMatch = /(?:^|;\s*)token=([^;]+)/.exec(cookieHeader);
+  const token = tokenMatch ? decodeURIComponent(tokenMatch[1]) : '';
+  const isAuthenticated = !!tokenMatch;
   const html = unauthorizedPage(pathname, isAuthenticated);
+
+  // If token is missing, force re-authentication instead of rendering protected pages.
+  if (!tokenMatch) {
+    return Response.redirect(new URL('/login', request.url), 302);
+  }
 
   // 2.1 If no role is found, redirect to login page
   if (!role) {
+    return Response.redirect(new URL('/login', request.url), 302);
+  }
+
+  // 2.2 Basic token payload validation to prevent SSR pages from crashing with 401 API calls.
+  const tokenPayload = parseJwtPayload(token);
+  if (!tokenPayload) {
+    return Response.redirect(new URL('/login', request.url), 302);
+  }
+
+  const now = Math.floor(Date.now() / 1000);
+  if (typeof tokenPayload.exp === 'number' && tokenPayload.exp <= now) {
+    return Response.redirect(new URL('/login', request.url), 302);
+  }
+  
+  const hasSocietyContext = tokenPayload.society_id != null || tokenPayload.society_group_id != null;
+  if (!hasSocietyContext) {
     return Response.redirect(new URL('/login', request.url), 302);
   }
 
