@@ -24,7 +24,7 @@ const TravelSearchCard = ({ token, route, routeIndex, onSelectFlight, onSelectHo
         </h2>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
         {/* Flight Search Section */}
         <div>
           <button
