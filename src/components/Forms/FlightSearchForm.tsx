@@ -79,8 +79,8 @@ const FlightSearchForm = ({ token, route, routeIndex, tripType, ticketType }: Fl
     const payload = {
       origin: selectedDepartureAirport,
       destination: selectedArrivalAirport,
-      departureDate: '2026-06-01', //route.starting_date
-      ...(selectedTripType === 'round' && { returnDate: '2026-06-02' }), //route.ending_date
+      departureDate: route.beginning_date, 
+      ...(selectedTripType === 'round' && { returnDate: route.ending_date }),
       tripType: selectedTripType,
       cabinClass: selectedTicketType,
       pageSize: selectedResultsNumber,
