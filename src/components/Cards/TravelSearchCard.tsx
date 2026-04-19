@@ -32,9 +32,9 @@ const TravelSearchCard = ({ token, route, routeIndex, onSelectFlight, onSelectHo
 
   return (
     <div className="card">
-      <div className="card-title">
-        <h2 className="text-lg font-semibold text-text-primary">
-          Ruta #{routeIndex + 1}: Selecciona Vuelos y Hoteles
+      <div className="card-title !bg-secondary">
+        <h2 className="text-lg font-semibold !text-white">
+          Ruta #{routeIndex + 1} 
         </h2>
       </div>
 
