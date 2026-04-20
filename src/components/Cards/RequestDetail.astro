@@ -12,7 +12,9 @@ import TextHeader from "@components/Layout/TextHeader.astro";
 import Button from "@/components/Buttons/Button";
 import { getCookie } from "@data/cookies";
 import TravelSearchCard from "@/components/Cards/TravelSearchCard";
+import ConfirmationDocumentForm from "@/components/Forms/ConfirmationDocumentForm";
 import type { UserRole } from "@/types/roles";
+import { roleRoutes } from "@/config/routeAccess";
 const { request, title, subtitle } = Astro.props;
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
 ---
@@ -163,6 +165,21 @@ const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
                 onSelectHotel={(hotel) => {
                   console.log("Hotel selected:", hotel);
                 }}
+                token={getCookie("token", Astro.cookies) || ""}
+              />
+            ))}
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <h2 class="text-xl font-bold text-text-primary">
+                Documentos de Confirmación de Reserva
+              </h2>
+            </div>
+            {request.routes.map((route: any, index: number) => (
+              <ConfirmationDocumentForm
+                client:load
+                route={route}
+                routeIndex={index}
                 token={getCookie("token", Astro.cookies) || ""}
               />
             ))}
