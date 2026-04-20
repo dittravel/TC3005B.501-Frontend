@@ -1,8 +1,8 @@
 /**
  * Receipt Summary Component
- * 
- * Provides a Pop-up menu that summarizes the total amount of approved receipts, 
- * the requested fee (if any), and the final reimbursement amount.
+ *
+ * Provides a Pop-up menu that summarizes the total amount of approved receipts,
+ * the imposed fee, and the final reimbursement amount.
  */
 
 import { useState } from "react";
@@ -15,18 +15,18 @@ interface Props {
   requestId: string | number;
   token: string;
   expenses: any[];
-  requestedFee?: number | null;
+  imposedFee?: number | null;
   redirectTo?: string;
 }
 
 /**
  * Receipt Summary Modal
- * Displays a summary of the approved receipts, requested fee, and reimbursement amount.
+ * Displays a summary of the approved receipts, imposed fee, and reimbursement amount.
  * Provides options to finalize the request or cancel.
  * @param {number | string} requestId - The ID of the request being summarized
  * @param {string} token - Authentication token for API requests
  * @param {any[]} expenses - Array of expense receipts associated with the request
- * @param {number} requestedFee - The fee that was requested in advance (if any)
+ * @param {number} imposedFee - The advance amount assigned by accounts payable (if any)
  * @param {string} redirectTo - URL to redirect to after finalizing the request
  * @returns {JSX.Element} A button that triggers a modal with the receipt summary
  */
@@ -34,7 +34,7 @@ export default function ReceiptSummaryModal({
   requestId,
   token,
   expenses,
-  requestedFee,
+  imposedFee,
   redirectTo = "/dashboard"
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
@@ -47,8 +47,8 @@ export default function ReceiptSummaryModal({
   const totalApproved = approvedExpenses.reduce((sum, exp) => sum + (exp.local_amount || 0), 0);
 
   // Calculate reimbursement amount considering requested fee (if any)
-  const hasAdvance = requestedFee && requestedFee > 0;
-  const reimbursement = hasAdvance ? requestedFee - totalApproved : totalApproved;
+  const hasAdvance = imposedFee && imposedFee > 0;
+  const reimbursement = hasAdvance ? imposedFee - totalApproved : totalApproved;
 
   return (
     <div>
@@ -72,13 +72,11 @@ export default function ReceiptSummaryModal({
 
             {/* Summary Info */}
             <div className="space-y-3 bg-card-hover p-4 rounded border border-border">
-              {/* Requested Fee */}
-              {hasAdvance && (
-                <div>
-                  <p className="text-sm text-text-secondary">Anticipo Solicitado</p>
-                  <p className="text-2xl font-semibold text-text-primary">${requestedFee?.toFixed(2)}</p>
-                </div>
-              )}
+              {/* Imposed Fee */}
+              <div>
+                <p className="text-sm text-text-secondary">Anticipo Solicitado</p>
+                <p className="text-2xl font-semibold text-text-primary">${(imposedFee || 0).toFixed(2)}</p>
+              </div>
 
               {/* Approved Receipts */}
               <div>

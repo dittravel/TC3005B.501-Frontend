@@ -17,7 +17,7 @@ interface Props {
   token: string;
   allReviewed?: boolean;
   requestId: string | number;
-  requestedFee?: number;
+  imposedFee?: number;
 }
 
 const validationColors: Record<string, TagType> = {
@@ -36,7 +36,7 @@ const validationColors: Record<string, TagType> = {
  * @param {string | number} requestId - ID of the associated request
  * @returns {JSX.Element} A section containing the list of receipts and actions
  */
-export default function ReceiptsList({ expenses, token, allReviewed, requestId, requestedFee }: Props) {
+export default function ReceiptsList({ expenses, token, allReviewed, requestId, imposedFee }: Props) {
   return (
     <section className="w-full space-y-6">
       <div className="flex justify-between items-center">
@@ -59,7 +59,7 @@ export default function ReceiptsList({ expenses, token, allReviewed, requestId, 
             requestId={requestId}
             token={token}
             expenses={expenses}
-            requestedFee={requestedFee}
+            imposedFee={imposedFee}
             redirectTo="/comprobaciones"
           />
         </div>

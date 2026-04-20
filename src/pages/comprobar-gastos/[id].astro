@@ -53,7 +53,7 @@ const allReviewed = enrichedExpenses.every((receipt: any) => receipt.validation 
       token={getCookie("token", Astro.cookies) || ""}
       allReviewed={allReviewed}
       requestId={request.request_id}
-      requestedFee={request.requested_fee}
+      imposedFee={request.imposed_fee}
     />
   </main>
 </MainLayout>
