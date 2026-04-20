@@ -8,14 +8,16 @@ import Card from '@/components/Utils/Card';
 import Button from '@/components/Buttons/Button';
 import ReceiptActions from '@/components/Actions/ReceiptActions';
 import UltimateWrapper from '@/components/Modals/UltimateWrapper';
+import ReceiptSummaryModal from '@/components/Modals/ReceiptSummaryModal';
+import { formatDate } from '@/utils/dateFormatter';
 import type { TagType } from '@/types/card';
-import type { a } from 'node_modules/tailwindcss/dist/types-CJYAW1ql.d.mts';
 
 interface Props {
   expenses: any[];
   token: string;
   allReviewed?: boolean;
   requestId: string | number;
+  requestedFee?: number;
 }
 
 const validationColors: Record<string, TagType> = {
@@ -34,26 +36,33 @@ const validationColors: Record<string, TagType> = {
  * @param {string | number} requestId - ID of the associated request
  * @returns {JSX.Element} A section containing the list of receipts and actions
  */
-export default function ReceiptsList({ expenses, token, allReviewed, requestId }: Props) {
+export default function ReceiptsList({ expenses, token, allReviewed, requestId, requestedFee }: Props) {
   return (
     <section className="w-full space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold text-text-primary">Comprobantes ({expenses.length})</h2>
-        {expenses.length > 0 && allReviewed && (
+        <div className="flex gap-4">
           <UltimateWrapper
             id={Number(requestId)}
             endpoint="/accounts-payable/validate-receipts"
-            title="Finalizar Solicitud"
-            message="¿Está seguro de que desea finalizar esta solicitud?"
+            title="Devolver Comprobantes"
+            message="¿Deseas devolver los comprobantes para corrección? Esto marcará la solicitud como pendiente nuevamente."
             modal_type="success"
-            color="success"
+            color="secondary"
             variant="filled"
-            label="Finalizar Solicitud"
+            label="Devolver Comprobantes"
             token={token}
             redirectTo="/dashboard"
             successMessage="Solicitud finalizada correctamente."
           />
-        )}
+          <ReceiptSummaryModal
+            requestId={requestId}
+            token={token}
+            expenses={expenses}
+            requestedFee={requestedFee}
+            redirectTo="/comprobaciones"
+          />
+        </div>
       </div>
 
       {expenses.length === 0 ? (
@@ -82,49 +91,55 @@ export default function ReceiptsList({ expenses, token, allReviewed, requestId }
                   <div className="space-y-3">
                     <div className="text-sm text-text-primary space-y-1">
                       <p>
-                        <span className="font-semibold">Monto:</span> ${receipt.amount} {receipt.currency || 'MXN'}
+                        <span className="font-semibold">Rubro:</span> {receipt.receipt_type_name}
                       </p>
                       <p>
-                        <span className="font-semibold">Rubro:</span> {receipt.receipt_type_name}
+                        <span className="font-semibold">Monto Original:</span> ${receipt.amount} {receipt.currency || 'MXN'}
+                      </p>
+                      <p>
+                        <span className="font-semibold">Monto Local:</span> ${receipt.local_amount || receipt.amount} MXN
+                      </p>
+                      <p>
+                        <span className="font-semibold">Fecha:</span> {formatDate(receipt.submission_date)}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-2 w-full">
-                    {pdf && (
-                      <a
-                        href={`${apiBaseUrl}/files/receipt-file/${pdf.fileId}`}
-                        className="block"
-                      >
-                        <Button
-                          color="secondary"
-                          variant="border"
-                          size="small"
-                          className="w-full flex flex-col items-center justify-center gap-y-1 py-3"
-                          title={`Descargar: ${pdf.fileName}`}
-                        >
-                          <span className="text-xs font-semibold truncate">{pdf.fileName}</span>
-                          <span className="text-sm">Descargar PDF</span>
-                        </Button>
-                      </a>
+                    {pdf && pdf.fileId && (
+                      <div className="flex w-full bg-card-hover p-2 border border-border rounded-md gap-4 items-center justify-between">
+                        <div className="flex flex-col items-start justify-center gap-1">
+                          <p className="text-md font-semibold text-text-primary">PDF</p>
+                          <p className="text-xs text-text-primary truncate">{pdf.fileName}</p>
+                        </div>
+                        <a href={`${apiBaseUrl}/files/receipt-file/${pdf.fileId}`}>
+                          <Button
+                            color="secondary"
+                            variant="border"
+                            size="small"
+                          >
+                            Descargar
+                          </Button>
+                        </a>
+                      </div>
                     )}
 
-                    {xml && (
-                      <a
-                        href={`${apiBaseUrl}/files/receipt-file/${xml.fileId}`}
-                        className="block"
-                      >
-                        <Button
-                          color="secondary"
-                          variant="border"
-                          size="small"
-                          className="w-full flex flex-col items-center justify-center gap-y-1 py-3"
-                          title={`Descargar: ${xml.fileName}`}
-                        >
-                          <span className="text-sm">Descargar XML</span>
-                          <span className="text-xs font-semibold truncate">{xml.fileName}</span>
-                        </Button>
-                      </a>
+                    {xml && xml.fileId && (
+                      <div className="flex w-full bg-card-hover p-2 border border-border rounded-md gap-4 items-center justify-between">
+                        <div className="flex flex-col items-start justify-center gap-1">
+                          <p className="text-md font-semibold text-text-primary">XML</p>
+                          <p className="text-xs text-text-primary truncate">{xml.fileName}</p>
+                        </div>
+                        <a href={`${apiBaseUrl}/files/receipt-file/${xml.fileId}`}>
+                          <Button
+                            color="secondary"
+                            variant="border"
+                            size="small"
+                          >
+                            Descargar
+                          </Button>
+                        </a>
+                      </div>
                     )}
 
                     {receipt.validation === 'Pendiente' && (
