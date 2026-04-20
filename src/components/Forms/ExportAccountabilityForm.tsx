@@ -5,7 +5,6 @@
 import React, { useState } from "react";
 import Button from "@/components/Buttons/Button";
 import { apiRequest } from "@utils/apiClient";
-import Input from "@/components/Utils/Input";
 
 interface Props {
   token: string;
@@ -94,7 +93,7 @@ export default function AccountingExportForm({ token }: Props) {
             color="secondary"
             onClick={handleSubmit}
             disabled={loading}
-            className="px-12 py-3 text-lg" // tamaño cómodo pero no exagerado
+            className="px-12 py-3 text-lg"
           >
             {loading ? "Exportando..." : "Exportar pólizas"}
           </Button>
