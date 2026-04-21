@@ -1,4 +1,6 @@
 describe('Rechazo de una solicitud por el autorizador', () => {
+  let requestId: string;
+
   function buscarSolicitud(id: string) {
     cy.document().then((doc) => {
       const links = [...doc.querySelectorAll('a[href^="/autorizar-solicitud/"]')];
@@ -8,7 +10,6 @@ describe('Rechazo de una solicitud por el autorizador', () => {
         cy.contains('button', 'Rechazar').click();
         cy.contains('button', 'Confirmar').should('be.visible').click();
       } else {
-        cy.wait(2000);
         avanzarPagina(id);
       }
     });
@@ -26,6 +27,7 @@ describe('Rechazo de una solicitud por el autorizador', () => {
 
         if (nextPageBtn) {
           cy.wrap(nextPageBtn).click();
+          cy.get('a[href^="/autorizar-solicitud/"]').should('exist');
           buscarSolicitud(id);
         } else {
           cy.get('div.flex.justify-center.items-center.gap-2.mt-8 > button')
@@ -33,10 +35,10 @@ describe('Rechazo de una solicitud por el autorizador', () => {
             .then(($nextBtn) => {
               if (!$nextBtn.prop('disabled')) {
                 cy.wrap($nextBtn).click();
-                cy.wait(500);
+                cy.get('a[href^="/autorizar-solicitud/"]').should('exist');
                 buscarSolicitud(id);
               } else {
-                throw new Error(`❌ No se encontró la solicitud con ID: ${id}`);
+                throw new Error(`No se encontró la solicitud con ID: ${id}`);
               }
             });
         }
@@ -55,23 +57,25 @@ describe('Rechazo de una solicitud por el autorizador', () => {
       .first()
       .within(() => {
         cy.contains(/^#\d+$/).then(($id) => {
-          const idText = $id.text().replace('#', '').trim();
-          Cypress.env('reject_request_id', idText);
+          requestId = $id.text().replace('#', '').trim();
         });
       });
   });
 
   it('debe rechazar la solicitud y cambiar su estado a RECHAZADA', () => {
-    cy.login(Cypress.env('N2_USER'), Cypress.env('N2_PASSWORD'));
+    if (!requestId) throw new Error('Prerequisite failed: no requestId from previous test');
 
+    cy.login(Cypress.env('N2_USER'), Cypress.env('N2_PASSWORD'));
     cy.get('li').contains('AUTORIZACIONES').click();
-    buscarSolicitud(Cypress.env('reject_request_id'));
+    buscarSolicitud(requestId);
   });
 
   it('debe mostrar que la solicitud fue cambiada a estado RECHAZADA desde el perfil del solicitante', () => {
+    if (!requestId) throw new Error('Prerequisite failed: no requestId from previous test');
+
     cy.login(Cypress.env('SOLICITANTE_USER'), Cypress.env('SOLICITANTE_PASSWORD'));
 
-    cy.contains(Cypress.env('reject_request_id'))
+    cy.contains(requestId)
       .parents('div')
       .first()
       .should('contain.text', 'RECHAZADA');

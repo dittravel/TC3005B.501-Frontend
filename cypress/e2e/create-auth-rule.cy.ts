@@ -18,28 +18,19 @@ describe('Creación de regla de autorización por el administrador', () => {
 
     cy.contains('button', /crear|guardar/i).click();
 
-    cy.get('body').should('contain.text', /.+/);
+    cy.contains(/requerido|obligatorio|campo.*vacío|required/i).should('be.visible');
     cy.url().should('include', '/crear-regla');
   });
 
   it('debe crear exitosamente una regla de autorización con un nivel', () => {
     cy.visit('/crear-regla');
 
-    cy.get('input[name="rule_name"]').type('Regla Cypress Test');
+    cy.get('input[name="rule_name"]').should('exist').type('Regla Cypress Test');
+    cy.get('input[name="niveles_autorizacion"]').should('exist').type('1');
+    cy.get('select[name="tipo_viaje"]').should('exist').select(1);
+    cy.get('input[name="dias_min"]').should('exist').type('1');
 
-    cy.get('input[name="niveles_autorizacion"]').type('1');
-
-    cy.get('select[name="tipo_viaje"]').select(1);
-
-    cy.get('input[name="dias_min"]').then(($input) => {
-      if ($input.length) cy.wrap($input).type('1');
-    });
-
-    cy.wait(500);
-
-    cy.get('select[name="nivel_1"]').then(($select) => {
-      if ($select.length) cy.wrap($select).select(1);
-    });
+    cy.get('select[name="nivel_1"]').should('exist').select(1);
 
     cy.contains('button', /crear|guardar/i).click();
 

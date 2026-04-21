@@ -33,7 +33,7 @@ describe('Subida de comprobante de gasto por el solicitante', () => {
       });
 
     cy.contains('button', /guardar|enviar|agregar/i).click();
-    cy.get('body').should('contain.text', /.+/);
+    cy.contains(/requerido|obligatorio|selecciona|required/i).should('be.visible');
   });
 
   it('debe completar y enviar exitosamente un comprobante de gasto', () => {
