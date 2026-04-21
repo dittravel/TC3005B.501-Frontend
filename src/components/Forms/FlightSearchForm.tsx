@@ -8,6 +8,7 @@
 import React, { useEffect, useState } from 'react';
 import type { TravelRoute } from '@/types/TravelRoute';
 import Button from '../Buttons/Button';
+import Card from '../Utils/Card';
 import { apiRequest } from '@/utils/apiClient';
 
 // Define the props for the FlightSearchForm component
@@ -122,7 +123,7 @@ const FlightSearchForm = ({ token, route, routeIndex, tripType, ticketType }: Fl
   }
 
   return (
-    <div className="mt-4 p-6 bg-gray-50 rounded-lg border border-gray-200 space-y-6 bg-primary/5">
+    <Card className="mt-4 p-6 bg-gray-50 rounded-lg border space-y-6 bg-primary/5">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <label
@@ -275,8 +276,8 @@ const FlightSearchForm = ({ token, route, routeIndex, tripType, ticketType }: Fl
               <div
                 key={flight.id}
                 className={`rounded-md border p-4 shadow-sm transition ${isSelected
-                  ? 'border-secondary bg-secondary/5 ring-2 ring-secondary/30'
-                  : 'border-gray-200 bg-tertiary hover:border-gray-300 hover:bg-gray-50'
+                  ? 'border-gray-200 bg-secondary/5 ring-2 ring-secondary/30'
+                  : 'border-gray-200 bg-tertiary hover:border-gray-300 hover:bg-secondary/5'
                   }`}
               >
                 <button
@@ -334,7 +335,7 @@ const FlightSearchForm = ({ token, route, routeIndex, tripType, ticketType }: Fl
           )}
         </div>
       )}
-    </div>
+    </Card>
   );
 };
 
