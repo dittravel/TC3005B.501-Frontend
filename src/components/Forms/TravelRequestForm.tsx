@@ -69,6 +69,7 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
       }));
       const newData = {
         ...data,
+        requires_advance: data.requested_fee !== null && data.requested_fee !== undefined && Number(data.requested_fee) > 0,
         routes: transformedRoutes,
       };
       setFormData(newData);
