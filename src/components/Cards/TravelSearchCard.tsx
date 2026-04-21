@@ -31,13 +31,6 @@ const TravelSearchCard = ({ token, route, routeIndex, onSelectFlight, onSelectHo
   };
 
   return (
-    <div className="card">
-      <div className="card-title !bg-secondary">
-        <h2 className="text-lg font-semibold !text-white">
-          Ruta #{routeIndex + 1} 
-        </h2>
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
         {route.plane_needed === true && (
           <>
@@ -84,8 +77,6 @@ const TravelSearchCard = ({ token, route, routeIndex, onSelectFlight, onSelectHo
           </>
         )}
       </div>
-
-    </div>
   );
 };
 

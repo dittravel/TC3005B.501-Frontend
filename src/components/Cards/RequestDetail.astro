@@ -92,101 +92,85 @@ const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
       <div class="card-title">
         <h2 class="text-xl font-bold text-text-primary">Rutas</h2>
       </div>
-      <div>
+      <div class="space-y-6">
         {
           request.routes.map((route: any, index: number) => (
-            <div key={index} class="routes-wrapper">
-              <div class="route-title">
-                <span>Ruta #{index + 1}</span>
-              </div>
-              <div class="route-content">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div class="space-y-3 text-text-primary">
-                    <p>
-                      <span class="font-medium">Origen:</span>{" "}
-                      {route.origin_city}, {route.origin_country}
-                    </p>
-                    <p>
-                      <span class="font-medium">Destino:</span>{" "}
-                      {route.destination_city}, {route.destination_country}
-                    </p>
-                    <p>
-                      <span class="font-medium">Fecha de salida:</span>{" "}
-                      {route.beginning_date}
-                    </p>
-                    <p>
-                      <span class="font-medium">Hora de salida:</span>{" "}
-                      {route.beginning_time}
-                    </p>
-                  </div>
-                  <div class="space-y-3 text-text-primary">
-                    <p>
-                      <span class="font-medium">Fecha de regreso:</span>{" "}
-                      {route.ending_date}
-                    </p>
-                    <p>
-                      <span class="font-medium">Hora de regreso:</span>{" "}
-                      {route.ending_time}
-                    </p>
-                    <p>
-                      <span class="font-medium">Hotel necesario:</span>{" "}
-                      {route.hotel_needed ? "Sí" : "No"}
-                    </p>
-                    <p>
-                      <span class="font-medium">Avión necesario:</span>{" "}
-                      {route.plane_needed ? "Sí" : "No"}
-                    </p>
+            <div class="space-y-4">
+              <div key={index} class="routes-wrapper ">
+                <div class="route-title">
+                  <span>Ruta #{index + 1}</span>
+                </div>
+                <div class="route-content">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-3 text-text-primary">
+                      <p>
+                        <span class="font-medium">Origen:</span>{" "}
+                        {route.origin_city}, {route.origin_country}
+                      </p>
+                      <p>
+                        <span class="font-medium">Destino:</span>{" "}
+                        {route.destination_city}, {route.destination_country}
+                      </p>
+                      <p>
+                        <span class="font-medium">Fecha de salida:</span>{" "}
+                        {route.beginning_date}
+                      </p>
+                      <p>
+                        <span class="font-medium">Hora de salida:</span>{" "}
+                        {route.beginning_time}
+                      </p>
+                    </div>
+                    <div class="space-y-3 text-text-primary">
+                      <p>
+                        <span class="font-medium">Fecha de regreso:</span>{" "}
+                        {route.ending_date}
+                      </p>
+                      <p>
+                        <span class="font-medium">Hora de regreso:</span>{" "}
+                        {route.ending_time}
+                      </p>
+                      <p>
+                        <span class="font-medium">Hotel necesario:</span>{" "}
+                        {route.hotel_needed ? "Sí" : "No"}
+                      </p>
+                      <p>
+                        <span class="font-medium">Avión necesario:</span>{" "}
+                        {route.plane_needed ? "Sí" : "No"}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
+              {role === "Agencia de viajes" && (
+                <>
+                  <div class="mt-4">
+                    <TravelSearchCard
+                      client:load
+                      route={route}
+                      routeIndex={index}
+                      onSelectFlight={(flight) => {
+                        console.log("Flight selected:", flight);
+                      }}
+                      onSelectHotel={(hotel) => {
+                        console.log("Hotel selected:", hotel);
+                      }}
+                      token={getCookie("token", Astro.cookies) || ""}
+                    />
+                  </div>
+                  <div class="mt-4">
+                    <ConfirmationDocumentForm
+                      client:load
+                      route={route}
+                      routeIndex={index}
+                      token={getCookie("token", Astro.cookies) || ""}
+                    />
+                  </div>
+                </>
+              )}
             </div>
           ))
         }
-      </div>
     </div>
-
-    {
-      role === "Agencia de viajes" && (
-        <>
-          <div class="card">
-            <div class="card-title">
-              <h2 class="text-xl font-bold text-text-primary">
-                Selecciona Vuelos y Hoteles
-              </h2>
-            </div>
-            {request.routes.map((route: any, index: number) => (
-              <TravelSearchCard
-                client:load
-                route={route}
-                routeIndex={index}
-                onSelectFlight={(flight) => {
-                  console.log("Flight selected:", flight);
-                }}
-                onSelectHotel={(hotel) => {
-                  console.log("Hotel selected:", hotel);
-                }}
-                token={getCookie("token", Astro.cookies) || ""}
-              />
-            ))}
-          </div>
-          <div class="card">
-            <div class="card-title">
-              <h2 class="text-xl font-bold text-text-primary">
-                Documentos de Confirmación de Reserva
-              </h2>
-            </div>
-            {request.routes.map((route: any, index: number) => (
-              <ConfirmationDocumentForm
-                client:load
-                route={route}
-                routeIndex={index}
-                token={getCookie("token", Astro.cookies) || ""}
-              />
-            ))}
-          </div>
-        </>
-      )
-    }
 
     {/* Notes Section */}
     {
