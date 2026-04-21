@@ -1,4 +1,6 @@
 describe('Proceso de autorización de una solicitud desde PRIMERA REVISIÓN hasta SEGUNDA REVISIÓN', () => {
+  let requestId: string;
+
   function buscarSolicitud(id: string) {
     cy.document().then((doc) => {
       const links = [...doc.querySelectorAll('a[href^="/autorizar-solicitud/"]')];
@@ -8,7 +10,6 @@ describe('Proceso de autorización de una solicitud desde PRIMERA REVISIÓN hast
         cy.contains('button', 'Aceptar').click();
         cy.contains('button', 'Confirmar').should('be.visible').click();
       } else {
-        cy.wait(2000);
         avanzarPagina(id);
       }
     });
@@ -27,6 +28,7 @@ describe('Proceso de autorización de una solicitud desde PRIMERA REVISIÓN hast
 
         if (nextPageBtn) {
           cy.wrap(nextPageBtn).click();
+          cy.get('a[href^="/autorizar-solicitud/"]').should('exist');
           buscarSolicitud(id);
         } else {
           cy.get('div.flex.justify-center.items-center.gap-2.mt-8 > button')
@@ -34,10 +36,10 @@ describe('Proceso de autorización de una solicitud desde PRIMERA REVISIÓN hast
             .then(($nextBtn) => {
               if (!$nextBtn.prop('disabled')) {
                 cy.wrap($nextBtn).click();
-                cy.wait(500);
+                cy.get('a[href^="/autorizar-solicitud/"]').should('exist');
                 buscarSolicitud(id);
               } else {
-                throw new Error(`❌ No se encontró la solicitud con ID: ${id}`);
+                throw new Error(`No se encontró la solicitud con ID: ${id}`);
               }
             });
         }
@@ -56,26 +58,27 @@ describe('Proceso de autorización de una solicitud desde PRIMERA REVISIÓN hast
       .first()
       .within(() => {
         cy.contains(/^#\d+$/).then(($id) => {
-          const idText = $id.text().replace('#', '').trim();
-          Cypress.env('request_id', idText);
+          requestId = $id.text().replace('#', '').trim();
         });
       });
   });
 
   it('debe autorizar la solicitud identificada y cambia su estado a SEGUNDA REVISIÓN', () => {
-    cy.login(Cypress.env('N2_USER'), Cypress.env('N2_PASSWORD'));
+    if (!requestId) throw new Error('Prerequisite failed: no requestId from previous test');
 
+    cy.login(Cypress.env('N2_USER'), Cypress.env('N2_PASSWORD'));
     cy.get('li').contains('AUTORIZACIONES').click();
-    buscarSolicitud(Cypress.env('request_id'));
+    buscarSolicitud(requestId);
   });
 
   it('debe mostrar que la solicitud haya cambiado a estado SEGUNDA REVISIÓN desde el perfil del solicitante', () => {
+    if (!requestId) throw new Error('Prerequisite failed: no requestId from previous test');
+
     cy.login(Cypress.env('SOLICITANTE_USER'), Cypress.env('SOLICITANTE_PASSWORD'));
 
-    cy.contains(Cypress.env('request_id'))
+    cy.contains(requestId)
       .parents('div')
       .first()
       .should('contain.text', 'SEGUNDA REVISIÓN');
   });
 });
-
