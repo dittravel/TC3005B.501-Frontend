@@ -12,7 +12,6 @@ interface FormData {
   rule_name: string;
   is_default: boolean;
   num_levels: number;
-  days_to_validate: number;
   automatic: boolean;
   travel_type?: string;
   min_duration?: number;
@@ -36,7 +35,6 @@ export const useAuthRuleForm = (isDefault: boolean = false) => {
     rule_name: isDefault ? "Regla por Defecto" : "",
     is_default: isDefault,
     num_levels: 1,
-    days_to_validate: 5,
     automatic: true,
     travel_type: "",
     min_duration: 0,
@@ -148,7 +146,7 @@ export const useAuthRuleForm = (isDefault: boolean = false) => {
   // Validate form
   const validateForm = () => {
     // Check required fields
-    if (!formData.num_levels || !formData.days_to_validate) {
+    if (!formData.num_levels) {
       return { isValid: false, error: "Por favor completa todos los campos requeridos" };
     }
 
@@ -190,11 +188,6 @@ export const useAuthRuleForm = (isDefault: boolean = false) => {
     // Validate num_levels ranges
     if (formData.num_levels < 1 || formData.num_levels > 10) {
       return { isValid: false, error: "El número de niveles debe ser entre 1 y 10" };
-    }
-
-    // Validate days_to_validate ranges
-    if (formData.days_to_validate < 5 || formData.days_to_validate > 30) {
-      return { isValid: false, error: "Los días para validar deben ser entre 5 y 30" };
     }
 
     // If not automatic, validate levels
@@ -246,7 +239,6 @@ export const useAuthRuleForm = (isDefault: boolean = false) => {
       ...prev,
       rule_name: data.rule_name || prev.rule_name,
       num_levels: numLevels,
-      days_to_validate: data.days_to_validate || 5,
       automatic: data.automatic || false,
       travel_type: data.travel_type || "",
       min_duration: data.min_duration || 0,

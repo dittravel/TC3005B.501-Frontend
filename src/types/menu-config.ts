@@ -18,7 +18,7 @@ export const SIDEBAR_CONFIG: Record<string, MenuItem[]> = {
     { label: 'Draft Solicitudes', route: '/solicitudes-draft', icon: 'edit_document', category: 'Viajes' },
     { label: 'Historial De Viajes', route: '/historial', icon: 'history', category: 'Viajes' },
     { label: 'Comprobar Gastos', route: '/comprobar-gastos', icon: 'receipt', category: 'Gastos' },
-    { label: 'Reembolsos', route: '/reembolso', icon: 'currency_exchange', category: 'Gastos' }
+    { label: 'Reembolsos', route: '/reembolsos', icon: 'currency_exchange', category: 'Gastos' }
   ],
   'Autorizador': [
     { label: 'Dashboard', route: '/dashboard', icon: 'home' },
@@ -28,7 +28,7 @@ export const SIDEBAR_CONFIG: Record<string, MenuItem[]> = {
     { label: 'Draft Solicitudes', route: '/solicitudes-draft', icon: 'edit_document', category: 'Viajes' },
     { label: 'Historial De Viajes', route: '/historial', icon: 'history', category: 'Viajes' },
     { label: 'Comprobar Gastos', route: '/comprobar-gastos', icon: 'receipt', category: 'Gastos' },
-    { label: 'Reembolsos', route: '/reembolso', icon: 'currency_exchange', category: 'Gastos' }
+    { label: 'Reembolsos', route: '/reembolsos', icon: 'currency_exchange', category: 'Gastos' }
   ],
   'Cuentas por pagar': [
     { label: 'Dashboard', route: '/dashboard', icon: 'home' },
