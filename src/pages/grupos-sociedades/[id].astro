@@ -1,0 +1,51 @@
+---
+/**
+ * Generic page for creating or editing a society group
+ * - /grupos-sociedades/nuevo → Create new society group
+ * - /grupos-sociedades/123 → Edit society group with ID 123
+ */
+
+import TextHeader from "@components/Layout/TextHeader.astro";
+import MainLayout from "@layouts/MainLayout.astro";
+import SocietyGroupForm from "@components/Forms/SocietyGroupForm";
+import { getCookie } from "@data/cookies";
+import { roleLabels } from "@config/role-labels";
+import type { UserRole } from "@type/roles";
+import { apiRequest } from "@/utils/apiClient";
+
+const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
+const buttonLabel = roleLabels[role];
+const userName = getCookie("username", Astro.cookies) || "";
+const token = getCookie("token", Astro.cookies) || "";
+const { id } = Astro.params;
+
+// Determine if we're creating or editing
+const isCreating = id === "nuevo";
+const isEditing = id && id !== "nuevo";
+
+let data = null;
+if (isEditing) {
+  try {
+    data = await apiRequest(`/society-groups/${id}`, { cookies: Astro.cookies });
+  } catch (error) {
+    data = null;
+    throw error;
+  }
+}
+---
+
+<MainLayout title={isCreating ? "Crear Grupo de Sociedad" : "Editar Grupo de Sociedad"} data={{userName, buttonLabel, role}}>
+  <div>
+    <TextHeader
+      title={isCreating ? "Crear nuevo grupo de sociedad" : "Editar Grupo de Sociedad"}
+      subtitle={isCreating ? "Complete el formulario con los datos del nuevo grupo de sociedad" : "Modifica los campos necesarios para actualizar la información del grupo de sociedad"}
+    />
+    <SocietyGroupForm
+      client:load
+      mode={isCreating ? "create" : "edit"}
+      data={data}
+      token={token}
+      redirectTo="/sociedades"
+    />
+  </div>
+</MainLayout>

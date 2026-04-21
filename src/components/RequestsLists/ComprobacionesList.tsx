@@ -35,6 +35,26 @@ function getStatusTag(stats: any): CardTag {
   };
 }
 
+// Calculate remaining days to validate a receipt
+function getRemainingDays(request: any) {
+  const totalDays = request.days_to_validate;
+
+  if (!totalDays || !request.creation_date) return 'Sin asignar';
+
+  const start = new Date(request.creation_date);
+  const today = new Date();
+
+  // Calculate the difference in days
+  const diffTime = today.getTime() - start.getTime();
+
+  // Convert milliseconds to days
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+  const remaining = totalDays - diffDays;
+
+  return remaining > 0 ? remaining : 0;
+}
+
 export default function ComprobacionesList({ data, title = "Comprobaciones", subtitle }: Props) {
   return (
     <section className="space-y-6 w-full">
@@ -54,9 +74,8 @@ export default function ComprobacionesList({ data, title = "Comprobaciones", sub
                 key={request.request_id}
                 tag={{ text: `Solicitud #${request.request_id}`, type: 'secondary' }}
                 status={statusTag}
-                href={`/comprobar-solicitud/${request.request_id}`}
               >
-                <div className="flex flex-col gap-4">
+                <div className="card-content-grid">
                   <div className="space-y-3">
                     <div className="text-sm text-text-primary space-y-1">
                       <p>
@@ -67,6 +86,9 @@ export default function ComprobacionesList({ data, title = "Comprobaciones", sub
                       </p>
                       <p>
                         <span className="font-semibold">Responsable:</span> {request.assigned_to_name || 'Sin asignar'}
+                      </p>
+                      <p>
+                        <span className="font-semibold">Días restantes para validar:</span> {getRemainingDays(request)}
                       </p>
                     </div>
 
@@ -84,6 +106,14 @@ export default function ComprobacionesList({ data, title = "Comprobaciones", sub
                         </div>
                       </div>
                     )}
+                  </div>
+
+                  <div className="flex flex-col gap-2 w-full">
+                    <a href={`/comprobar-solicitud/${request.request_id}`} className="block">
+                      <Button color="primary" variant="filled" size="medium" className="w-full">
+                        Ver Comprobantes
+                      </Button>
+                    </a>
                   </div>
                 </div>
               </Card>

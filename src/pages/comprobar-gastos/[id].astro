@@ -7,7 +7,6 @@ export const prerender = false;
 import MainLayout from "@layouts/MainLayout.astro";
 import TextHeader from "@components/Layout/TextHeader.astro";
 import ReceiptsList from "@/components/RequestsLists/ReceiptsList";
-import FinishRequestButton from "@/components/Buttons/FinishRequestButton";
 import type { UserRole } from "@type/roles";
 
 import { getCookie } from "@data/cookies";
@@ -43,28 +42,17 @@ const allReviewed = enrichedExpenses.every((receipt: any) => receipt.validation 
 ---
 
 <MainLayout title={`Solicitud #${request.request_id}`} data={{userName, buttonLabel, role}} >
-  <main class="flex flex-col items-center w-full">
-    <TextHeader
-      title={`Comprobantes de la solicitud #${request.request_id}`}
-      subtitle="Revisa los comprobantes de gastos relacionados con esta solicitud y valida su estado para finalizar el proceso"
+  <TextHeader
+    title={`Comprobantes de la solicitud #${request.request_id}`}
+    subtitle="Revisa los comprobantes de gastos relacionados con esta solicitud y valida su estado para finalizar el proceso"
+  />
+  <main>
+    <ReceiptsList
+      client:only="react"
+      expenses={enrichedExpenses}
+      token={getCookie("token", Astro.cookies) || ""}
+      allReviewed={allReviewed}
+      requestId={request.request_id}
     />
-
-    <section class="w-full space-y-6">
-      <ReceiptsList
-        client:only="react"
-        expenses={enrichedExpenses}
-        token={getCookie("token", Astro.cookies) || ""}
-      />
-
-      <div class="flex flex-row items-center justify-end">
-        {allReviewed && (
-          <FinishRequestButton
-            client:only="react"
-            requestId={request.request_id}
-            token={getCookie("token", Astro.cookies) || ""}
-          />
-        )}
-      </div>
-    </section>
   </main>
 </MainLayout>

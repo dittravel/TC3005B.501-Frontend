@@ -7,11 +7,15 @@
 import Card from '@/components/Utils/Card';
 import Button from '@/components/Buttons/Button';
 import ReceiptActions from '@/components/Actions/ReceiptActions';
+import UltimateWrapper from '@/components/Modals/UltimateWrapper';
 import type { TagType } from '@/types/card';
+import type { a } from 'node_modules/tailwindcss/dist/types-CJYAW1ql.d.mts';
 
 interface Props {
   expenses: any[];
   token: string;
+  allReviewed?: boolean;
+  requestId: string | number;
 }
 
 const validationColors: Record<string, TagType> = {
@@ -20,11 +24,36 @@ const validationColors: Record<string, TagType> = {
   'Pendiente': 'warning',
 };
 
-export default function ReceiptsList({ expenses, token }: Props) {
+/**
+ * Receipts List Component
+ * Renders a list of expense receipts with their validation 
+ * status and available actions.
+ * @param {any[]} expenses - Array of expense receipts to display
+ * @param {string} token - Authentication token for API requests
+ * @param {boolean} allReviewed - Flag indicating if all receipts have been reviewed
+ * @param {string | number} requestId - ID of the associated request
+ * @returns {JSX.Element} A section containing the list of receipts and actions
+ */
+export default function ReceiptsList({ expenses, token, allReviewed, requestId }: Props) {
   return (
     <section className="w-full space-y-6">
-      <div className="flex flex-col justify-between">
+      <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold text-text-primary">Comprobantes ({expenses.length})</h2>
+        {expenses.length > 0 && allReviewed && (
+          <UltimateWrapper
+            id={Number(requestId)}
+            endpoint="/accounts-payable/validate-receipts"
+            title="Finalizar Solicitud"
+            message="¿Está seguro de que desea finalizar esta solicitud?"
+            modal_type="success"
+            color="success"
+            variant="filled"
+            label="Finalizar Solicitud"
+            token={token}
+            redirectTo="/dashboard"
+            successMessage="Solicitud finalizada correctamente."
+          />
+        )}
       </div>
 
       {expenses.length === 0 ? (
@@ -102,8 +131,6 @@ export default function ReceiptsList({ expenses, token }: Props) {
                       <ReceiptActions
                         receipt_id={receipt.receipt_id}
                         disabled={false}
-                        onApprove={() => {}} // This was implemented in a wrong way, empty for now
-                        onReject={() => {}}
                         token={token}
                       />
                     )}

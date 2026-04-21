@@ -32,20 +32,24 @@ export default function Input(props: BaseInputProps) {
 		min,
 		max,
 		altText,
+		accept,
 	} = props;
 
 	const finalPattern = pattern ?? InputPatterns[type as keyof typeof InputPatterns];
 
   // Styles for the input component
 	const base = `
-    w-full border border-border rounded-md px-3 py-2
+    w-full rounded-md px-3 py-2
     text-text-primary placeholder:text-text-secondary
-    bg-card focus:outline-none focus:border-secondary
-    focus:ring-1 focus:ring-secondary
+    bg-card focus:outline-none
+    ${type === 'file'
+      ? 'border-2 border-dashed border-border focus:border-secondary focus:ring-0 cursor-pointer hover:border-secondary/70'
+      : 'border border-border focus:border-secondary focus:ring-1 focus:ring-secondary'
+    }
   `;
 	const classes = `
     ${base}
-    ${error ? 'border-warning-500' : 'border-border'}
+    ${error ? 'border-warning-500' : ''}
     ${disabled ? 'opacity-60 cursor-not-allowed' : ''}
     ${className}
   `.trim();
@@ -73,6 +77,7 @@ export default function Input(props: BaseInputProps) {
 				autoComplete={autoComplete}
 				min={min}
 				max={max}
+				accept={accept}
 			/>
 			{altText && (
 				<p className="text-xs text-text-secondary mt-1">

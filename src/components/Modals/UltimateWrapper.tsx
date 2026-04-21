@@ -1,8 +1,7 @@
 /**
 * UltimateWrapper Component
 * Wraps a ModalWrapper with automatic API request handling and success/error feedback.
-* Displays a confirmation modal that triggers an API call (typically for user deactivation)
-* and shows a toast notification on success before redirecting.
+* Displays a confirmation modal that triggers an API call and shows a toast notification on success before redirecting.
 */
 
 import { useCallback, useState } from "react";
@@ -11,7 +10,7 @@ import ModalWrapper from "@/components/Modals/ModalWrapper";
 import Toast from "@/components/Utils/Toast";
 
 interface Props {
-  user_id: number;
+  id: string | number;
   endpoint: string;
   title: string;
   message: string;
@@ -20,39 +19,57 @@ interface Props {
   variant?: "filled" | "border" | "empty";
   label?: string;
   token: string;
+  method?: "PUT" | "DELETE";
+  successMessage?: string;
+  errorMessage?: string;
+  className?: string;
   redirectTo?: string;
 }
 
-export default function UltimateWrapper({ 
-  user_id,
+/**
+ * Ultimate Wrapper Component
+ * Displays a button that triggers a confirmation modal. 
+ * On confirmation, it makes an API request and shows a toast notification based on the result.
+ * @param {Props} props - Configuration for the modal and API request
+ * @returns {JSX.Element} Modal and toast components
+ */
+export default function UltimateWrapper({
+  id,
   endpoint,
   title,
   message,
   modal_type = "warning",
   color = "warning",
   variant = "filled",
-  label = "Eliminar",
+  label = "Confirmar",
+  method = "PUT",
+  successMessage = "Operación realizada exitosamente.",
+  errorMessage = "Error al realizar la operación.",
   token,
+  className,
   redirectTo = "/dashboard"
 }: Props) {
-  // State for toast notification display
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [loading, setLoading] = useState(false);
+
   const handleConfirm = useCallback(async () => {
+    setLoading(true);
     try {
-      const url = `${endpoint}/${user_id}`;
-      await apiRequest(url, { 
-        method: "PUT",
+      const url = `${endpoint}/${id}`;
+      await apiRequest(url, {
+        method: method,
         headers: { Authorization: `Bearer ${token}` }
       });
-      setToast({ message: 'Usuario desactivado exitosamente.', type: 'success' });
+      setToast({ message: successMessage, type: 'success' });
       setTimeout(() => {
         window.location.href = redirectTo;
       }, 2000);
     } catch (error) {
       console.error("Error en la solicitud:", error);
-      setToast({ message: 'Error al desactivar el usuario.', type: 'error' });
+      setToast({ message: errorMessage, type: 'error' });
+      setLoading(false);
     }
-  }, [endpoint, redirectTo]);
+  }, [endpoint, redirectTo, id]);
   
   return (
     <>
@@ -64,8 +81,10 @@ export default function UltimateWrapper({
         modal_type={modal_type}
         variant={variant}
         onConfirm={handleConfirm}
+        disabled={loading}
+        className={className}
       >
-        {label}
+        {loading ? "Procesando..." : label}
       </ModalWrapper>
     </>
   );

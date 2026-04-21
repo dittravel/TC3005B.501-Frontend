@@ -35,6 +35,7 @@ const getClasses = ({
   const base = `
     block rounded font-medium cursor-pointer
     disabled:opacity-30 disabled:cursor-not-allowed
+    text-center
   `;
   const variantMap = {
     filled: "border border-text-primary/20",

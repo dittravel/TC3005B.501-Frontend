@@ -1,8 +1,8 @@
 /**
-* Button to import data from an XML file
+* Button to import data from a file
 *
 * This button is used in the AdminView to allow administrators to import users
-* from an XML file. When clicked, it triggers a hidden file input that accepts XML files
+* from a file. When clicked, it triggers a hidden file input that accepts files
 */
 
 import { useState } from "react";
@@ -11,7 +11,7 @@ import Tag from "@/components/Utils/Tag";
 import Reminder from "@/components/Utils/Reminder";
 
 interface Props {
-  endpoint: string; // API endpoint to send the XML file for processing
+  endpoint: string; // API endpoint to send the file for processing
   token: string;
 }
 
@@ -20,17 +20,25 @@ interface ImportResponse {
   success: boolean;
   message: string;
   summary?: {
+    societies: {
+      created: string[];
+      updated: string[];
+      skipped: string[];
+    };
     departments: {
       created: Array<{ name: string, cost_center: string }>;
+      updated: Array<{ name: string, old_cost_center_id: string | null, new_cost_center_id: string | null }>;
       skipped: string[];
     };
     costCenters: {
       created: string[];
+      updated: Array<{ name: string, old_name: string | null, new_name: string | null }>;
       skipped: string[];
     };
     users: {
       created: Array<{ username: string; role: string; department: string }>;
       updated: Array<{ username: string; role: string; department: string }>;
+      deactivated: Array<{ username: string; role: string; department: string }>;
     };
   };
   error?: string;
@@ -159,13 +167,13 @@ export default function ImportDataButton({ endpoint, token }: Props) {
             <path d="M7.25 10.25a.75.75 0 0 0 1.5 0V4.56l2.22 2.22a.75.75 0 1 0 1.06-1.06l-3.5-3.5a.75.75 0 0 0-1.06 0l-3.5 3.5a.75.75 0 0 0 1.06 1.06l2.22-2.22v5.69Z" />
             <path d="M3.5 9.75a.75.75 0 0 0-1.5 0v1.5A2.75 2.75 0 0 0 4.75 14h6.5A2.75 2.75 0 0 0 14 11.25v-1.5a.75.75 0 0 0-1.5 0v1.5c0 .69-.56 1.25-1.25 1.25h-6.5c-.69 0-1.25-.56-1.25-1.25v-1.5Z" />
           </svg>
-          Subir archivo XML
+          Subir archivo JSON
         </div>
       </Button>
       <input
         type="file"
         id="fileInput"
-        accept=".xml"
+        accept=".json"
         className="hidden"
         onChange={handleFile}
       />
@@ -173,7 +181,23 @@ export default function ImportDataButton({ endpoint, token }: Props) {
       {showSummary && importData && importData.summary && (
         <div>
           <h2 className="text-xl font-semibold mb-4">Resumen de Importación</h2>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+            {/* Societies */}
+            {importData.summary.societies && (
+              <SummaryCard title="Sociedades">
+                <SummaryItem
+                  label="Creadas"
+                  items={importData.summary.societies.created}
+                  type="success"
+                />
+                <SummaryItem
+                  label="Actualizadas"
+                  items={importData.summary.societies.updated}
+                  type="success"
+                />
+                <SummaryItem label="Omitidas" items={importData.summary.societies.skipped} type="warning" />
+              </SummaryCard>
+            )}
             {/* Departments */}
             <SummaryCard title="Departamentos">
               <SummaryItem
@@ -181,11 +205,21 @@ export default function ImportDataButton({ endpoint, token }: Props) {
                 items={importData.summary.departments.created.map(d => `${d.name} (CC: ${d.cost_center})`)}
                 type="success"
               />
+              <SummaryItem
+                label="Actualizados"
+                items={importData.summary.departments.updated.map(d => `${d.name} (CC: ${d.old_cost_center_id} → ${d.new_cost_center_id})`)}
+                type="success"
+              />
               <SummaryItem label="Omitidos" items={importData.summary.departments.skipped} type="warning" />
             </SummaryCard>
             {/* Cost Centers */}
             <SummaryCard title="Centros de Costo">
               <SummaryItem label="Creados" items={importData.summary.costCenters.created} type="success" />
+              <SummaryItem
+                label="Actualizados"
+                items={importData.summary.costCenters.updated.map(cc => `${cc.name} (Desc: ${cc.old_name} → ${cc.new_name})`)}
+                type="success"
+              />
               <SummaryItem label="Omitidos" items={importData.summary.costCenters.skipped} type="warning" />
             </SummaryCard>
             {/* Users */}
@@ -199,6 +233,11 @@ export default function ImportDataButton({ endpoint, token }: Props) {
                 label="Actualizados"
                 items={importData.summary.users.updated.map(u => u.username)}
                 type="success"
+              />
+              <SummaryItem
+                label="Desactivados"
+                items={importData.summary.users.deactivated.map(u => u.username)}
+                type="warning"
               />
             </SummaryCard>
           </div>

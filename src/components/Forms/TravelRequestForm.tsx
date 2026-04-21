@@ -10,14 +10,13 @@ import { useState, useEffect } from 'react';
 import { apiRequest } from '@utils/apiClient';
 import type { TravelRoute } from '@/types/TravelRoute';
 import type { FormData } from '@/types/FormData';
-import type { DepartmentData } from '@/types/DepartmentData';
 import RouteInputGroup from '@/components/Forms/RouteInputGroup';
 import Input from '@/components/Utils/Input';
-import Select from '@/components/Utils/Select';
 import Textarea from '@/components/Utils/Textarea';
 import Reminder from '@/components/Utils/Reminder';
 import Toast from '@/components/Utils/Toast';
 import Button from '@/components/Buttons/Button';
+import Checkbox from '@/components/Utils/Checkbox';
 
 interface Props {
   data?: FormData;
@@ -39,7 +38,9 @@ const emptyRoute: TravelRoute = {
   ending_date: '',
   ending_time: '',
   plane_needed: false,
-  hotel_needed: false
+  hotel_needed: false,
+  selected_flight: null,
+  selected_hotel: null
 };
 
 const initialFormState: FormData = {
@@ -47,11 +48,11 @@ const initialFormState: FormData = {
   notes: '',
   requested_fee: '',
   imposed_fee: 0,
+  requires_advance: false,
   routes: [{ ...emptyRoute, router_index: 0 }],
 };
 
 export default function TravelRequestForm({ data, mode, request_id, user_id, role, token }: Props) {
-  const [deptData, setDeptData] = useState<DepartmentData | null>(null);
   const [formData, setFormData] = useState<FormData>(initialFormState);
   const [error, setError] = useState<string | null>(null);
   const [disabledButton, setDisabledButton] = useState<boolean>(false);
@@ -74,24 +75,6 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
     }
   }, [data]);
 
-  /**
-   * Fetches department information for the current user.
-   */
-  useEffect(() => {
-    async function fetchDepartmentInfo() {
-      try {
-        const response = await apiRequest(`/applicant/get-cc/${user_id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        setDeptData(response);
-      } catch (err) {
-        // TODO: Implement proper error handling for department fetch failures
-      }
-    }
-    fetchDepartmentInfo();
-  }, [user_id, token]);
 
   /**
    * Handles updates to individual route fields.
@@ -121,15 +104,27 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
    * @param {React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>} e - The change event
    * @returns {void}
    */
-  const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setError(null);
-    const { name, value, type } = e.target;
-    const checked = (e.target as HTMLInputElement).checked;
-    setFormData((prev) => ({
+const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  setError(null);
+  const { name, value, type } = e.target;
+  const checked = (e.target as HTMLInputElement).checked;
+
+  setFormData((prev) => {
+    if (name === 'requires_advance' && !checked) {
+      return {
+        ...prev,
+        requires_advance: false,
+        requested_fee: '',
+        notes: ''
+      };
+    }
+
+    return {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
-    }));
-  };
+    };
+  });
+};
 
   /**
    * Adds a new empty route to the form.
@@ -299,8 +294,8 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
       !firstRoute.beginning_time ||
       !firstRoute.ending_date ||
       !firstRoute.ending_time ||
-      !formData.requested_fee ||
-      !formData.notes
+      formData.requires_advance && !formData.requested_fee ||
+      formData.requires_advance && !formData.notes
     ) {
       setError('Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.');
       handleSetToast('Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.', 'error');
@@ -317,6 +312,7 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
       notes: formData.notes,
       requested_fee: parseFloat(formData.requested_fee as string) || 0,
       imposed_fee: 0,
+      requires_advance: formData.requires_advance,
       travel_type: travelType,
       origin_country_name: firstRoute.origin_country_name,
       origin_city_name: firstRoute.origin_city_name,
@@ -463,8 +459,8 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
         firstRoute.beginning_time,
         firstRoute.ending_date,
         firstRoute.ending_time,
-        formData.requested_fee,
-        formData.notes,
+        formData.requires_advance && formData.requested_fee,
+        formData.requires_advance && formData.notes,
       ].some(field => !field);
 
       if (missingFields) {
@@ -578,8 +574,8 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
       !firstRoute.beginning_time ||
       !firstRoute.ending_date ||
       !firstRoute.ending_time ||
-      !formData.requested_fee ||
-      !formData.notes
+      formData.requires_advance && !formData.requested_fee ||
+      formData.requires_advance && !formData.notes
     ) {
       setError('Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.');
       handleSetToast('Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.', 'error');
@@ -662,50 +658,36 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
             2. Detalles Generales del Viaje
           </h2>
         </div>
+      {/* Checkbox */}
+      <Checkbox
+        name="requires_advance"
+        label="¿Requiere Anticipo?"
+        checked={formData.requires_advance || false}
+        onChange={handleGeneralChange}
+      />
+      {/* Only show requested fee and notes if "requires_advance" is true */}
+      {formData.requires_advance && (
+        <div className="space-y-6">
+          <Input
+            name="requested_fee"
+            label="Anticipo Esperado"
+            placeholder="Ej: 1500.00"
+            type="number"
+            value={formData.requested_fee === 0 ? '' : formData.requested_fee}
+            onChange={handleGeneralChange}
+          />
 
-        {/* Requested Fee and Notes */}
-        <Input
-          name="requested_fee"
-          label="Anticipo Esperado (MXN)"
-          placeholder="Anticipo Esperado (MXN)"
-          type="number"
-          value={formData.requested_fee === 0 ? '' : formData.requested_fee}
-          onChange={handleGeneralChange}
-          required
-          error={error ? 'Campo requerido' : ''}
-        />
-        <Textarea
-          name="notes"
-          label="Observaciones / Comentarios"
-          placeholder="Escribe tus observaciones aquí..."
-          value={formData.notes}
-          onChange={handleGeneralChange}
-          required
-          rows={4}
-        />
-
-        {/* Department Info */}
-        {deptData && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Select
-              name="costs_center"
-              label="Centro de Costos"
-              value={deptData.costs_center}
-              disabled
-            >
-              <option value={deptData.costs_center}>{deptData.costs_center}</option>
-            </Select>
-            <Select
-              name="department_name"
-              label="Departamento"
-              value={deptData.department_name}
-              disabled
-            >
-              <option value={deptData.department_name}>{deptData.department_name}</option>
-            </Select>
-          </div>
-        )}
-      </div>
+          <Textarea
+            name="notes"
+            label="Observaciones / Comentarios"
+            placeholder="Escribe tus observaciones aquí..."
+            value={formData.notes}
+            onChange={handleGeneralChange}
+            rows={4}
+          />
+        </div>
+      )}
+     </div>
 
       {/* Error and Info Messages */}
       { error && (

@@ -23,6 +23,7 @@ interface SubmitExpenseParams {
   concepto: string;
   monto: number;
   currency: string;
+  receiptDate?: string | null;
   pdfFile: File;
   xmlFile?: File | null;
   token: string;
@@ -52,6 +53,7 @@ export async function SubmitTravelExpense({
   concepto,
   monto,
   currency,
+  receiptDate,
   pdfFile,
   xmlFile,
   token,
@@ -74,6 +76,7 @@ export async function SubmitTravelExpense({
   formData.append("route_id", routeId.toString());
   formData.append("amount", monto.toString());
   formData.append("currency", currency);
+  if (receiptDate) formData.append("receipt_date", receiptDate);
 
   const uploadRes = await fetch(`${import.meta.env.PUBLIC_API_BASE_URL}/applicant/create-expense-with-files`, {
     method: "POST",
@@ -107,7 +110,7 @@ export async function SubmitTravelExpense({
   // Wait for the server to process
   await new Promise((res) => setTimeout(res, 500));
 
-  // If replacing a previous receipt, delete it and reset request status to pending
+  // If replacing a previous receipt, delete it
   if (receiptToReplace) {
     try {
       // Delete the previous receipt
@@ -117,14 +120,8 @@ export async function SubmitTravelExpense({
           Authorization: `Bearer ${token}`,
         },
       });
-
-      // Reset the request status to 6 (Comprobación gastos del viaje) to allow revalidation
-      await apiRequest(`/applicant/update-request-status/${requestId}/6`, {
-        method: "PUT",
-        headers: { Authorization: `Bearer ${token}` },
-      });
     } catch (err) {
-      console.error("Error replacing receipt or updating status:", err);
+      console.error("Error replacing receipt:", err);
       // Don't throw - the new receipt was uploaded successfully
     }
   }

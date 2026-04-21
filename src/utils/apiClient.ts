@@ -36,7 +36,7 @@ if (isServer && isDevelopment && typeof process !== 'undefined') {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 }
 
-type HTTP = 'GET' | 'POST' | 'PUT';
+type HTTP = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
 interface ApiOptions {
   method?: HTTP;

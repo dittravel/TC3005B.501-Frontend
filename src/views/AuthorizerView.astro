@@ -7,8 +7,9 @@
 
 import TextHeader from "@components/Layout/TextHeader.astro";
 import RequestSection from "@components/Cards/RequestSection.astro";
-import {apiRequest} from "@utils/apiClient";
+import { apiRequest } from "@utils/apiClient";
 import { getCookie } from "@data/cookies";
+import { getSocietyName } from "@data/societyHelper";
 
 const requests = await (async () => {
   try {
@@ -19,13 +20,14 @@ const requests = await (async () => {
   }
 })()
 const { userName } = Astro.props;
+const societyName = await getSocietyName(Astro);
 ---
 
 <div>
   <main>
     <TextHeader
       title={`Bienvenido, ${userName}`}
-      subtitle="Ditta Consulting"
+      subtitle={societyName}
     />
       <RequestSection
         title="Solicitudes por autorizar"

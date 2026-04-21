@@ -30,6 +30,7 @@ interface RouteInputGroupProps {
  * @returns {JSX.Element} Rendered route input form group
  */
 const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, index, onRemove, isRemovable }) => {
+  
   /**
    * Handles input changes for all input fields in the route form.
    * Converts checkbox values to boolean and regular input values to string.

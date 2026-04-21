@@ -10,12 +10,16 @@ import React, { useState } from "react";
 import Button from "@/components/Buttons/Button";
 import Input from "@/components/Utils/Input";
 import { apiRequest } from "@utils/apiClient";
+import ThemeButton from "@/components/Buttons/ThemeButton";
+import { useTheme } from "@hooks/useTheme";
+
 
 export default function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const { theme } = useTheme();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,6 +41,26 @@ export default function ForgotPasswordForm() {
 
   return (
     <div className="flex flex-col justify-center items-center h-screen w-full bg-background px-5">
+      {/* Header */}
+          <div className="flex justify-between items-center w-full absolute top-0 left-0 p-5 md:px-16 md:py-8">
+            {/* Logo */}
+            {theme === "light" ? (
+              <img
+                src="/logo_texto_dittravel_color.png"
+                className="h-20 w-auto drop-shadow-lg"
+                alt="Logo Dittravel"
+              />
+            ) : (
+              <img
+                src="/logo_texto_dittravel_blanco.png"
+                className="h-20 w-auto drop-shadow-lg"
+                alt="Logo Dittravel"
+              />
+            )}
+            {/* Theme Toggle Button */}
+            <ThemeButton />
+          </div>
+      
       <div className="w-full md:w-100">
         <div className="p-2 md:p-8 flex flex-col justify-center items-center rounded-xl gap-8 md:shadow-lg md:bg-card md:border-border md:border-1">
 

@@ -6,17 +6,57 @@
 
 import ImportDataButton from "@/components/Buttons/ImportDataButton";
 
-// Example XML structure to show in the UI as a reference
-const exampleXml = 
-`<Organizacion name="Mi Empresa">
-  <Departamento name="Finanzas" cost_center="CC-FN-01">
-    <Empleado usuario="laura.flores" rol="Autorizador" />
-    <Empleado usuario="andres.gomez" rol="Solicitante" jefe_usuario="laura.flores" />
-  </Departamento>
-  <Departamento name="Recursos Humanos" cost_center="CC-RH-01">
-    <Empleado usuario="miguel.de.cervantes" rol="Autorizador" />
-  </Departamento>
-</Organizacion>`;
+// Example JSON structure
+const exampleJson =
+`{
+  "CeCo": [
+    { "Clave": 101, "Descripcion": "Finanzas" }
+  ],
+  "Departamentos": [
+    { "Clave": 1, "Descripcion": "Finanzas", "CeCo": 101 }
+  ],
+  "Sociedades": [
+    {
+      "Clave": 1,
+      "Descripcion": "Ditta Servicios",
+      "MonedaLocal": "MXN",
+      "Empleados": [
+        {
+          "NoEmpleado": "Emp001",
+          "Nombre": "Admin User",
+          "Usuario": "admin",
+          "Email": "admin@empresa.com",
+          "JefeInmediato": null,
+          "Proveedor": 2001,
+          "CeCo": 101,
+          "Departamento": 1,
+          "Status": "A",
+          "FechaAlta": "2023-01-01",
+          "FechaCambio": "2023-06-01"
+        },
+        {
+          "NoEmpleado": "Emp002",
+          "Nombre": "Carlos Ramos",
+          "Usuario": "carlos.ramos",
+          "Email": "carlos.ramos@empresa.com",
+          "JefeInmediato": "Emp001",
+          "Proveedor": 2002,
+          "CeCo": 101,
+          "Departamento": 1,
+          "Status": "A",
+          "FechaAlta": "2023-01-05",
+          "FechaCambio": "2023-06-01"
+        }
+      ]
+    },
+    {
+      "Clave": 2,
+      "Descripcion": "Ditta Consulting",
+      "MonedaLocal": "USD",
+      "Empleados": []
+    }
+  ]
+}`;
 
 type Props = {
   endpoint: string;
@@ -35,7 +75,7 @@ export default function ImportDataForm({ endpoint, token }: Props) {
       <div className="card">
         <div className="card-title">
           <h2>Subir archivo</h2>
-          <p>Carga un archivo XML con la estructura organizacional de tu empresa</p>
+          <p>Carga un archivo JSON con la estructura organizacional de tu empresa</p>
         </div>
         <ImportDataButton
           endpoint={endpoint}
@@ -45,10 +85,10 @@ export default function ImportDataForm({ endpoint, token }: Props) {
       <div className="card">
         <div className="card-title">
           <h2>Formato esperado</h2>
-          <p>El archivo XML debe seguir la siguiente estructura</p>
+          <p>El archivo JSON debe seguir la siguiente estructura</p>
         </div>
-        <pre className="card-secondary whitespace-pre-wrap break-words overflow-x-auto">
-          {exampleXml}
+        <pre className="card-secondary overflow-x-scroll">
+          {exampleJson}
         </pre>
       </div>
     </div>

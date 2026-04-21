@@ -39,7 +39,7 @@ export default function ApproveReceiptStatus({
       const url = `/accounts-payable/validate-receipt/${receipt_id}`;
       await apiRequest(url, { 
         method: "PUT", 
-        data: {"approval": 1},
+        data: {"approval": "Aprobado"},
         headers: { Authorization: `Bearer ${token}` }
       });
       setToast({ message: 'Comprobante aprobado exitosamente.', type: 'success' });

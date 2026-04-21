@@ -20,8 +20,7 @@ interface Props {
 
 // Mapping of user roles to their corresponding href values for action buttons in the table
 const roleDictionary = {
-  'N1': "autorizar-solicitud",
-  'N2': "autorizar-solicitud",
+  'Autorizador': "autorizar-solicitud",
   'Cuentas por pagar': "cotizar-solicitud",
   'Agencia de viajes': "atender-solicitud",
 } as const;
