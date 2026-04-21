@@ -21,17 +21,15 @@ declare namespace Cypress {
  * @param password - Contraseña del usuario
  */
 Cypress.Commands.add('login', (username: string, password: string) => {
-  // Navega a la página principal de la aplicación
   cy.visit('https://localhost:4321');
 
-  // Limpia cookies y almacenamiento local para evitar sesiones residuales
   cy.clearCookies();
   cy.clearLocalStorage();
 
-  // Ingresa el nombre de usuario en el campo correspondiente
-  cy.get('input[placeholder*="Usuario"]').type(username);
+  // Seed the CSRF cookie so the login POST includes a valid x-csrf-token header
+  cy.request({ url: `${Cypress.env('API_BASE_URL') || 'https://localhost:3000'}/api/csrf-token`, failOnStatusCode: false });
 
-  // Ingresa la contraseña y envía el formulario con Enter
+  cy.get('input[placeholder*="Usuario"]').type(username);
   cy.get('input[placeholder*="Contraseña"]').type(password + '{enter}');
 
   // Verifica que la alerta de éxito contenga el mensaje esperado

@@ -1,37 +1,8 @@
-/**
- * API Client Utility
- * 
- * This module provides a utility function `apiRequest` to make HTTP requests to the backend API.
- * It handles authentication by including a JWT token from cookies, and it also manages SSL certificate
- * validation for development environments with self-signed certificates.
- * 
- * 
- * Usage:
- * 
- * --GET
- *  const requests = await apiRequest('/applicant/get-user-requests/1');
- * 
- * --POST
- *  await apiRequest('/applicant/create-request', {
- *    method: 'POST',
- *    data: { payload }
- *  });
- * 
- * --PUT
- *  await apiRequest('/applicant/update-request/1', {
- *    method: 'PUT',
- *    data: { payload }
- *  });
- */
-
 import { getSession } from "@data/cookies";
 
-// Handle SSL certificate validation for server-side (Node.js) environment
-// This is needed for Astro SSR to work with self-signed certificates
 const isServer = typeof window === 'undefined';
 const isDevelopment = import.meta.env.DEV || import.meta.env.MODE === 'development';
 
-// In development server environment, disable certificate validation
 if (isServer && isDevelopment && typeof process !== 'undefined') {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 }
@@ -47,6 +18,28 @@ interface ApiOptions {
 
 const BASE_URL = import.meta.env.PUBLIC_API_BASE_URL || 'https://localhost:3000/api';
 
+let _csrfToken: string | null = null;
+
+function readCsrfCookie(): string | null {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(/(?:^|;\s*)csrfToken=([^;]+)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+async function getCsrfToken(): Promise<string> {
+  if (_csrfToken) return _csrfToken;
+  const fromCookie = readCsrfCookie();
+  if (fromCookie) {
+    _csrfToken = fromCookie;
+    return _csrfToken;
+  }
+  const res = await fetch(`${BASE_URL.replace('/api', '')}/api/csrf-token`, {
+    credentials: 'include',
+  });
+  const data = await res.json();
+  _csrfToken = data.csrfToken;
+  return _csrfToken as string;
+}
 
 export async function apiRequest<T = any>(
   path: string,
@@ -55,13 +48,24 @@ export async function apiRequest<T = any>(
   const { method = 'GET', data, headers, cookies } = options;
 
   const url = `${BASE_URL}${path}`;
-  
+
   let token = "";
   try {
-    const session = getSession(cookies); 
+    const session = getSession(cookies);
     token = session.token;
   } catch (e) {
     console.warn("[WARN] No se pudo obtener sesión en apiRequest", e);
+  }
+
+  const isMutation = method !== 'GET';
+  let csrfHeader: Record<string, string> = {};
+  if (isMutation && !isServer) {
+    try {
+      const csrf = await getCsrfToken();
+      csrfHeader = { 'x-csrf-token': csrf };
+    } catch {
+      // Continue without CSRF token — server will reject if required
+    }
   }
 
   const config: RequestInit = {
@@ -70,28 +74,25 @@ export async function apiRequest<T = any>(
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...csrfHeader,
       ...headers,
     },
     ...(data && { body: JSON.stringify(data) }),
   };
 
   try {
-    // For Node.js in development, the NODE_TLS_REJECT_UNAUTHORIZED env var handles this
-    // For browsers, we can't directly modify SSL validation behavior
     const res = await fetch(url, config);
 
     if (!res.ok) {
       if (res.status === 401 || res.status === 403) {
         console.warn("Unauthorized request - token may be invalid or expired");
-        // Redirect to login page
         if (typeof window !== 'undefined') {
           window.location.href = '/login';
         }
-
         throw {
           status: res.status,
           message: 'Unauthorized - redirecting to login'
-        }
+        };
       }
 
       let errorData: any;
