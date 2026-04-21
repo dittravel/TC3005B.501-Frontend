@@ -66,12 +66,9 @@ const TravelSearchCard = ({ token, route, routeIndex, onSelectFlight, onSelectHo
 
             {isHotelSearchOpen && (
               <HotelSearchForm
+                token={token}
                 route={route}
                 routeIndex={routeIndex}
-                onSelectHotel={(hotel) => {
-                  if (onSelectHotel) onSelectHotel(hotel);
-                  setIsHotelSearchOpen(false);
-                }}
               />
             )}
           </>

@@ -83,15 +83,6 @@ export async function apiRequest<T = any>(
     if (!res.ok) {
       if (res.status === 401 || res.status === 403) {
         console.warn("Unauthorized request - token may be invalid or expired");
-        try {
-          await fetch(`${BASE_URL}/user/logout`, {
-            method: 'POST',
-            credentials: 'include',
-          });
-        } catch (e) {
-          console.error("Error during logout after unauthorized response:", e);
-        }
-
         // Redirect to login page
         if (typeof window !== 'undefined') {
           window.location.href = '/login';
