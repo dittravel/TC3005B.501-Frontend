@@ -114,28 +114,44 @@ export default function ExpensesForm({
 
     return (
         <>
-            <div className="space-y-4">
-                <Input
-                    name="pdfFile"
-                    label="Archivo PDF"
-                    type="file"
-                    accept=".pdf"
-                    onChange={(e) => setPdfFile(e.target.files ? e.target.files[0] : null)}
-                />
-            </div>
-            <div className="flex flex-col sm:flex-row justify-end gap-3 mt-4">
-                <div>
-                    <ModalWrapper
-                        title="Subir Comprobante"
-                        message="¿Estas seguro de que deseas realizar esta acción?"
-                        modal_type="confirm"
-                        color="success"
-                        variant="filled"
-                        onConfirm={handleSubmit}
-                        disabled={loading}
-                    >
-                        Subir Comprobante
-                    </ModalWrapper>
+            <div className="space-y-6">
+                {route.plane_needed && (
+                    <div className="space-y-4">
+                        <Input
+                            name="pdfFile"
+                            label="Reservación Vuelo PDF"
+                            type="file"
+                            accept=".pdf"
+                            onChange={(e) => setPdfFile(e.target.files ? e.target.files[0] : null)}
+                        />
+                    </div>
+                )}
+                {route.hotel_needed && (
+                    <div className="space-y-4">
+                        <Input
+                            name="pdfFile"
+                            label="Reservación Hotel PDF"
+                            type="file"
+                            accept=".pdf"
+                            onChange={(e) => setPdfFile(e.target.files ? e.target.files[0] : null)}
+                        />
+                    </div>
+                )}
+
+                <div className="flex flex-col sm:flex-row justify-end gap-3 mt-4">
+                    <div>
+                        <ModalWrapper
+                            title="Subir Comprobante"
+                            message="¿Estas seguro de que deseas realizar esta acción?"
+                            modal_type="confirm"
+                            color="success"
+                            variant="filled"
+                            onConfirm={handleSubmit}
+                            disabled={loading}
+                        >
+                            Subir documento reservación
+                        </ModalWrapper>
+                    </div>
                 </div>
             </div>
         </>
