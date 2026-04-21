@@ -9,7 +9,6 @@ import AccountingExportForm from "@/components/Forms/ExportAccountabilityForm";
 import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
 import type { UserRole } from "@type/roles";
-import { only } from 'node:test';
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
 const buttonLabel = roleLabels[role] || "";

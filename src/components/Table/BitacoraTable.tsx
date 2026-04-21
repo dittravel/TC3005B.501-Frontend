@@ -1,5 +1,5 @@
 /**
- * BitacoraTable Component
+ * Audit Log Table Component
  *
  * Displays the audit log table with client-side filters by action type
  * and actor name, plus pagination.
@@ -8,8 +8,8 @@
 import { useState, useMemo } from "react";
 import DataTable from "./DataTable";
 import Pagination from "./Pagination";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
+import Select from "@/components/Utils/Select";
+import Input from "@/components/Utils/Input";
 
 interface AuditEntry {
   audit_log_id: number;
@@ -36,8 +36,7 @@ interface Props {
   role: string;
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-
+// Constants
 const ACTION_TYPE_LABELS: Record<string, string> = {
   USER_CREATED: "Usuario creado",
   USER_UPDATED: "Usuario editado",
@@ -48,6 +47,7 @@ const ACTION_TYPE_LABELS: Record<string, string> = {
   REQUEST_RECEIPTS_VALIDATED: "Comprobantes validados",
   RECEIPT_APPROVED: "Comprobante aprobado",
   RECEIPT_REJECTED: "Comprobante rechazado",
+  REFUND_PROCESSED: "Reembolso procesado",
 };
 
 const COLUMNS = [
@@ -60,10 +60,10 @@ const COLUMNS = [
   { key: "metadata_detail", label: "Detalles" },
 ];
 
+// Limit of entries per page
 const LIMIT = 50;
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
+// Helpers
 function formatDate(isoString: string): string {
   return new Intl.DateTimeFormat("es-MX", {
     day: "2-digit",
@@ -83,8 +83,14 @@ function formatMetadata(metadata: Record<string, any> | null): string {
     .join(" · ");
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
+/**
+ * Audit Log Table Component
+ * Displays the audit log with filters and pagination.
+ * @param {AuditEntry[]} initialData - Initial entries to display in the table
+ * @param {Meta} initialMeta - Initial metadata for pagination
+ * @param {string} role - User role for access control
+ * @returns {JSX.Element} The audit log table component
+ */
 export default function BitacoraTable({ initialData, initialMeta, role }: Props) {
   const [data, setData] = useState<AuditEntry[]>(initialData);
   const [meta, setMeta] = useState<Meta>(initialMeta);
@@ -97,7 +103,7 @@ export default function BitacoraTable({ initialData, initialMeta, role }: Props)
 
   const totalPages = Math.ceil(meta.total_count / LIMIT);
 
-  // ── Fetch página ──────────────────────────────────────────────────────────
+  // Fetch a specific page of audit log entries
   async function fetchPage(newPage: number) {
     setLoading(true);
     setError(null);
@@ -122,7 +128,8 @@ export default function BitacoraTable({ initialData, initialMeta, role }: Props)
     }
   }
 
-  // ── Filtros en cliente ────────────────────────────────────────────────────
+  // Filters
+  // useMemo to avoid recalculating filtered rows on every render
   const rows = useMemo(
     () =>
       data
@@ -146,27 +153,14 @@ export default function BitacoraTable({ initialData, initialMeta, role }: Props)
 
   return (
     <div>
-      {/* Encabezado */}
-      <div className="grid grid-cols-[1fr_auto] items-center gap-4 mb-4">
-        <h2 className="text-2xl font-semibold">
-          Bitácora de acciones {meta.total_count > 0 && `(${meta.total_count})`}
-        </h2>
-      </div>
-
-      {/* Filtros */}
-      <div className="flex flex-wrap gap-3 items-end mb-4">
-        <div className="flex flex-col gap-1">
-          <label
-            htmlFor="filter-action"
-            className="text-sm font-medium text-text-secondary"
-          >
-            Tipo de acción
-          </label>
-          <select
-            id="filter-action"
+      {/* Filters */}
+      <div className="flex flex-col md:flex-row gap-3 items-end mb-8">
+        <div className="w-full md:flex-1 [&>div]:mb-0">
+          <Select
+            name="filter-action"
+            label="Tipo de acción"
             value={filterAction}
             onChange={(e) => setFilterAction(e.target.value)}
-            className="border border-border rounded-md px-3 py-2 bg-card text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-secondary"
           >
             <option value="">Todas</option>
             {Object.entries(ACTION_TYPE_LABELS).map(([value, label]) => (
@@ -174,27 +168,20 @@ export default function BitacoraTable({ initialData, initialMeta, role }: Props)
                 {label}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
-
-        <div className="flex flex-col gap-1">
-          <label
-            htmlFor="filter-name"
-            className="text-sm font-medium text-text-secondary"
-          >
-            Buscar usuario
-          </label>
-          <input
-            id="filter-name"
+        <div className="w-full md:flex-1">
+          <Input
+            name="filter-name"
             type="text"
+            label="Buscar usuario"
             placeholder="Nombre de usuario..."
             value={filterName}
             onChange={(e) => setFilterName(e.target.value)}
-            className="border border-border rounded-md px-3 py-2 bg-card text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-secondary w-52"
           />
         </div>
 
-        <span className="text-sm text-text-secondary ml-auto self-end">
+        <span className="text-sm text-text-secondary md:ml-10 md:whitespace-nowrap">
           {rows.length} resultado{rows.length !== 1 ? "s" : ""} en esta página
         </span>
       </div>

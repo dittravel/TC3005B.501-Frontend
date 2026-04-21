@@ -55,23 +55,44 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   const { request } = context;
   const url = new URL(request.url);
   const pathname = url.pathname;
-  
+
   // 1. Allow public routes without authentication
   if (matchPath(pathname, publicRoutes)) {
     return next();
   }
-  
-  // 2. Get role from cookies
+
+  // 2. Get role and token from cookies
   const cookieHeader = request.headers.get('cookie') || '';
   const roleMatch = cookieHeader.match(/(?:^|;\s*)role=([^;]+)/);
   const role = roleMatch ? decodeURIComponent(roleMatch[1]) : '';
   const tokenMatch = cookieHeader.match(/(?:^|;\s*)token=([^;]+)/);
+  const token = tokenMatch ? tokenMatch[1] : '';
   const isAuthenticated = !!tokenMatch || !!role;
   const html = unauthorizedPage(pathname, isAuthenticated);
 
   // 2.1 If no role is found, redirect to login page
   if (!role) {
     return Response.redirect(new URL('/login', request.url), 302);
+  }
+
+  // 2.2 Check if token has expired
+  if (token) {
+    try {
+      const parts = token.split('.');
+      if (parts.length === 3) {
+        const payload = JSON.parse(
+          Buffer.from(parts[1], 'base64').toString('utf-8')
+        );
+        const currentTime = Math.floor(Date.now() / 1000);
+        if (payload.exp && payload.exp < currentTime) {
+          const loginUrl = new URL('/login', request.url);
+          loginUrl.searchParams.set('expired', 'true');
+          return Response.redirect(loginUrl, 302);
+        }
+      }
+    } catch (error) {
+      // Token parsing error, continue
+    }
   }
 
   // 3. Check if the route is registered in the system
