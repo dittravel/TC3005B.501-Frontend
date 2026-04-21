@@ -157,18 +157,6 @@ export default function AuthRuleForm({ token, mode, data }: Props) {
             value={formData.num_levels}
             onChange={handleChange}
           />
-          <Input
-            label="Días de comprobación"
-            name="days_to_validate"
-            type="number"
-            placeholder="Número"
-            altText="Ingresa un valor entre 5 y 30"
-            min={5}
-            max={30}
-            required
-            value={formData.days_to_validate}
-            onChange={handleChange}
-          />
         </div>
         {formData.num_levels > 0 && formData.num_levels < 11 && (
           <div className="flex flex-col card-secondary mt-4">
