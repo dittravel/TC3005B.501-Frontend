@@ -1,11 +1,11 @@
 ---
 /**
- * Dashboard page for the application. 
- * It displays different content based on the user's role
+ * Dashboard page for the application.
+ * Displays shortcuts to critical actions based on user permissions
  */
 
 import MainLayout from "@layouts/MainLayout.astro";
-import { roleViews } from "@views/role-views";
+import DashboardComponent from "@components/Dashboard/Dashboard";
 import type { UserRole } from "@type/roles";
 
 import { getCookie } from "@data/cookies";
@@ -15,11 +15,10 @@ const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
 const userName = getCookie("username", Astro.cookies) || "";
 
 const buttonLabel = roleLabels[role];
-const ViewComponent = roleViews[role];
 
 const showMessages: boolean = role !== "Solicitante" && role !== "Administrador";
 ---
 
 <MainLayout title="Dashboard" data={{userName, buttonLabel, role}} showMessages={showMessages}>
-  <ViewComponent userName={userName}/>
+  <DashboardComponent client:only="react" role={role} userName={userName} />
 </MainLayout>

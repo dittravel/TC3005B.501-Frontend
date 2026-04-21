@@ -10,10 +10,9 @@ export const roleRoutes: Record<UserRole, string[]> = {
   'Solicitante': [
     '/dashboard',
     '/perfil-usuario',
+    '/solicitudes',
     '/crear-solicitud',
-    '/historial',
     '/reembolsos',
-    '/solicitudes-draft',
     '/comprobar-gastos',
     '/completar-draft/*',
     '/editar-solicitud/*',
@@ -40,11 +39,9 @@ export const roleRoutes: Record<UserRole, string[]> = {
   'Autorizador': [
     '/dashboard',
     '/perfil-usuario',
-    '/solicitudes-autorizador',
+    '/solicitudes',
     '/crear-solicitud',
-    '/historial',
     '/reembolsos',
-    '/solicitudes-draft',
     '/comprobar-gastos',
     '/completar-draft/*',
     '/editar-solicitud/*',
@@ -58,6 +55,7 @@ export const roleRoutes: Record<UserRole, string[]> = {
   'Administrador': [
     '/dashboard',
     '/perfil-usuario',
+    '/usuarios',
     '/crear-usuario','/editar-usuario/*',
     '/importar-datos',
     '/reglas-autorizacion','/crear-regla','/editar-regla/*',
