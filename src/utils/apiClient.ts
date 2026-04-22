@@ -87,11 +87,14 @@ export async function apiRequest<T = any>(
       if (res.status === 401 || res.status === 403) {
         console.warn("Unauthorized request - token may be invalid or expired");
         if (typeof window !== 'undefined') {
+          if (res.status === 401) {
+            localStorage.setItem('sessionExpired', 'true');
+          }
           window.location.href = '/login';
         }
         throw {
           status: res.status,
-          message: 'Unauthorized - redirecting to login'
+          message: res.status === 401 ? 'Session expired - redirecting to login' : 'Unauthorized - redirecting to login'
         };
       }
 
