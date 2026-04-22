@@ -1,5 +1,5 @@
 /**
- * ReceiptActions Component
+ * Receipt Actions Component
  * 
  * Provides action buttons for approving or rejecting travel receipts.
  * Manages the state for displaying confirmation modals and handles API requests
@@ -17,26 +17,21 @@ interface ReceiptProps {
   token: string;
 }
 
+/**
+ * Receipt Actions Component
+ * Renders approve and reject buttons for a receipt, 
+ * and handles the logic for confirming actions
+ * @param {number} receipt_id - The ID of the receipt to act upon
+ * @param {boolean} disabled - Whether the action buttons should be disabled
+ * @param {string} token - Authentication token for API requests
+ * @returns {JSX.Element} - The rendered component
+ */
 export default function ReceiptActions({ receipt_id, disabled, token }: ReceiptProps) {
   const [showModal, setShowModal] = useState(false);
   const [action, setAction] = useState<"approve" | "reject" | null>(null);
   const [loading, setLoading] = useState(false);
 
-  /**
-   * Opens the confirmation modal for the specified action type.
-   * @param {string} type - The action type: "approve" or "reject"
-   * @returns {void}
-   */
-  const handleClick = (type: "approve" | "reject") => {
-    setAction(type);
-    setShowModal(true);
-  };
-
-  /**
-   * Handles the confirmation of receipt approval or rejection.
-   * Sends a PUT request to update the receipt status and calls the appropriate callback.
-   * @returns {Promise<void>}
-   */
+  // Handles the confirmation of receipt approval or rejection.
   const confirmAction = async () => {
     const approval = action === "approve" ? "Aprobado" : "Rechazado";
 
@@ -82,7 +77,7 @@ export default function ReceiptActions({ receipt_id, disabled, token }: ReceiptP
         color="success"
         variant="filled"
         label="Aprobar"
-        disabled={disabled} 
+        disabled={disabled}
         token={token}
       />
 

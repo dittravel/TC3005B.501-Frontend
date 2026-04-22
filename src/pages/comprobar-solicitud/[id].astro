@@ -27,14 +27,6 @@ try {
   request = null;
   throw new Error(`No request found with ID ${id}`);
 }
-
-// Get authorization deadline for the request
-let deadlineStatus = null;
-try {
-  deadlineStatus = await apiRequest(`/applicant/deadline-status/${id}`, { cookies: Astro.cookies });
-} catch (error) {
-  deadlineStatus = null;
-}
 ---
 
 <MainLayout title={`Comprobantes de la solicitud #${id}`} data={{userName, role, buttonLabel}}>
@@ -49,7 +41,6 @@ try {
       expenses={request.Expenses}
       requestId={id}
       token={getCookie("token", Astro.cookies) || ""}
-      deadlineStatus={deadlineStatus}
     />
   </main>
 </MainLayout>

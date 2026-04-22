@@ -39,6 +39,19 @@ const enrichedExpenses = await Promise.all(
   })
 );
 const allReviewed = enrichedExpenses.every((receipt: any) => receipt.validation !== "Pendiente");
+
+// Get society info (for local currency)
+const society = await (async () => {
+  try {
+    const data = await apiRequest(`/societies/current`, {
+      cookies: Astro.cookies
+    });
+    return data?.society || null;
+  } catch (error) {
+    console.error("Error al cargar la sociedad del usuario:", error);
+    return null;
+  }
+})();
 ---
 
 <MainLayout title={`Solicitud #${request.request_id}`} data={{userName, buttonLabel, role}} >
@@ -54,6 +67,7 @@ const allReviewed = enrichedExpenses.every((receipt: any) => receipt.validation 
       allReviewed={allReviewed}
       requestId={request.request_id}
       imposedFee={request.imposed_fee}
+      currency={society?.currency || "MXN"}
     />
   </main>
 </MainLayout>

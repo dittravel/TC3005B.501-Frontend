@@ -138,7 +138,7 @@ export default function Requests({ data }: RequestsProps) {
           color="secondary"
           size="medium"
         >
-          + Nueva Solicitud
+          Crear Solicitud
         </Button>
       </div>
 

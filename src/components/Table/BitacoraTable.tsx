@@ -48,6 +48,11 @@ const ACTION_TYPE_LABELS: Record<string, string> = {
   RECEIPT_APPROVED: "Comprobante aprobado",
   RECEIPT_REJECTED: "Comprobante rechazado",
   REFUND_PROCESSED: "Reembolso procesado",
+  POLICY_CREATED: "Política creada",
+  POLICY_UPDATED: "Política editada",
+  POLICY_DEACTIVATED: "Política desactivada",
+  RECEIPTS_RETURNED: "Comprobantes devueltos",
+  RECEIPT_AMOUNT_EDITED: "Monto del comprobante editado",
 };
 
 const COLUMNS = [
