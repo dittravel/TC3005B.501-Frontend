@@ -235,9 +235,9 @@ const HotelSearchForm = ({ token, route, routeIndex }: HotelSearchFormProps) => 
                             ⭐ {hotel.rating ?? 'Sin calificación'} | {hotel.installation ?? 'Sin tipo'}
                           </p>
                         </div>
-                        <p className="font-semibold text-tertiary">
-                          {hotel.cost ? `$${hotel.cost} / noche` : 'Precio no disponible'}
-                        </p>
+                          <p className="font-semibold text-tertiary">
+                            {hotel.cost ? `$${hotel.cost} ${hotel.currency ?? 'USD'} / noche` : 'Precio no disponible'}
+                          </p>
                       </div>
                     </button>
                   </div>
