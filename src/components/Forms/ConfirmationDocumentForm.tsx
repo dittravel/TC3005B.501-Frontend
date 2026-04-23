@@ -22,7 +22,8 @@ export default function ExpensesForm({
     });
 
     // File states
-    const [pdfFile, setPdfFile] = useState<File | null>(null);
+    const [flightPdfFile, setFlightPdfFile] = useState<File | null>(null);
+    const [hotelPdfFile, setHotelPdfFile] = useState<File | null>(null);
 
     // Loading and error states
     const [loading, setLoading] = useState(false);
@@ -45,20 +46,36 @@ export default function ExpensesForm({
 
     // Handle form submission for creating or updating receipt
     const handleSubmit = async () => {
-        if (pdfFile && !pdfFile.name.toLowerCase().endsWith('.pdf')) {
+        if (flightPdfFile && !flightPdfFile.name.toLowerCase().endsWith('.pdf')) {
             setToast({ message: "El archivo PDF debe tener extensión .pdf válida.", type: 'error' });
             setLoading(false);
             return;
         }
 
+        const baseUrl = import.meta.env.PUBLIC_API_BASE_URL;
         const submitData = new FormData();
         submitData.append("route_id", formData.routeId.toString());
 
-        if (pdfFile) submitData.append("pdf", pdfFile);
+        if (flightPdfFile) submitData.append("flightPdf", flightPdfFile);
+        if (hotelPdfFile) submitData.append("hotelPdf", hotelPdfFile);
 
         console.log("Submitting form with data:");
         for (const pair of submitData.entries()) {
             console.log(`${pair[0]}: ${pair[1]}`);
+        }
+
+        const response = await fetch(`${baseUrl}/travel-agent/create-reservation-file`, {
+          method: "POST",
+          body: submitData,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: "include"
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || `Error: ${response.status}`);
         }
 
         // try {
@@ -118,22 +135,22 @@ export default function ExpensesForm({
                 {route.plane_needed && (
                     <div className="space-y-4">
                         <Input
-                            name="pdfFile"
+                            name="flightPdfFile"
                             label="Reservación Vuelo PDF"
                             type="file"
                             accept=".pdf"
-                            onChange={(e) => setPdfFile(e.target.files ? e.target.files[0] : null)}
+                            onChange={(e) => setFlightPdfFile(e.target.files ? e.target.files[0] : null)}
                         />
                     </div>
                 )}
                 {route.hotel_needed && (
                     <div className="space-y-4">
                         <Input
-                            name="pdfFile"
+                            name="hotelPdfFile"
                             label="Reservación Hotel PDF"
                             type="file"
                             accept=".pdf"
-                            onChange={(e) => setPdfFile(e.target.files ? e.target.files[0] : null)}
+                            onChange={(e) => setHotelPdfFile(e.target.files ? e.target.files[0] : null)}
                         />
                     </div>
                 )}
