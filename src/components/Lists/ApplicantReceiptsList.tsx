@@ -10,7 +10,6 @@ import Button from '@/components/Buttons/Button';
 import UltimateWrapper from '@/components/Modals/UltimateWrapper';
 import LabeledValue from '@/components/Utils/LabeledValue';
 import Tag from '@/components/Utils/Tag';
-import { FileDownload } from "@mui/icons-material";
 import type { TagType } from '@/types/card';
 import { formatDate } from '@/utils/dateFormatter';
 
@@ -165,6 +164,16 @@ export default function ApplicantReceiptsList({
                     </div>
                   )}
                 </div>
+
+                {/* Notes */}
+                {expense.notes && (
+                  <div className="card-secondary">
+                    <LabeledValue
+                      label="Notas del revisor"
+                      value={expense.notes}
+                    />
+                  </div>
+                )}
                 
                 {/* Files */}
                 <div>

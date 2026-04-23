@@ -57,6 +57,10 @@ export default function ReviewReceiptsList({
   const [editingReceiptId, setEditingReceiptId] = useState<number | null>(null);
   const [editAmount, setEditAmount] = useState<string>("");
 
+  // State for editing notes
+  const [editingNotesId, setEditingNotesId] = useState<number | null>(null);
+  const [editNotes, setEditNotes] = useState<string>("");
+
   // Toast state for success/error messages
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
@@ -82,6 +86,29 @@ export default function ReviewReceiptsList({
       setTimeout(() => window.location.reload(), 1500);
     } catch (err) {
       setToast({ message: err instanceof Error ? err.message : "Error al actualizar", type: 'error' });
+    }
+  };
+
+  // Handle saving notes for a receipt
+  const handleSaveNotes = async (receiptId: number, notes: string) => {
+    if (notes.length > 500) {
+      setToast({ message: "Las notas no pueden exceder los 500 caracteres", type: 'error' });
+      return;
+    }
+
+    try {
+      await apiRequest(`/accounts-payable/edit-receipt-notes/${receiptId}`, {
+        method: "PUT",
+        data: { notes: notes || null },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setToast({ message: "Notas actualizadas correctamente", type: 'success' });
+      setEditingNotesId(null);
+      setTimeout(() => window.location.reload(), 1500);
+    } catch (err) {
+      setToast({ message: err instanceof Error ? err.message : "Error al actualizar notas", type: 'error' });
     }
   };
 
@@ -185,6 +212,59 @@ export default function ReviewReceiptsList({
                   )}
                 </div>
 
+                {/* Notes */}
+                <div>
+                  {editingNotesId === receipt.receipt_id ? (
+                    <div className="space-y-2">
+                      <Input
+                        name={`notes-${receipt.receipt_id}`}
+                        label="Notas (opcional)"
+                        type="text"
+                        value={editNotes}
+                        onChange={(e) => setEditNotes(e.target.value)}
+                        placeholder="Agrega notas para el solicitante"
+                      />
+                      <div className="flex gap-2 justify-end">
+                        <Button
+                          size="small"
+                          color="primary"
+                          onClick={() => setEditingNotesId(null)}
+                        >
+                          Cancelar
+                        </Button>
+                        <Button
+                          size="small"
+                          color="secondary"
+                          onClick={() => handleSaveNotes(receipt.receipt_id, editNotes)}
+                        >
+                          Guardar Notas
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <div>
+                        <p className="text-sm font-semibold text-text-primary mb-2">Notas</p>
+                        <p className="text-sm text-text-secondary">{receipt.notes || "Sin notas"}</p>
+                      </div>
+                      <div className="flex justify-end">
+                        <Button
+                          size="small"
+                          color="secondary"
+                          variant="filled"
+                          onClick={() => {
+                            setEditingNotesId(receipt.receipt_id);
+                            setEditNotes(receipt.notes || "");
+                          }}
+                        >
+                          Editar Notas
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+
                 {/* Files */}
                 <div>
                   <div className="flex flex-col md:flex-row gap-4">
@@ -243,7 +323,7 @@ export default function ReviewReceiptsList({
                           onChange={(e) => setEditAmount(e.target.value)}
                           placeholder="0.00"
                         />
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 justify-end w-full">
                           <Button
                             size="small"
                             color="primary"
@@ -261,17 +341,18 @@ export default function ReviewReceiptsList({
                         </div>
                       </div>
                     ) : (
-                      <Button
-                        size="small"
-                        color="warning"
-                        onClick={() => {
-                          setEditingReceiptId(receipt.receipt_id);
-                          setEditAmount((receipt.local_amount || receipt.amount).toString());
-                        }}
-                        className="mt-2"
-                      >
-                        Editar Monto
-                      </Button>
+                      <div className="flex justify-end">
+                        <Button
+                          size="small"
+                          color="warning"
+                          onClick={() => {
+                            setEditingReceiptId(receipt.receipt_id);
+                            setEditAmount((receipt.local_amount || receipt.amount).toString());
+                          }}
+                        >
+                          Editar Monto
+                        </Button>
+                      </div>
                     )}
                   </div>
                 )}

@@ -53,6 +53,7 @@ const ACTION_TYPE_LABELS: Record<string, string> = {
   POLICY_DEACTIVATED: "Política desactivada",
   RECEIPTS_RETURNED: "Comprobantes devueltos",
   RECEIPT_AMOUNT_EDITED: "Monto del comprobante editado",
+  RECEIPT_NOTES_EDITED: "Notas del comprobante editadas",
 };
 
 const COLUMNS = [

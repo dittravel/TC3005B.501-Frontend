@@ -42,23 +42,26 @@ export default function ComprobacionesList({ data, title = "Comprobaciones", sub
     <section className="space-y-6 w-full">
       <div className="flex items-center justify-between gap-4">
         <InfoCard
-          value={data.filter((r: any) => 
-            getVerificationStats(r).accepted === getVerificationStats(r).total).length
-          }
+          value={data.filter((r: any) => {
+            const stats = getVerificationStats(r);
+            return stats.accepted === stats.total && stats.total > 0;
+          }).length}
           type="success"
           title="Aceptadas"
         />
         <InfoCard
-          value={data.filter((r: any) => 
-            getVerificationStats(r).pending > 0 || getVerificationStats(r).total === 0).length
-          }
+          value={data.filter((r: any) => {
+            const stats = getVerificationStats(r);
+            return stats.pending > 0 || stats.total === 0;
+          }).length}
           type="alert"
           title="Pendientes"
         />
         <InfoCard
-          value={data.filter((r: any) => 
-            getVerificationStats(r).rejected === getVerificationStats(r).total).length
-          }
+          value={data.filter((r: any) => {
+            const stats = getVerificationStats(r);
+            return stats.rejected === stats.total && stats.total > 0;
+          }).length}
           type="warning"
           title="Rechazadas"
         />
