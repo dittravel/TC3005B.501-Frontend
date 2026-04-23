@@ -6,7 +6,7 @@
 export const prerender = false;
 import MainLayout from "@layouts/MainLayout.astro";
 import TextHeader from "@components/Layout/TextHeader.astro";
-import ReceiptsList from "@/components/RequestsLists/ReceiptsList";
+import ReviewReceiptsList from "@/components/Lists/ReviewReceiptsList";
 import type { UserRole } from "@type/roles";
 
 import { getCookie } from "@data/cookies";
@@ -60,7 +60,7 @@ const society = await (async () => {
     subtitle="Revisa los comprobantes de gastos relacionados con esta solicitud y valida su estado para finalizar el proceso"
   />
   <main>
-    <ReceiptsList
+    <ReviewReceiptsList
       client:only="react"
       expenses={enrichedExpenses}
       token={getCookie("token", Astro.cookies) || ""}

@@ -39,9 +39,11 @@ const societyName = await getSocietyName(Astro);
     title="Mis Solicitudes"
     subtitle={societyName}
   />
-  <Requests
-    client:only="react"
-    data={requests}
-    role={role}
-  />
+  <main>
+    <Requests
+      client:only="react"
+      data={requests}
+      role={role}
+    />
+  </main>
 </MainLayout>
