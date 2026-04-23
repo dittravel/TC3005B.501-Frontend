@@ -171,9 +171,82 @@ const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
             </div>
           ))
         }
+      </div>
     </div>
-  </div>
-  {/* Notes Section */}
+    {/* Reservation Files Section */}
+    { role !== "Agencia de viajes" &&
+      request.routes.some(
+        (route: any) => route.flight_pdf_file_id || route.hotel_pdf_file_id,
+      ) && (
+        <div class="card">
+          <div class="card-title">
+            <h2 class="text-xl font-bold text-text-primary">
+              Documentos de Reservación
+            </h2>
+          </div>
+          <div class="space-y-4">
+            {request.routes.map(
+              (route: any, index: number) =>
+                (route.flight_pdf_file_id || route.hotel_pdf_file_id) && (
+                  <div class="space-y-2">
+                    <p class="text-sm font-semibold text-text-primary">
+                      Ruta #{index + 1}
+                    </p>
+                    {route.flight_pdf_file_id && (
+                      <div class="flex w-full bg-card-hover p-2 border border-border rounded-md gap-4 items-center justify-between">
+                        <div class="flex flex-col items-start justify-center gap-1">
+                          <p class="text-md font-semibold text-text-primary">
+                            Vuelo PDF
+                          </p>
+                          <p class="text-xs text-text-primary">
+                            {route.flight_pdf_file_name}
+                          </p>
+                        </div>
+                        <a
+                          href={`${import.meta.env.PUBLIC_API_BASE_URL}/files/receipt-file/${route.flight_pdf_file_id}`}
+                        >
+                          <Button
+                            color="secondary"
+                            variant="border"
+                            size="small"
+                          >
+                            Descargar
+                          </Button>
+                        </a>
+                      </div>
+                    )}
+                    {route.hotel_pdf_file_id && (
+                      <div class="flex w-full bg-card-hover p-2 border border-border rounded-md gap-4 items-center justify-between">
+                        <div class="flex flex-col items-start justify-center gap-1">
+                          <p class="text-md font-semibold text-text-primary">
+                            Hotel PDF
+                          </p>
+                          <p class="text-xs text-text-primary">
+                            {route.hotel_pdf_file_name}
+                          </p>
+                        </div>
+                        <a
+                          href={`${import.meta.env.PUBLIC_API_BASE_URL}/files/receipt-file/${route.hotel_pdf_file_id}`}
+                        >
+                          <Button
+                            color="secondary"
+                            variant="border"
+                            size="small"
+                          >
+                            Descargar
+                          </Button>
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                ),
+            )}
+          </div>
+        </div>
+      )
+    }
+
+    {/* Notes Section */}
     {
       request.notes && (
         <div class="card mt-6">
@@ -186,4 +259,5 @@ const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
         </div>
       )
     }
+  </div>
 </main>
