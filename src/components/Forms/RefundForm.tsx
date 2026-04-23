@@ -62,7 +62,7 @@ export default function RefundForm({ role, refunds, wallet, currency }: Props) {
         </div>
         <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
           <p className="text-text-primary">
-            {wallet >= 0 ? 'La empresa le debe' : 'Usted le debe a la empresa'}
+            {wallet >= 0 ? 'La empresa te debe' : 'Le debes a la empresa'}
           </p>
           <Tag
             text={`$ ${wallet.toFixed(2)}${currency ? ` ${currency}` : ''}`}
