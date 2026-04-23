@@ -1,27 +1,27 @@
 /**
  * TravelRequestForm Component
- * 
+ *
  * Comprehensive travel request form that supports creating, editing, and saving draft requests.
  * Manages multiple routes with detailed validation for dates, times, and required fields.
  * Includes automatic save to draft functionality and role-based navigation.
  */
 
-import { useState, useEffect } from 'react';
-import { apiRequest } from '@utils/apiClient';
-import type { TravelRoute } from '@/types/TravelRoute';
-import type { FormData } from '@/types/FormData';
-import RouteInputGroup from '@/components/Forms/RouteInputGroup';
-import Input from '@/components/Utils/Input';
-import Select from '@/components/Utils/Select';
-import Textarea from '@/components/Utils/Textarea';
-import Reminder from '@/components/Utils/Reminder';
-import Toast from '@/components/Utils/Toast';
-import Button from '@/components/Buttons/Button';
-import Checkbox from '@/components/Utils/Checkbox';
+import { useState, useEffect } from "react";
+import { apiRequest } from "@utils/apiClient";
+import type { TravelRoute } from "@/types/TravelRoute";
+import type { FormData } from "@/types/FormData";
+import RouteInputGroup from "@/components/Forms/RouteInputGroup";
+import Input from "@/components/Utils/Input";
+import Select from "@/components/Utils/Select";
+import Textarea from "@/components/Utils/Textarea";
+import Reminder from "@/components/Utils/Reminder";
+import Toast from "@/components/Utils/Toast";
+import Button from "@/components/Buttons/Button";
+import Checkbox from "@/components/Utils/Checkbox";
 
 interface Props {
   data?: FormData;
-  mode: 'create' | 'edit' | 'draft';
+  mode: "create" | "edit" | "draft";
   request_id?: string;
   user_id: string;
   role?: string;
@@ -31,54 +31,67 @@ interface Props {
 
 const emptyRoute: TravelRoute = {
   router_index: 0,
-  origin_country_name: '',
-  origin_city_name: '',
-  destination_country_name: '',
-  destination_city_name: '',
-  beginning_date: '',
-  beginning_time: '',
-  ending_date: '',
-  ending_time: '',
+  origin_country_name: "",
+  origin_city_name: "",
+  destination_country_name: "",
+  destination_city_name: "",
+  beginning_date: "",
+  beginning_time: "",
+  ending_date: "",
+  ending_time: "",
   plane_needed: false,
   hotel_needed: false,
   selected_flight: null,
-  selected_hotel: null
+  selected_hotel: null,
 };
 
 const initialFormState: FormData = {
   ...emptyRoute,
-  notes: '',
-  requested_fee: '',
+  notes: "",
+  requested_fee: "",
   imposed_fee: 0,
-  currency: 'MXN',
+  currency: "MXN",
   requires_advance: false,
   routes: [{ ...emptyRoute, router_index: 0 }],
 };
 
-export default function TravelRequestForm({ data, mode, request_id, user_id, role, token, currencies = [] }: Props) {
+export default function TravelRequestForm({
+  data,
+  mode,
+  request_id,
+  user_id,
+  role,
+  token,
+  currencies = [],
+}: Props) {
   const [formData, setFormData] = useState<FormData>(initialFormState);
   const [error, setError] = useState<string | null>(null);
   const [disabledButton, setDisabledButton] = useState<boolean>(false);
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
 
   useEffect(() => {
     if (data) {
       const transformedRoutes = data.routes.map((route: any) => ({
         ...route,
-        origin_country_name: route.origin_country || '',
-        origin_city_name: route.origin_city || '',
-        destination_country_name: route.destination_country || '',
-        destination_city_name: route.destination_city || '',
+        origin_country_name: route.origin_country || "",
+        origin_city_name: route.origin_city || "",
+        destination_country_name: route.destination_country || "",
+        destination_city_name: route.destination_city || "",
       }));
       const newData = {
         ...data,
-        requires_advance: data.requested_fee !== null && data.requested_fee !== undefined && Number(data.requested_fee) > 0,
+        requires_advance:
+          data.requested_fee !== null &&
+          data.requested_fee !== undefined &&
+          Number(data.requested_fee) > 0,
         routes: transformedRoutes,
       };
       setFormData(newData);
     }
   }, [data]);
-
 
   /**
    * Handles updates to individual route fields.
@@ -94,7 +107,7 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
         if (i === index) {
           return {
             ...route,
-            [name]: value
+            [name]: value,
           };
         }
         return route;
@@ -108,27 +121,31 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
    * @param {React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>} e - The change event
    * @returns {void}
    */
-const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-  setError(null);
-  const { name, value, type } = e.target;
-  const checked = (e.target as HTMLInputElement).checked;
+  const handleGeneralChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
+    setError(null);
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
 
-  setFormData((prev) => {
-    if (name === 'requires_advance' && !checked) {
+    setFormData((prev) => {
+      if (name === "requires_advance" && !checked) {
+        return {
+          ...prev,
+          requires_advance: false,
+          requested_fee: "",
+          notes: "",
+        };
+      }
+
       return {
         ...prev,
-        requires_advance: false,
-        requested_fee: '',
-        notes: ''
+        [name]: type === "checkbox" ? checked : value,
       };
-    }
-
-    return {
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    };
-  });
-};
+    });
+  };
 
   /**
    * Adds a new empty route to the form.
@@ -137,7 +154,10 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
   const addRoute = () => {
     setFormData((prev) => ({
       ...prev,
-      routes: [...prev.routes, { ...emptyRoute, router_index: prev.routes.length }]
+      routes: [
+        ...prev.routes,
+        { ...emptyRoute, router_index: prev.routes.length },
+      ],
     }));
   };
 
@@ -169,7 +189,7 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
   const validateRoutes = (): string | null => {
     const today = new Date();
     // Set today to the start of the day (00:00:00) for accurate date-only comparison
-    today.setHours(0, 0, 0, 0); 
+    today.setHours(0, 0, 0, 0);
 
     for (const [idx, route] of formData.routes.entries()) {
       // Validate that date strings are not empty before creating Date objects
@@ -187,18 +207,26 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
 
       // 1. Check if beginning_date is in the past
       // Compare normalized dates to ignore time component
-      const beginningDateOnly = new Date(beginning_date.getFullYear(), beginning_date.getMonth(), beginning_date.getDate());
+      const beginningDateOnly = new Date(
+        beginning_date.getFullYear(),
+        beginning_date.getMonth(),
+        beginning_date.getDate(),
+      );
       if (beginningDateOnly < today) {
         return `Ruta #${idx + 1}: La fecha de inicio (${route.beginning_date}) no puede ser una fecha pasada.`;
       }
 
       // 2. Check if ending_date is before beginning_date
       // Compare normalized dates for initial check
-      const endingDateOnly = new Date(ending_date.getFullYear(), ending_date.getMonth(), ending_date.getDate());
+      const endingDateOnly = new Date(
+        ending_date.getFullYear(),
+        ending_date.getMonth(),
+        ending_date.getDate(),
+      );
       if (endingDateOnly < beginningDateOnly) {
         return `Ruta #${idx + 1}: La fecha de fin (${route.ending_date}) debe ser igual o posterior a la fecha de inicio (${route.beginning_date}).`;
       }
-      
+
       // 3. If dates are the same, check times
       if (endingDateOnly.getTime() === beginningDateOnly.getTime()) {
         if (!route.beginning_time || !route.ending_time) {
@@ -206,13 +234,14 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
         }
 
         // Parse hours and minutes
-        const [bh, bm] = route.beginning_time.split(':').map(Number);
-        const [eh, em] = route.ending_time.split(':').map(Number);
-        
+        const [bh, bm] = route.beginning_time.split(":").map(Number);
+        const [eh, em] = route.ending_time.split(":").map(Number);
+
         const beginningMinutes = bh * 60 + bm;
         const endingMinutes = eh * 60 + em;
 
-        if (endingMinutes <= beginningMinutes) { // Use <= to enforce "posterior" (strictly after)
+        if (endingMinutes <= beginningMinutes) {
+          // Use <= to enforce "posterior" (strictly after)
           return `Ruta #${idx + 1}: La hora de fin (${route.ending_time}) debe ser posterior a la hora de inicio (${route.beginning_time}) cuando las fechas son las mismas.`;
         }
       }
@@ -228,7 +257,11 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
    * @param {number} duration - How long to display the toast (default: 2000ms)
    * @returns {void}
    */
-  const handleSetToast = (message: string, type: 'success' | 'error', duration: number = 2000) => {
+  const handleSetToast = (
+    message: string,
+    type: "success" | "error",
+    duration: number = 2000,
+  ) => {
     setDisabledButton(true);
     setToast({ message, type });
     setTimeout(() => {
@@ -243,11 +276,12 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
    * @returns {string} 'Internacional' or 'Nacional'
    */
   const determineTravelType = (): string => {
-    const isInternational = formData.routes.some(route =>
-      route.destination_country_name &&
-      route.destination_country_name.toLowerCase() !== 'méxico'
+    const isInternational = formData.routes.some(
+      (route) =>
+        route.destination_country_name &&
+        route.destination_country_name.toLowerCase() !== "méxico",
     );
-    return isInternational ? 'Internacional' : 'Nacional';
+    return isInternational ? "Internacional" : "Nacional";
   };
 
   /**
@@ -284,7 +318,10 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
     const routeError = validateRoutes();
     if (routeError) {
       setError(routeError);
-      handleSetToast('Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.', 'error');
+      handleSetToast(
+        "Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.",
+        "error",
+      );
       return;
     }
 
@@ -298,11 +335,16 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
       !firstRoute.beginning_time ||
       !firstRoute.ending_date ||
       !firstRoute.ending_time ||
-      formData.requires_advance && !formData.requested_fee ||
-      formData.requires_advance && !formData.notes
+      (formData.requires_advance && !formData.requested_fee) ||
+      (formData.requires_advance && !formData.notes)
     ) {
-      setError('Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.');
-      handleSetToast('Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.', 'error');
+      setError(
+        "Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.",
+      );
+      handleSetToast(
+        "Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.",
+        "error",
+      );
       return;
     }
 
@@ -317,6 +359,7 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
       requested_fee: parseFloat(formData.requested_fee as string) || 0,
       imposed_fee: 0,
       currency: formData.currency,
+      exch_rate: 0, // valor a obtener de algún lado
       requires_advance: formData.requires_advance,
       travel_type: travelType,
       origin_country_name: firstRoute.origin_country_name,
@@ -331,28 +374,34 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
       hotel_needed: firstRoute.hotel_needed,
       additionalRoutes: formData.routes.slice(1).map((route, idx) => ({
         ...route,
-        router_index: idx + 1
+        router_index: idx + 1,
       })),
     };
     try {
       await apiRequest(`/applicant/create-travel-request/${user_id}`, {
-        method: 'POST',
+        method: "POST",
         data: dataToSend,
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      setToast({ message: 'Solicitud creada y enviada exitosamente.', type: 'success' });
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      setToast({
+        message: "Solicitud creada y enviada exitosamente.",
+        type: "success",
+      });
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       if (role === "Solicitante") {
-        window.location.href = '/dashboard';
+        window.location.href = "/dashboard";
       } else {
-        window.location.href = '/solicitudes-autorizador';
+        window.location.href = "/solicitudes-autorizador";
       }
     } catch (error) {
-      console.error('Error al enviar la solicitud:', error);
-      setError('Hubo un error al enviar la solicitud.');
-      setToast({ message: 'Hubo un error al enviar la solicitud.', type: 'error' });
+      console.error("Error al enviar la solicitud:", error);
+      setError("Hubo un error al enviar la solicitud.");
+      setToast({
+        message: "Hubo un error al enviar la solicitud.",
+        type: "error",
+      });
     }
   };
 
@@ -367,45 +416,62 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
 
     const routeError = validateRoutes();
     if (routeError) {
-      handleSetToast(routeError + " Los campos válidos se guardarán en el borrador.", 'error', 4000);
+      handleSetToast(
+        routeError + " Los campos válidos se guardarán en el borrador.",
+        "error",
+        4000,
+      );
     }
 
     const firstRoute = formData.routes[0] || {};
     const draftData: Record<string, any> = {};
 
-    if (firstRoute.router_index !== undefined) draftData.router_index = firstRoute.router_index;
+    if (firstRoute.router_index !== undefined)
+      draftData.router_index = firstRoute.router_index;
     if (formData.notes) draftData.notes = formData.notes;
-    if (formData.requested_fee) draftData.requested_fee = parseFloat(formData.requested_fee as string) || 0;
+    if (formData.requested_fee)
+      draftData.requested_fee =
+        parseFloat(formData.requested_fee as string) || 0;
     if (formData.currency) draftData.currency = formData.currency;
     draftData.imposed_fee = 0; // Always send imposed_fee as 0
 
-    if (firstRoute.origin_country_name) draftData.origin_country_name = firstRoute.origin_country_name;
-    if (firstRoute.origin_city_name) draftData.origin_city_name = firstRoute.origin_city_name;
-    if (firstRoute.destination_country_name) draftData.destination_country_name = firstRoute.destination_country_name;
-    if (firstRoute.destination_city_name) draftData.destination_city_name = firstRoute.destination_city_name;
-    if (firstRoute.beginning_date) draftData.beginning_date = firstRoute.beginning_date;
-    if (firstRoute.beginning_time) draftData.beginning_time = firstRoute.beginning_time;
+    if (firstRoute.origin_country_name)
+      draftData.origin_country_name = firstRoute.origin_country_name;
+    if (firstRoute.origin_city_name)
+      draftData.origin_city_name = firstRoute.origin_city_name;
+    if (firstRoute.destination_country_name)
+      draftData.destination_country_name = firstRoute.destination_country_name;
+    if (firstRoute.destination_city_name)
+      draftData.destination_city_name = firstRoute.destination_city_name;
+    if (firstRoute.beginning_date)
+      draftData.beginning_date = firstRoute.beginning_date;
+    if (firstRoute.beginning_time)
+      draftData.beginning_time = firstRoute.beginning_time;
     if (firstRoute.ending_date) draftData.ending_date = firstRoute.ending_date;
     if (firstRoute.ending_time) draftData.ending_time = firstRoute.ending_time;
-    if (firstRoute.plane_needed) draftData.plane_needed = firstRoute.plane_needed;
-    if (firstRoute.hotel_needed) draftData.hotel_needed = firstRoute.hotel_needed;
+    if (firstRoute.plane_needed)
+      draftData.plane_needed = firstRoute.plane_needed;
+    if (firstRoute.hotel_needed)
+      draftData.hotel_needed = firstRoute.hotel_needed;
 
-    const additionalRoutes = formData.routes.slice(1)
+    const additionalRoutes = formData.routes
+      .slice(1)
       .map((route, idx) => ({
         ...route,
-        router_index: idx + 1
+        router_index: idx + 1,
       }))
-      .filter(route =>
-        route.origin_country_name ||
-        route.origin_city_name ||
-        route.destination_country_name ||
-        route.destination_city_name ||
-        route.beginning_date ||
-        route.beginning_time ||
-        route.ending_date ||
-        route.ending_time ||
-        route.plane_needed ||
-        route.hotel_needed
+      .filter(
+        (route) =>
+          route.origin_country_name ||
+          route.origin_city_name ||
+          route.destination_country_name ||
+          route.destination_city_name ||
+          route.beginning_date ||
+          route.beginning_time ||
+          route.ending_date ||
+          route.ending_time ||
+          route.plane_needed ||
+          route.hotel_needed,
       );
 
     if (additionalRoutes.length > 0) {
@@ -416,19 +482,22 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
 
     try {
       await apiRequest(`/applicant/create-draft-travel-request/${user_id}`, {
-        method: 'POST',
+        method: "POST",
         data: draftData,
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      handleSetToast('Borrador guardado exitosamente.', 'success');
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      window.location.href = '/solicitudes-draft';
+      handleSetToast("Borrador guardado exitosamente.", "success");
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      window.location.href = "/solicitudes-draft";
     } catch (err) {
       // TODO: Implement proper error handling to extract specific error messages from API
-      setError('Hubo un error al guardar el borrador.');
-      handleSetToast('Hubo un error al guardar el borrador. Por favor, inténtalo de nuevo.', 'error');
+      setError("Hubo un error al guardar el borrador.");
+      handleSetToast(
+        "Hubo un error al guardar el borrador. Por favor, inténtalo de nuevo.",
+        "error",
+      );
     }
   };
 
@@ -443,7 +512,7 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
   const handleEditRequest = async (
     e: React.FormEvent,
     completeForm: boolean,
-    href_route?: string
+    href_route?: string,
   ): Promise<boolean> => {
     e.preventDefault();
 
@@ -451,7 +520,10 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
       const routeError = validateRoutes();
       if (routeError) {
         setError(routeError);
-        handleSetToast("Hubo un error al editar la solicitud. Por favor, inténtalo de nuevo.", 'error');
+        handleSetToast(
+          "Hubo un error al editar la solicitud. Por favor, inténtalo de nuevo.",
+          "error",
+        );
         return false;
       }
 
@@ -467,17 +539,27 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
         firstRoute.ending_time,
         formData.requires_advance && formData.requested_fee,
         formData.requires_advance && formData.notes,
-      ].some(field => !field);
+      ].some((field) => !field);
 
       if (missingFields) {
-        setError('Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.');
-        handleSetToast('Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.', 'error');
+        setError(
+          "Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.",
+        );
+        handleSetToast(
+          "Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.",
+          "error",
+        );
         return false;
       }
     } else {
       const routeError = validateRoutes();
       if (routeError) {
-        handleSetToast(routeError + " Los cambios se guardarán, pero los campos de fecha/hora inválidos deberán corregirse para enviar la solicitud.", 'error', 5000);
+        handleSetToast(
+          routeError +
+            " Los cambios se guardarán, pero los campos de fecha/hora inválidos deberán corregirse para enviar la solicitud.",
+          "error",
+          5000,
+        );
       }
     }
 
@@ -487,24 +569,31 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
     const firstRoute = formData.routes[0];
 
     const includeIfExists = (key: string, value: any) => {
-      if (value !== undefined && value !== '' && value !== null) {
+      if (value !== undefined && value !== "" && value !== null) {
         editedData[key] = value;
       }
     };
 
-    includeIfExists('router_index', firstRoute.router_index);
-    editedData.notes = typeof formData.notes === 'string' ? formData.notes.trim() : '';
-    includeIfExists('requested_fee', parseFloat(formData.requested_fee as string));
-    includeIfExists('currency', formData.currency);
+    includeIfExists("router_index", firstRoute.router_index);
+    editedData.notes =
+      typeof formData.notes === "string" ? formData.notes.trim() : "";
+    includeIfExists(
+      "requested_fee",
+      parseFloat(formData.requested_fee as string),
+    );
+    includeIfExists("currency", formData.currency);
     editedData.imposed_fee = 0;
-    includeIfExists('origin_country_name', firstRoute.origin_country_name);
-    includeIfExists('origin_city_name', firstRoute.origin_city_name);
-    includeIfExists('destination_country_name', firstRoute.destination_country_name);
-    includeIfExists('destination_city_name', firstRoute.destination_city_name);
-    includeIfExists('beginning_date', firstRoute.beginning_date);
-    includeIfExists('beginning_time', firstRoute.beginning_time);
-    includeIfExists('ending_date', firstRoute.ending_date);
-    includeIfExists('ending_time', firstRoute.ending_time);
+    includeIfExists("origin_country_name", firstRoute.origin_country_name);
+    includeIfExists("origin_city_name", firstRoute.origin_city_name);
+    includeIfExists(
+      "destination_country_name",
+      firstRoute.destination_country_name,
+    );
+    includeIfExists("destination_city_name", firstRoute.destination_city_name);
+    includeIfExists("beginning_date", firstRoute.beginning_date);
+    includeIfExists("beginning_time", firstRoute.beginning_time);
+    includeIfExists("ending_date", firstRoute.ending_date);
+    includeIfExists("ending_time", firstRoute.ending_time);
     editedData.plane_needed = firstRoute.plane_needed;
     editedData.hotel_needed = firstRoute.hotel_needed;
 
@@ -514,17 +603,18 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
         ...route,
         router_index: idx + 1,
       }))
-      .filter(route =>
-        route.origin_country_name ||
-        route.origin_city_name ||
-        route.destination_country_name ||
-        route.destination_city_name ||
-        route.beginning_date ||
-        route.beginning_time ||
-        route.ending_date ||
-        route.ending_time ||
-        route.plane_needed ||
-        route.hotel_needed
+      .filter(
+        (route) =>
+          route.origin_country_name ||
+          route.origin_city_name ||
+          route.destination_country_name ||
+          route.destination_city_name ||
+          route.beginning_date ||
+          route.beginning_time ||
+          route.ending_date ||
+          route.ending_time ||
+          route.plane_needed ||
+          route.hotel_needed,
       );
 
     if (additionalRoutes.length > 0) {
@@ -535,22 +625,30 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
 
     try {
       await apiRequest(`/applicant/edit-travel-request/${request_id}`, {
-        method: 'PUT',
+        method: "PUT",
         data: editedData,
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
       if (href_route) {
-        setToast({ message: 'Cambios guardados exitosamente.', type: 'success' });
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        setToast({
+          message: "Cambios guardados exitosamente.",
+          type: "success",
+        });
+        await new Promise((resolve) => setTimeout(resolve, 2000));
         window.location.href = href_route;
       }
       return true;
     } catch (err) {
       // TODO: Implement proper error handling to extract specific error messages from API
-      setError('Hubo un error al editar la solicitud. Por favor, inténtalo de nuevo.');
-      handleSetToast('Hubo un error al editar la solicitud. Por favor, inténtalo de nuevo.', 'error');
+      setError(
+        "Hubo un error al editar la solicitud. Por favor, inténtalo de nuevo.",
+      );
+      handleSetToast(
+        "Hubo un error al editar la solicitud. Por favor, inténtalo de nuevo.",
+        "error",
+      );
       return false;
     }
   };
@@ -563,11 +661,14 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
    */
   const handleFinishDraft = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const routeError = validateRoutes();
     if (routeError) {
       setError(routeError);
-      handleSetToast("Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.", 'error');
+      handleSetToast(
+        "Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.",
+        "error",
+      );
       return;
     }
 
@@ -581,11 +682,16 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
       !firstRoute.beginning_time ||
       !firstRoute.ending_date ||
       !firstRoute.ending_time ||
-      formData.requires_advance && !formData.requested_fee ||
-      formData.requires_advance && !formData.notes
+      (formData.requires_advance && !formData.requested_fee) ||
+      (formData.requires_advance && !formData.notes)
     ) {
-      setError('Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.');
-      handleSetToast('Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.', 'error');
+      setError(
+        "Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.",
+      );
+      handleSetToast(
+        "Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.",
+        "error",
+      );
       return;
     }
 
@@ -593,19 +699,27 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
     if (!editSuccess) return;
 
     try {
-      await apiRequest(`/applicant/confirm-draft-travel-request/${user_id}/${request_id}`, {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      handleSetToast('Borrador completado exitosamente.', 'success');
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      window.location.href = '/solicitudes-draft';
+      await apiRequest(
+        `/applicant/confirm-draft-travel-request/${user_id}/${request_id}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      handleSetToast("Borrador completado exitosamente.", "success");
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      window.location.href = "/solicitudes-draft";
     } catch (err) {
       // TODO: Implement proper error handling to extract specific error messages from API
-      setError('Hubo un error al completar el borrador. Por favor, inténtalo de nuevo.');
-      handleSetToast('Hubo un error al completar el borrador. Por favor, inténtalo de nuevo.', 'error');
+      setError(
+        "Hubo un error al completar el borrador. Por favor, inténtalo de nuevo.",
+      );
+      handleSetToast(
+        "Hubo un error al completar el borrador. Por favor, inténtalo de nuevo.",
+        "error",
+      );
     }
   };
 
@@ -647,16 +761,12 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
 
         {/* Button to add more routes */}
         <div className="flex justify-end mt-4">
-          <Button
-            type="button"
-            onClick={addRoute}
-            color="secondary"
-          >
+          <Button type="button" onClick={addRoute} color="secondary">
             + Agregar Ruta
           </Button>
         </div>
       </div>
-      
+
       {/* General Trip Details */}
       <div className="card space-y-6">
         {/* Title */}
@@ -665,100 +775,109 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
             2. Detalles Generales del Viaje
           </h2>
         </div>
-      {/* Checkbox */}
-      <Checkbox
-        name="requires_advance"
-        label="¿Requiere Anticipo?"
-        checked={formData.requires_advance || false}
-        onChange={handleGeneralChange}
-      />
-      {/* Only show requested fee and notes if "requires_advance" is true */}
-      {formData.requires_advance && (
-        <div className="space-y-6">
-          <div className="w-full flex gap-6">
-            <div className="flex-1">
-              <Input
-                name="requested_fee"
-                label="Anticipo Esperado"
-                placeholder="Ej: 1500.00"
-                type="number"
-                value={formData.requested_fee === 0 ? '' : formData.requested_fee}
-                onChange={handleGeneralChange}
-              />
+        {/* Checkbox */}
+        <Checkbox
+          name="requires_advance"
+          label="¿Requiere Anticipo?"
+          checked={formData.requires_advance || false}
+          onChange={handleGeneralChange}
+        />
+        {/* Only show requested fee and notes if "requires_advance" is true */}
+        {formData.requires_advance && (
+          <div className="space-y-6">
+            <div className="w-full flex gap-6">
+              <div className="flex-1">
+                <Input
+                  name="requested_fee"
+                  label="Anticipo Esperado"
+                  placeholder="Ej: 1500.00"
+                  type="number"
+                  value={
+                    formData.requested_fee === 0 ? "" : formData.requested_fee
+                  }
+                  onChange={handleGeneralChange}
+                />
+              </div>
+              <div className="flex-1">
+                <Select
+                  name="currency"
+                  label="Moneda"
+                  value={formData.currency || ""}
+                  onChange={handleGeneralChange}
+                >
+                  <option value="">Selecciona una moneda</option>
+                  {currencies.length > 0 ? (
+                    currencies.map((curr: any) => (
+                      <option key={curr.currency} value={curr.currency}>
+                        {curr.currency} - {curr.name}
+                      </option>
+                    ))
+                  ) : (
+                    <>
+                      <option value="MXN">MXN - Peso Mexicano</option>
+                      <option value="USD">USD - Dólar Estadounidense</option>
+                      <option value="EUR">EUR - Euro</option>
+                    </>
+                  )}
+                </Select>
+              </div>
             </div>
-            <div className="flex-1">
-              <Select
-                name="currency"
-                label="Moneda"
-                value={formData.currency || ''}
-                onChange={handleGeneralChange}
-              >
-                <option value="">Selecciona una moneda</option>
-                {currencies.length > 0 ? (
-                  currencies.map((curr: any) => (
-                    <option key={curr.currency} value={curr.currency}>
-                      {curr.currency} - {curr.name}
-                    </option>
-                  ))
-                ) : (
-                  <>
-                    <option value="MXN">MXN - Peso Mexicano</option>
-                    <option value="USD">USD - Dólar Estadounidense</option>
-                    <option value="EUR">EUR - Euro</option>
-                  </>
-                )}
-              </Select>
-            </div>
+
+            <Textarea
+              name="notes"
+              label="Observaciones / Comentarios"
+              placeholder="Escribe tus observaciones aquí..."
+              value={formData.notes}
+              onChange={handleGeneralChange}
+              rows={4}
+            />
           </div>
-          
-          <Textarea
-            name="notes"
-            label="Observaciones / Comentarios"
-            placeholder="Escribe tus observaciones aquí..."
-            value={formData.notes}
-            onChange={handleGeneralChange}
-            rows={4}
-          />
-        </div>
-      )}
-     </div>
+        )}
+      </div>
 
       {/* Error and Info Messages */}
-      { error && (
-        <Reminder text={error} type="warning" />
+      {error && <Reminder text={error} type="warning" />}
+      {mode === "draft" && !error && (
+        <Reminder
+          text="Estás editando un borrador. Asegúrate de completar todos los campos antes de enviar."
+          type="alert"
+        />
       )}
-      {mode === 'draft' && !error && (
-        <Reminder text="Estás editando un borrador. Asegúrate de completar todos los campos antes de enviar." type="alert" />
+      {mode === "edit" && !error && (
+        <Reminder
+          text="Estás editando una solicitud existente. Asegúrate de revisar todos los campos antes de actualizar."
+          type="alert"
+        />
       )}
-      {mode === 'edit' && !error && (
-        <Reminder text="Estás editando una solicitud existente. Asegúrate de revisar todos los campos antes de actualizar." type="alert" />
-      )}
-      {mode === 'create' && !error && (
-        <Reminder text="Estás creando una nueva solicitud de viaje. Completa todos los campos requeridos." type="alert" />
+      {mode === "create" && !error && (
+        <Reminder
+          text="Estás creando una nueva solicitud de viaje. Completa todos los campos requeridos."
+          type="alert"
+        />
       )}
 
       <div className="flex flex-col sm:flex-row justify-end gap-3 w-full">
-        <Button 
-          type="button" 
-          onClick={handleResetForm} 
+        <Button
+          type="button"
+          onClick={handleResetForm}
           variant="filled"
           color="primary"
           disabled={disabledButton}
         >
           Limpiar Formulario
         </Button>
-        {mode == 'create' && (
-          <div className='flex flex-col md:flex-row gap-3'>
-            <Button 
-              type="button" 
+        {mode == "create" && (
+          <div className="flex flex-col md:flex-row gap-3">
+            <Button
+              type="button"
               onClick={handleSaveDraft}
               color="secondary"
               disabled={disabledButton}
             >
               Guardar Borrador
             </Button>
-            <Button 
-              type="button" 
+            <Button
+              type="button"
               onClick={handleSubmitRequest}
               color="success"
               disabled={disabledButton}
@@ -767,11 +886,15 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
             </Button>
           </div>
         )}
-        {mode == 'edit' && (
-          <Button 
+        {mode == "edit" && (
+          <Button
             type="button"
             onClick={async (e) => {
-              await handleEditRequest(e as unknown as React.FormEvent, true, '/dashboard');
+              await handleEditRequest(
+                e as unknown as React.FormEvent,
+                true,
+                "/dashboard",
+              );
             }}
             color="secondary"
             disabled={disabledButton}
@@ -779,20 +902,24 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
             Actualizar Solicitud
           </Button>
         )}
-        {mode == 'draft' && (
-          <div className='flex flex-col md:flex-row gap-3'>
-            <Button 
+        {mode == "draft" && (
+          <div className="flex flex-col md:flex-row gap-3">
+            <Button
               type="button"
               onClick={async (e) => {
-                await handleEditRequest(e as unknown as React.FormEvent, false, '/solicitudes-draft');
+                await handleEditRequest(
+                  e as unknown as React.FormEvent,
+                  false,
+                  "/solicitudes-draft",
+                );
               }}
               color="secondary"
               disabled={disabledButton}
             >
               Guardar Cambios
             </Button>
-            <Button 
-              type="button" 
+            <Button
+              type="button"
               onClick={handleFinishDraft}
               color="success"
               disabled={disabledButton}
