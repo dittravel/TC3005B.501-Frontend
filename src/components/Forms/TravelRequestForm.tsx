@@ -347,7 +347,7 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
       if (role === "Solicitante") {
         window.location.href = '/dashboard';
       } else {
-        window.location.href = '/solicitudes-autorizador';
+        window.location.href = '/solicitudes';
       }
     } catch (error) {
       console.error('Error al enviar la solicitud:', error);
