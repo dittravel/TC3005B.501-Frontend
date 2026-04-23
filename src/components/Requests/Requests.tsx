@@ -10,6 +10,7 @@ import type { UserRole } from '@type/roles';
 import Button from '@components/Buttons/Button';
 import Select from '@components/Utils/Select';
 import Card from '@components/Utils/Card';
+import LabeledValue from '@components/Utils/LabeledValue';
 import Pagination from '@components/Table/Pagination';
 import { getStatusTagType } from '@utils/statusMapper';
 
@@ -21,6 +22,7 @@ interface TravelRequest {
   imposed_fee: number;
   request_days: number;
   creation_date: string;
+  assigned_to_name?: string;
   routes: Array<{
     route_id: number;
     origin_country: string;
@@ -136,7 +138,6 @@ export default function Requests({ data }: RequestsProps) {
           onClick={() => window.location.href = '/crear-solicitud'}
           variant="filled"
           color="secondary"
-          size="medium"
         >
           Crear Solicitud
         </Button>
@@ -162,23 +163,23 @@ export default function Requests({ data }: RequestsProps) {
               }}
             >
               <div className="flex justify-between gap-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1">
-                  <div className="space-y-1">
-                    <p className="text-sm text-text-primary">
-                      <span className="font-semibold">Destino:</span> {request.routes?.[0]?.destination_city}, {request.routes?.[0]?.destination_country}
-                    </p>
-                    <p className="text-sm text-text-primary">
-                      <span className="font-semibold">Duración:</span> {request.request_days} días
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm text-text-primary">
-                      <span className="font-semibold">Fechas:</span> {request.routes?.[0]?.beginning_date ? new Date(request.routes[0].beginning_date).toLocaleDateString('es-MX') : '—'} - {request.routes?.[0]?.ending_date ? new Date(request.routes[0].ending_date).toLocaleDateString('es-MX') : '—'}
-                    </p>
-                    <p className="text-sm text-text-primary">
-                      <span className="font-semibold">Monto:</span> ${request.requested_fee}
-                    </p>
-                  </div>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 flex-1">
+                  <LabeledValue
+                    label="Destino"
+                    value={`${request.routes?.[0]?.destination_city}, ${request.routes?.[0]?.destination_country}`}
+                  />
+                  <LabeledValue
+                    label="Fechas"
+                    value={`${request.routes?.[0]?.beginning_date ? new Date(request.routes[0].beginning_date).toLocaleDateString('es-MX') : '—'} - ${request.routes?.[0]?.ending_date ? new Date(request.routes[0].ending_date).toLocaleDateString('es-MX') : '—'}`}
+                  />
+                  <LabeledValue
+                    label="Monto Solicitado"
+                    value={`$${request.requested_fee}`}
+                  />
+                  <LabeledValue
+                    label="Asignado a"
+                    value={request.assigned_to_name || 'Sin asignar'}
+                  />
                 </div>
                 
                 <div className="flex items-end">
@@ -192,7 +193,6 @@ export default function Requests({ data }: RequestsProps) {
                     }}
                     variant="filled"
                     color={request.request_status === 'Borrador' ? 'secondary' : 'primary'}
-                    size="small"
                   >
                     {request.request_status === 'Borrador' 
                       ? 'Editar Borrador' 
