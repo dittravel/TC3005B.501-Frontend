@@ -162,6 +162,7 @@ const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
                       client:load
                       route={route}
                       routeIndex={index}
+                      routeId={route.route_id}
                       token={getCookie("token", Astro.cookies) || ""}
                     />
                   </div>
@@ -171,8 +172,8 @@ const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
           ))
         }
     </div>
-
-    {/* Notes Section */}
+  </div>
+  {/* Notes Section */}
     {
       request.notes && (
         <div class="card mt-6">
@@ -185,5 +186,4 @@ const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
         </div>
       )
     }
-  </div>
 </main>
