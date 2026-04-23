@@ -111,15 +111,35 @@ const FlightSearchForm = ({ token, route, routeIndex, tripType, ticketType }: Fl
   }
 
   // Handles submitting the selected flight and saving its price to the database
-  const handleSubmitFlight = (flight: any) => {
+  const handleSubmitFlight = async () => {
     if (!selectedFlight) {
       alert('Por favor selecciona un vuelo antes de continuar.');
       return;
     }
-    // Guardar precio del vuelo seleccionado en la base de datos
-    console.log("Precio vuelo:", selectedFlight.price);
 
-    alert(`Has seleccionado el vuelo de ${selectedFlight.owner} por ${selectedFlight.price} ${selectedFlight.currency}.`);
+    if (!route.route_id) {
+      alert('No se encontró la ruta para guardar la tarifa del vuelo.');
+      return;
+    }
+
+    const parsedFlightFee = Number(selectedFlight.price);
+    if (!Number.isFinite(parsedFlightFee) || parsedFlightFee < 0) {
+      alert('El precio del vuelo seleccionado no es válido.');
+      return;
+    }
+
+    try {
+      await apiRequest(`/travel-agent/route-fees/${route.route_id}`, {
+        method: 'PUT',
+        data: { flight_fee: parsedFlightFee },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      alert(`Has seleccionado el vuelo de ${selectedFlight.owner} por ${selectedFlight.price} ${selectedFlight.currency}.`);
+    } catch (error) {
+      console.error('Error guardando flight_fee:', error);
+      alert('No se pudo guardar la tarifa del vuelo. Intenta de nuevo.');
+    }
   }
 
   return (

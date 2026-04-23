@@ -23,7 +23,7 @@ const HotelSearchForm = ({ token, route, routeIndex }: HotelSearchFormProps) => 
   const [shownHotels, setShownHotels] = useState(false);
   const [selectedHotel, setSelectedHotel] = useState<any>(null);
 
-  const [address, setAddress] = useState(route.destination_city_name || '');
+  const [address, setAddress] = useState(route.destination_city_name || route.destination_city || '');
   const [checkInDate, setCheckInDate] = useState(route.beginning_date || '');
   const [checkOutDate, setCheckOutDate] = useState(route.ending_date || '');
   const [guests, setGuests] = useState<number>(1);
@@ -69,13 +69,35 @@ const HotelSearchForm = ({ token, route, routeIndex }: HotelSearchFormProps) => 
     setSelectedHotel(hotel);
   };
 
-  const handleSubmitHotel = () => {
+  const handleSubmitHotel = async () => {
     if (!selectedHotel) {
       alert('Por favor selecciona un hotel antes de continuar.');
       return;
     }
-    console.log('Hotel seleccionado:', selectedHotel);
-    alert(`Has seleccionado ${selectedHotel.name} por $${selectedHotel.cost} por noche.`);
+
+    if (!route.route_id) {
+      alert('No se encontró la ruta para guardar la tarifa del hotel.');
+      return;
+    }
+
+    const parsedHotelFee = Number(selectedHotel.cost);
+    if (!Number.isFinite(parsedHotelFee) || parsedHotelFee < 0) {
+      alert('El precio del hotel seleccionado no es válido.');
+      return;
+    }
+
+    try {
+      await apiRequest(`/travel-agent/route-fees/${route.route_id}`, {
+        method: 'PUT',
+        data: { hotel_fee: parsedHotelFee },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      alert(`Has seleccionado ${selectedHotel.name} por ${selectedHotel.cost} ${selectedHotel.currency || ''} por noche.`);
+    } catch (error) {
+      console.error('Error guardando hotel_fee:', error);
+      alert('No se pudo guardar la tarifa del hotel. Intenta de nuevo.');
+    }
   };
 
   return (
