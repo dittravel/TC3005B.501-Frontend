@@ -18,9 +18,12 @@ interface Props {
   data: any[];
   token: string;
   itemsPerPage?: number;
+  canCreateRule?: boolean;
+  canEditRule?: boolean;
+  canDeleteRule?: boolean;
 }
 
-export default function AuthRulesList({ data, token, itemsPerPage = 5 }: Props) {
+export default function AuthRulesList({ data, token, itemsPerPage = 5, canCreateRule = false, canEditRule = false, canDeleteRule = false }: Props) {
   // Separate default and non-default rules
   const defaultRule = data.find(rule => rule.is_default);
   const rules = data.filter(rule => !rule.is_default);
@@ -44,13 +47,15 @@ export default function AuthRulesList({ data, token, itemsPerPage = 5 }: Props) 
         <h2 className="text-xl font-semibold text-text-primary">
           Reglas de Autorización ({rules.length})
         </h2>
-        <Button
-          variant="filled"
-          color="secondary"
-          href="/crear-regla"
-        >
-          Crear Regla
-        </Button>
+        {canCreateRule ? (
+          <Button
+            variant="filled"
+            color="secondary"
+            href="/crear-regla"
+          >
+            Crear Regla
+          </Button>
+        ) : null}
       </div>
       {rules.length > 0 ? (
         <div className="space-y-6">
@@ -94,22 +99,26 @@ export default function AuthRulesList({ data, token, itemsPerPage = 5 }: Props) 
                 {/* Actions */}
                 <div>
                   <div className="w-full flex flex-row gap-2">
-                    <Button
-                      variant="filled"
-                      color="primary"
-                      className="w-full"
-                      href={`/editar-regla/${rule.rule_id}`}
-                    >
-                      <span className="flex justify-center">
-                        Editar
-                      </span>
-                    </Button>
-                    <DeleteAuthRuleModal
-                      title="Eliminar Regla"
-                      message="¿Estás seguro de que deseas eliminar esta regla de autorización?"
-                      token={token}
-                      rule_id={rule.rule_id}
-                    />
+                    {canEditRule ? (
+                      <Button
+                        variant="filled"
+                        color="primary"
+                        className="w-full"
+                        href={`/editar-regla/${rule.rule_id}`}
+                      >
+                        <span className="flex justify-center">
+                          Editar
+                        </span>
+                      </Button>
+                    ) : null}
+                    {canDeleteRule ? (
+                      <DeleteAuthRuleModal
+                        title="Eliminar Regla"
+                        message="¿Estás seguro de que deseas eliminar esta regla de autorización?"
+                        token={token}
+                        rule_id={rule.rule_id}
+                      />
+                    ) : null}
                   </div>
                 </div>
               </div>

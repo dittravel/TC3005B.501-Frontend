@@ -36,11 +36,12 @@ interface RefundPolicyProps {
   data: any[];
   itemsPerPage?: number;
   token: string;
+  canEditPolicy?: boolean;
 }
 
 
 // Renders the default refund policy form and paginated list of existing policies.
-export default function RefundPolicyForm({ role, data, itemsPerPage = 5, token }: RefundPolicyProps) {
+export default function RefundPolicyForm({ role, data, itemsPerPage = 5, token, canEditPolicy = false }: RefundPolicyProps) {
   const [page, setPage] = useState(1);
   const totalPages = Math.ceil(data.length / itemsPerPage);
   const start = (page - 1) * itemsPerPage;
@@ -127,67 +128,71 @@ export default function RefundPolicyForm({ role, data, itemsPerPage = 5, token }
             Esta política se aplicará para cualquier solicitud de reembolso por defecto
           </p>
         </div>
+        {canEditPolicy ? (
+          <form onSubmit={handleRefundPolicySubmit} className="space-y-4">
+            <div className="flex flex-wrap items-center gap-3">
+              <label className="text-sm font-medium text-text-primary">
+                Monto entre
+              </label>
+              <Input
+                name="minAmount"
+                type="number"
+                required={true}
+                value={refundPolicyData.minAmount}
+                onChange={handleRefundPolicyChange}
+                min={0}
+              />
+              <label className="text-sm font-medium text-text-primary">
+                y
+              </label>
+              <Input
+                name="maxAmount"
+                type="number"
+                required={true}
+                value={refundPolicyData.maxAmount}
+                onChange={handleRefundPolicyChange}
+                min={Math.max(1, refundPolicyData.minAmount + 1)}
+              />
+              <span className="text-sm font-medium text-text-primary">MXN</span>
+            </div>
 
-        <form onSubmit={handleRefundPolicySubmit} className="space-y-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <label className="text-sm font-medium text-text-primary">
-              Monto entre
-            </label>
-            <Input
-              name="minAmount"
-              type="number"
-              required={true}
-              value={refundPolicyData.minAmount}
-              onChange={handleRefundPolicyChange}
-              min={0}
-              //max={refundPolicyData.maxAmount > 0 ? refundPolicyData.maxAmount - 1 : undefined}
+            <div className="flex flex-wrap items-center gap-3">
+              <label className="text-sm font-medium text-text-primary">
+                Tiempo máximo
+              </label>
+              <Input
+                name="maxDays"
+                type="number"
+                required={true}
+                value={refundPolicyData.maxDays}
+                onChange={handleRefundPolicyChange}
+                min={0}
+              />
+              <span className="text-sm font-medium text-text-primary">días</span>
+            </div>
+
+            <SelectGroup
+              name="validations"
+              label="Validaciones para Reembolso"
+              items={[
+                { id: 'bill', label: 'Validar contra Factura' },
+                { id: 'predefinedInput', label: 'Validar contra Insumo Predefinido' }
+              ]}
+              selectedValues={selectedValidations}
+              onChange={handleValidationChange}
             />
-            <label className="text-sm font-medium text-text-primary">
-              y
-            </label>
-            <Input
-              name="maxAmount"
-              type="number"
-              required={true}
-              value={refundPolicyData.maxAmount}
-              onChange={handleRefundPolicyChange}
-              min={Math.max(1, refundPolicyData.minAmount + 1)}
-            />
-            <span className="text-sm font-medium text-text-primary">MXN</span>
-          </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <label className="text-sm font-medium text-text-primary">
-              Tiempo máximo
-            </label>
-            <Input
-              name="maxDays"
-              type="number"
-              required={true}
-              value={refundPolicyData.maxDays}
-              onChange={handleRefundPolicyChange}
-              min={0}
-            />
-            <span className="text-sm font-medium text-text-primary">días</span>
+            <div className="flex justify-end">
+              <Button variant="filled" color="secondary">
+                Guardar Política de Reembolso
+              </Button>
+            </div>
+          </form>
+        ) : (
+          <div className="p-4 text-center text-text-secondary border border-border-primary rounded-lg">
+            No tienes permisos para editar políticas de reembolso
           </div>
-
-          <SelectGroup
-            name="validations"
-            label="Validaciones para Reembolso"
-            items={[
-              { id: 'bill', label: 'Validar contra Factura' },
-              { id: 'predefinedInput', label: 'Validar contra Insumo Predefinido' }
-            ]}
-            selectedValues={selectedValidations}
-            onChange={handleValidationChange}
-          />
-
-          <div className="flex justify-end">
-            <Button variant="filled" color="secondary">
-              Guardar Política de Reembolso
-            </Button>
-          </div>
-        </form>
+        )}
       </div>
 
       {/* Refund Policies Section */}
@@ -195,9 +200,11 @@ export default function RefundPolicyForm({ role, data, itemsPerPage = 5, token }
         <h2 className="text-xl font-semibold text-text-primary">
           Políticas de Reembolso ({data.length})
         </h2>
-        <Button variant="filled" color="secondary"  href="/edit-politica-rembolso">
-          + Crear Política
-        </Button>
+        {canEditPolicy ? (
+          <Button variant="filled" color="secondary" href="/edit-politica-rembolso">
+            + Crear Política
+          </Button>
+        ) : null}
       </div>
       {data.length > 0 ? (
         <div className="space-y-6">
