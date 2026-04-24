@@ -18,9 +18,12 @@ interface Props {
   data: any;
   token: string;
   role: string;
+  canCreate?: boolean;
+  canEdit?: boolean;
+  canDelete?: boolean;
 }
 
-export default function SocietyGroupsTable({ data, token, role }: Props) {
+export default function SocietyGroupsTable({ data, token, role, canCreate = false, canEdit = false, canDelete = false }: Props) {
   const columns = [
     { key: 'id', label: 'ID' },
     { key: 'description', label: 'Descripción' },
@@ -32,15 +35,17 @@ export default function SocietyGroupsTable({ data, token, role }: Props) {
     description: group.description,
     actions: (
       <div className="flex gap-2">
-        <Button
-          name="Editar"
-          color="primary"
-          href={`/grupos-sociedades/${group.id}`}
-          className="w-full"
-        >
-          Editar
-        </Button>
-        {!group.is_default && (
+        {canEdit ? (
+          <Button
+            name="Editar"
+            color="primary"
+            href={`/grupos-sociedades/${group.id}`}
+            className="w-full"
+          >
+            Editar
+          </Button>
+        ) : null}
+        {!group.is_default && canDelete ? (
           <UltimateWrapper
             user_id={group.id}
             endpoint="/society-groups"
@@ -56,7 +61,7 @@ export default function SocietyGroupsTable({ data, token, role }: Props) {
             token={token}
             method="DELETE"
           />
-        )}
+        ) : null}
       </div>
     )
   }));
@@ -67,15 +72,17 @@ export default function SocietyGroupsTable({ data, token, role }: Props) {
         <h2 className="text-2xl font-semibold">
           Grupos de sociedades {data.length > 0 && `(${data.length})`}
         </h2>
-        <Button
-          name="Crear Grupo"
-          color="secondary"
-          href="/grupos-sociedades/nuevo"
-        >
-          Crear Grupo
-        </Button>
+        {canCreate ? (
+          <Button
+            name="Crear Grupo"
+            color="secondary"
+            href="/grupos-sociedades/nuevo"
+          >
+            Crear Grupo
+          </Button>
+        ) : null}
       </div>
-      <DataTable columns={columns} rows={rows} role={role as any} />
+      <DataTable columns={columns} rows={rows} />
     </div>
   );
 }

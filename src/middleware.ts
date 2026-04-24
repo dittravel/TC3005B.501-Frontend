@@ -4,7 +4,7 @@
  */
 
 import type { MiddlewareHandler } from 'astro';
-import { roleRoutes, allWhitelistedRoutes } from '@config/routeAccess';
+import { roleRoutes, allWhitelistedRoutes, hasRoutePermission } from '@config/routeAccess';
 import { unauthorizedPage } from '@utils/unauthorizedPage';
 
 /**
@@ -111,15 +111,21 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     return Response.redirect(new URL('/login', request.url), 302);
   }
 
+  const permissionKeys = Array.isArray(tokenPayload.permissions)
+    ? tokenPayload.permissions.map((permission) => String(permission).trim()).filter(Boolean)
+    : [];
+
   // 3. Check if the route is registered in the system
   const isKnownRoute = matchPath(pathname, allWhitelistedRoutes);
   if (!isKnownRoute) {
     return new Response(html, { status: 404, headers: { 'Content-Type': 'text/html' } });
   }
 
-  // 4. Check if the role has access to the route
+  // 4. Check if the role and/or permission keys have access to the route
   const allowedRoutes = roleRoutes[role as keyof typeof roleRoutes] ?? [];
-  const isAuthorized = matchPath(pathname, allowedRoutes);
+  const authorizedByRole = matchPath(pathname, allowedRoutes);
+  const authorizedByPermission = hasRoutePermission(pathname, permissionKeys);
+  const isAuthorized = authorizedByRole || authorizedByPermission;
 
   if (!isAuthorized) {
     return new Response(html, { status: 404, headers: { 'Content-Type': 'text/html' } });

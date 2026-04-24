@@ -11,6 +11,7 @@
 import type { UserRole } from "@type/roles";
 import type { MenuItem } from "@type/menu-config";
 import { SIDEBAR_CONFIG } from "@type/menu-config";
+import { hasRoutePermission } from "@config/routeAccess";
 import SidebarButton from "@components/Buttons/SideBarButton.astro";
 
 interface Props {
@@ -20,7 +21,41 @@ interface Props {
 const { role } = Astro.props;
 const currentPath = Astro.url.pathname;
 
-const items = SIDEBAR_CONFIG[role] ?? [];
+function parseJwtPayload(token: string): Record<string, any> | null {
+  try {
+    const parts = token.split('.');
+    if (parts.length < 2) return null;
+
+    const base64 = parts[1].replaceAll('-', '+').replaceAll('_', '/');
+    const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '=');
+    const json = Buffer.from(padded, 'base64').toString('utf8');
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+}
+
+const token = Astro.cookies.get('token')?.value || '';
+const tokenPayload = token ? parseJwtPayload(token) : null;
+const permissionKeys = Array.isArray(tokenPayload?.permissions)
+  ? tokenPayload.permissions.map((permission: unknown) => String(permission).trim()).filter(Boolean)
+  : [];
+
+const permissionSet = new Set(permissionKeys);
+const items = SIDEBAR_CONFIG.filter((item) => {
+  const requiredAnyPermissions = item.requiredAnyPermissions || [];
+  const requiredAllPermissions = item.requiredAllPermissions || [];
+
+  const matchesAny = requiredAnyPermissions.length === 0
+    ? true
+    : requiredAnyPermissions.some((permission) => permissionSet.has(permission));
+
+  const matchesAll = requiredAllPermissions.length === 0
+    ? true
+    : requiredAllPermissions.every((permission) => permissionSet.has(permission));
+
+  return matchesAny && matchesAll && hasRoutePermission(item.route, permissionKeys);
+});
 
 // Group items by category dynamically
 const groupedItems = items.reduce((acc, item) => {

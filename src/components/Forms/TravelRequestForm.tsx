@@ -345,11 +345,7 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
       });
       setToast({ message: 'Solicitud creada y enviada exitosamente.', type: 'success' });
       await new Promise(resolve => setTimeout(resolve, 2000));
-      if (role === "Solicitante") {
-        window.location.href = '/dashboard';
-      } else {
-        window.location.href = '/solicitudes-autorizador';
-      }
+      window.location.href = '/dashboard';
     } catch (error) {
       console.error('Error al enviar la solicitud:', error);
       setError('Hubo un error al enviar la solicitud.');

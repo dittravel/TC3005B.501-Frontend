@@ -9,6 +9,8 @@ import Input from "@/components/Utils/Input";
 import Checkbox from "@/components/Utils/Checkbox";
 import Button from "@/components/Buttons/Button";
 import { apiRequest } from "@/utils/apiClient";
+import Toast from "@/components/Utils/Toast";
+import { permissionLabelToKey, permissionsByCategory } from "@/config/permissionCatalog";
 
 interface Props {
   token: string;
@@ -16,43 +18,16 @@ interface Props {
   data?: any;
 }
 
-const permissionsByCategory = [
-  {
-    category: "Usuarios",
-    permissions: ["Ver usuarios", "Crear usuarios", "Editar usuarios", "Eliminar usuarios"],
-  },
-  {
-    category: "Solicitudes de viaje",
-    permissions: [
-      "Ver solicitudes", "Crear solicitudes", "Editar solicitudes", "Eliminar solicitudes",
-      "Aprobar/Rechazar solicitudes", "Definir monto a autorizar",
-      "Ver opciones de vuelos", "Ver opciones de hoteles",
-      "Finalizar viaje", "Cancelar viaje", "Rechazar viaje",
-    ],
-  },
-  {
-    category: "Comprobantes",
-    permissions: [
-      "Ver comprobantes", "Crear comprobantes", "Editar comprobantes",
-      "Eliminar comprobantes", "Aprobar/Rechazar comprobantes",
-    ],
-  },
-  {
-    category: "Reembolsos",
-    permissions: [
-      "Solicitar reembolsos", "Asignar presupuesto impuesto", "Aprobar/Rechazar reembolso",
-    ],
-  },
-];
-
-export default function CreateRoleForm({ token, mode, data }: Props) {
+export default function CreateRoleForm({ token, mode, data }: Readonly<Props>) {
   const [nombre, setNombre] = useState("");
   const [selectedPermissions, setSelectedPermissions] = useState<Set<string>>(new Set());
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
-  function togglePermission(permission: string) {
+  function togglePermission(permissionKey: string) {
     setSelectedPermissions(prev => {
       const next = new Set(prev);
-      next.has(permission) ? next.delete(permission) : next.add(permission);
+      next.has(permissionKey) ? next.delete(permissionKey) : next.add(permissionKey);
       return next;
     });
   }
@@ -60,15 +35,36 @@ export default function CreateRoleForm({ token, mode, data }: Props) {
   useEffect(() => {
     if (mode === "edit" && data) {
       setNombre(data.name || "");
-      setSelectedPermissions(new Set(data.permissions || []));
+      if (Array.isArray(data.permission_keys) && data.permission_keys.length > 0) {
+        setSelectedPermissions(new Set(data.permission_keys));
+      } else if (Array.isArray(data.permissions)) {
+        const mappedPermissions = data.permissions
+          .map((permissionLabel: string) => permissionLabelToKey[permissionLabel] || permissionLabel)
+          .filter(Boolean);
+        setSelectedPermissions(new Set(mappedPermissions));
+      }
     }
   }, [mode, data]);
 
   async function handleSubmit() {
+    if (!nombre.trim()) {
+      setToast({ message: 'El nombre del rol es obligatorio', type: 'error' });
+      return;
+    }
+
+    if (selectedPermissions.size === 0) {
+      setToast({ message: 'Selecciona al menos un permiso para el rol', type: 'error' });
+      return;
+    }
+
+    setIsSubmitting(true);
+    setToast(null);
+
     const payload = {
       name: nombre,
       permissions: Array.from(selectedPermissions),
     };
+
     try {
       const response = await apiRequest(
         mode === "create" ? "/admin/create-role" : `/admin/update-role/${data.role_id}`,
@@ -82,20 +78,31 @@ export default function CreateRoleForm({ token, mode, data }: Props) {
       );
 
       if (response.success) {
-        alert(`Rol ${mode === "create" ? "creado" : "actualizado"} exitosamente`);
-        window.location.href = "/roles";
+        setToast({ message: `Rol ${mode === "create" ? "creado" : "actualizado"} exitosamente`, type: 'success' });
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        globalThis.location.href = "/roles";
       } else {
-        alert(`Error al ${mode === "create" ? "crear" : "actualizar"} el rol`);
+        setToast({ message: `Error al ${mode === "create" ? "crear" : "actualizar"} el rol`, type: 'error' });
       }
     } catch (error) {
       console.error(`Error ${mode === "create" ? "creating" : "updating"} role:`, error);
-      alert(`Error al ${mode === "create" ? "crear" : "actualizar"} el rol`);
+      setToast({ message: `Error al ${mode === "create" ? "crear" : "actualizar"} el rol`, type: 'error' });
+    } finally {
+      setIsSubmitting(false);
     }
-    console.log("Crear rol:", payload);
+  }
+
+  let submitLabel = "Actualizar rol";
+  if (isSubmitting) {
+    submitLabel = mode === "create" ? "Guardando..." : "Actualizando...";
+  } else if (mode === "create") {
+    submitLabel = "Guardar rol";
   }
 
   return (
     <div className="space-y-6 mt-6">
+      {toast && <Toast message={toast.message} type={toast.type} />}
+
       {/* Role name */}
       <div className="card">
         <div className="card-title">
@@ -128,12 +135,12 @@ export default function CreateRoleForm({ token, mode, data }: Props) {
               <div className="flex flex-col gap-1">
                 {permissions.map((permission) => (
                   <Checkbox
-                    key={permission}
-                    label={permission}
-                    name={permission}
-                    value={permission}
-                    checked={selectedPermissions.has(permission)}
-                    onChange={() => togglePermission(permission)}
+                    key={permission.key}
+                    label={permission.label}
+                    name={permission.key}
+                    value={permission.key}
+                    checked={selectedPermissions.has(permission.key)}
+                    onChange={() => togglePermission(permission.key)}
                   />
                 ))}
               </div>
@@ -148,7 +155,7 @@ export default function CreateRoleForm({ token, mode, data }: Props) {
           Cancelar
         </Button>
         <Button variant="filled" color="secondary" onClick={handleSubmit}>
-          {mode === "create" ? "Guardar rol" : "Actualizar rol"}
+          {submitLabel}
         </Button>
       </div>
     </div>

@@ -212,7 +212,7 @@ export default function BitacoraTable({ initialData, initialMeta, role }: Props)
           Cargando registros...
         </div>
       ) : (
-        <DataTable columns={COLUMNS} rows={rows} role={role as any} type="" />
+        <DataTable columns={COLUMNS} rows={rows} />
       )}
 
       {/* Paginación */}

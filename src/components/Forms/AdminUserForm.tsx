@@ -34,11 +34,12 @@ interface CreateUserFormProps {
   departments?: any[];
   roles?: any[];
   societies?: any[];
-  token: string; 
+  token: string;
+  defaultRoleId?: number | null;
 }
 
-const initialFormData: FormData = {
-  role_id: '',
+const getInitialFormData = (defaultRoleId?: number | null): FormData => ({
+  role_id: defaultRoleId ?? '',
   department_id: '',
   society_id: '',
   user_name: '',
@@ -47,7 +48,7 @@ const initialFormData: FormData = {
   email: '',
   phone_number: '',
   boss_id: ''
-};
+});
 
 /**
  * CreateUserForm component allows administrators to create or edit users in the system.
@@ -56,7 +57,7 @@ const initialFormData: FormData = {
  * @param {string} props.redirectTo - URL to redirect after successful form submission.
  * @param {string} props.token - Authorization token for API requests.
  */
-export default function CreateUserForm({ mode, user_data, redirectTo, token, departments = [], roles = [], societies = [] }: CreateUserFormProps) {
+export default function CreateUserForm({ mode, user_data, redirectTo, token, departments = [], roles = [], societies = [], defaultRoleId = null }: Readonly<CreateUserFormProps>) {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -85,8 +86,16 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token, dep
   // Initialize form data based on mode and user data
   const [formData, setFormData] = useState<FormData>(() => {
     if (mode === 'edit' && user_data) {
+      // In edit mode, use role_id directly if available, otherwise try to find by role_name
+      let roleId: number | '' = '';
+      if (user_data.role_id) {
+        roleId = user_data.role_id;
+      } else if (user_data.role_name) {
+        roleId = roles.find(r => r.role_name === user_data.role_name)?.role_id ?? '';
+      }
+      
       return {
-        role_id: roles.find(r => r.role_name === user_data.role_name)?.role_id ?? '',
+        role_id: roleId,
         department_id: departments.find(d => d.department_name === user_data.department_name)?.department_id ?? '',
         society_id: user_data.society_id ?? '',
         user_name: user_data.user_name,
@@ -97,8 +106,16 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token, dep
         boss_id: user_data.boss_id ?? ''
       };
     }
-    return initialFormData;
+    return getInitialFormData(defaultRoleId);
   });
+
+  // Keep create form aligned with current default role if the role is still empty.
+  useEffect(() => {
+    if (mode !== 'create') return;
+    if (formData.role_id !== '' && formData.role_id !== null && formData.role_id !== undefined) return;
+    if (!defaultRoleId) return;
+    setFormData((prev) => ({ ...prev, role_id: defaultRoleId }));
+  }, [mode, defaultRoleId, formData.role_id]);
   
   // Fetch boss list when department changes
   useEffect(() => {
@@ -159,12 +176,21 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token, dep
    */
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: ['role_id', 'department_id', 'society_id', 'boss_id'].includes(name)
+    setFormData(prev => {
+      const nextValue = ['role_id', 'department_id', 'society_id', 'boss_id'].includes(name)
         ? (value === '' ? '' : parseInt(value))
-        : value
-    }));
+        : value;
+
+      // If department changes, clear boss selection to force a valid boss from the new department.
+      if (name === 'department_id') {
+        return { ...prev, department_id: nextValue as number | '', boss_id: '' };
+      }
+
+      return {
+        ...prev,
+        [name]: nextValue
+      };
+    });
 
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
@@ -207,7 +233,7 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token, dep
 
       setToast({ message: `Usuario ${mode === 'edit' ? 'actualizado' : 'creado'} exitosamente`, type: 'success' });
       if (mode === 'create') {
-        setFormData(initialFormData);
+        setFormData(getInitialFormData(defaultRoleId));
       }
       await new Promise(resolve => setTimeout(resolve, 2000));
       if (redirectTo) {
@@ -215,21 +241,24 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token, dep
       }
 
     } catch (error: any) {
-      // Handle backend validation errors
-      if (error.message.includes('errors')) {
-        try {
-          const errorData = JSON.parse(error.message.split(': ')[1]);
-          if (errorData.errors) {
-            const backendErrors: FormErrors = {};
-            errorData.errors.forEach((err: any) => {
-              backendErrors[err.param] = err.msg;
-            });
-            setErrors(backendErrors);
-            setToast({ message: 'Por favor corrige los errores marcados', type: 'error' });
+      // Handle backend validation errors from ApiError response payload.
+      const responseErrors = error?.response?.errors;
+      const responseMessage = error?.response?.error || error?.response?.message;
+
+      if (Array.isArray(responseErrors) && responseErrors.length > 0) {
+        const backendErrors: FormErrors = {};
+        responseErrors.forEach((err: any) => {
+          const field = err?.path || err?.param;
+          if (field) {
+            backendErrors[field] = err?.msg || 'Campo inválido';
           }
-        } catch {
-          setToast({ message: 'Error al procesar la respuesta del servidor', type: 'error' });
-        }
+        });
+        setErrors(backendErrors);
+        setToast({ message: 'Por favor corrige los errores marcados', type: 'error' });
+      } else if (typeof responseMessage === 'string' && responseMessage.trim().length > 0) {
+        setToast({ message: responseMessage, type: 'error' });
+      } else if (typeof error?.message === 'string' && error.message.trim().length > 0) {
+        setToast({ message: error.message, type: 'error' });
       } else {
         setToast({ message: 'Error al procesar la solicitud', type: 'error' });
       }
@@ -247,7 +276,7 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token, dep
         window.location.href = redirectTo;
       }
     } else {
-      setFormData(initialFormData);
+      setFormData(getInitialFormData(defaultRoleId));
       setErrors({});
       setToast(null);
     }
@@ -317,37 +346,23 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token, dep
               placeholder="555-1234"
             />
           </div>
-
-          {/* Workstation and Role */}
+          {/* Society and Department */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Input
-              type="text"
-              name="workstation"
-              label="Estación de Trabajo"
-              value={formData.workstation}
-              onChange={handleInputChange}
-              error={errors.workstation}
-              placeholder="Ej: WS-001"
-            />
             <Select
-              label="Rol"
-              name="role_id"
-              value={formData.role_id}
+              label="Sociedad"
+              name="society_id"
+              value={String(formData.society_id)}
               onChange={handleInputChange}
-              error={errors.role_id}
+              error={errors.society_id}
               required
             >
-              <option value="">Seleccionar rol</option>
-              {roles.map(role => (
-                <option key={role.role_id} value={role.role_id}>
-                  {role.role_name}
+              <option value="">Seleccionar sociedad</option>
+              {societies && societies.map((society: any) => (
+                <option key={society.id} value={String(society.id)}>
+                  {society.description}
                 </option>
               ))}
             </Select>
-          </div>
-
-          {/* Department and Boss */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Select
               label="Departamento"
               name="department_id"
@@ -360,6 +375,25 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token, dep
               {departments.map(dep => (
                 <option key={dep.department_id} value={dep.department_id}>
                   {dep.department_name}
+                </option>
+              ))}
+            </Select>
+          </div>
+
+          {/* Role and Boss */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Select
+              label="Rol"
+              name="role_id"
+              value={formData.role_id}
+              onChange={handleInputChange}
+              error={errors.role_id}
+              required
+            >
+              <option value="">Seleccionar rol</option>
+              {roles.map(role => (
+                <option key={role.role_id} value={role.role_id}>
+                  {role.role_name}
                 </option>
               ))}
             </Select>
@@ -379,24 +413,19 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token, dep
             </Select>
           </div>
 
-          {/* Society */}
+          {/* Workstation */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Select
-              label="Sociedad"
-              name="society_id"
-              value={String(formData.society_id)}
+            <Input
+              type="text"
+              name="workstation"
+              label="Estación de Trabajo"
+              value={formData.workstation}
               onChange={handleInputChange}
-              error={errors.society_id}
-              required
-            >
-              <option value="">Seleccionar sociedad</option>
-              {societies && societies.map((society: any) => (
-                <option key={society.id} value={String(society.id)}>
-                  {society.description}
-                </option>
-              ))}
-            </Select>
+              error={errors.workstation}
+              placeholder="Ej: WS-001"
+            />
           </div>
+
         </div>
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">

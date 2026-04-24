@@ -8,16 +8,17 @@ import Input from '@/components/Utils/Input';
 import Select from '@/components/Utils/Select';
 import Button from '@/components/Buttons/Button';
 import Toast from '@/components/Utils/Toast';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { apiRequest } from '@/utils/apiClient';
 
 interface Props {
   userData: any;
   departmentUsers?: any[];
   token: string;
+  canManageAbsence?: boolean;
 }
 
-export default function UserProfile({ userData, departmentUsers = [], token }: Props) {
+export default function UserProfile({ userData, departmentUsers = [], token, canManageAbsence = false }: Readonly<Props>) {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [substituteId, setSubstituteId] = useState('');
@@ -35,15 +36,15 @@ export default function UserProfile({ userData, departmentUsers = [], token }: P
 
   // Autocomplete absence preferences when user data changes
   useEffect(() => {
-    if (userData.role_name !== 'Solicitante') {
+    if (canManageAbsence) {
       setStartDate(userData.out_of_office_start_date?.split('T')[0] || '');
       setEndDate(userData.out_of_office_end_date?.split('T')[0] || '');
       setSubstituteId(userData.substitute_id || '');
     }
-  }, [userData.user_id]);
+  }, [canManageAbsence, userData.user_id, userData.out_of_office_start_date, userData.out_of_office_end_date, userData.substitute_id]);
 
   // Handler for submitting absence preferences
-  const handleAbsenceSubmit = async (e: React.FormEvent) => {
+  const handleAbsenceSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
     setToast(null);
@@ -62,6 +63,7 @@ export default function UserProfile({ userData, departmentUsers = [], token }: P
       });
       setToast({ message: 'Preferencias de ausencia guardadas correctamente', type: 'success' });
     } catch (error) {
+      console.error('Error saving absence preferences:', error);
       setToast({ message: 'Error al guardar preferencias de ausencia', type: 'error' });
     } finally {
       setIsSubmitting(false);
@@ -129,7 +131,7 @@ export default function UserProfile({ userData, departmentUsers = [], token }: P
       </div>
 
       {/* Out of office preferences */}
-      {userData.role_name !== 'Solicitante' && (
+      {canManageAbsence && (
         <form onSubmit={handleAbsenceSubmit}>
           <div className="card">
             <div className="card-title">
@@ -148,7 +150,7 @@ export default function UserProfile({ userData, departmentUsers = [], token }: P
                 name="out_of_office_end_date"
                 label="Fecha de fin de ausencia"
                 type="date"
-                min={startDate ? startDate : getLocalDateString()}
+                min={startDate || getLocalDateString()}
                 value={endDate}
                 onChange={e => setEndDate(e.target.value)}
               />
@@ -159,13 +161,11 @@ export default function UserProfile({ userData, departmentUsers = [], token }: P
                 onChange={e => setSubstituteId(e.target.value)}
               >
                 <option value="">Sin sustituto</option>
-                {departmentUsers &&
-                  departmentUsers.map((user) => (
-                    <option key={user.user_id} value={user.user_id}>
-                      {user.user_name}
-                    </option>
-                  ))
-                }
+                {departmentUsers?.map((user) => (
+                  <option key={user.user_id} value={user.user_id}>
+                    {user.user_name}
+                  </option>
+                ))}
               </Select>
             </div>
           </div>
