@@ -87,6 +87,7 @@ export async function apiRequest<T = any>(
       if (res.status === 401 || res.status === 403) {
         console.warn("Unauthorized request - token may be invalid or expired");
         if (typeof window !== 'undefined') {
+          // Mark that session expired for displaying message on login page
           if (res.status === 401) {
             localStorage.setItem('sessionExpired', 'true');
           }

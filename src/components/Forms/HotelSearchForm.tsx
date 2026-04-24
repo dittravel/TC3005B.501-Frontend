@@ -23,7 +23,7 @@ const HotelSearchForm = ({ token, route, routeIndex }: HotelSearchFormProps) => 
   const [shownHotels, setShownHotels] = useState(false);
   const [selectedHotel, setSelectedHotel] = useState<any>(null);
 
-  const [address, setAddress] = useState(route.destination_city_name || '');
+  const [address, setAddress] = useState(`${route.destination_city}, ${route.destination_country}` || '');
   const [checkInDate, setCheckInDate] = useState(route.beginning_date || '');
   const [checkOutDate, setCheckOutDate] = useState(route.ending_date || '');
   const [guests, setGuests] = useState<number>(1);
@@ -96,7 +96,6 @@ const HotelSearchForm = ({ token, route, routeIndex }: HotelSearchFormProps) => 
               type="text"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              placeholder="Ciudad o dirección"
               className="w-full rounded-md border border-gray-300 bg-card px-4 py-2.5 text-sm text-tertiary shadow-sm transition focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
             />
           </div>
@@ -236,9 +235,9 @@ const HotelSearchForm = ({ token, route, routeIndex }: HotelSearchFormProps) => 
                             ⭐ {hotel.rating ?? 'Sin calificación'} | {hotel.installation ?? 'Sin tipo'}
                           </p>
                         </div>
-                        <p className="font-semibold text-tertiary">
-                          {hotel.cost ? `$${hotel.cost} / noche` : 'Precio no disponible'}
-                        </p>
+                          <p className="font-semibold text-tertiary">
+                            {hotel.cost ? `$${hotel.cost} ${hotel.currency ?? 'USD'} / noche` : 'Precio no disponible'}
+                          </p>
                       </div>
                     </button>
                   </div>

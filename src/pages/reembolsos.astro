@@ -1,0 +1,74 @@
+---
+/**
+ * This Astro page renders the reimbursement panel for the user.
+ */
+
+import TextHeader from '@components/Layout/TextHeader.astro';
+import MainLayout from "@layouts/MainLayout.astro";
+import RefundForm from "@/components/Forms/RefundForm";
+
+import type { UserRole } from "@type/roles";
+import { getCookie } from "@data/cookies";
+import { roleLabels } from "@config/role-labels";
+import { apiRequest } from "@/utils/apiClient";
+
+const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
+const buttonLabel = roleLabels[role];
+const userName = getCookie("username", Astro.cookies) || "";
+const userId = getCookie("id", Astro.cookies);
+
+// Get user refunds
+const refunds = await (async () => {
+  try {
+    const response = await apiRequest(`/refunds/user/${userId}`, {
+      cookies: Astro.cookies
+    });
+    return response.refunds || [];
+  } catch (error) {
+    console.error("Error al cargar los reembolsos del usuario:", error);
+    return [];
+  }
+})();
+
+// Get user wallet (balance)
+const wallet = await (async () => {
+  try {
+    const data = await apiRequest(`/user/get-user-wallet/${userId}`, {
+      cookies: Astro.cookies
+    });
+    return data?.wallet || 0;
+  } catch (error) {
+    console.error("Error al cargar el balance del usuario:", error);
+    return 0;
+  }
+})();
+
+// Get user society info (for local currency)
+const society = await (async () => {
+  try {
+    const data = await apiRequest(`/societies/current`, {
+      cookies: Astro.cookies
+    });
+    return data?.society || null;
+  } catch (error) {
+    console.error("Error al cargar la sociedad del usuario:", error);
+    return null;
+  }
+})();
+---
+
+<MainLayout title="Panel de Reembolsos" data={{userName, buttonLabel, role}}>
+  <TextHeader
+    title="Panel de reembolsos"
+    subtitle="Gestiona tus reembolsos y solicitudes de devolución"
+  />
+  <main>
+    <RefundForm 
+      client:load
+      role={role}
+      refunds={refunds}
+      wallet={wallet}
+      currency={society?.currency || "MXN"}
+    />
+  </main>
+</MainLayout>
