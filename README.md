@@ -194,12 +194,28 @@ The application is fully integrated with the backend API. To start using the app
    ```
 
 3. **Login**: Use the login interface to authenticate with your credentials. The available roles are:
-   - **Solicitante** (Applicant) - Create and manage travel requests
-   - **Agencia de viajes** (Travel Agency) - Attend to travel requests
-   - **Cuentas por pagar** (Accounts Payable) - Validate and check receipts
-   - **N1** - Authorize level 1 requests
-   - **N2** - Authorize level 2 requests
-   - **Administrador** (Administrator) - Manage users and system settings
+   - **Requester (Solicitante)** - Manages own travel requests and receipts
+   - **Travel Agency (Agencia de viajes)** - Handles requests and reviews flight/hotel options
+   - **Accounts Payable (Cuentas por pagar)** - Reviews and approves/rejects receipts
+   - **Authorizer (Autorizador)** - Requester capabilities + request approval/rejection
+   - **Administrator (Administrador)** - Full system management
+
+### Default role permissions (base and dummy)
+
+The default permission matrix is defined in backend seed logic (`prisma/seedShared.js`) and is the same for:
+
+- base seed (`pnpm prisma:seed`)
+- dummy seed (`pnpm prisma:seed:dummy`)
+
+In dummy mode, these defaults are duplicated across dummy society groups and users.
+
+| Role | Module summary | Default permission keys |
+| --- | --- | --- |
+| Requester (Solicitante) | Travel, Receipts | `travel:view`, `travel:create`, `travel:edit`, `receipts:create`, `receipts:edit` |
+| Travel Agency (Agencia de viajes) | Travel | `travel:view`, `travel:edit`, `travel:view_flights`, `travel:view_hotels`, `travel:approve` |
+| Accounts Payable (Cuentas por pagar) | Receipts | `receipts:view`, `receipts:approve` |
+| Authorizer (Autorizador) | Travel, Receipts | `travel:view`, `travel:create`, `travel:edit`, `travel:approve`, `travel:reject`, `receipts:create`, `receipts:edit` |
+| Administrator (Administrador) | All modules | all `permission_key` values available in `Permission` |
 
 
 
