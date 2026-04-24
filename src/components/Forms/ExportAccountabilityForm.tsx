@@ -76,6 +76,25 @@ export default function AccountingExportForm({ token }: Props) {
     setErrorMessage("");
   };
 
+  const handleDownload = () => {
+    if (!result) return;
+
+    const fecha = new Date().toISOString().split("T")[0];
+    const nombreArchivo = `exportacion-${fecha}.json`;
+
+    const blob = new Blob([JSON.stringify(result, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = nombreArchivo;
+    link.click();
+
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="max-w-4xl mx-auto mt-8 px-4">
       <div className="bg-card border border-border rounded-2xl p-8 md:p-10 shadow-sm">
@@ -111,6 +130,14 @@ export default function AccountingExportForm({ token }: Props) {
           <div className="mt-10">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-2xl font-semibold">Resultado:</h3>
+              <Button
+                type="button"
+                color="primary"
+                size="small"
+                onClick={handleDownload}
+              >
+                Descargar JSON
+              </Button>
               <Button
                 type="button"
                 color="secondary"
