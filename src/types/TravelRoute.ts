@@ -16,4 +16,6 @@ export interface TravelRoute {
   hotel_needed: boolean;
   selected_flight: null;
   selected_hotel: null;
+  destination_city?: string;
+  destination_country?: string;
 }
