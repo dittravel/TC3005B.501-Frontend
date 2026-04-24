@@ -871,7 +871,6 @@ export default function TravelRequestForm({
             </Button>
             <Button
               type="submit"
-              onClick={handleSubmitRequest}
               color="success"
               disabled={loading}
             >

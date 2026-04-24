@@ -238,7 +238,7 @@ export default function AuthRuleForm({ token, mode, data }: Props) {
             <option value="">Selecciona una opción</option>
             <option value="Nacional">Nacional</option>
             <option value="Internacional">Internacional</option>
-            <option value="Ambos">Ambos</option>
+            <option value="Todos">Todos</option>
           </Select>
         </div>
       </div>
