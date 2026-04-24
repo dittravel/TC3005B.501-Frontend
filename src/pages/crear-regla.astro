@@ -9,14 +9,33 @@ import TextHeader from '@components/Layout/TextHeader.astro';
 import MainLayout from "@layouts/MainLayout.astro";
 import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
+import { hasRoutePermission } from "@config/routeAccess";
 import type { UserRole } from "@type/roles";
 import CreateAuthRuleForm from "@/components/Forms/CreateAuthRuleForm";
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
-const buttonLabel = roleLabels[role];
+const buttonLabel = roleLabels[role] || role || "Usuario";
 const userName = getCookie("username", Astro.cookies) || "";
+const token = getCookie("token", Astro.cookies) || "";
 
-if (role !== "Administrador") {
+function parseJwtPayload(jwtToken: string): Record<string, any> | null {
+  try {
+    const parts = jwtToken.split('.');
+    if (parts.length < 2) return null;
+    const base64 = parts[1].replaceAll('-', '+').replaceAll('_', '/');
+    const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '=');
+    return JSON.parse(Buffer.from(padded, 'base64').toString('utf8'));
+  } catch {
+    return null;
+  }
+}
+
+const tokenPayload = parseJwtPayload(token);
+const permissionKeys = Array.isArray(tokenPayload?.permissions)
+  ? tokenPayload.permissions.map((permission: unknown) => String(permission).trim()).filter(Boolean)
+  : [];
+
+if (!hasRoutePermission('/crear-regla', permissionKeys)) {
   return Astro.redirect("/404");
 }
 ---
@@ -30,7 +49,7 @@ if (role !== "Administrador") {
     <CreateAuthRuleForm
       client:only="react"
       mode="create"
-      token={getCookie("token", Astro.cookies) || ""}
+      token={token}
     />
   </main>
 </MainLayout>

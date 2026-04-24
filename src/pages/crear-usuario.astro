@@ -45,6 +45,18 @@ const roles = await (async () => {
   }
 })();
 
+const defaultRole = await (async () => {
+  try {
+    return await apiRequest('/admin/get-default-role', {
+      headers: { Authorization: `Bearer ${getCookie("token", Astro.cookies) || ""}` },
+      cookies: Astro.cookies,
+    });
+  } catch (error) {
+    console.error("Error loading default role:", error);
+    return null;
+  }
+})();
+
 // Get societies
 const societies = await (async () => {
   try {
@@ -73,6 +85,7 @@ const societies = await (async () => {
       roles={roles}
       societies={societies}
       token={getCookie("token", Astro.cookies) || ""}
+      defaultRoleId={defaultRole?.role_id || null}
     />
   </div>
 </MainLayout>
