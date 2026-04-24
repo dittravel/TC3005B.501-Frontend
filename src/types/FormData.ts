@@ -11,6 +11,7 @@ export interface FormData {
   notes: string;
   requested_fee: number | string;
   imposed_fee: number | string;
+  currency: string;
   origin_country_name: string;
   origin_city_name: string;
   destination_country_name: string;

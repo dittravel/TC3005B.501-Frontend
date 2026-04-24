@@ -5,13 +5,14 @@
  * sets authentication cookies on successful login, and displays error messages on failure.
  */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Button from "@/components/Buttons/Button";
 import { apiRequest } from "@utils/apiClient";
 import ThemeButton from "@/components/Buttons/ThemeButton";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useTheme } from "@hooks/useTheme";
 import Input from "@/components/Utils/Input";
+import Reminder from "@/components/Utils/Reminder";
 
 // Styles for the password input icon
 const visibleIconStyle = `
@@ -23,8 +24,19 @@ export default function LoginForm() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [sessionExpiredMessage, setSessionExpiredMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const { theme } = useTheme();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('expired') === 'true') {
+        setSessionExpiredMessage('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+  }, []);
 
   /**
    * Handles the login form submission.
@@ -77,6 +89,11 @@ export default function LoginForm() {
       
       {/* Main Container */}
       <div className="w-full md:w-100">
+        {/* Session Expired Reminder */}
+        {sessionExpiredMessage && (
+          <Reminder text={sessionExpiredMessage} type="alert" />
+        )}
+
         {/* Login Form Container */}
         <div className="
           p-2 md:p-8

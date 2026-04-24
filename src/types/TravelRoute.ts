@@ -23,4 +23,6 @@ export interface TravelRoute {
   hotel_fee?: number | null;
   selected_flight: null;
   selected_hotel: null;
+  destination_city?: string;
+  destination_country?: string;
 }

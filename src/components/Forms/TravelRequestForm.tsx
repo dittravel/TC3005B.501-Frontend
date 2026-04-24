@@ -12,6 +12,7 @@ import type { TravelRoute } from '@/types/TravelRoute';
 import type { FormData } from '@/types/FormData';
 import RouteInputGroup from '@/components/Forms/RouteInputGroup';
 import Input from '@/components/Utils/Input';
+import Select from '@/components/Utils/Select';
 import Textarea from '@/components/Utils/Textarea';
 import Reminder from '@/components/Utils/Reminder';
 import Toast from '@/components/Utils/Toast';
@@ -25,6 +26,7 @@ interface Props {
   user_id: string;
   role?: string;
   token: string;
+  currencies?: Array<{ currency: string; name: string }>;
 }
 
 const emptyRoute: TravelRoute = {
@@ -48,11 +50,12 @@ const initialFormState: FormData = {
   notes: '',
   requested_fee: '',
   imposed_fee: 0,
+  currency: 'MXN',
   requires_advance: false,
   routes: [{ ...emptyRoute, router_index: 0 }],
 };
 
-export default function TravelRequestForm({ data, mode, request_id, user_id, role, token }: Props) {
+export default function TravelRequestForm({ data, mode, request_id, user_id, role, token, currencies = [] }: Props) {
   const [formData, setFormData] = useState<FormData>(initialFormState);
   const [error, setError] = useState<string | null>(null);
   const [disabledButton, setDisabledButton] = useState<boolean>(false);
@@ -69,6 +72,7 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
       }));
       const newData = {
         ...data,
+        requires_advance: data.requested_fee !== null && data.requested_fee !== undefined && Number(data.requested_fee) > 0,
         routes: transformedRoutes,
       };
       setFormData(newData);
@@ -100,11 +104,11 @@ export default function TravelRequestForm({ data, mode, request_id, user_id, rol
   };
 
   /**
-   * Handles changes to general form fields (notes, requested fee, etc.).
-   * @param {React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>} e - The change event
+   * Handles changes to general form fields (notes, requested fee, currency, etc.).
+   * @param {React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>} e - The change event
    * @returns {void}
    */
-const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
   setError(null);
   const { name, value, type } = e.target;
   const checked = (e.target as HTMLInputElement).checked;
@@ -312,6 +316,7 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
       notes: formData.notes,
       requested_fee: parseFloat(formData.requested_fee as string) || 0,
       imposed_fee: 0,
+      currency: formData.currency,
       requires_advance: formData.requires_advance,
       travel_type: travelType,
       origin_country_name: firstRoute.origin_country_name,
@@ -371,6 +376,7 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
     if (firstRoute.router_index !== undefined) draftData.router_index = firstRoute.router_index;
     if (formData.notes) draftData.notes = formData.notes;
     if (formData.requested_fee) draftData.requested_fee = parseFloat(formData.requested_fee as string) || 0;
+    if (formData.currency) draftData.currency = formData.currency;
     draftData.imposed_fee = 0; // Always send imposed_fee as 0
 
     if (firstRoute.origin_country_name) draftData.origin_country_name = firstRoute.origin_country_name;
@@ -489,6 +495,7 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
     includeIfExists('router_index', firstRoute.router_index);
     editedData.notes = typeof formData.notes === 'string' ? formData.notes.trim() : '';
     includeIfExists('requested_fee', parseFloat(formData.requested_fee as string));
+    includeIfExists('currency', formData.currency);
     editedData.imposed_fee = 0;
     includeIfExists('origin_country_name', firstRoute.origin_country_name);
     includeIfExists('origin_city_name', firstRoute.origin_city_name);
@@ -668,15 +675,42 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
       {/* Only show requested fee and notes if "requires_advance" is true */}
       {formData.requires_advance && (
         <div className="space-y-6">
-          <Input
-            name="requested_fee"
-            label="Anticipo Esperado"
-            placeholder="Ej: 1500.00"
-            type="number"
-            value={formData.requested_fee === 0 ? '' : formData.requested_fee}
-            onChange={handleGeneralChange}
-          />
-
+          <div className="w-full flex gap-6">
+            <div className="flex-1">
+              <Input
+                name="requested_fee"
+                label="Anticipo Esperado"
+                placeholder="Ej: 1500.00"
+                type="number"
+                value={formData.requested_fee === 0 ? '' : formData.requested_fee}
+                onChange={handleGeneralChange}
+              />
+            </div>
+            <div className="flex-1">
+              <Select
+                name="currency"
+                label="Moneda"
+                value={formData.currency || ''}
+                onChange={handleGeneralChange}
+              >
+                <option value="">Selecciona una moneda</option>
+                {currencies.length > 0 ? (
+                  currencies.map((curr: any) => (
+                    <option key={curr.currency} value={curr.currency}>
+                      {curr.currency} - {curr.name}
+                    </option>
+                  ))
+                ) : (
+                  <>
+                    <option value="MXN">MXN - Peso Mexicano</option>
+                    <option value="USD">USD - Dólar Estadounidense</option>
+                    <option value="EUR">EUR - Euro</option>
+                  </>
+                )}
+              </Select>
+            </div>
+          </div>
+          
           <Textarea
             name="notes"
             label="Observaciones / Comentarios"

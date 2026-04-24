@@ -1,0 +1,47 @@
+---
+/**
+ * Requests Page
+ * 
+ * This page displays the user's travel requests, allowing them to view details, 
+ * edit drafts, and check expenses based on the status of each request. 
+ */
+import MainLayout from "@layouts/MainLayout.astro";
+import TextHeader from "@components/Layout/TextHeader.astro";
+import Requests from "@components/Requests/Requests";
+import type { UserRole } from "@type/roles";
+
+import { getCookie } from "@data/cookies";
+import { roleLabels } from "@config/role-labels";
+import { getSocietyName } from "@data/societyHelper";
+import { apiRequest } from "@utils/apiClient";
+
+const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
+const userName = getCookie("username", Astro.cookies) || "";
+const userId = getCookie("id", Astro.cookies) || "";
+
+// Fetch user requests
+let requests = [];
+try {
+  const response = await apiRequest(`/requests/${userId}`, { cookies: Astro.cookies });
+  if (response && Array.isArray(response)) {
+    requests = response;
+  }
+} catch (error) {
+  console.error('[solicitudes.astro] Error fetching requests:', error);
+}
+
+const buttonLabel = roleLabels[role];
+const societyName = await getSocietyName(Astro);
+---
+
+<MainLayout title="Solicitudes" data={{ userName, buttonLabel, role }}>
+  <TextHeader
+    title="Mis Solicitudes"
+    subtitle={societyName}
+  />
+  <Requests
+    client:only="react"
+    data={requests}
+    role={role}
+  />
+</MainLayout>
