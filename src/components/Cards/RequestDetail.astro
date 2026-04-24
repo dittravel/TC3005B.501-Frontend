@@ -184,16 +184,16 @@ const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
               Documentos de Reservación
             </h2>
           </div>
-          <div class="space-y-4">
+          <div class="routes-wrapper space-y-6">
             {request.routes.map(
               (route: any, index: number) =>
                 (route.flight_pdf_file_id || route.hotel_pdf_file_id) && (
-                  <div class="space-y-2">
-                    <p class="text-sm font-semibold text-text-primary">
-                      Ruta #{index + 1}
-                    </p>
+                  <div>
+                    <div class="route-title">
+                      <span>Ruta #{index + 1}</span>
+                    </div>
                     {route.flight_pdf_file_id && (
-                      <div class="flex w-full bg-card-hover p-2 border border-border rounded-md gap-4 items-center justify-between">
+                      <div class="flex w-full bg-card-hover p-2 border border-border gap-4 items-center justify-between">
                         <div class="flex flex-col items-start justify-center gap-1">
                           <p class="text-md font-semibold text-text-primary">
                             Vuelo PDF
