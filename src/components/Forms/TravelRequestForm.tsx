@@ -58,7 +58,7 @@ const initialFormState: FormData = {
 export default function TravelRequestForm({ data, mode, request_id, user_id, role, token, currencies = [] }: Props) {
   const [formData, setFormData] = useState<FormData>(initialFormState);
   const [error, setError] = useState<string | null>(null);
-  const [disabledButton, setDisabledButton] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
@@ -229,11 +229,11 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
    * @returns {void}
    */
   const handleSetToast = (message: string, type: 'success' | 'error', duration: number = 2000) => {
-    setDisabledButton(true);
+    setLoading(true);
     setToast({ message, type });
     setTimeout(() => {
       setToast(null);
-      setDisabledButton(false);
+      setLoading(false);
     }, duration);
   };
 
@@ -280,11 +280,13 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
    */
   const handleSubmitRequest = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
 
     const routeError = validateRoutes();
     if (routeError) {
       setError(routeError);
       handleSetToast('Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.', 'error');
+      setLoading(false);
       return;
     }
 
@@ -303,6 +305,7 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
     ) {
       setError('Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.');
       handleSetToast('Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.', 'error');
+      setLoading(false);
       return;
     }
 
@@ -353,6 +356,7 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
       console.error('Error al enviar la solicitud:', error);
       setError('Hubo un error al enviar la solicitud.');
       setToast({ message: 'Hubo un error al enviar la solicitud.', type: 'error' });
+      setLoading(false);
     }
   };
 
@@ -424,7 +428,7 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
       });
       handleSetToast('Borrador guardado exitosamente.', 'success');
       await new Promise(resolve => setTimeout(resolve, 2000));
-      window.location.href = '/solicitudes-draft';
+      window.location.href = '/solicitudes';
     } catch (err) {
       // TODO: Implement proper error handling to extract specific error messages from API
       setError('Hubo un error al guardar el borrador.');
@@ -601,7 +605,7 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
       });
       handleSetToast('Borrador completado exitosamente.', 'success');
       await new Promise(resolve => setTimeout(resolve, 2000));
-      window.location.href = '/solicitudes-draft';
+      window.location.href = '/solicitudes';
     } catch (err) {
       // TODO: Implement proper error handling to extract specific error messages from API
       setError('Hubo un error al completar el borrador. Por favor, inténtalo de nuevo.');
@@ -743,7 +747,7 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
           onClick={handleResetForm} 
           variant="filled"
           color="primary"
-          disabled={disabledButton}
+          disabled={loading}
         >
           Limpiar Formulario
         </Button>
@@ -753,15 +757,15 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
               type="button" 
               onClick={handleSaveDraft}
               color="secondary"
-              disabled={disabledButton}
+              disabled={loading}
             >
               Guardar Borrador
             </Button>
-            <Button 
-              type="button" 
+            <Button
+              type="submit"
               onClick={handleSubmitRequest}
               color="success"
-              disabled={disabledButton}
+              disabled={loading}
             >
               Enviar Solicitud
             </Button>
@@ -774,7 +778,7 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
               await handleEditRequest(e as unknown as React.FormEvent, true, '/dashboard');
             }}
             color="secondary"
-            disabled={disabledButton}
+            disabled={loading}
           >
             Actualizar Solicitud
           </Button>
@@ -784,18 +788,18 @@ const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAre
             <Button 
               type="button"
               onClick={async (e) => {
-                await handleEditRequest(e as unknown as React.FormEvent, false, '/solicitudes-draft');
+                await handleEditRequest(e as unknown as React.FormEvent, false, '/solicitudes');
               }}
               color="secondary"
-              disabled={disabledButton}
+              disabled={loading}
             >
               Guardar Cambios
             </Button>
-            <Button 
-              type="button" 
+            <Button
+              type="submit"
               onClick={handleFinishDraft}
               color="success"
-              disabled={disabledButton}
+              disabled={loading}
             >
               Enviar Solicitud
             </Button>

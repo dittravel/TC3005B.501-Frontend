@@ -32,6 +32,7 @@ try {
 
 const buttonLabel = roleLabels[role];
 const societyName = await getSocietyName(Astro);
+const token = getCookie("token", Astro.cookies) || "";
 ---
 
 <MainLayout title="Solicitudes" data={{ userName, buttonLabel, role }}>
@@ -43,7 +44,7 @@ const societyName = await getSocietyName(Astro);
     <Requests
       client:only="react"
       data={requests}
-      role={role}
+      token={token}
     />
   </main>
 </MainLayout>

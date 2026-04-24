@@ -12,6 +12,7 @@ import Select from '@components/Utils/Select';
 import Card from '@components/Utils/Card';
 import LabeledValue from '@components/Utils/LabeledValue';
 import Pagination from '@components/Table/Pagination';
+import UltimateWrapper from '@components/Modals/UltimateWrapper';
 import { getStatusTagType } from '@utils/statusMapper';
 
 interface TravelRequest {
@@ -36,13 +37,13 @@ interface TravelRequest {
 
 interface RequestsProps {
   data: TravelRequest[];
-  role: UserRole;
+  token: string;
 }
 
 // Function to determine the appropriate action route based on request status
 const getActionRoute = (status: string, requestId: number): string => {
   if (status === 'Borrador') {
-    return `/editar-solicitud/${requestId}`;
+    return `/editar-borrador/${requestId}`;
   }
   if (status === 'Comprobación gastos del viaje') {
     return `/comprobar-solicitud/${requestId}`;
@@ -52,7 +53,17 @@ const getActionRoute = (status: string, requestId: number): string => {
   return `/detalles-solicitud/${requestId}`;
 };
 
-export default function Requests({ data }: RequestsProps) {
+/**
+ * Requests Component
+ * Displays a list of travel requests for the user, with filtering and sorting options.
+ * @param {TravelRequest[]} data - Array of travel requests to display.
+ * @param {string} token - Authentication token for API requests.
+ * @returns {JSX.Element} The rendered Requests component.
+ */
+export default function Requests({
+  data,
+  token
+}: RequestsProps) {
   // State for filters, sorting, and pagination
   const [statusFilter, setStatusFilter] = useState('all');
   const [sort, setSort] = useState('desc');
@@ -155,18 +166,20 @@ export default function Requests({ data }: RequestsProps) {
           paginatedRequests.map((request) => (
             <Card
               key={request.request_id}
-              href={`/detalles-solicitud/${request.request_id}`}
               tag={{ text: `Solicitud #${request.request_id}`, type: 'secondary' }}
               status={{
                 text: request.request_status || 'Desconocido',
                 type: getStatusTagType(request.request_status),
               }}
             >
-              <div className="flex justify-between gap-6">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 flex-1">
+              <div className="flex flex-col lg:flex-row justify-between gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-1">
                   <LabeledValue
                     label="Destino"
-                    value={`${request.routes?.[0]?.destination_city}, ${request.routes?.[0]?.destination_country}`}
+                    value={`
+                      ${request.routes?.[0]?.destination_city === 'notSelected' ? '—' : request.routes?.[0]?.destination_city}, 
+                      ${request.routes?.[0]?.destination_country === 'notSelected' ? '—' : request.routes?.[0]?.destination_country}
+                    `}
                   />
                   <LabeledValue
                     label="Fechas"
@@ -182,7 +195,7 @@ export default function Requests({ data }: RequestsProps) {
                   />
                 </div>
                 
-                <div className="flex items-end">
+                <div className="flex gap-4 items-end">
                   <Button
                     onClick={(e) => {
                       e.preventDefault();
@@ -192,14 +205,30 @@ export default function Requests({ data }: RequestsProps) {
                       }
                     }}
                     variant="filled"
-                    color={request.request_status === 'Borrador' ? 'secondary' : 'primary'}
+                    color={request.request_status === 'Borrador' ? 'primary' : 'secondary'}
                   >
-                    {request.request_status === 'Borrador' 
-                      ? 'Editar Borrador' 
+                    {request.request_status === 'Borrador'
+                      ? 'Editar'
                       : request.request_status === 'Comprobación gastos del viaje'
                       ? 'Comprobar Gastos'
                       : 'Ver Detalles'}
                   </Button>
+                  {request.request_status === 'Borrador' && (
+                    <UltimateWrapper
+                      id={Number(request.request_id)}
+                      endpoint="/requests/delete-draft"
+                      title="Eliminar borrador"
+                      message="¿Está seguro de que deseas eliminar este borrador?"
+                      redirectTo="/solicitudes"
+                      modal_type="warning"
+                      color="warning"
+                      variant="filled"
+                      label="Eliminar"
+                      method="DELETE"
+                      token={token}
+                      successMessage="Borrador eliminado exitosamente."
+                    />
+                  )}
                 </div>
               </div>
             </Card>
