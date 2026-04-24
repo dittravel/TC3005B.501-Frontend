@@ -1,30 +1,30 @@
 ---
 /**
- * Refund Policies Page
+ * Edit Refund Policy Page
  */
 
 import TextHeader from "@components/Layout/TextHeader.astro";
 import MainLayout from "@layouts/MainLayout.astro";
-import DefaultRefundPolicy from "@components/Forms/DefaultRefundPolicy";
-import RefundPoliciesList from "@components/Lists/RefundPoliciesList";
+import RefundPolicyForm from "@components/Forms/RefundPolicyForm";
 import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
 import type { UserRole } from "@type/roles";
 import { apiRequest } from "@/utils/apiClient";
 
+const { id } = Astro.params;
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
 const buttonLabel = roleLabels[role];
 const userName = getCookie("username", Astro.cookies) || "";
 
-// Get refund policies list
-const policies = await (async () => {
+// Get refund policy
+const policy = await (async () => {
   try {
-    return await apiRequest(`/refund-policy`, {
+    return await apiRequest(`/refund-policy/${id}`, {
       cookies: Astro.cookies
     });
   } catch (error) {
-    console.error("Error al cargar las políticas de reembolso:", error);
-    return [];
+    console.error("Error al cargar la política de reembolso:", error);
+    return null;
   }
 })();
 
@@ -45,23 +45,19 @@ const society = await (async () => {
 const token = getCookie("token", Astro.cookies) || "";
 ---
 
-<MainLayout title="Políticas de Reembolso" data={{userName, buttonLabel, role}}>
+<MainLayout title="Editar Política de Reembolso" data={{userName, buttonLabel, role}}>
   <TextHeader
-    title="Políticas de Reembolso"
-    subtitle="Configura y gestiona las políticas de reembolso del sistema"
+    title="Editar Política de Reembolso"
+    subtitle="Modifica los parámetros de la política de reembolso"
   />
   <main>
-    <DefaultRefundPolicy
+    <RefundPolicyForm
       client:load
-      defaultPolicy={policies.find((p: any) => p.is_default)}
+      mode="edit"
+      data={policy}
       currency={society?.currency || "MXN"}
       token={token}
-    />
-    <RefundPoliciesList
-      client:load
-      data={policies}
-      currency={society?.currency || "MXN"}
-      token={token}
+      redirectTo="/politicas-reembolso"
     />
   </main>
 </MainLayout>

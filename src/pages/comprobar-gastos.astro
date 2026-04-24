@@ -5,7 +5,7 @@
 
 import MainLayout from "@layouts/MainLayout.astro";
 import TextHeader from "@components/Layout/TextHeader.astro";
-import ComprobacionesList from "@/components/RequestsLists/ComprobacionesList";
+import ComprobacionesList from "@/components/Lists/ComprobacionesList";
 import type { UserRole } from "@type/roles";
 
 import { getCookie } from "@data/cookies";
@@ -44,17 +44,15 @@ const requests = await Promise.all(
 ---
 
 <MainLayout title="Comprobar Gastos" data={{userName, buttonLabel, role}}>
-  <div>
-    <main>
-      <TextHeader
-        title={`Comprobantes pendientes de ${userName}`}
-        subtitle="Aquí puedes conocer el estado de solicitudes en proceso de comprobación"
-      />
-      <ComprobacionesList
-        client:only="react"
-        data={requests}
-        title="Comprobantes Pendientes"
-      />
-    </main>
-  </div>
+  <TextHeader
+    title="Solicitudes en proceso de comprobación"
+    subtitle="Aquí puedes ver el estado de tus solicitudes que están en proceso de comprobación de gastos."
+  />
+  <main>
+    <ComprobacionesList
+      client:only="react"
+      data={requests}
+      title="Solicitudes pendientes"
+    />
+  </main>
 </MainLayout>

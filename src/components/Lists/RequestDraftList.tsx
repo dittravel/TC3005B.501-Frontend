@@ -62,7 +62,7 @@ export default function RequestDraftList({ requests, token }: Props) {
 
                 {/* Buttons */}
                 <div className="flex flex-col gap-2 w-full">
-                  <a href={`/completar-draft/${request.request_id}`} className="block">
+                  <a href={`/editar-borrador/${request.request_id}`} className="block">
                     <Button
                       color="secondary"
                       variant="filled"

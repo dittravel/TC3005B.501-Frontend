@@ -46,12 +46,22 @@ const emptyRoute: TravelRoute = {
 };
 
 const initialFormState: FormData = {
-  ...emptyRoute,
+  router_index: 0,
   notes: "",
   requested_fee: "",
   imposed_fee: 0,
   currency: "MXN",
   requires_advance: false,
+  origin_country_name: "",
+  origin_city_name: "",
+  destination_country_name: "",
+  destination_city_name: "",
+  beginning_date: "",
+  beginning_time: "",
+  ending_date: "",
+  ending_time: "",
+  plane_needed: false,
+  hotel_needed: false,
   routes: [{ ...emptyRoute, router_index: 0 }],
 };
 
@@ -66,11 +76,8 @@ export default function TravelRequestForm({
 }: Props) {
   const [formData, setFormData] = useState<FormData>(initialFormState);
   const [error, setError] = useState<string | null>(null);
-  const [disabledButton, setDisabledButton] = useState<boolean>(false);
-  const [toast, setToast] = useState<{
-    message: string;
-    type: "success" | "error";
-  } | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
     if (data) {
@@ -257,16 +264,12 @@ export default function TravelRequestForm({
    * @param {number} duration - How long to display the toast (default: 2000ms)
    * @returns {void}
    */
-  const handleSetToast = (
-    message: string,
-    type: "success" | "error",
-    duration: number = 2000,
-  ) => {
-    setDisabledButton(true);
+  const handleSetToast = (message: string, type: 'success' | 'error', duration: number = 2000) => {
+    setLoading(true);
     setToast({ message, type });
     setTimeout(() => {
       setToast(null);
-      setDisabledButton(false);
+      setLoading(false);
     }, duration);
   };
 
@@ -314,14 +317,13 @@ export default function TravelRequestForm({
    */
   const handleSubmitRequest = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
 
     const routeError = validateRoutes();
     if (routeError) {
       setError(routeError);
-      handleSetToast(
-        "Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.",
-        "error",
-      );
+      handleSetToast('Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.', 'error');
+      setLoading(false);
       return;
     }
 
@@ -338,13 +340,9 @@ export default function TravelRequestForm({
       (formData.requires_advance && !formData.requested_fee) ||
       (formData.requires_advance && !formData.notes)
     ) {
-      setError(
-        "Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.",
-      );
-      handleSetToast(
-        "Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.",
-        "error",
-      );
+      setError('Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.');
+      handleSetToast('Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.', 'error');
+      setLoading(false);
       return;
     }
 
@@ -393,15 +391,13 @@ export default function TravelRequestForm({
       if (role === "Solicitante") {
         window.location.href = "/dashboard";
       } else {
-        window.location.href = "/solicitudes-autorizador";
+        window.location.href = '/solicitudes';
       }
     } catch (error) {
-      console.error("Error al enviar la solicitud:", error);
-      setError("Hubo un error al enviar la solicitud.");
-      setToast({
-        message: "Hubo un error al enviar la solicitud.",
-        type: "error",
-      });
+      console.error('Error al enviar la solicitud:', error);
+      setError('Hubo un error al enviar la solicitud.');
+      setToast({ message: 'Hubo un error al enviar la solicitud.', type: 'error' });
+      setLoading(false);
     }
   };
 
@@ -488,9 +484,9 @@ export default function TravelRequestForm({
           Authorization: `Bearer ${token}`,
         },
       });
-      handleSetToast("Borrador guardado exitosamente.", "success");
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      window.location.href = "/solicitudes-draft";
+      handleSetToast('Borrador guardado exitosamente.', 'success');
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      window.location.href = '/solicitudes';
     } catch (err) {
       // TODO: Implement proper error handling to extract specific error messages from API
       setError("Hubo un error al guardar el borrador.");
@@ -699,18 +695,15 @@ export default function TravelRequestForm({
     if (!editSuccess) return;
 
     try {
-      await apiRequest(
-        `/applicant/confirm-draft-travel-request/${user_id}/${request_id}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-      handleSetToast("Borrador completado exitosamente.", "success");
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      window.location.href = "/solicitudes-draft";
+      await apiRequest(`/applicant/confirm-draft-travel-request/${user_id}/${request_id}`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      handleSetToast('Borrador completado exitosamente.', 'success');
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      window.location.href = '/solicitudes';
     } catch (err) {
       // TODO: Implement proper error handling to extract specific error messages from API
       setError(
@@ -862,7 +855,7 @@ export default function TravelRequestForm({
           onClick={handleResetForm}
           variant="filled"
           color="primary"
-          disabled={disabledButton}
+          disabled={loading}
         >
           Limpiar Formulario
         </Button>
@@ -872,15 +865,15 @@ export default function TravelRequestForm({
               type="button"
               onClick={handleSaveDraft}
               color="secondary"
-              disabled={disabledButton}
+              disabled={loading}
             >
               Guardar Borrador
             </Button>
             <Button
-              type="button"
+              type="submit"
               onClick={handleSubmitRequest}
               color="success"
-              disabled={disabledButton}
+              disabled={loading}
             >
               Enviar Solicitud
             </Button>
@@ -897,7 +890,7 @@ export default function TravelRequestForm({
               );
             }}
             color="secondary"
-            disabled={disabledButton}
+            disabled={loading}
           >
             Actualizar Solicitud
           </Button>
@@ -907,22 +900,18 @@ export default function TravelRequestForm({
             <Button
               type="button"
               onClick={async (e) => {
-                await handleEditRequest(
-                  e as unknown as React.FormEvent,
-                  false,
-                  "/solicitudes-draft",
-                );
+                await handleEditRequest(e as unknown as React.FormEvent, false, '/solicitudes');
               }}
               color="secondary"
-              disabled={disabledButton}
+              disabled={loading}
             >
               Guardar Cambios
             </Button>
             <Button
-              type="button"
+              type="submit"
               onClick={handleFinishDraft}
               color="success"
-              disabled={disabledButton}
+              disabled={loading}
             >
               Enviar Solicitud
             </Button>
