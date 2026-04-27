@@ -38,19 +38,16 @@ const permissionKeys = Array.isArray(tokenPayload?.permissions)
   ? tokenPayload.permissions.map((permission: unknown) => String(permission).trim()).filter(Boolean)
   : [];
 
-const canViewSocietyGroups = permissionKeys.includes('society_groups:view');
-const canCreateSocietyGroup = permissionKeys.includes('society_groups:create');
-const canEditSocietyGroup = permissionKeys.includes('society_groups:edit');
-const canDeleteSocietyGroup = permissionKeys.includes('society_groups:delete');
-const canViewSocieties = permissionKeys.includes('societies:view');
-const canCreateSociety = permissionKeys.includes('societies:create');
-const canEditSociety = permissionKeys.includes('societies:edit');
-const canDeleteSociety = permissionKeys.includes('societies:delete');
+const canManageSocietyGroups = permissionKeys.includes('superadmin:manage_groups');
+const canViewSocieties = canManageSocietyGroups || permissionKeys.includes('societies:view');
+const canCreateSociety = canManageSocietyGroups || permissionKeys.includes('societies:create');
+const canEditSociety = canManageSocietyGroups || permissionKeys.includes('societies:edit');
+const canDeleteSociety = canManageSocietyGroups || permissionKeys.includes('societies:delete');
 
 // Get society groups
 let isDefaultGroup = false;
 const societyGroups = await (async () => {
-  if (!canViewSocietyGroups) {
+  if (!canManageSocietyGroups) {
     return [];
   }
 
@@ -94,15 +91,15 @@ const societies = await (async () => {
   />
   <main>
     <div class="flex flex-col gap-8">
-      {canViewSocietyGroups && isDefaultGroup && (
+      {canManageSocietyGroups && isDefaultGroup && (
         <SocietyGroupsTable
           client:load
           data={societyGroups}
           token={token}
           role={role}
-          canCreate={canCreateSocietyGroup}
-          canEdit={canEditSocietyGroup}
-          canDelete={canDeleteSocietyGroup}
+          canCreate={canManageSocietyGroups}
+          canEdit={canManageSocietyGroups}
+          canDelete={canManageSocietyGroups}
         />
       )}
       {canViewSocieties ? (

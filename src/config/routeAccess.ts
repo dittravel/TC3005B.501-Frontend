@@ -2,6 +2,7 @@
  * Route Access
  * 
  * Mapping of user roles to their accessible routes in the application
+ * Este file es importante revisarlo particularmente por lo de los roles custom -_-
  */
 
 import type { UserRole } from '@type/roles';
@@ -10,12 +11,11 @@ export const roleRoutes: Record<UserRole, string[]> = {
   'Solicitante': [
     '/dashboard',
     '/perfil-usuario',
+    '/solicitudes',
     '/crear-solicitud',
-    '/historial',
-    '/reembolso',
-    '/solicitudes-draft',
+    '/reembolsos',
     '/comprobar-gastos',
-    '/completar-draft/*',
+    '/editar-borrador/*',
     '/editar-solicitud/*',
     '/comprobar-solicitud/*',
     '/detalles-solicitud/*',
@@ -32,6 +32,7 @@ export const roleRoutes: Record<UserRole, string[]> = {
   'Cuentas por pagar': [
     '/dashboard',
     '/perfil-usuario',
+    '/reembolsos',
     '/cotizaciones',
     '/comprobaciones',
     '/cotizar-solicitud/*',
@@ -40,13 +41,11 @@ export const roleRoutes: Record<UserRole, string[]> = {
   'Autorizador': [
     '/dashboard',
     '/perfil-usuario',
-    '/solicitudes-autorizador',
+    '/solicitudes',
     '/crear-solicitud',
-    '/historial',
-    '/reembolso',
-    '/solicitudes-draft',
+    '/reembolsos',
     '/comprobar-gastos',
-    '/completar-draft/*',
+    '/editar-borrador/*',
     '/editar-solicitud/*',
     '/comprobar-solicitud/*',
     '/autorizaciones',
@@ -58,15 +57,24 @@ export const roleRoutes: Record<UserRole, string[]> = {
   'Administrador': [
     '/dashboard',
     '/perfil-usuario',
+    '/usuarios',
     '/crear-usuario','/editar-usuario/*',
     '/importar-datos',
     '/reglas-autorizacion','/crear-regla','/editar-regla/*',
     '/roles','/crear-rol','/editar-rol/*',
-    '/politicas-reembolso', '/edit-politica-rembolso',
+    '/politicas-reembolso', '/editar-politica-reembolso/*', '/crear-politica-reembolso',
     '/exportar-datos-contables',
-    '/sociedades', '/sociedades/*',
-    '/grupos-sociedades', '/grupos-sociedades/*',
     '/bitacora',
+  ],
+  'Superadministrador': [
+    '/dashboard',
+    '/perfil-usuario',
+    '/sociedades',
+    '/sociedades/*',
+    '/grupos-sociedades',
+    '/grupos-sociedades/*',
+    '/administradores-maestros',
+    '/bitacora-grupo',
   ],
 };
 
@@ -77,6 +85,7 @@ type PermissionRouteRule = {
 };
 
 export const permissionRouteRules: PermissionRouteRule[] = [
+  { pattern: '/usuarios', permissions: ['users:view'] },
   { pattern: '/crear-usuario', permissions: ['users:create'] },
   { pattern: '/editar-usuario/*', permissions: ['users:edit'] },
   { pattern: '/importar-datos', permissions: ['system:import_data'] },
@@ -87,14 +96,17 @@ export const permissionRouteRules: PermissionRouteRule[] = [
   { pattern: '/crear-regla', permissions: ['travel:def_amount'] },
   { pattern: '/editar-regla/*', permissions: ['travel:def_amount'] },
   { pattern: '/politicas-reembolso', permissions: ['travel:def_amount'] },
-  { pattern: '/edit-politica-rembolso', permissions: ['travel:def_amount'] },
+  { pattern: '/editar-politica-reembolso/*', permissions: ['travel:def_amount'] },
+  { pattern: '/crear-politica-reembolso', permissions: ['travel:def_amount'] },
   { pattern: '/bitacora', permissions: ['system:audit_log'] },
-  { pattern: '/sociedades', permissions: ['societies:view', 'society_groups:view'], mode: 'any' },
-  { pattern: '/sociedades/nueva', permissions: ['societies:create'] },
-  { pattern: '/sociedades/*', permissions: ['societies:edit'] },
-  { pattern: '/grupos-sociedades', permissions: ['society_groups:view'] },
-  { pattern: '/grupos-sociedades/nuevo', permissions: ['society_groups:create'] },
-  { pattern: '/grupos-sociedades/*', permissions: ['society_groups:edit'] },
+  { pattern: '/sociedades', permissions: ['superadmin:manage_groups'] },
+  { pattern: '/sociedades/nueva', permissions: ['superadmin:manage_groups'] },
+  { pattern: '/sociedades/*', permissions: ['superadmin:manage_groups'] },
+  { pattern: '/grupos-sociedades', permissions: ['superadmin:manage_groups'] },
+  { pattern: '/grupos-sociedades/nuevo', permissions: ['superadmin:manage_groups'] },
+  { pattern: '/grupos-sociedades/*', permissions: ['superadmin:manage_groups'] },
+  { pattern: '/administradores-maestros', permissions: ['superadmin:manage_master_admins'] },
+  { pattern: '/bitacora-grupo', permissions: ['superadmin:view_group_audit_log'] },
   { pattern: '/exportar-datos-contables', permissions: ['system:export_accounting'] },
   { pattern: '/cotizaciones', permissions: ['travel:view_flights', 'travel:view_hotels', 'receipts:view'], mode: 'any' },
   { pattern: '/cotizar-solicitud/*', permissions: ['travel:view_flights', 'travel:view_hotels', 'receipts:view'], mode: 'any' },
@@ -106,17 +118,16 @@ export const permissionRouteRules: PermissionRouteRule[] = [
   { pattern: '/atender-solicitud/*', permissions: ['travel:approve'] },
   { pattern: '/crear-solicitud', permissions: ['travel:create'] },
   { pattern: '/solicitudes-draft', permissions: ['travel:edit'] },
-  { pattern: '/completar-draft/*', permissions: ['travel:edit'] },
+  { pattern: '/editar-borrador/*', permissions: ['travel:edit'] },
+  { pattern: '/solicitudes', permissions: ['travel:view', 'travel:approve', 'travel:reject'], mode: 'any' },
   { pattern: '/editar-solicitud/*', permissions: ['travel:edit'] },
-  { pattern: '/historial', permissions: ['travel:view'] },
-  { pattern: '/solicitudes-autorizador', permissions: ['travel:approve', 'travel:reject'], mode: 'any' },
   { pattern: '/detalles-solicitud/*', permissions: ['travel:view'] },
   { pattern: '/comprobar-solicitud/*', permissions: ['travel:view'] },
   { pattern: '/comprobar-gastos', permissions: ['receipts:create', 'receipts:edit', 'receipts:view'], mode: 'any' },
   { pattern: '/subir-comprobante/*', permissions: ['receipts:create'] },
   { pattern: '/resubir-comprobante/*', permissions: ['receipts:edit'] },
   { pattern: '/editar-comprobante/*', permissions: ['receipts:edit'] },
-  { pattern: '/reembolso', permissions: ['receipts:create', 'receipts:edit'], mode: 'any' },
+  { pattern: '/reembolsos', permissions: ['refunds:request', 'refunds:budget', 'refunds:approve'], mode: 'any' },
 ];
 
 export function hasRoutePermission(pathname: string, permissionKeys: string[] = []): boolean {

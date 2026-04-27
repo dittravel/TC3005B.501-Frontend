@@ -8,6 +8,7 @@ const baseRoleLabels: Record<string, string> = {
     'Solicitante': "Solicitante",
     'Autorizador': "Autorizador",
     'Administrador': "Administrador",
+    'Superadministrador': "Superadministrador",
     'Cuentas por pagar': "Cuentas por Pagar",
     'Agencia de viajes': "Agencia de Viajes",
 };

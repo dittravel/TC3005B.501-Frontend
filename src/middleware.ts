@@ -52,7 +52,7 @@ export const publicRoutes = [
   '/detalles-solicitud/*',
   '/comprobar-solicitud/*',
   '/atender-solicitud/*',
-  'cotizar-solicitud/*',
+  '/cotizar-solicitud/*',
   '/presupuesto-viaje/*',
   '/resultado-accion-email',
 ];
@@ -75,14 +75,14 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   if (matchPath(pathname, publicRoutes)) {
     return next();
   }
-  
-  // 2. Get role from cookies
+
+  // 2. Get role and tokenes from cookies
   const cookieHeader = request.headers.get('cookie') || '';
   const roleMatch = /(?:^|;\s*)role=([^;]+)/.exec(cookieHeader);
   const role = roleMatch ? decodeURIComponent(roleMatch[1]) : '';
   const tokenMatch = /(?:^|;\s*)token=([^;]+)/.exec(cookieHeader);
   const token = tokenMatch ? decodeURIComponent(tokenMatch[1]) : '';
-  const isAuthenticated = !!tokenMatch;
+  const isAuthenticated = !!tokenMatch || !!role;
   const html = unauthorizedPage(pathname, isAuthenticated);
 
   // If token is missing, force re-authentication instead of rendering protected pages.
@@ -114,7 +114,6 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   const permissionKeys = Array.isArray(tokenPayload.permissions)
     ? tokenPayload.permissions.map((permission) => String(permission).trim()).filter(Boolean)
     : [];
-
   // 3. Check if the route is registered in the system
   const isKnownRoute = matchPath(pathname, allWhitelistedRoutes);
   if (!isKnownRoute) {

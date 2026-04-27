@@ -36,6 +36,7 @@ interface CreateUserFormProps {
   societies?: any[];
   token: string;
   defaultRoleId?: number | null;
+  lockSocietySelection?: boolean;
 }
 
 const getInitialFormData = (defaultRoleId?: number | null): FormData => ({
@@ -57,13 +58,17 @@ const getInitialFormData = (defaultRoleId?: number | null): FormData => ({
  * @param {string} props.redirectTo - URL to redirect after successful form submission.
  * @param {string} props.token - Authorization token for API requests.
  */
-export default function CreateUserForm({ mode, user_data, redirectTo, token, departments = [], roles = [], societies = [], defaultRoleId = null }: Readonly<CreateUserFormProps>) {
+export default function CreateUserForm({ mode, user_data, redirectTo, token, departments = [], roles = [], societies = [], defaultRoleId = null, lockSocietySelection = false }: Readonly<CreateUserFormProps>) {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const fixedSocietyId = lockSocietySelection && societies.length === 1
+    ? Number(societies[0]?.id)
+    : null;
 
   // State for boss list based on selected department
   const [bossData, setBossData] = useState<any[]>([]);
+  const selectableRoles = roles.filter((role) => role?.role_name !== 'Superadministrador');
 
   const fetchBosses = async (departmentId: number) => {
     try {
@@ -116,6 +121,13 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token, dep
     if (!defaultRoleId) return;
     setFormData((prev) => ({ ...prev, role_id: defaultRoleId }));
   }, [mode, defaultRoleId, formData.role_id]);
+
+  // Keep society locked to the actor's society when required by the page scope.
+  useEffect(() => {
+    if (!fixedSocietyId) return;
+    if (formData.society_id === fixedSocietyId) return;
+    setFormData((prev) => ({ ...prev, society_id: fixedSocietyId }));
+  }, [fixedSocietyId, formData.society_id]);
   
   // Fetch boss list when department changes
   useEffect(() => {
@@ -218,6 +230,10 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token, dep
         ? { ...formData, ...(formData.password ? {} : { password: undefined }) }
         : formData;
 
+      if (fixedSocietyId) {
+        payload.society_id = fixedSocietyId;
+      }
+
       const endpoint = mode === 'edit'
         ? `/admin/update-user/${user_data.user_id}`
         : '/admin/create-user';
@@ -233,7 +249,8 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token, dep
 
       setToast({ message: `Usuario ${mode === 'edit' ? 'actualizado' : 'creado'} exitosamente`, type: 'success' });
       if (mode === 'create') {
-        setFormData(getInitialFormData(defaultRoleId));
+        const resetData = getInitialFormData(defaultRoleId);
+        setFormData(fixedSocietyId ? { ...resetData, society_id: fixedSocietyId } : resetData);
       }
       await new Promise(resolve => setTimeout(resolve, 2000));
       if (redirectTo) {
@@ -276,7 +293,8 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token, dep
         window.location.href = redirectTo;
       }
     } else {
-      setFormData(getInitialFormData(defaultRoleId));
+      const resetData = getInitialFormData(defaultRoleId);
+      setFormData(fixedSocietyId ? { ...resetData, society_id: fixedSocietyId } : resetData);
       setErrors({});
       setToast(null);
     }
@@ -354,6 +372,7 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token, dep
               value={String(formData.society_id)}
               onChange={handleInputChange}
               error={errors.society_id}
+              disabled={Boolean(fixedSocietyId)}
               required
             >
               <option value="">Seleccionar sociedad</option>
@@ -391,7 +410,7 @@ export default function CreateUserForm({ mode, user_data, redirectTo, token, dep
               required
             >
               <option value="">Seleccionar rol</option>
-              {roles.map(role => (
+              {selectableRoles.map(role => (
                 <option key={role.role_id} value={role.role_id}>
                   {role.role_name}
                 </option>

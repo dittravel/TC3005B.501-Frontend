@@ -46,7 +46,7 @@ TC3005B.501-Frontend/
    ├─ README.md                 # Source README
    ├─ assets/                   # Static assets
    ├─ components/               # Reusable UI components (Astro, TSX)
-   │  ├─ RequestsLists/         # Components for request lists
+   │  ├─ Lists/         # Components for request lists
    │  └─ Table/                 # Table-related components
    ├─ config/                   # Configuration files (e.g., modal config)
    ├─ data/                     # Data files or constants

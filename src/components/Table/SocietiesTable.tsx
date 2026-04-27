@@ -51,7 +51,7 @@ export default function SocietyGroupsTable({ data, token, role, canCreate = fals
         ) : null}
         {canDelete ? (
           <UltimateWrapper
-            user_id={group.id}
+            id={group.id}
             endpoint="/societies"
             title="¿Estás seguro de que deseas eliminar esta sociedad?"
             message="Esta acción no se puede deshacer."
@@ -64,6 +64,7 @@ export default function SocietyGroupsTable({ data, token, role, canCreate = fals
             errorMessage="Error al eliminar la sociedad."
             method="DELETE"
             token={token}
+            className="w-full"
           />
         ) : null}
       </div>

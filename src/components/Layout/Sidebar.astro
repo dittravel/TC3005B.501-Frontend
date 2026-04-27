@@ -42,7 +42,9 @@ const permissionKeys = Array.isArray(tokenPayload?.permissions)
   : [];
 
 const permissionSet = new Set(permissionKeys);
-const items = SIDEBAR_CONFIG.filter((item) => {
+const fallbackItems = SIDEBAR_CONFIG['Administrador'] || [];
+const roleItems = SIDEBAR_CONFIG[role] || fallbackItems;
+const items = roleItems.filter((item) => {
   const requiredAnyPermissions = item.requiredAnyPermissions || [];
   const requiredAllPermissions = item.requiredAllPermissions || [];
 

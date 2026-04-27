@@ -11,7 +11,7 @@ import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
 import { hasRoutePermission } from "@config/routeAccess";
 import type { UserRole } from "@type/roles";
-import CreateAuthRuleForm from "@/components/Forms/CreateAuthRuleForm";
+import AuthRuleForm from "@/components/Forms/AuthRuleForm";
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
 const buttonLabel = roleLabels[role] || role || "Usuario";
@@ -46,7 +46,7 @@ if (!hasRoutePermission('/crear-regla', permissionKeys)) {
       subtitle="Define los niveles de autorización y condiciones para esta regla"
   />
   <main>
-    <CreateAuthRuleForm
+    <AuthRuleForm
       client:only="react"
       mode="create"
       token={token}

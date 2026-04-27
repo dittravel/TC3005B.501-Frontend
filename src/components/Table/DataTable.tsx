@@ -27,7 +27,7 @@ export default function DataTable({ columns, rows }: Readonly<Props>) {
   if (isLoading) {
     return (
       <div className="p-4 text-center text-text-secondary">
-        Cargando datos...
+        No hay datos
       </div>
     );
   }

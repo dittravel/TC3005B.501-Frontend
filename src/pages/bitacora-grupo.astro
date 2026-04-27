@@ -1,0 +1,62 @@
+---
+/**
+ * Superadmin grouped audit log page.
+ */
+
+import TextHeader from '@components/Layout/TextHeader.astro';
+import MainLayout from '@layouts/MainLayout.astro';
+import BitacoraTable from '@components/Table/BitacoraTable';
+
+import { getCookie } from '@data/cookies';
+import { roleLabels } from '@config/role-labels';
+import type { UserRole } from '@type/roles';
+import { apiRequest } from '@/utils/apiClient';
+
+const role: UserRole = getCookie('role', Astro.cookies) as UserRole;
+const buttonLabel = roleLabels[role];
+const userName = getCookie('username', Astro.cookies) || '';
+const societyGroupId = getCookie('society_group_id', Astro.cookies) || '';
+const initialSocietyGroupId = role === 'Superadministrador' ? '' : societyGroupId;
+
+let societyGroups: any[] = [];
+let initialData: any[] = [];
+let initialMeta = { count: 0, total_count: 0, has_more: false, filters: {} };
+
+try {
+  const groupsResponse = await apiRequest('/society-groups', { cookies: Astro.cookies });
+  societyGroups = Array.isArray(groupsResponse)
+    ? groupsResponse.map((group: any) => ({ id: group.id, description: group.description || `Grupo ${group.id}` }))
+    : [];
+} catch {
+  societyGroups = [];
+}
+
+try {
+  const initialGroupParam = initialSocietyGroupId ? `&society_group_id=${initialSocietyGroupId}` : '';
+  const response = await apiRequest(`/audit-log/get-logs?limit=50&offset=0&include_metadata=true${initialGroupParam}`, {
+    cookies: Astro.cookies,
+  });
+  initialData = response.data ?? [];
+  initialMeta = response.meta ?? initialMeta;
+} catch {
+  initialData = [];
+}
+---
+
+<MainLayout title="Bitácora por Grupo" data={{ userName, buttonLabel, role }}>
+  <TextHeader
+    title="Bitácora por grupo"
+    subtitle="Consulta eventos del sistema filtrando por grupo de sociedades"
+  />
+
+  <main>
+    <BitacoraTable
+      client:only="react"
+      initialData={initialData}
+      initialMeta={initialMeta}
+      role={role}
+      initialSocietyGroupId={initialSocietyGroupId}
+      societyGroups={societyGroups}
+    />
+  </main>
+</MainLayout>

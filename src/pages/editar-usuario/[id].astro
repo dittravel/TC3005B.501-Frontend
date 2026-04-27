@@ -67,9 +67,17 @@ const roles = await (async () => {
 // Get societies
 const societies = await (async () => {
   try {
-    return await apiRequest(`/societies`, {
+    if (role === 'Superadministrador') {
+      return await apiRequest(`/societies`, {
+        cookies: Astro.cookies
+      });
+    }
+
+    const currentSociety = await apiRequest(`/societies/current`, {
       cookies: Astro.cookies
     });
+
+    return currentSociety ? [currentSociety] : [];
   } catch (error) {
     console.error("Error loading societies:", error);
     return [];
@@ -98,6 +106,7 @@ const societies = await (async () => {
         departments={departments}
         roles={roles}
         societies={societies}
+        lockSocietySelection={role !== 'Superadministrador'}
       />
     )}
   </div>

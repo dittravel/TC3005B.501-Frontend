@@ -1,11 +1,11 @@
 ---
 /**
- * Dashboard page for the application. 
- * It displays different content based on the user's role
+ * Dashboard page for the application.
+ * Displays shortcuts to critical actions based on user permissions
  */
 
 import MainLayout from "@layouts/MainLayout.astro";
-import { resolveRoleView } from "@views/role-views";
+import DashboardComponent from "@components/Dashboard/Dashboard";
 import type { UserRole } from "@type/roles";
 
 import { getCookie } from "@data/cookies";
@@ -27,6 +27,7 @@ function parseJwtPayload(jwtToken: string): Record<string, unknown> | null {
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
 const userName = getCookie("username", Astro.cookies) || "";
+const userId = getCookie("id", Astro.cookies) || "";
 const token = getCookie("token", Astro.cookies) || "";
 const tokenPayload = parseJwtPayload(token);
 const permissionKeys = Array.isArray(tokenPayload?.permissions)
@@ -35,10 +36,16 @@ const permissionKeys = Array.isArray(tokenPayload?.permissions)
 
 const buttonLabel = roleLabels[role] || role || "Usuario";
 const profile = resolveDashboardProfile(role, permissionKeys);
-const ViewComponent = resolveRoleView(role, permissionKeys);
 const showMessages = shouldShowDashboardMessages(profile);
 ---
 
 <MainLayout title="Dashboard" data={{userName, buttonLabel, role}} showMessages={showMessages}>
-  <ViewComponent userName={userName}/>
+  <DashboardComponent
+    client:only="react"
+    userId={String(userId)}
+    role={role}
+    userName={userName}
+    token={String(token)}
+    permissionKeys={permissionKeys}
+  />
 </MainLayout>

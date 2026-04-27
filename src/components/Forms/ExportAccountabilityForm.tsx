@@ -71,8 +71,6 @@ export default function AccountingExportForm({ token }: Props) {
         );
       }
     } catch (error: any) {
-      //console.error("❌ Error completo:", error);
-
       const detail = error?.detail || error?.response || error;
       const status = detail?.status || error?.status || 500;
 

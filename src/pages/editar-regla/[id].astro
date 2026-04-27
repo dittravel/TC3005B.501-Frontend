@@ -10,7 +10,7 @@ import type { UserRole } from "@type/roles";
 import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
 import { apiRequest } from "@/utils/apiClient";
-import CreateAuthRuleForm from "@/components/Forms/CreateAuthRuleForm";
+import AuthRuleForm from "@/components/Forms/AuthRuleForm";
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
 const buttonLabel = roleLabels[role];
@@ -30,7 +30,7 @@ const rule = await apiRequest(`/admin/auth-rules/${id}`, { cookies: Astro.cookie
     subtitle="Modifica las condiciones y niveles de autorización"
   />
   <main>
-    <CreateAuthRuleForm
+    <AuthRuleForm
       client:only="react"
       mode="edit"
       data={rule}

@@ -11,7 +11,7 @@ import UltimateWrapper from '@components/Modals/UltimateWrapper';
 interface SocietyGroup {
   id: number;
   description: string;
-  is_default?: boolean;
+  is_default?: boolean | number | string | null;
 }
 
 interface Props {
@@ -24,13 +24,19 @@ interface Props {
 }
 
 export default function SocietyGroupsTable({ data, token, role, canCreate = false, canEdit = false, canDelete = false }: Props) {
+  const isDefaultGroupValue = (value: SocietyGroup['is_default']) =>
+    value === true || value === 1 || value === '1' || String(value).toLowerCase() === 'true';
+
   const columns = [
     { key: 'id', label: 'ID' },
     { key: 'description', label: 'Descripción' },
     { key: 'actions', label: 'Acciones' },
   ];
   
-  const rows = data.map((group: SocietyGroup) => ({
+  const rows = data.map((group: SocietyGroup) => {
+    const isDefaultGroup = isDefaultGroupValue(group.is_default);
+
+    return {
     id: group.id,
     description: group.description,
     actions: (
@@ -45,9 +51,9 @@ export default function SocietyGroupsTable({ data, token, role, canCreate = fals
             Editar
           </Button>
         ) : null}
-        {!group.is_default && canDelete ? (
+        {!isDefaultGroup && canDelete ? (
           <UltimateWrapper
-            user_id={group.id}
+            id={group.id}
             endpoint="/society-groups"
             title="¿Estás seguro de que deseas eliminar este grupo de sociedad?"
             message="Esta acción no se puede deshacer."
@@ -55,16 +61,18 @@ export default function SocietyGroupsTable({ data, token, role, canCreate = fals
             color="warning"
             variant="filled"
             label="Eliminar"
-            redirectTo="/sociedades"
+            redirectTo="/grupos-sociedades"
             successMessage="Grupo de sociedad eliminado exitosamente."
             errorMessage="Error al eliminar el grupo de sociedad."
             token={token}
             method="DELETE"
+            className="w-full"
           />
         ) : null}
       </div>
     )
-  }));
+    };
+  });
   
   return (
     <div>

@@ -23,6 +23,10 @@ export default function CreateRoleForm({ token, mode, data }: Readonly<Props>) {
   const [selectedPermissions, setSelectedPermissions] = useState<Set<string>>(new Set());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const visiblePermissionsByCategory = permissionsByCategory.map(({ category, permissions }) => ({
+    category,
+    permissions: permissions.filter((permission) => !permission.key.startsWith('superadmin:') && !permission.key.startsWith('society_groups:')),
+  })).filter(({ permissions }) => permissions.length > 0);
 
   function togglePermission(permissionKey: string) {
     setSelectedPermissions(prev => {
@@ -62,7 +66,7 @@ export default function CreateRoleForm({ token, mode, data }: Readonly<Props>) {
 
     const payload = {
       name: nombre,
-      permissions: Array.from(selectedPermissions),
+      permissions: Array.from(selectedPermissions).filter((permission) => !String(permission).startsWith('superadmin:') && !String(permission).startsWith('society_groups:')),
     };
 
     try {
@@ -129,7 +133,7 @@ export default function CreateRoleForm({ token, mode, data }: Readonly<Props>) {
           </h2>
         </div>
         <div className="space-y-6 mt-4">
-          {permissionsByCategory.map(({ category, permissions }) => (
+          {visiblePermissionsByCategory.map(({ category, permissions }) => (
             <div key={category} className="card-secondary p-4 rounded-lg">
               <p className="text-sm font-semibold text-accent-primary mb-3">{category}</p>
               <div className="flex flex-col gap-1">
