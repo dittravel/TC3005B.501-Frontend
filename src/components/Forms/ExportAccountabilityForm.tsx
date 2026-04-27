@@ -128,26 +128,29 @@ export default function AccountingExportForm({ token }: Props) {
         {/* Resultado JSON */}
         {result && (
           <div className="mt-10">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-2xl font-semibold">Resultado:</h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-2xl font-semibold">Resultado:</h3>
+
+            <div className="flex items-center gap-3">
               <Button
                 type="button"
                 color="primary"
-                size="small"
+                className="px-4 py-2"
                 onClick={handleDownload}
               >
                 Descargar JSON
               </Button>
+
               <Button
                 type="button"
-                color="secondary"
-                size="small"
+                variant="empty"
+                className="px-3 py-2"
                 onClick={handleClear}
               >
-                Limpiar resultado
+                Limpiar
               </Button>
             </div>
-
+        </div>
             <div className="bg-zinc-950 text-zinc-100 p-6 rounded-2xl overflow-auto max-h-[650px] font-mono text-sm border border-border">
               <pre>{JSON.stringify(result, null, 2)}</pre>
             </div>
