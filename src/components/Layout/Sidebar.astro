@@ -42,25 +42,23 @@ const permissionKeys = Array.isArray(tokenPayload?.permissions)
   : [];
 
 const permissionSet = new Set(permissionKeys);
-const fallbackItems = SIDEBAR_CONFIG['Administrador'] || [];
-const roleItems = SIDEBAR_CONFIG[role] || fallbackItems;
-const items = roleItems.filter((item) => {
+const items = SIDEBAR_CONFIG.filter((item: MenuItem) => {
   const requiredAnyPermissions = item.requiredAnyPermissions || [];
   const requiredAllPermissions = item.requiredAllPermissions || [];
 
   const matchesAny = requiredAnyPermissions.length === 0
     ? true
-    : requiredAnyPermissions.some((permission) => permissionSet.has(permission));
+    : requiredAnyPermissions.some((permission: string) => permissionSet.has(permission));
 
   const matchesAll = requiredAllPermissions.length === 0
     ? true
-    : requiredAllPermissions.every((permission) => permissionSet.has(permission));
+    : requiredAllPermissions.every((permission: string) => permissionSet.has(permission));
 
   return matchesAny && matchesAll && hasRoutePermission(item.route, permissionKeys);
 });
 
 // Group items by category dynamically
-const groupedItems = items.reduce((acc, item) => {
+const groupedItems = items.reduce((acc: Record<string, MenuItem[]>, item: MenuItem) => {
   const category = item.category || 'General';
   if (!acc[category]) acc[category] = [];
   acc[category].push(item);
@@ -76,7 +74,7 @@ const groupedItems = items.reduce((acc, item) => {
   ">
   <div class="h-full px-4 py-6 overflow-auto">
     {
-      Object.entries(groupedItems).map(([category, categoryItems]) => (
+      Object.entries(groupedItems).map(([category, categoryItems]: [string, MenuItem[]]) => (
         <div class="mb-4">
           {category !== 'General' && (
             <h3 class="text-sm font-medium text-text-secondary px-2 mb-2">
@@ -85,7 +83,7 @@ const groupedItems = items.reduce((acc, item) => {
           )}
           <ul class="space-y-1 list-none p-0 m-0">
             {
-              categoryItems.map((item) => {
+              categoryItems.map((item: MenuItem) => {
                 const isActive = currentPath.startsWith(item.route);
                 return (
                   <li>

@@ -20,10 +20,10 @@ interface ImportResponse {
   success: boolean;
   message: string;
   summary?: {
-    societies: {
-      created: string[];
-      updated: string[];
-      skipped: string[];
+    users: {
+      created: Array<{ username: string; role: string; department: string }>;
+      updated: Array<{ username: string; role: string; department: string }>;
+      deactivated: Array<{ username: string; role: string; department: string }>;
     };
     departments: {
       created: Array<{ name: string, cost_center: string }>;
@@ -34,11 +34,6 @@ interface ImportResponse {
       created: string[];
       updated: Array<{ name: string, old_name: string | null, new_name: string | null }>;
       skipped: string[];
-    };
-    users: {
-      created: Array<{ username: string; role: string; department: string }>;
-      updated: Array<{ username: string; role: string; department: string }>;
-      deactivated: Array<{ username: string; role: string; department: string }>;
     };
   };
   error?: string;
@@ -182,22 +177,24 @@ export default function ImportDataButton({ endpoint, token }: Props) {
         <div>
           <h2 className="text-xl font-semibold mb-4">Resumen de Importación</h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-            {/* Societies */}
-            {importData.summary.societies && (
-              <SummaryCard title="Sociedades">
-                <SummaryItem
-                  label="Creadas"
-                  items={importData.summary.societies.created}
-                  type="success"
-                />
-                <SummaryItem
-                  label="Actualizadas"
-                  items={importData.summary.societies.updated}
-                  type="success"
-                />
-                <SummaryItem label="Omitidas" items={importData.summary.societies.skipped} type="warning" />
-              </SummaryCard>
-            )}
+            {/* Users */}
+            <SummaryCard title="Usuarios">
+              <SummaryItem
+                label="Creados"
+                items={importData.summary.users.created.map(u => u.username)}
+                type="success"
+              />
+              <SummaryItem
+                label="Actualizados"
+                items={importData.summary.users.updated.map(u => u.username)}
+                type="success"
+              />
+              <SummaryItem
+                label="Desactivados"
+                items={importData.summary.users.deactivated.map(u => u.username)}
+                type="warning"
+              />
+            </SummaryCard>
             {/* Departments */}
             <SummaryCard title="Departamentos">
               <SummaryItem
@@ -221,24 +218,6 @@ export default function ImportDataButton({ endpoint, token }: Props) {
                 type="success"
               />
               <SummaryItem label="Omitidos" items={importData.summary.costCenters.skipped} type="warning" />
-            </SummaryCard>
-            {/* Users */}
-            <SummaryCard title="Usuarios">
-              <SummaryItem
-                label="Creados"
-                items={importData.summary.users.created.map(u => u.username)}
-                type="success"
-              />
-              <SummaryItem
-                label="Actualizados"
-                items={importData.summary.users.updated.map(u => u.username)}
-                type="success"
-              />
-              <SummaryItem
-                label="Desactivados"
-                items={importData.summary.users.deactivated.map(u => u.username)}
-                type="warning"
-              />
             </SummaryCard>
           </div>
         </div>
