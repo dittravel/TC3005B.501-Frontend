@@ -20,19 +20,31 @@ import { apiRequest } from "@/utils/apiClient";
 
 const { id } = Astro.params;
 let request = null;
+let currencies = [];
+
 try {
   request = await apiRequest(`/user/get-travel-request/${id}`, { cookies: Astro.cookies });
 } catch (error) {
   request = null;
   throw new Error(`No request found with ID ${id}`);
 }
+
+// Fetch currencies from the backend
+try {
+  const response = await apiRequest('/exchange-rate/catalog', { cookies: Astro.cookies });
+  currencies = response.data || [];
+} catch (error) {
+  console.error('Error fetching currencies:', error);
+}
+
+console.log('Fetched request data:', request);
 ---
 
 <MainLayout title="Completar Draft" data={{ userName, buttonLabel, role }}>
   <div>
     <TextHeader
-      title="Completar solicitud de viaje"
-      subtitle="Por favor termine de llenar el siguiente draft por completo"
+      title="Editar borrador de solicitud"
+      subtitle="Por favor termine de llenar el siguiente borrador por completo"
     />
     <main>
       <TravelRequestForm
@@ -43,6 +55,7 @@ try {
         user_id={getCookie("id", Astro.cookies) || ""}
         role={role}
         token={getCookie("token", Astro.cookies) || ""}
+        currencies={currencies}
       />
     </main>
   </div>

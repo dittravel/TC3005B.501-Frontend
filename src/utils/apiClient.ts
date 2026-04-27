@@ -154,7 +154,7 @@ export async function apiRequest<T = any>(
 
         const text = await res.text();
         try {
-          return JSON.parse(text);
+          return JSON.parse(text) as T;
         } catch {
           return text as T;
         }

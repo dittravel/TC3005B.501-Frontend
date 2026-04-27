@@ -1,18 +1,22 @@
 ---
 /**
  * Author: Kenia Esmeralda Ramos Javier.
- * 
- * This component displays the detailed information of a travel 
+ *
+ * This component displays the detailed information of a travel
  * request in a structured and styled way, matching TravelRequestForm layout.
- * 
+ *
  * Includes a button to navigate back to the requests history.
  */
 
-import TextHeader from '@components/Layout/TextHeader.astro';
-import Button from '@/components/Buttons/Button';
-import TravelSearchCard from '@/components/Cards/TravelSearchCard';
+import TextHeader from "@components/Layout/TextHeader.astro";
+import Button from "@/components/Buttons/Button";
+import { getCookie } from "@data/cookies";
+import TravelSearchCard from "@/components/Cards/TravelSearchCard";
+import ConfirmationDocumentForm from "@/components/Forms/ConfirmationDocumentForm";
+import type { UserRole } from "@/types/roles";
 const { request, title, subtitle } = Astro.props;
-
+const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
+const token = getCookie("token", Astro.cookies) || "";
 ---
 
 <main class="flex flex-col items-center">
@@ -91,71 +95,165 @@ const { request, title, subtitle } = Astro.props;
           Rutas
         </h2>
       </div>
-      <div>
-        {request.routes.map((route: any, index: number) => (
-          <div key={index} class="routes-wrapper">
-            <div class="route-title">
-              <span>Ruta #{index + 1}</span>
-            </div>
-            <div class="route-content">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-3 text-text-primary">
-                  <p>
-                    <span class="font-medium">Origen:</span> {route.origin_city}, {route.origin_country}
-                  </p>
-                  <p>
-                    <span class="font-medium">Destino:</span> {route.destination_city}, {route.destination_country}
-                  </p>
-                  <p>
-                    <span class="font-medium">Fecha de salida:</span> {route.beginning_date}
-                  </p>
-                  <p>
-                    <span class="font-medium">Hora de salida:</span> {route.beginning_time}
-                  </p>
+      <div class="space-y-6">
+        {
+          request.routes.map((route: any, index: number) => (
+            <div class="space-y-4">
+              <div class="routes-wrapper ">
+                <div class="route-title">
+                  <span>Ruta #{index + 1}</span>
                 </div>
-                <div class="space-y-3 text-text-primary">
-                  <p>
-                    <span class="font-medium">Fecha de regreso:</span> {route.ending_date}
-                  </p>
-                  <p>
-                    <span class="font-medium">Hora de regreso:</span> {route.ending_time}
-                  </p>
-                  <p>
-                    <span class="font-medium">Hotel necesario:</span> {route.hotel_needed ? 'Sí' : 'No'}
-                  </p>
-                  <p>
-                    <span class="font-medium">Avión necesario:</span> {route.plane_needed ? 'Sí' : 'No'}
-                  </p>
+                <div class="route-content">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-3 text-text-primary">
+                      <p>
+                        <span class="font-medium">Origen:</span>{" "}
+                        {route.origin_city}, {route.origin_country}
+                      </p>
+                      <p>
+                        <span class="font-medium">Destino:</span>{" "}
+                        {route.destination_city}, {route.destination_country}
+                      </p>
+                      <p>
+                        <span class="font-medium">Fecha de salida:</span>{" "}
+                        {route.beginning_date}
+                      </p>
+                      <p>
+                        <span class="font-medium">Hora de salida:</span>{" "}
+                        {route.beginning_time}
+                      </p>
+                    </div>
+                    <div class="space-y-3 text-text-primary">
+                      <p>
+                        <span class="font-medium">Fecha de regreso:</span>{" "}
+                        {route.ending_date}
+                      </p>
+                      <p>
+                        <span class="font-medium">Hora de regreso:</span>{" "}
+                        {route.ending_time}
+                      </p>
+                      <p>
+                        <span class="font-medium">Hotel necesario:</span>{" "}
+                        {route.hotel_needed ? "Sí" : "No"}
+                      </p>
+                      <p>
+                        <span class="font-medium">Avión necesario:</span>{" "}
+                        {route.plane_needed ? "Sí" : "No"}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
+              {role === "Agencia de viajes" && (
+                <>
+                  <div class="mt-4">
+                    <TravelSearchCard
+                      client:load
+                      route={route}
+                      routeIndex={index}
+                      token={token}
+                    />
+                  </div>
+                  <div class="mt-4">
+                    <ConfirmationDocumentForm
+                      client:load
+                      route={route}
+                      routeId={route.route_id}
+                      token={token}
+                    />
+                  </div>
+                </>
+              )}
             </div>
-          </div>
-        ))}
+          ))
+        }
       </div>
     </div>
-
-    {/* Travel Search Card */}
-    <TravelSearchCard
-      route={request.routes[0]}
-      routeIndex={0}
-      onSelectFlight={(flight) => {
-        console.log('Flight selected:', flight);
-      }}
-      onSelectHotel={(hotel) => {
-        console.log('Hotel selected:', hotel);
-      }}
-    />
+    {/* Reservation Files Section */}
+    { role !== "Agencia de viajes" &&
+      request.routes.some(
+        (route: any) => route.flight_pdf_file_id || route.hotel_pdf_file_id,
+      ) && (
+        <div class="card">
+          <div class="card-title">
+            <h2 class="text-xl font-bold text-text-primary">
+              Documentos de Reservación
+            </h2>
+          </div>
+          <div class="space-y-4">
+            {request.routes.map(
+              (route: any, index: number) =>
+                (route.flight_pdf_file_id || route.hotel_pdf_file_id) && (
+                  <div class="space-y-2">
+                    <p class="text-sm font-semibold text-text-primary">
+                      Ruta #{index + 1}
+                    </p>
+                    {route.flight_pdf_file_id && (
+                      <div class="flex w-full bg-card-hover p-2 border border-border rounded-md gap-4 items-center justify-between">
+                        <div class="flex flex-col items-start justify-center gap-1">
+                          <p class="text-md font-semibold text-text-primary">
+                            Vuelo PDF
+                          </p>
+                          <p class="text-xs text-text-primary">
+                            {route.flight_pdf_file_name}
+                          </p>
+                        </div>
+                        <a
+                          href={`${import.meta.env.PUBLIC_API_BASE_URL}/files/receipt-file/${route.flight_pdf_file_id}`}
+                        >
+                          <Button
+                            color="secondary"
+                            variant="border"
+                            size="small"
+                          >
+                            Descargar
+                          </Button>
+                        </a>
+                      </div>
+                    )}
+                    {route.hotel_pdf_file_id && (
+                      <div class="flex w-full bg-card-hover p-2 border border-border rounded-md gap-4 items-center justify-between">
+                        <div class="flex flex-col items-start justify-center gap-1">
+                          <p class="text-md font-semibold text-text-primary">
+                            Hotel PDF
+                          </p>
+                          <p class="text-xs text-text-primary">
+                            {route.hotel_pdf_file_name}
+                          </p>
+                        </div>
+                        <a
+                          href={`${import.meta.env.PUBLIC_API_BASE_URL}/files/receipt-file/${route.hotel_pdf_file_id}`}
+                        >
+                          <Button
+                            color="secondary"
+                            variant="border"
+                            size="small"
+                          >
+                            Descargar
+                          </Button>
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                ),
+            )}
+          </div>
+        </div>
+      )
+    }
 
     {/* Notes Section */}
-    {request.notes && (
-      <div class="card">
-        <div class="card-title">
-          <h2 class="text-xl font-bold text-text-primary">
-            Observaciones / Comentarios
-          </h2>
+    {
+      request.notes && (
+        <div class="card mt-6">
+          <div class="card-title ">
+            <h2 class="text-xl font-bold text-text-primary ">
+              Observaciones / Comentarios
+            </h2>
+          </div>
+          <p class="text-text-primary">{request.notes}</p>
         </div>
-        <p class="text-text-primary">{request.notes}</p>
-      </div>
-    )}
+      )
+    }
   </div>
 </main>

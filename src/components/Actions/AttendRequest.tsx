@@ -29,11 +29,9 @@ export default function AttendRequest({ request_id, token }: Props) {
    * @returns {Promise<void>}
    */
   const handleConfirm = useCallback(async () => {
-    const parsedFee = parseFloat(imposedFee);
-
-    // Validate that the imposed fee is a valid positive number
-    if (!imposedFee || isNaN(parsedFee) || parsedFee <= 0) {
-      setErrorMessage("Por favor ingrese un monto válido mayor a 0.");
+    // Allow empty (defaults to 0) or valid positive number
+    if (imposedFee && (isNaN(parseFloat(imposedFee)) || parseFloat(imposedFee) < 0)) {
+      setErrorMessage("Por favor ingrese un monto válido o déjalo en blanco.");
       return;
     }
 
@@ -42,6 +40,7 @@ export default function AttendRequest({ request_id, token }: Props) {
 
     try {
       const url = `/accounts-payable/attend-travel-request/${request_id}`;
+      const parsedFee = imposedFee ? parseFloat(imposedFee) : 0;
       await apiRequest(url, {
         method: "PUT",
         data: {
@@ -54,7 +53,7 @@ export default function AttendRequest({ request_id, token }: Props) {
       window.location.href = "/dashboard";
     } catch (error) {
       console.error("Error al asignar presupuesto:", error);
-      alert("Ocurrió un error al enviar la información.");
+      setToast({ message: 'Ocurrió un error al enviar la información.', type: 'error' });
     }
   }, [imposedFee, request_id]);
 
@@ -68,12 +67,11 @@ export default function AttendRequest({ request_id, token }: Props) {
       <Input
         type="number"
         name="imposedFee"
-        label="Presupuesto impuesto (MXN)"
-        placeholder="Ingrese el monto presupuestal"
+        label="Presupuesto impuesto"
+        placeholder="0.00 MXN"
         value={imposedFee}
         onChange={(e) => setImposedFee(e.target.value)}
         error={errorMessage}
-        required
       />
 
       <div className="flex w-full justify-end mt-6">

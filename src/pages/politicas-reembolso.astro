@@ -5,69 +5,63 @@
 
 import TextHeader from "@components/Layout/TextHeader.astro";
 import MainLayout from "@layouts/MainLayout.astro";
-import RefundPolicyForm from "@/components/Forms/RefundPolicyForm";
+import DefaultRefundPolicy from "@components/Forms/DefaultRefundPolicy";
+import RefundPoliciesList from "@components/Lists/RefundPoliciesList";
 import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
 import type { UserRole } from "@type/roles";
+import { apiRequest } from "@/utils/apiClient";
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
 const buttonLabel = roleLabels[role];
 const userName = getCookie("username", Astro.cookies) || "";
-const token = getCookie("token", Astro.cookies) || "";
 
-function parseJwtPayload(jwtToken: string): Record<string, unknown> | null {
+// Get refund policies list
+const policies = await (async () => {
   try {
-    const parts = jwtToken.split('.');
-    if (parts.length < 2) return null;
-    const base64 = parts[1].replaceAll('-', '+').replaceAll('_', '/');
-    const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '=');
-    return JSON.parse(Buffer.from(padded, 'base64').toString('utf8'));
-  } catch {
+    return await apiRequest(`/refund-policy`, {
+      cookies: Astro.cookies
+    });
+  } catch (error) {
+    console.error("Error al cargar las políticas de reembolso:", error);
+    return [];
+  }
+})();
+
+// Get society info (for local currency)
+const society = await (async () => {
+  try {
+    const data = await apiRequest(`/societies/current`, {
+      cookies: Astro.cookies
+    });
+    return data || null;
+  } catch (error) {
+    console.error("Error al cargar la sociedad del usuario:", error);
     return null;
   }
-}
+})();
 
-const tokenPayload = parseJwtPayload(token);
-const permissionKeys = Array.isArray(tokenPayload?.permissions)
-  ? tokenPayload.permissions.map((permission: unknown) => String(permission).trim()).filter(Boolean)
-  : [];
-
-const canEditPolicy = permissionKeys.includes('travel:def_amount');
+// Get token
+const token = getCookie("token", Astro.cookies) || "";
 ---
 
-<MainLayout title="Roles" data={{ userName, buttonLabel, role }}>
-  <div>
-    <TextHeader
-      title="Políticas de reembolso"
-      subtitle="Configura las políticas de reembolso del sistema"
+<MainLayout title="Políticas de Reembolso" data={{userName, buttonLabel, role}}>
+  <TextHeader
+    title="Políticas de Reembolso"
+    subtitle="Configura y gestiona las políticas de reembolso del sistema"
+  />
+  <main>
+    <DefaultRefundPolicy
+      client:load
+      defaultPolicy={policies.find((p: any) => p.is_default)}
+      currency={society?.local_currency || "MXN"}
+      token={token}
     />
-    <main>
-      <RefundPolicyForm
-        token={token}
-        role={role}
-        canEditPolicy={canEditPolicy}
-        client:only="react"
-        data = {[
-          {
-            id: 1,
-            name: "Viajes económicos",
-            minAmount: 1000,
-            maxAmount: 2999,
-            maxDays: 20,
-            validateAgainstInvoice: false,
-            validateAgainstPredefinedInput: false,
-          },
-          {
-            id: 2,
-            name: "Viajes costosos",
-            minAmount: 3000,
-            maxAmount: 5999,
-            maxDays: 30,
-            validateAgainstInvoice: true,
-            validateAgainstPredefinedInput: true,
-          },
-        ]}
-      />
-    </main>
-  </div>
+    <RefundPoliciesList
+      client:load
+      data={policies}
+      currency={society?.local_currency || "MXN"}
+      token={token}
+    />
+  </main>
 </MainLayout>
