@@ -385,7 +385,7 @@ export default function TravelRequestForm({
       });
       setToast({ message: 'Solicitud creada y enviada exitosamente.', type: 'success' });
       await new Promise(resolve => setTimeout(resolve, 2000));
-      window.location.href = '/dashboard';
+      window.location.href = '/solicitudes';
     } catch (error) {
       console.error('Error al enviar la solicitud:', error);
       setError('Hubo un error al enviar la solicitud.');
@@ -879,7 +879,7 @@ export default function TravelRequestForm({
               await handleEditRequest(
                 e as unknown as React.FormEvent,
                 true,
-                "/dashboard",
+                "/solicitudes",
               );
             }}
             color="secondary"

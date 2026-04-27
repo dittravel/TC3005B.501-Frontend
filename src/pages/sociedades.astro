@@ -91,17 +91,6 @@ const societies = await (async () => {
   />
   <main>
     <div class="flex flex-col gap-8">
-      {canManageSocietyGroups && isDefaultGroup && (
-        <SocietyGroupsTable
-          client:load
-          data={societyGroups}
-          token={token}
-          role={role}
-          canCreate={canManageSocietyGroups}
-          canEdit={canManageSocietyGroups}
-          canDelete={canManageSocietyGroups}
-        />
-      )}
       {canViewSocieties ? (
         <SocietiesTable
           client:load
