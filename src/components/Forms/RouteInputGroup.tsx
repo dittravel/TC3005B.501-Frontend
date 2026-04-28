@@ -8,11 +8,15 @@
  * Svg icons obtained from Heroicons (https://heroicons.com/)
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import Button from '@/components/Buttons/Button';
 import Input from '@/components/Utils/Input';
 import Checkbox from '@/components/Utils/Checkbox';
 import type { TravelRoute } from '@/types/TravelRoute';
+import Select from '@/components/Utils/Select';
+
+interface Country { country_id: number; country_name: string; }
+interface City    { city_id: number;    city_name: string; country_id: number; }
 
 interface RouteInputGroupProps {
   route: TravelRoute;
@@ -20,6 +24,8 @@ interface RouteInputGroupProps {
   index: number;
   onRemove?: (index: number) => void;
   isRemovable: boolean;
+  countries?: Country[];
+  cities?: City[];
 }
 
 /**
@@ -29,8 +35,32 @@ interface RouteInputGroupProps {
  * @param {RouteInputGroupProps} props - Component properties
  * @returns {JSX.Element} Rendered route input form group
  */
-const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, index, onRemove, isRemovable }) => {
-  
+const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, index, onRemove, isRemovable, countries, cities }) => {
+  const [selectedOriginCountryId, setSelectedOriginCountryId] = useState<number | ''>('');
+  const [selectedDestCountryId,   setSelectedDestCountryId]   = useState<number | ''>('');
+
+  const originCities = (cities ?? []).filter(c => c.country_id === selectedOriginCountryId);
+  const destCities   = (cities ?? []).filter(c => c.country_id === selectedDestCountryId);
+
+  const handleCountryChange = (field: 'origin' | 'destination') => (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const countryId = Number(e.target.value) || '';
+    const selected  = (countries ?? []).find(c => c.country_id === countryId);
+    if (field === 'origin') {
+      setSelectedOriginCountryId(countryId as number);
+      onChange(index, 'origin_country_name', selected?.country_name ?? '');
+      onChange(index, 'origin_city_name', '');
+    } else {
+      setSelectedDestCountryId(countryId as number);
+      onChange(index, 'destination_country_name', selected?.country_name ?? '');
+      onChange(index, 'destination_city_name', '');
+    }
+  };
+
+  const handleCityChange = (field: 'origin' | 'destination') => (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const name = field === 'origin' ? 'origin_city_name' : 'destination_city_name';
+    onChange(index, name, e.target.value);
+  };
+
   /**
    * Handles input changes for all input fields in the route form.
    * Converts checkbox values to boolean and regular input values to string.
@@ -75,48 +105,62 @@ const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, inde
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Origin Country */}
-            <Input
+            <Select
               name="origin_country_name"
               label="País de Origen"
-              placeholder="País Origen"
-              type="text"
-              value={route.origin_country_name === "notSelected" ? '' : route.origin_country_name}
-              onChange={handleInputChange}
+              value={selectedOriginCountryId}
+              onChange={handleCountryChange('origin')}
               required
-            />
+            >
+              <option value="">Selecciona un país</option>
+              {(countries ?? []).map(c => (
+                <option key={c.country_id} value={c.country_id}>{c.country_name}</option>
+              ))}
+            </Select>
 
             {/* Origin City */}
-            <Input
+            <Select
               name="origin_city_name"
               label="Ciudad de Origen"
-              placeholder="Ciudad Origen"
-              type="text"
-              value={route.origin_city_name === "notSelected" ? '' : route.origin_city_name}
-              onChange={handleInputChange}
+              value={route.origin_city_name ?? ''}
+              onChange={handleCityChange('origin')}
+              disabled={originCities.length === 0}
               required
-            />
+            >
+              <option value="">Selecciona una ciudad</option>
+              {originCities.map(c => (
+                <option key={c.city_id} value={c.city_name}>{c.city_name}</option>
+              ))}
+            </Select>
 
             {/* Destination Country */}
-            <Input
+            <Select
               name="destination_country_name"
               label="País de Destino"
-              placeholder="País Destino"
-              type="text"
-              value={route.destination_country_name === "notSelected" ? '' : route.destination_country_name}
-              onChange={handleInputChange}
+              value={selectedDestCountryId}
+              onChange={handleCountryChange('destination')}
               required
-            />
+            >
+              <option value="">Selecciona un país</option>
+              {(countries ?? []).map(c => (
+                <option key={c.country_id} value={c.country_id}>{c.country_name}</option>
+              ))}
+            </Select>
 
             {/* Destination City */}
-            <Input
+            <Select
               name="destination_city_name"
               label="Ciudad de Destino"
-              placeholder="Ciudad Destino"
-              type="text"
-              value={route.destination_city_name === "notSelected" ? '' : route.destination_city_name}
-              onChange={handleInputChange}
+              value={route.destination_city_name ?? ''}
+              onChange={handleCityChange('destination')}
+              disabled={destCities.length === 0}
               required
-            />
+            >
+              <option value="">Selecciona una ciudad</option>
+              {destCities.map(c => (
+                <option key={c.city_id} value={c.city_name}>{c.city_name}</option>
+              ))}
+            </Select>
           </div>
         </div>
 
