@@ -825,6 +825,7 @@ export default function TravelRequestForm({
               value={formData.notes}
               onChange={handleGeneralChange}
               rows={4}
+              required
             />
           </div>
         )}
