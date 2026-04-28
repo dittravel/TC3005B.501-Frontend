@@ -32,7 +32,7 @@ Esto significa que cuando un usuario entra a cualquier página, el servidor de N
 
 ### 1.2 Adaptador: @astrojs/node
 
-Astro sabe en donde va a correr el servidor. Para eso existen los adaptadores, que son paquetes que le dicen a Astro cómo comportarse según el entorno. El proyecto usa `@astrojs/node`, lo que significa que el servidor que ejecuta el proyecto es Node.js.
+Astro **no** sabe en donde va a correr el servidor. Para eso existen los adaptadores, que son paquetes que le dicen a Astro cómo comportarse según el entorno. El proyecto usa `@astrojs/node`, lo que significa que el servidor que ejecuta el proyecto es Node.js.
 
 Esto se confirmó con esta línea del output de `npm run build`:
 
@@ -57,7 +57,7 @@ Se completó en 25ms porque no había nada que pregenerar. Páginas como `login`
 
 ## 2. ¿Cuántos componentes se cargan en el navegador y cuáles son?
 
-En Astro los componentes se renderizan por dejecto en el servidor y el navegador recibe HTMLs. Para que un componente sea interactivo en el navegador, se le debe agregar una directiva para inicialización que le dice a Astro cuándo y cómo enviar el componente al navegador.
+En Astro los componentes se renderizan por defecto en el servidor y el navegador recibe HTMLs. Para que un componente sea interactivo en el navegador, se le debe agregar una directiva para inicialización que le dice a Astro cuándo y cómo enviar el componente al navegador.
 
 Algunas directivas disponibles pueden ser:
 - **`client:load`** — El componente se renderiza en el servidor y se
@@ -179,7 +179,7 @@ Este comando lista todos los archivos `.js` generados dentro de la carpeta `dist
 | `client.js` | **179.41 kB** | Runtime de React |
 | `createSvgIcon.js` | **74.45 kB** | Íconos de MUI |
 | `TravelRequestForm.js` | 18.32 kB | Formulario de solicitud de viaje |
-| `TravelSearchCard.js` | 14.85 kB | Íconos de MUI |
+| `TravelSearchCard.js` | 14.85 kB | Tarjeta de búsqueda de viajes |
 | `ExpensesForm.js` | 10.12 kB | Formulario de gastos |
 | `ReceiptsList.js` | 8.75 kB | Lista de comprobantes |
 | `index.js` | 8.39 kB | Punto de entrada |
@@ -232,3 +232,13 @@ Los siguientes componentes fueron identificados como **posibles** elementos para
 Si alguno de estos componentes se convierte a `.astro`, ese archivo desaparece completamente del lado del cliente. Por ende, el navegador recibe menos archivos de JavaScript, lo que podría significa una página que carga y se muestra más rápido.
 
 ## 5. Recomendaciones
+
+En base a todo el análisis realizado previamente, a continuación propongo 4 acciones que se pueden hacer para mejorar el rendimiento del frontend. Algunas resultan sencillas porque solo involucran eliminar algo, pero otras involucran revisar los componentes listados en la Sección 4.
+
+| ID | Qué hacer |
+|---|-----------|
+| MR-1 | Eliminar el import de `Check` no utilizado en `TravelSearchCard.tsx` |
+| MR-2 | Hacer `login`, `forgot-password` y `reset-password` como páginas estáticas |
+| MR-3 | Revisar los componentes listados en la Sección 4 y convertir a `.astro` los que sean aptos para el cambio|
+| MR-4 | Cambiar `client:only` por `client:load` en páginas que sí dependen de datos del servidor |
+
