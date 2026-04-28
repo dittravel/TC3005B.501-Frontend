@@ -46,7 +46,7 @@ TC3005B.501-Frontend/
    ├─ README.md                 # Source README
    ├─ assets/                   # Static assets
    ├─ components/               # Reusable UI components (Astro, TSX)
-   │  ├─ RequestsLists/         # Components for request lists
+   │  ├─ Lists/         # Components for request lists
    │  └─ Table/                 # Table-related components
    ├─ config/                   # Configuration files (e.g., modal config)
    ├─ data/                     # Data files or constants
@@ -159,3 +159,16 @@ The application is fully integrated with the backend API. To start using the app
 [typescript-badge]: https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white&color=blue
 [tailwind-badge]: https://img.shields.io/badge/Tailwind-ffffff?style=for-the-badge&logo=tailwindcss&logoColor=38bdf8
 [react-badge]: https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black&color=blue
+
+### Frontend Optimization Tests
+
+Open console in your browser (right click -> inspect -> console) to visualize frontend performance. 
+We use Google´s web vitals library to conduct these tests. Find below a guide of what each acronym means:
+
+| Metric   | When it fires                                   |
+| -------- | ----------------------------------------------- |
+| **TTFB** | immediately on page load  |
+| **FCP**  | when first content paints                       |
+| **LCP**  | when largest element finishes loading           |
+| **CLS**  | when layout shifts happen                       |
+| **INP**  | when you interact (click/type)                  |

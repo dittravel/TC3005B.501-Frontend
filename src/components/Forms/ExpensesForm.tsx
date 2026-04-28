@@ -68,7 +68,7 @@ export default function ExpensesForm({
     routeId: data?.route_id || routes?.[0]?.route_id || null as number | null,
     concepto: data?.receipt_type_name || "Transporte",
     receiptDate: data ? data.receipt_date.split('T')[0] : "",
-    monto: data?.amount?.toString() || "",
+    monto: data?.amount ? parseFloat(data.amount).toFixed(2).toString() : "",
     currency: data?.currency || "",
     isInternational: data ? data.currency !== "MXN" : false,
   });
@@ -288,10 +288,10 @@ export default function ExpensesForm({
         submitData.append("request_id", requestId.toString());
         submitData.append("route_id", formData.routeId.toString());
         submitData.append("receipt_type_id", conceptoMap[formData.concepto].toString());
-        submitData.append("amount", formData.monto);
+        submitData.append("amount", parseFloat(formData.monto).toFixed(2));
         submitData.append("currency", formData.currency);
         submitData.append("receipt_date", formData.receiptDate);
-        submitData.append("local_amount", localAmount || formData.monto);
+        submitData.append("local_amount", parseFloat(localAmount || formData.monto).toFixed(2));
         if (pdfFile) submitData.append("pdf", pdfFile);
         if (xmlFile) submitData.append("xml", xmlFile);
 
@@ -315,10 +315,10 @@ export default function ExpensesForm({
         const updateData: any = {
           route_id: formData.routeId,
           receipt_type_name: formData.concepto,
-          amount: parseFloat(formData.monto),
+          amount: parseFloat(parseFloat(formData.monto).toFixed(2)),
           currency: formData.currency,
           receipt_date: formData.receiptDate,
-          local_amount: parseFloat(localAmount || formData.monto),
+          local_amount: parseFloat(parseFloat(localAmount || formData.monto).toFixed(2)),
         };
 
         // If resubmitting a rejected receipt, 

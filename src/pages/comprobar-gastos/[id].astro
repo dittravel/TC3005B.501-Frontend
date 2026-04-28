@@ -6,7 +6,7 @@
 export const prerender = false;
 import MainLayout from "@layouts/MainLayout.astro";
 import TextHeader from "@components/Layout/TextHeader.astro";
-import ReceiptsList from "@/components/RequestsLists/ReceiptsList";
+import ReviewReceiptsList from "@/components/Lists/ReviewReceiptsList";
 import type { UserRole } from "@type/roles";
 
 import { getCookie } from "@data/cookies";
@@ -39,6 +39,19 @@ const enrichedExpenses = await Promise.all(
   })
 );
 const allReviewed = enrichedExpenses.every((receipt: any) => receipt.validation !== "Pendiente");
+
+// Get society info (for local currency)
+const society = await (async () => {
+  try {
+    const data = await apiRequest(`/societies/current`, {
+      cookies: Astro.cookies
+    });
+    return data?.society || null;
+  } catch (error) {
+    console.error("Error al cargar la sociedad del usuario:", error);
+    return null;
+  }
+})();
 ---
 
 <MainLayout title={`Solicitud #${request.request_id}`} data={{userName, buttonLabel, role}} >
@@ -47,13 +60,14 @@ const allReviewed = enrichedExpenses.every((receipt: any) => receipt.validation 
     subtitle="Revisa los comprobantes de gastos relacionados con esta solicitud y valida su estado para finalizar el proceso"
   />
   <main>
-    <ReceiptsList
+    <ReviewReceiptsList
       client:only="react"
       expenses={enrichedExpenses}
       token={getCookie("token", Astro.cookies) || ""}
       allReviewed={allReviewed}
       requestId={request.request_id}
       imposedFee={request.imposed_fee}
+      currency={society?.currency || "MXN"}
     />
   </main>
 </MainLayout>
