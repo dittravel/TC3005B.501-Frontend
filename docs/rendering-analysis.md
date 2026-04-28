@@ -198,4 +198,37 @@ El segundo archivo más pesado (74 kB) corresponde a los íconos de MUI (Materia
 
 ## 4. ¿Qué componentes podrían ser más ligeros?
 
+Como se mencionó en la Sección 2, `client:only="react"` hace que un componente se construya completamente en el navegador. Esto funciona cuando el componente necesita interactividad, como formularios o cosas que se ejecutan en el navegador.
+
+Pero, si un componente solo muestra información, no necesita ser un componente de React interactivo, porque podría ser un componente `.astro`, que se renderiza únicamente en el servidor y no manda nada de JavaScript al navegador.
+
+Una forma para poder identificar si un componente de React necesita ejecutarse en el navegador es revisar si usa alguno de estos elementos:
+
+- **`useState`**: maneja un estado interno que cambia
+- **`useEffect`**: ejecuta algo cuando el componente se actualiza
+- **`useRef`**: referencia directa a un elemento
+- **`useContext`**: usa un contexto global
+
+Si un componente `.tsx` no usa ninguno de estos, podría convertirse a `.astro` y eliminarse del lado del cliente.
+
+Referencia: [Astro Docs: UI Frameworks](https://docs.astro.build/en/guides/framework-components/#hydrating-interactive-components)
+
+### Posibles componentes a cambiar
+
+Los siguientes componentes fueron identificados como **posibles** elementos para convertirse en `.astro`, basándose en su tamaño. 
+
+**Cabe y es muy importante aclarar que, antes de hacer esto, los archivos requieren una inspección manual para confirmarse.**
+
+| Componente | Tamaño|
+|------------|-----------------|
+| `CreateRoleForm.js` | 0.26 kB |
+| `ExpensesForm.js` | 0.38 kB |
+| `Card.js` | 0.58 kB |
+| `Tag.js` | 0.86 kB |
+| `Checkbox.js` | 1.20 kB |
+
+### ¿Qué podría pasar si los convertimos?
+
+Si alguno de estos componentes se convierte a `.astro`, ese archivo desaparece completamente del lado del cliente. Por ende, el navegador recibe menos archivos de JavaScript, lo que podría significa una página que carga y se muestra más rápido.
+
 ## 5. Recomendaciones
