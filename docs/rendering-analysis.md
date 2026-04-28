@@ -237,8 +237,46 @@ En base a todo el análisis realizado previamente, a continuación propongo 4 ac
 
 | ID | Qué hacer |
 |---|-----------|
-| MR-1 | Eliminar el import de `Check` no utilizado en `TravelSearchCard.tsx` |
-| MR-2 | Hacer `login`, `forgot-password` y `reset-password` como páginas estáticas |
-| MR-3 | Revisar los componentes listados en la Sección 4 y convertir a `.astro` los que sean aptos para el cambio|
-| MR-4 | Cambiar `client:only` por `client:load` en páginas que sí dependen de datos del servidor |
+| MR-1 | Eliminar el import de `Check` no utilizado en `TravelSearchCard.tsx`. |
+| MR-2 | Hacer `login`, `forgot-password` y `reset-password` como páginas estáticas. |
+| MR-3 | Revisar los componentes listados en la Sección 4 y convertir a `.astro` los que sean aptos para el cambio. |
+| MR-4 | Cambiar `client:only` por `client:load` en páginas que sí dependen de datos del servidor. |
 
+### Detección de imports no utilizados
+
+Al correr el comando `npm run build` mencionado en la Sección 3, Astro
+emitió advertencias de un `useMemo` importado pero no utilizado en los
+siguientes 20 archivos:
+
+```
+[WARN] [vite] "useMemo" is imported from external module "react" but never used in:
+    - "src/components/Buttons/Button.tsx"
+    - "src/components/Forms/ExportAccountabilityForm.tsx"
+    - "src/components/Table/Pagination.tsx"
+    - "src/components/Utils/Toast.tsx"
+    - "src/components/Forms/AdminUserForm.tsx"
+    - "src/components/Forms/SocietyGroupForm.tsx"
+    - "src/components/Forms/SocietyForm.tsx"
+    - "src/components/Buttons/UserMenu.tsx"
+    - "src/components/Buttons/ImportDataButton.tsx"
+    - "src/components/Forms/UserProfile.tsx"
+    - "src/components/Forms/ConfirmationDocumentForm.tsx"
+    - "src/components/Modals/DeleteAuthRuleModal.tsx"
+    - "src/hooks/useAuthRuleForm.ts"
+    - "src/components/Modals/ModalWrapper.tsx"
+    - "src/components/Modals/UltimateWrapper.tsx"
+    - "src/components/Forms/HotelSearchForm.tsx"
+    - "src/components/Forms/FlightSearchForm.tsx"
+    - "src/components/Cards/TravelSearchCard.tsx"
+    - "src/components/Forms/DefaultAuthRule.tsx"
+    - "src/components/RequestsLists/AuthRulesList.tsx"
+
+[WARN] [vite] "Check" is imported from external module "@mui/icons-material" but never used in:
+    - "src/components/Cards/TravelSearchCard.tsx"
+```
+
+Ahora, en base a esto, otra mejora posible sería:
+
+| ID | Qué hacer |
+|----|-----------|
+| MR-5 | Eliminar los imports de `useMemo` no utilizados en los archivos listados previamente. |
