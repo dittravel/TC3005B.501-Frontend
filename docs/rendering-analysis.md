@@ -159,7 +159,42 @@ A continuación se enlistan la cantidad de directivas (y sus tipos) que hay en l
 | `resubir-comprobante/[id].astro` | `client:only="react"` |
 | `sociedades/[id].astro` | `client:load` |
 
-## 3 Archivos más pesados generados
+## 3. Archivos más pesados generados
+
+Cuando se ejecuta `npm run build`, Astro y Vite procesan todos los componentes y generan archivos `.js` que se mandan al navegador. 
+Entre más pesados sean estos archivos, más tiempo le toma al navegador descargarlos y ejecutarlos antes de mostrarlos en pantalla.
+
+El listado de estos archivos se obtuvo con el siguiente comando:
+
+```bash
+ls -lh dist/client/_astro/*.js | sort -k5 -rh | head -20
+```
+
+Este comando lista todos los archivos `.js` generados dentro de la carpeta `dist/client/_astro/`, los ordena de mayor a menor por tamaño, y muestra los 20 más pesados.
+
+### Resultados
+
+| Archivo | Tamaño | ¿Qué es? |
+|---------|--------|----------|
+| `client.js` | **179.41 kB** | Runtime de React |
+| `createSvgIcon.js` | **74.45 kB** | Íconos de MUI |
+| `TravelRequestForm.js` | 18.32 kB | Formulario de solicitud de viaje |
+| `TravelSearchCard.js` | 14.85 kB | Íconos de MUI |
+| `ExpensesForm.js` | 10.12 kB | Formulario de gastos |
+| `ReceiptsList.js` | 8.75 kB | Lista de comprobantes |
+| `index.js` | 8.39 kB | Punto de entrada |
+| `RoleConfigurationForm.js` | 8.38 kB | Configuración de roles |
+| `AuthRulesList.js` | 7.26 kB | Lista de reglas de autorización |
+| `RefundPolicyForm.js` | 6.84 kB | Políticas de reembolso |
+| `AdminUserForm.js` | 6.20 kB | Formulario de usuarios |
+| `ImportDataForm.js` | 5.77 kB |Importación de datos |
+| `AuthRuleForm.js` | 5.67 kB | Formulario de regla de autorización |
+| `Dashboard.js` | 5.46 kB | Dashboard principal |
+
+El segundo archivo más pesado (74 kB) corresponde a los íconos de MUI (Material UI), una librería de componentes visuales. Durante el build, Astro arrojó esta advertencia:
+- `[WARN] "Check" is imported from external module "@mui/icons-material" but never used in "src/components/Cards/TravelSearchCard.tsx"`
+
+`TravelSearchCard.tsx` importa un ícono llamado `Check` que **nunca usa**. Esto fuerza al compilador a incluir todo el paquete de íconos de MUI al final, aunque solo se necesite uno. **Eliminar ese import podría reducir el peso de ese archivo.**
 
 ## 4. ¿Qué componentes podrían ser más ligeros?
 
