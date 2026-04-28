@@ -159,7 +159,7 @@ export default function Requests({
         {paginatedRequests.length === 0 ? (
           <Card className="text-center py-8">
             <p className="text-text-secondary font-semibold">
-              No hay solicitudes con ese filtro
+              No se encontraron solicitudes
             </p>
           </Card>
         ) : (

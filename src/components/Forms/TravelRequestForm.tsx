@@ -789,6 +789,7 @@ export default function TravelRequestForm({
                     formData.requested_fee === 0 ? "" : formData.requested_fee
                   }
                   onChange={handleGeneralChange}
+                  required
                 />
               </div>
               <div className="flex-1">
@@ -797,6 +798,7 @@ export default function TravelRequestForm({
                   label="Moneda"
                   value={formData.currency || ""}
                   onChange={handleGeneralChange}
+                  required
                 >
                   <option value="">Selecciona una moneda</option>
                   {currencies.length > 0 ? (
@@ -823,6 +825,7 @@ export default function TravelRequestForm({
               value={formData.notes}
               onChange={handleGeneralChange}
               rows={4}
+              required
             />
           </div>
         )}
