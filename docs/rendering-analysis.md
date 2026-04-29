@@ -8,7 +8,7 @@
 ## 1. ¿Cómo está configurado el proyecto?
 Para entender la forma en la que el Frontend funciona, se debe analizar la configuración del framework principal del proyecto: Astro. Esta información se obtuvo ejecutando el comando `npm run build` en la raiz del Frontend, que compila todo el proyecto y muestra un reporte de cómo está configurado y qué es lo que genera.
 
-### 1.1 Modo de Renderización: Servidor (SSR)
+### 1.1 Modo de Renderización: Servidor (Server Side Rendering)
 
 Astro tiene tres modos de renderización posibles:
 
@@ -229,7 +229,7 @@ Los siguientes componentes fueron identificados como **posibles** elementos para
 
 ### ¿Qué podría pasar si los convertimos?
 
-Si alguno de estos componentes se convierte a `.astro`, ese archivo desaparece completamente del lado del cliente. Por ende, el navegador recibe menos archivos de JavaScript, lo que podría significa una página que carga y se muestra más rápido.
+Si alguno de estos componentes se convierte a `.astro`, ese archivo desaparece completamente del lado del cliente. Por ende, el navegador recibe menos archivos de JavaScript, lo que podría significar una página que carga y se muestra más rápido.
 
 ## 5. Recomendaciones
 
@@ -280,3 +280,16 @@ Ahora, en base a esto, otra mejora posible sería:
 | ID | Qué hacer |
 |----|-----------|
 | MR-5 | Eliminar los imports de `useMemo` no utilizados en los archivos listados previamente. |
+
+## 6. Conclusión
+
+El frontend de Dittravel está configurado en modo SSR. La mayoría de las páginas usan `client:only="react"`, lo que significa que el servidor manda HTMLs vacíos y el navegador tiene que construir todo desde cero.
+
+Las mejoras de rendimiento (MRs) propuestas no requieren cambios grandes (porque la mayoría son eliminar imports o cambiar directivas). Pero lo más complejo, que sería revisar los componentes candidatos de la Sección 4, requieren una inspección manual, pero fuera de eso, considero que pueden reducir bastante lo que se manda al navegador, mejorando el rendimiento!
+
+---
+### Referencias
+- [Astro Docs: Rendering Modes](https://v4.docs.astro.build/en/basics/rendering-modes/)
+- [Astro Docs: Client Directives](https://docs.astro.build/en/reference/directives-reference/#client-directives)
+- [Astro Docs: UI Frameworks](https://docs.astro.build/en/guides/framework-components/#hydrating-interactive-components)
+- [Vite Docs: Build](https://vitejs.dev/guide/build)
