@@ -78,7 +78,7 @@ export default function RefundForm({ role, refunds, wallet, currency }: Props) {
         {refunds.length > 0 ? (
           <DataTable columns={columns} rows={rows} role={role as any} />
         ) : (
-          <p className="text-text-secondary">No hay reembolsos registrados</p>
+          <p className="text-text-secondary">No se encontraron reembolsos</p>
         )}
       </div>
     </div>

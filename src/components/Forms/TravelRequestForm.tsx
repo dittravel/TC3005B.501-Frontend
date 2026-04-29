@@ -27,6 +27,8 @@ interface Props {
   role?: string;
   token: string;
   currencies?: Array<{ currency: string; name: string }>;
+  countries?:  Array<{ country_id: number; country_name: string }>;
+  cities?:     Array<{ city_id: number; city_name: string; country_id: number }>;
 }
 
 const emptyRoute: TravelRoute = {
@@ -73,6 +75,8 @@ export default function TravelRequestForm({
   role,
   token,
   currencies = [],
+  countries = [],
+  cities = [],
 }: Props) {
   const [formData, setFormData] = useState<FormData>(initialFormState);
   const [error, setError] = useState<string | null>(null);
@@ -742,6 +746,8 @@ export default function TravelRequestForm({
             index={index}
             onRemove={removeRoute}
             isRemovable={formData.routes.length > 1}
+            countries={countries}
+            cities={cities}
           />
         ))}
 
@@ -782,6 +788,7 @@ export default function TravelRequestForm({
                     formData.requested_fee === 0 ? "" : formData.requested_fee
                   }
                   onChange={handleGeneralChange}
+                  required
                 />
               </div>
               <div className="flex-1">
@@ -790,6 +797,7 @@ export default function TravelRequestForm({
                   label="Moneda"
                   value={formData.currency || ""}
                   onChange={handleGeneralChange}
+                  required
                 >
                   <option value="">Selecciona una moneda</option>
                   {currencies.length > 0 ? (
@@ -816,6 +824,7 @@ export default function TravelRequestForm({
               value={formData.notes}
               onChange={handleGeneralChange}
               rows={4}
+              required
             />
           </div>
         )}
