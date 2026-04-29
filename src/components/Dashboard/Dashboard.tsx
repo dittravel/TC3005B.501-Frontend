@@ -29,6 +29,7 @@ import {
   MAX_DASHBOARD_QUICK_ACTIONS,
   type DashboardActionDefinition,
 } from '@config/dashboardActions';
+import Button from '@components/Buttons/Button';
 import { readDashboardPreferences } from '@/utils/dashboardPreferences';
 
 const ICON_SIZE = 40;
@@ -107,11 +108,20 @@ export default function Dashboard({ userId, role, userName, token = '', permissi
       </div>
 
       {/* Quick Actions */}
-      <h2 className="text-lg font-semibold text-text-primary mb-2">
-        Acciones rápidas
-      </h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold text-text-primary">
+          Acciones rápidas
+        </h2>
+        <Button
+          variant="link"
+          color="secondary"
+          onClick={() => handleNavigate('/perfil-usuario')}
+        >
+          Personalizar
+        </Button>
+      </div>
       {actions.length === 0 ? (
-        <p className="text-text-secondary">agrega acciones preferidas en tu sección de usuario</p>
+        <p className="text-text-secondary">Agrega acciones preferidas en tu perfil de usuario</p>
       ) : null}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {actions.map((action) => (

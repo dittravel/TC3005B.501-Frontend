@@ -28,28 +28,34 @@ export const permissionsByCategory: PermissionCategory[] = [
     ],
   },
   {
-    category: 'Grupos de sociedades',
-    permissions: [
-      { key: 'society_groups:view', label: 'Ver grupos de sociedades' },
-      { key: 'society_groups:create', label: 'Crear grupos de sociedades' },
-      { key: 'society_groups:edit', label: 'Editar grupos de sociedades' },
-      { key: 'society_groups:delete', label: 'Eliminar grupos de sociedades' },
-    ],
-  },
-  {
     category: 'Solicitudes de viaje',
     permissions: [
       { key: 'travel:view', label: 'Ver solicitudes' },
       { key: 'travel:create', label: 'Crear solicitudes' },
       { key: 'travel:edit', label: 'Editar solicitudes' },
       { key: 'travel:delete', label: 'Eliminar solicitudes' },
+      { key: 'travel:finalize', label: 'Finalizar solicitudes' },
+      { key: 'travel:cancel', label: 'Cancelar solicitudes' },
+      { key: 'travel:reject', label: 'Rechazar solicitudes' },
+    ],
+  },
+  {
+    category: 'Autorizaciones',
+    permissions: [
       { key: 'travel:approve', label: 'Aprobar/Rechazar solicitudes' },
-      { key: 'travel:def_amount', label: 'Definir monto a autorizar' },
+    ],
+  },
+  {
+    category: 'Cotizaciones',
+    permissions: [
+      { key: 'travel:def_amount', label: 'Cotizar solicitud' },
+    ],
+  },
+  {
+    category: 'Agencia de viajes',
+    permissions: [
       { key: 'travel:view_flights', label: 'Ver opciones de vuelos' },
       { key: 'travel:view_hotels', label: 'Ver opciones de hoteles' },
-      { key: 'travel:finalize', label: 'Finalizar viaje' },
-      { key: 'travel:cancel', label: 'Cancelar viaje' },
-      { key: 'travel:reject', label: 'Rechazar viaje' },
     ],
   },
   {
@@ -63,11 +69,22 @@ export const permissionsByCategory: PermissionCategory[] = [
     ],
   },
   {
+    category: 'Roles',
+    permissions: [
+      { key: 'roles:manage', label: 'Administrar roles' },
+    ],
+  },
+  {
+    category: 'Configuración',
+    permissions: [
+      { key: 'auth_rules:manage', label: 'Administrar reglas de autorización' },
+      { key: 'refund_policies:manage', label: 'Administrar políticas de reembolso' },
+    ],
+  },
+  {
     category: 'Reembolsos',
     permissions: [
-      { key: 'refunds:request', label: 'Solicitar reembolsos' },
-      { key: 'refunds:budget', label: 'Asignar presupuesto impuesto' },
-      { key: 'refunds:approve', label: 'Aprobar/Rechazar reembolso' },
+      { key: 'refunds:create', label: 'Crear reembolsos' },
     ],
   },
   {
@@ -76,6 +93,14 @@ export const permissionsByCategory: PermissionCategory[] = [
       { key: 'system:audit_log', label: 'Ver bitácora de acciones' },
       { key: 'system:import_data', label: 'Importar datos' },
       { key: 'system:export_accounting', label: 'Exportar datos contables' },
+    ],
+  },
+  {
+    category: 'Superadmin',
+    permissions: [
+      { key: 'superadmin:manage_groups', label: 'Administrar grupos de sociedades' },
+      { key: 'superadmin:manage_master_admins', label: 'Administrar administradores maestros' },
+      { key: 'superadmin:view_group_audit_log', label: 'Ver bitácora por grupo' },
     ],
   },
 ];
@@ -97,14 +122,6 @@ export const permissionLabelToKey: Record<string, string> = {
   'Crear sociedad': 'societies:create',
   'Editar sociedad': 'societies:edit',
   'Eliminar sociedad': 'societies:delete',
-  'Ver grupos de sociedades': 'society_groups:view',
-  'Crear grupos de sociedades': 'society_groups:create',
-  'Editar grupos de sociedades': 'society_groups:edit',
-  'Eliminar grupos de sociedades': 'society_groups:delete',
-  'Ver grupo de sociedad': 'society_groups:view',
-  'Crear grupo de sociedad': 'society_groups:create',
-  'Editar grupo de sociedad': 'society_groups:edit',
-  'Eliminar grupo de sociedad': 'society_groups:delete',
   'Ver solicitudes': 'travel:view',
   'Crear solicitudes': 'travel:create',
   'Editar solicitudes': 'travel:edit',
@@ -126,10 +143,14 @@ export const permissionLabelToKey: Record<string, string> = {
   'Editar comprobantes': 'receipts:edit',
   'Eliminar comprobantes': 'receipts:delete',
   'Aprobar/Rechazar comprobantes': 'receipts:approve',
-  'Solicitar reembolsos': 'refunds:request',
-  'Asignar presupuesto impuesto': 'refunds:budget',
-  'Aprobar/Rechazar reembolso': 'refunds:approve',
-  'Ver bitácora de acciones': 'system:audit_log',
+  'Crear reembolsos': 'refunds:create',
+  'Administrar roles': 'roles:manage',
+  'Administrar reglas de autorización': 'auth_rules:manage',
+  'Administrar políticas de reembolso': 'refund_policies:manage',
+  'Bitácora de acciones': 'system:audit_log',
   'Importar datos': 'system:import_data',
   'Exportar datos contables': 'system:export_accounting',
+  'Administrar grupos de sociedades': 'superadmin:manage_groups',
+  'Administrar administradores maestros': 'superadmin:manage_master_admins',
+  'Ver bitácora por grupo': 'superadmin:view_group_audit_log',
 };

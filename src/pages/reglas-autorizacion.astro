@@ -34,9 +34,9 @@ const permissionKeys = Array.isArray(tokenPayload?.permissions)
   ? tokenPayload.permissions.map((permission: unknown) => String(permission).trim()).filter(Boolean)
   : [];
 
-const canCreateRule = permissionKeys.includes('travel:def_amount');
-const canEditRule = permissionKeys.includes('travel:def_amount');
-const canDeleteRule = permissionKeys.includes('travel:def_amount');
+const canCreateRule = permissionKeys.includes('auth_rules:manage');
+const canEditRule = permissionKeys.includes('auth_rules:manage');
+const canDeleteRule = permissionKeys.includes('auth_rules:manage');
 
 // Get auth rules list
 const authRules = await (async () => {
