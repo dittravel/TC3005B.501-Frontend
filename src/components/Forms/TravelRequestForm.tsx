@@ -27,6 +27,8 @@ interface Props {
   role?: string;
   token: string;
   currencies?: Array<{ currency: string; name: string }>;
+  countries?:  Array<{ country_id: number; country_name: string }>;
+  cities?:     Array<{ city_id: number; city_name: string; country_id: number }>;
 }
 
 const emptyRoute: TravelRoute = {
@@ -73,6 +75,8 @@ export default function TravelRequestForm({
   role,
   token,
   currencies = [],
+  countries = [],
+  cities = [],
 }: Props) {
   const [formData, setFormData] = useState<FormData>(initialFormState);
   const [error, setError] = useState<string | null>(null);
@@ -749,6 +753,8 @@ export default function TravelRequestForm({
             index={index}
             onRemove={removeRoute}
             isRemovable={formData.routes.length > 1}
+            countries={countries}
+            cities={cities}
           />
         ))}
 
