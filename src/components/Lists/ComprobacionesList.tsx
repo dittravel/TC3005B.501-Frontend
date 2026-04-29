@@ -65,6 +65,14 @@ export default function ComprobacionesList({ data, title = "Comprobaciones", sub
           type="warning"
           title="Rechazadas"
         />
+        <InfoCard
+          value={data.filter((r: any) => {
+            const stats = getVerificationStats(r);
+            return stats.accepted > 0 && stats.rejected > 0;
+          }).length}
+          type="info"
+          title="Mixtas"
+        />
       </div>
       <div className="flex flex-col justify-between">
         <h2 className="text-xl font-bold text-text-primary">{title} ({data.length})</h2>

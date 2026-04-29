@@ -43,7 +43,7 @@ const getSizeClasses = (size: TagProps['size']) => {
     case 'small':
       return 'px-2 py-0.5 text-xs';
     case 'medium':
-      return 'px-3 py-1 text-md';
+      return 'px-3 py-1 text-sm';
     case 'large':
       return 'px-4 py-2 text-lg';
     default:

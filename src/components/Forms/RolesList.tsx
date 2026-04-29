@@ -63,7 +63,7 @@ export default function RolesList(props: Readonly<Props>) {
               key={rol.id}
               tag={{ text: `#${index + 1 + start}`, type: 'secondary' }}
             >
-              <div className="grid grid-cols-1 md:grid-cols-[1fr_3fr_auto] gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-[1fr_3fr_auto] gap-8 items-center">
 
                 {/* Role name */}
                 <h2 className="flex items-center gap-2 text-lg font-semibold text-text-primary">
@@ -71,11 +71,9 @@ export default function RolesList(props: Readonly<Props>) {
                 </h2>
 
                 {/* Permissions summary by module */}
-                <div className="flex flex-col justify-center text-sm text-text-primary space-y-1">
-                  <p className="font-mono">
-                    {abbreviatePermissions(rol.permissions || [])}
-                  </p>
-                </div>
+                <p>
+                  {abbreviatePermissions(rol.permissions || [])}
+                </p>
 
                 {/* Actions */}
                 <div className="flex flex-row items-center justify-end gap-2">
