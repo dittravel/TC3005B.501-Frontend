@@ -97,11 +97,13 @@ export default function Dashboard({ userId, role, userName, token = '', permissi
 
   return (
     <div className="space-y-12">
+
       {/* Welcome Message */}
       <div>
         <h1 className="text-2xl font-bold text-text-primary mb-2">
           Bienvenido(a), {userName}
         </h1>
+
         <p className="text-lg text-text-secondary">
           ¿Qué deseas hacer hoy?
         </p>
@@ -128,19 +130,29 @@ export default function Dashboard({ userId, role, userName, token = '', permissi
           <button
             key={action.route}
             onClick={() => handleNavigate(action.route)}
-            className="group relative overflow-hidden rounded-lg border border-border bg-card p-6 text-left transition-all duration-300 hover:border-secondary hover:shadow-lg hover:shadow-secondary/20 cursor-pointer"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleNavigate(action.route);
+              }
+            }}
+            className="group relative overflow-hidden rounded-lg border border-border bg-card p-6 text-left transition-all duration-300 hover:border-secondary hover:shadow-lg hover:shadow-secondary/20 hover:-translate-y-1 cursor-pointer focus:outline-none focus:ring-2 focus:ring-secondary"
           >
             <div className="flex h-full flex-col justify-between">
+
+              {/* Icon + arrow */}
               <div className="flex items-start justify-between mb-4">
                 <div className="text-secondary">
                   {ICON_BY_KEY[action.iconKey]}
                 </div>
-                <div className="text-text-secondary text-2xl group-hover:translate-x-1 transition-transform">
+
+                <div className="text-text-secondary text-2xl transition-transform duration-300 group-hover:translate-x-1 group-hover:scale-110">
                   <ArrowForwardIos />
                 </div>
               </div>
 
-              <div className="flex flex-col align-start">
+              {/* Text */}
+              <div className="flex flex-col">
                 <h3 className="text-xl font-semibold text-text-primary mb-2">
                   {action.label}
                 </h3>
@@ -148,6 +160,7 @@ export default function Dashboard({ userId, role, userName, token = '', permissi
                   {action.description}
                 </p>
               </div>
+
             </div>
           </button>
         ))}
