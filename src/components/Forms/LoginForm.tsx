@@ -56,10 +56,15 @@ export default function LoginForm() {
       // Clear error message on successful login
       setErrorMessage("");
 
-      // Persist session cookies in the frontend domain for Astro/React reads.
+      // Validate HTTPS before setting sensitive cookies
       const isHttps = window.location.protocol === "https:";
-      const secureAttr = isHttps ? "; Secure" : "";
-      const commonAttrs = `; Path=/; SameSite=Lax${secureAttr}`;
+      if (!isHttps) {
+        setErrorMessage("Se requiere una conexión segura (HTTPS) para iniciar sesión.");
+        return;
+      }
+
+      // Persist session cookies in the frontend domain for Astro/React reads.
+      const commonAttrs = "; Path=/; SameSite=Lax; Secure";
       const oneHour = 60 * 60;
 
       document.cookie = `token=${encodeURIComponent(response.token)}${commonAttrs}; Max-Age=${oneHour}`;
