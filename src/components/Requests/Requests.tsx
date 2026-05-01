@@ -90,6 +90,7 @@ export default function Requests({
     { value: "Atención Agencia de Viajes", label: "Atención Agencia de Viajes" },
     { value: "Cancelado", label: "Cancelado" },
     { value: "Finalizado", label: "Finalizado" },
+    { value: "Rechazado", label: "Rechazado" },
   ];
 
   const filteredAndSortedRequests = useMemo(() => {
