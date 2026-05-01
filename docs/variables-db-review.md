@@ -127,10 +127,138 @@ Este comando busca cualquier mención de `localhost:3000` o `http://` que **no**
 
 Los únicos resultados que aparecieron fueron 4 identificadores de XML para unos íconos. **No hay URLs del Backend hardcodeadas en el código**.
 
-
 ## 3. ¿Cómo se conecta el Backend a la DB?
 
+El Backend es el que habla directamente con la base de datos. El equipo migró el Backend a **Prisma**, manteniendo MariaDB como motor.
+
+Para revisar la conexión hay que analizar cuatro cosas: el `.env.example`, el `schema.prisma`, el archivo que inicializa el cliente, y las migraciones.
+
+### 3.1 Variables que declara el `.env.example` del Backend
+
+A diferencia del `.env.example` del Frontend, el `.env.example` del Backend declara muchísimas más variables agrupadas por bloques:
+
+| Grupo | Variables |
+|-------|-----------|
+| Servidor | `PORT`, `NODE_ENV`, `FRONTEND_URL`, `BACKEND_URL` |
+| Base de datos (formato corto) | `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` |
+| Base de datos (formato largo) | `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_NAME`, `DATABASE_USER`, `DATABASE_PASSWORD` |
+| Base de datos (Prisma) | `DATABASE_URL` |
+| MongoDB | `MONGO_URI` |
+| Seguridad | `AES_SECRET_KEY`, `AES_IV`, `JWT_SECRET` |
+| Mail | `MAIL_USER`, `MAIL_PASSWORD` |
+| APIs externas | `DUFFEL_TOKEN`, `SERPAPI_API_KEY` |
+| Paginación | `FLIGHT_SEARCH_PAGE_SIZE`, `HOTEL_SEARCH_PAGE_SIZE` |
+
+### 3.2 El schema de Prisma
+
+El archivo `prisma/schema.prisma` es el modelo de datos.
+
+```prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+```
+
+- `provider = "mysql"`  significa que la base de datos es MySQL/MariaDB
+- El resto del archivo modela todo el negocio de Dittravel: `User`, `Request`, `Receipt`, `Route`, `AuthorizationRule`, `Society`, `SocietyGroup`, `Account`, etc.
+
+Otras cosas que vi son que:
+- Los modelos están comentados con `///`, lo que hace que la documentación sea entendible y clara.
+- Casi todas las relaciones usan `onDelete: Restrict` y `onUpdate: Restrict` para evitar borrados accidentales.
+- Se usan enums (`AuthorizationRule_travel_type`, `Receipt_validation`, `Currency_frequency`, etc.) en lugar de strings sueltos.
+
+Referencia: [Prisma Docs: Schema](https://www.prisma.io/docs/orm/prisma-schema)
+
+### 3.3 La conexión en `lib/prisma.js`
+
+El archivo `lib/prisma.js` es el que crea la instancia del cliente de Prisma. Se ve así:
+
+```js
+import { PrismaMariaDb } from "@prisma/adapter-mariadb";
+import prismaClientPkg from "@prisma/client";
+
+const { PrismaClient } = prismaClientPkg;
+
+const host = process.env.DB_HOST || process.env.DATABASE_HOST;
+const user = process.env.DB_USER || process.env.DATABASE_USER;
+const password = process.env.DB_PASSWORD || process.env.DATABASE_PASSWORD;
+const database = process.env.DB_NAME || process.env.DATABASE_NAME;
+
+const adapter = new PrismaMariaDb({
+  host,
+  user,
+  password,
+  database,
+  connectionLimit: 5,
+});
+const prisma = new PrismaClient({ adapter });
+
+export { prisma };
+```
+
+- El pool de conexiones está limitado a **5 conexiones simultáneas** con `connectionLimit: 5`.
+- Las variables se leen con un `||` que primero intenta `DB_*` y si no va a `DATABASE_*`. 
+
+### 3.4 Las migraciones
+
+Para ver el historial de migraciones, ejecuté:
+
+```bash
+ls prisma/migrations/
+```
+
+Encontré **18 carpetas** con timestamps, cada una representando una migración aplicada al schema desde Abril del 2026. Algunos ejemplos:
+
+- `20260408161759_init`: la migración inicial.
+- `20260410205127_accounting_tables`: tablas de contabilidad.
+- `20260420153904_add_refund_table`: tabla de reembolsos.
+- `20260423050147_add_reservation_file_fields`: campos de archivos de reservaciones.
+
+Referencia: [Prisma Docs: Migrations](https://www.prisma.io/docs/orm/prisma-migrate)
+
 ## 4. Elementos encontrados
+
+Mientras revisaba la configuración del Frontend me encontré con un par de elementos que no son urgentes ni graves, pero sí entrarían como futuras mejoras para el proyecto.
+
+### 4.1 `PUBLIC_IS_DEV` está declarada pero no se usa
+
+`PUBLIC_IS_DEV` aparece en `.env.example` y en el schema de `astro.config.mjs`, pero al hacer un grep en `src/` no la usa ningún archivo:
+
+```bash
+grep -rn "PUBLIC_IS_DEV" src/
+```
+
+El comando no devuelve resultados. En lugar de usar esa variable, `apiClient.ts` ocupa `import.meta.env.DEV` y `import.meta.env.MODE`, que son de Vite y de Astro y vienen sin tener que declarar nada.
+
+Es una variable que, aunque no rompe nada, puede llegar a confundir a quien lea el `.env.example` por primera vez pensando que tiene que configurarla.
+
+### 4.2 Línea de `apiClient.ts`
+
+Al revisar el archivo encontré esta línea:
+
+```ts
+const isDevelopment = [import.meta.env.DEV](http://import.meta.env.DEV) || import.meta.env.MODE === 'development';
+```
+
+tiene una sintaxis `[ ... ](url)` de un **link de Markdown**, no de TypeScript. 
+
+TypeScript no marca error o algo similar porque, técnicamente, `[algo aquí]` es válido y el resto se interpreta como una expresión válida. El problema es que `[import.meta.env.DEV]` siempre es un array de un elemento, así que `isDevelopment` da `true` sin importar el entorno.
+
+No causa daño en local porque ese bloque desactiva validaciones que ya queríamos desactivadas en desarrollo, pero es algo que vale la pena arreglar en el futuro.
+
+### 4.3 `PUBLIC_API_BASE_URL` se lee en 13 archivos diferentes
+
+Como se menciona en la Sección 1.4, la variable `PUBLIC_API_BASE_URL` se lee directamente en 13 archivos distintos. El tema es que ya existe la constante `BASE_URL` en `apiClient.ts`:
+
+```ts
+const BASE_URL = import.meta.env.PUBLIC_API_BASE_URL || 'https://localhost:3000/api';
+```
+
+Pero el resto de archivos no la usa, sino que vuelven a leer `import.meta.env.PUBLIC_API_BASE_URL` directamente.
 
 ## 5. Recomendaciones
 
