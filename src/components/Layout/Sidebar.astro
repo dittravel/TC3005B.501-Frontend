@@ -101,7 +101,7 @@ const groupedItems = items.reduce((acc: Record<string, MenuItem[]>, item: MenuIt
 
 <script is:inline>
   const currentPath = window.location.pathname;
-  const activeItem = document.querySelector(`#sidebar-${currentPath}`);
+  const activeItem = document.querySelector(`[data-sidebar-path="${currentPath}"]`);
 
   if (activeItem) {
     const startY = window.scrollY;
