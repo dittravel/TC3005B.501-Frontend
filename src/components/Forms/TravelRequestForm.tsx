@@ -27,6 +27,8 @@ interface Props {
   role?: string;
   token: string;
   currencies?: Array<{ currency: string; name: string }>;
+  countries?:  Array<{ country_id: number; country_name: string }>;
+  cities?:     Array<{ city_id: number; city_name: string; country_id: number }>;
 }
 
 const emptyRoute: TravelRoute = {
@@ -73,6 +75,8 @@ export default function TravelRequestForm({
   role,
   token,
   currencies = [],
+  countries = [],
+  cities = [],
 }: Props) {
   const [formData, setFormData] = useState<FormData>(initialFormState);
   const [error, setError] = useState<string | null>(null);
@@ -383,16 +387,9 @@ export default function TravelRequestForm({
           Authorization: `Bearer ${token}`,
         },
       });
-      setToast({
-        message: "Solicitud creada y enviada exitosamente.",
-        type: "success",
-      });
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      if (role === "Solicitante") {
-        window.location.href = "/dashboard";
-      } else {
-        window.location.href = '/solicitudes';
-      }
+      setToast({ message: 'Solicitud creada y enviada exitosamente.', type: 'success' });
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      window.location.href = '/solicitudes';
     } catch (error) {
       console.error('Error al enviar la solicitud:', error);
       setError('Hubo un error al enviar la solicitud.');
@@ -749,6 +746,8 @@ export default function TravelRequestForm({
             index={index}
             onRemove={removeRoute}
             isRemovable={formData.routes.length > 1}
+            countries={countries}
+            cities={cities}
           />
         ))}
 
@@ -889,7 +888,7 @@ export default function TravelRequestForm({
               await handleEditRequest(
                 e as unknown as React.FormEvent,
                 true,
-                "/dashboard",
+                "/solicitudes",
               );
             }}
             color="secondary"

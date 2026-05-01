@@ -25,6 +25,17 @@ try {
 } catch (error) {
   console.error('Error fetching currencies:', error);
 }
+
+// Fetch countries and cities for the form dropdowns
+let countries = [];
+let cities = [];
+try {
+  countries = await apiRequest('/countries', { cookies: Astro.cookies });
+  cities    = await apiRequest('/cities',    { cookies: Astro.cookies });
+} catch (error) {
+  console.error('Error fetching countries/cities:', error);
+}
+
 ---
 
 <MainLayout title="Crear Solicitud" data={{userName, buttonLabel, role}}>
@@ -41,6 +52,8 @@ try {
         role={role}
         token={getCookie("token", Astro.cookies) || ""}
         currencies={currencies}
+        countries={countries}
+        cities={cities}
       />
     </main>
   </div>

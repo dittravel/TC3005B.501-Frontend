@@ -15,9 +15,14 @@ const userName = getCookie("username", Astro.cookies) || "";
 const buttonLabel = roleLabels[role];
 
 import { apiRequest } from '@utils/apiClient';
+const userId = getCookie("id", Astro.cookies);
 const requests = await (async () => {
+  if (!userId) {
+    return [];
+  }
+
   try {
-    return await apiRequest(`/applicant/get-user-requests/${getCookie("id", Astro.cookies)}/`, { cookies: Astro.cookies });
+    return await apiRequest(`/applicant/get-user-requests/${userId}/`, { cookies: Astro.cookies });
   } catch (error) {
     return [];
   }

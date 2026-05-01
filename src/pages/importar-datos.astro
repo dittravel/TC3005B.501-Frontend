@@ -12,20 +12,39 @@ import ImportDataForm from "@/components/Forms/ImportDataForm";
 import type { UserRole } from "@type/roles";
 import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
+import { hasRoutePermission } from "@config/routeAccess";
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
 const userName = getCookie("username", Astro.cookies) || "";
-const buttonLabel = roleLabels[role];
+const buttonLabel = roleLabels[role] || role || "Usuario";
 
 const token = getCookie("token", Astro.cookies);
+
+function parseJwtPayload(jwtToken: string): Record<string, any> | null {
+  try {
+    const parts = jwtToken.split('.');
+    if (parts.length < 2) return null;
+    const base64 = parts[1].replaceAll('-', '+').replaceAll('_', '/');
+    const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '=');
+    return JSON.parse(Buffer.from(padded, 'base64').toString('utf8'));
+  } catch {
+    return null;
+  }
+}
+
+const tokenPayload = token ? parseJwtPayload(token) : null;
+const permissionKeys = Array.isArray(tokenPayload?.permissions)
+  ? tokenPayload.permissions.map((permission: unknown) => String(permission).trim()).filter(Boolean)
+  : [];
+const canImportData = hasRoutePermission('/importar-datos', permissionKeys);
 ---
 
-<MainLayout title="Roles" data={{userName, buttonLabel, role}}>
+<MainLayout title="Importar Datos" data={{userName, buttonLabel, role}}>
   <TextHeader
     title="Importar Datos"
     subtitle="Importa datos organizacionales externos"
   />
-  {role === "Administrador" ? (
+  {canImportData ? (
     <main>
       <ImportDataForm
         client:load

@@ -8,21 +8,40 @@ import Input from '@/components/Utils/Input';
 import Select from '@/components/Utils/Select';
 import Button from '@/components/Buttons/Button';
 import Toast from '@/components/Utils/Toast';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, type BaseSyntheticEvent } from 'react';
 import { apiRequest } from '@/utils/apiClient';
+import type { UserRole } from '@type/roles';
+import { getAccessibleDashboardActions, MAX_DASHBOARD_QUICK_ACTIONS } from '@config/dashboardActions';
+import { readDashboardPreferences, writeDashboardPreferences } from '@/utils/dashboardPreferences';
 
 interface Props {
   userData: any;
   departmentUsers?: any[];
   token: string;
+  canManageAbsence?: boolean;
+  role: UserRole;
+  permissionKeys?: string[];
 }
 
-export default function UserProfile({ userData, departmentUsers = [], token }: Props) {
+export default function UserProfile({
+  userData,
+  departmentUsers = [],
+  token,
+  canManageAbsence = false,
+  role,
+  permissionKeys = [],
+}: Readonly<Props>) {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [substituteId, setSubstituteId] = useState('');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedQuickActionRoutes, setSelectedQuickActionRoutes] = useState<string[]>([]);
+
+  const availableQuickActions = useMemo(
+    () => getAccessibleDashboardActions(role, permissionKeys),
+    [role, permissionKeys]
+  );
 
   // Get today's date in local timezone format (YYYY-MM-DD)
   const getLocalDateString = () => {
@@ -35,15 +54,41 @@ export default function UserProfile({ userData, departmentUsers = [], token }: P
 
   // Autocomplete absence preferences when user data changes
   useEffect(() => {
-    if (userData.role_name !== 'Solicitante') {
+    if (canManageAbsence) {
       setStartDate(userData.out_of_office_start_date?.split('T')[0] || '');
       setEndDate(userData.out_of_office_end_date?.split('T')[0] || '');
       setSubstituteId(userData.substitute_id || '');
     }
-  }, [userData.user_id]);
+  }, [canManageAbsence, userData.user_id, userData.out_of_office_start_date, userData.out_of_office_end_date, userData.substitute_id]);
 
-  // Handler for submitting absence preferences
-  const handleAbsenceSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    const allowedRoutes = new Set(availableQuickActions.map((action) => action.route));
+    readDashboardPreferences(userData.user_id, token).then((saved) => {
+      setSelectedQuickActionRoutes(saved.filter((route) => allowedRoutes.has(route)));
+    });
+  }, [availableQuickActions, token, userData.user_id]);
+
+  const handleQuickActionToggle = (route: string) => {
+    setSelectedQuickActionRoutes((previous) => {
+      const current = new Set(previous);
+      if (current.has(route)) {
+        current.delete(route);
+      } else {
+        if (current.size >= MAX_DASHBOARD_QUICK_ACTIONS) {
+          setToast({ message: `Puedes seleccionar hasta ${MAX_DASHBOARD_QUICK_ACTIONS} acciones rápidas`, type: 'error' });
+          return previous;
+        }
+        current.add(route);
+      }
+
+      const next = Array.from(current);
+      writeDashboardPreferences(userData.user_id, next, token);
+      return next;
+    });
+  };
+
+  // Handler for submitting user configuration
+  const handleUserConfigSubmit = async (e: BaseSyntheticEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setToast(null);
@@ -60,9 +105,10 @@ export default function UserProfile({ userData, departmentUsers = [], token }: P
           Authorization: `Bearer ${token}`
         }
       });
-      setToast({ message: 'Preferencias de ausencia guardadas correctamente', type: 'success' });
+      setToast({ message: 'Configuración de usuario guardada correctamente', type: 'success' });
     } catch (error) {
-      setToast({ message: 'Error al guardar preferencias de ausencia', type: 'error' });
+      console.error('Error saving user configuration:', error);
+      setToast({ message: 'Error al guardar configuración de usuario', type: 'error' });
     } finally {
       setIsSubmitting(false);
     }
@@ -99,6 +145,47 @@ export default function UserProfile({ userData, departmentUsers = [], token }: P
         </div>
       </div>
 
+      <div className="card">
+        <div className="card-title">
+          <h2>Acciones rápidas del dashboard</h2>
+        </div>
+        <p className="text-sm text-text-secondary mb-4">
+          Selecciona las tarjetas que quieres ver en el dashboard (máximo {MAX_DASHBOARD_QUICK_ACTIONS}).
+        </p>
+
+        {availableQuickActions.length === 0 ? (
+          <p className="text-sm text-text-secondary">No hay acciones disponibles para tu perfil actual.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {availableQuickActions.map((action) => {
+              const checked = selectedQuickActionRoutes.includes(action.route);
+              const atLimit = !checked && selectedQuickActionRoutes.length >= MAX_DASHBOARD_QUICK_ACTIONS;
+              const checkboxId = `quick-action-${action.route.replaceAll('/', '-').replaceAll('*', 'wildcard')}`;
+
+              return (
+                <div
+                  key={action.route}
+                  className={`flex items-start gap-3 rounded-md border p-3 transition-colors ${checked ? 'border-secondary bg-secondary/5' : 'border-border'} ${atLimit ? 'opacity-60' : ''}`}
+                >
+                  <input
+                    id={checkboxId}
+                    type="checkbox"
+                    checked={checked}
+                    disabled={atLimit}
+                    onChange={() => handleQuickActionToggle(action.route)}
+                    className="mt-1 h-4 w-4"
+                  />
+                  <label htmlFor={checkboxId} className="cursor-pointer">
+                    <span className="block text-sm font-semibold text-text-primary">{action.label}</span>
+                    <span className="block text-xs text-text-secondary">{action.description}</span>
+                  </label>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
       {/* Employee information */}
       <div className="card">
         <div className="card-title">
@@ -129,8 +216,8 @@ export default function UserProfile({ userData, departmentUsers = [], token }: P
       </div>
 
       {/* Out of office preferences */}
-      {userData.role_name !== 'Solicitante' && (
-        <form onSubmit={handleAbsenceSubmit}>
+      {canManageAbsence && (
+        <form onSubmit={handleUserConfigSubmit}>
           <div className="card">
             <div className="card-title">
               <h2>Preferencias de Ausencia</h2>
@@ -148,7 +235,7 @@ export default function UserProfile({ userData, departmentUsers = [], token }: P
                 name="out_of_office_end_date"
                 label="Fecha de fin de ausencia"
                 type="date"
-                min={startDate ? startDate : getLocalDateString()}
+                min={startDate || getLocalDateString()}
                 value={endDate}
                 onChange={e => setEndDate(e.target.value)}
               />
@@ -159,13 +246,11 @@ export default function UserProfile({ userData, departmentUsers = [], token }: P
                 onChange={e => setSubstituteId(e.target.value)}
               >
                 <option value="">Sin sustituto</option>
-                {departmentUsers &&
-                  departmentUsers.map((user) => (
-                    <option key={user.user_id} value={user.user_id}>
-                      {user.user_name}
-                    </option>
-                  ))
-                }
+                {departmentUsers?.map((user) => (
+                  <option key={user.user_id} value={user.user_id}>
+                    {user.user_name}
+                  </option>
+                ))}
               </Select>
             </div>
           </div>

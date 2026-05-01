@@ -34,6 +34,8 @@ interface Props {
   initialData: AuditEntry[];
   initialMeta: Meta;
   role: string;
+  initialSocietyGroupId?: string;
+  societyGroups?: Array<{ id: number; description: string }>;
 }
 
 // Constants
@@ -97,15 +99,15 @@ function formatMetadata(metadata: Record<string, any> | null): string {
  * @param {string} role - User role for access control
  * @returns {JSX.Element} The audit log table component
  */
-export default function BitacoraTable({ initialData, initialMeta, role }: Props) {
+export default function BitacoraTable({ initialData, initialMeta, role, initialSocietyGroupId = '', societyGroups = [] }: Readonly<Props>) {
   const [data, setData] = useState<AuditEntry[]>(initialData);
   const [meta, setMeta] = useState<Meta>(initialMeta);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
   const [filterAction, setFilterAction] = useState("");
   const [filterName, setFilterName] = useState("");
+  const [selectedSocietyGroupId, setSelectedSocietyGroupId] = useState(initialSocietyGroupId);
 
   const totalPages = Math.ceil(meta.total_count / LIMIT);
 
@@ -119,6 +121,9 @@ export default function BitacoraTable({ initialData, initialMeta, role }: Props)
         offset: String((newPage - 1) * LIMIT),
         include_metadata: "true",
       });
+      if (selectedSocietyGroupId) {
+        params.set('society_group_id', selectedSocietyGroupId);
+      }
       const res = await fetch(`/api/audit-log/get-logs?${params}`, {
         credentials: "include",
       });
@@ -154,13 +159,36 @@ export default function BitacoraTable({ initialData, initialMeta, role }: Props)
           source_ip: e.source_ip,
           metadata_detail: formatMetadata(e.metadata),
         })),
-    [data, filterAction, filterName]
+    [data, filterAction, filterName, selectedSocietyGroupId]
   );
+
+  function handleSocietyGroupChange(event: React.ChangeEvent<HTMLSelectElement>) {
+    const value = event.target.value;
+    setSelectedSocietyGroupId(value);
+    fetchPage(1);
+  }
 
   return (
     <div>
       {/* Filters */}
       <div className="flex flex-col md:flex-row gap-3 items-end mb-8">
+        {societyGroups.length > 0 ? (
+          <div className="w-full md:flex-1 [&>div]:mb-0">
+            <Select
+              name="filter-society-group"
+              label="Grupo de sociedad"
+              value={selectedSocietyGroupId}
+              onChange={handleSocietyGroupChange}
+            >
+              <option value="">Todos</option>
+              {societyGroups.map((group) => (
+                <option key={group.id} value={String(group.id)}>
+                  {group.description}
+                </option>
+              ))}
+            </Select>
+          </div>
+        ) : null}
         <div className="w-full md:flex-1 [&>div]:mb-0">
           <Select
             name="filter-action"
@@ -188,7 +216,7 @@ export default function BitacoraTable({ initialData, initialMeta, role }: Props)
         </div>
 
         <span className="text-sm text-text-secondary md:ml-10 md:whitespace-nowrap">
-          {rows.length} resultado{rows.length !== 1 ? "s" : ""} en esta página
+          {rows.length} resultado{rows.length === 1 ? "" : "s"} en esta página
         </span>
       </div>
 
@@ -205,7 +233,7 @@ export default function BitacoraTable({ initialData, initialMeta, role }: Props)
           Cargando registros...
         </div>
       ) : (
-        <DataTable columns={COLUMNS} rows={rows} role={role as any} type="" />
+        <DataTable columns={COLUMNS} rows={rows} />
       )}
 
       {/* Paginación */}

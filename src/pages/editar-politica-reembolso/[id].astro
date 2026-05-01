@@ -34,7 +34,7 @@ const society = await (async () => {
     const data = await apiRequest(`/societies/current`, {
       cookies: Astro.cookies
     });
-    return data?.society || null;
+    return data || null;
   } catch (error) {
     console.error("Error al cargar la sociedad del usuario:", error);
     return null;
@@ -55,7 +55,7 @@ const token = getCookie("token", Astro.cookies) || "";
       client:load
       mode="edit"
       data={policy}
-      currency={society?.currency || "MXN"}
+      currency={society?.local_currency || "MXN"}
       token={token}
       redirectTo="/politicas-reembolso"
     />

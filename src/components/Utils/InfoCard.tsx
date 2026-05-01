@@ -2,7 +2,7 @@
 * Info Card Component
 * 
 * Reusable card component for displaying key information with a value and title
-* Designed for use in summary sections and dashboards
+* Designed for use in summary sections and dashboards (por jeemplo las cartitas de permisos)
 */
 
 interface Props {

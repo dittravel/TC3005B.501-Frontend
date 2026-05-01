@@ -2,23 +2,19 @@ import React, { useState } from 'react';
 import FlightSearchForm from '@/components/Forms/FlightSearchForm';
 import HotelSearchForm from '@/components/Forms/HotelSearchForm';
 import type { TravelRoute } from '@/types/TravelRoute';
-import { Check } from '@mui/icons-material';
 import Checkbox from '../Utils/Checkbox';
 
 interface TravelSearchCardProps {
   token: string;
   route: TravelRoute;
   routeIndex: number;
-  onSelectFlight?: (flight: any) => void;
-  onChange: (index: number, name: string, value: any) => void;
-  onSelectHotel?: (hotel: any) => void;
 }
 
-const TravelSearchCard = ({ token, route, routeIndex, onSelectFlight, onSelectHotel, onChange }: TravelSearchCardProps) => {
+const TravelSearchCard = ({ token, route, routeIndex }: TravelSearchCardProps) => {
   const [isFlightSearchOpen, setIsFlightSearchOpen] = useState(false);
   const [isHotelSearchOpen, setIsHotelSearchOpen] = useState(false);
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target;
+    const { name } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
 
     if (name === "plane_form") {

@@ -5,60 +5,60 @@
  * It provides a personalized welcome message and quick access to key actions based on permissions
  */
 
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   NoteAdd,
   Receipt,
   CheckCircle,
   PriceChange,
   Luggage,
-  FileUpload,
   CurrencyExchange,
   ArrowForwardIos,
   InsertDriveFile,
   History,
+  Hub,
+  ManageAccounts,
+  Group,
+  AdminPanelSettings,
+  Gavel,
+  ReceiptLong,
 } from '@mui/icons-material';
 import type { UserRole } from '@type/roles';
-
-interface DashboardAction {
-  label: string;
-  route: string;
-  icon: React.ReactNode;
-  description: string;
-}
+import {
+  getAccessibleDashboardActions,
+  MAX_DASHBOARD_QUICK_ACTIONS,
+  type DashboardActionDefinition,
+} from '@config/dashboardActions';
+import Button from '@components/Buttons/Button';
+import { readDashboardPreferences } from '@/utils/dashboardPreferences';
 
 const ICON_SIZE = 40;
 
-// Define the available actions for each role
-const DASHBOARD_ACTIONS: Record<UserRole, DashboardAction[]> = {
-  'Solicitante': [
-    { label: 'Crear Solicitud', route: '/crear-solicitud', icon: <NoteAdd sx={{ fontSize: ICON_SIZE }} />, description: 'Inicia una nueva solicitud de viaje' },
-    { label: 'Comprobar Gastos', route: '/comprobar-gastos', icon: <Receipt sx={{ fontSize: ICON_SIZE }} />, description: 'Adjunta comprobantes de gastos' },
-    { label: 'Reembolsos', route: '/reembolsos', icon: <CurrencyExchange sx={{ fontSize: ICON_SIZE }} />, description: 'Consulta el estado de tus reembolsos' },
-  ],
-  'Autorizador': [
-    { label: 'Autorizaciones', route: '/autorizaciones', icon: <CheckCircle sx={{ fontSize: ICON_SIZE }} />, description: 'Revisa y autoriza solicitudes pendientes' },
-    { label: 'Crear Solicitud', route: '/crear-solicitud', icon: <NoteAdd sx={{ fontSize: ICON_SIZE }} />, description: 'Inicia una nueva solicitud de viaje' },
-    { label: 'Comprobar Gastos', route: '/comprobar-gastos', icon: <Receipt sx={{ fontSize: ICON_SIZE }} />, description: 'Adjunta comprobantes de gastos' },
-    { label: 'Reembolsos', route: '/reembolsos', icon: <CurrencyExchange sx={{ fontSize: ICON_SIZE }} />, description: 'Consulta el estado de tus reembolsos' },
-  ],
-  'Administrador': [
-    { label: 'Importar Datos', route: '/importar-datos', icon: <FileUpload sx={{ fontSize: ICON_SIZE }} />, description: 'Importa el organigrama desde un archivo' },
-    { label: 'Exportar datos contables', route: '/exportar-datos-contables', icon: <InsertDriveFile sx={{ fontSize: ICON_SIZE }} />, description: 'Exporta datos contables para auditoría' },
-    { label: 'Bitácora', route: '/bitacora', icon: <History sx={{ fontSize: ICON_SIZE }} />, description: 'Revisa la bitácora de actividades del sistema' },
-  ],
-  'Cuentas por pagar': [
-    { label: 'Cotizaciones', route: '/cotizaciones', icon: <PriceChange sx={{ fontSize: ICON_SIZE }} />, description: 'Gestiona solicitudes por cotizar' },
-    { label: 'Comprobantes', route: '/comprobaciones', icon: <Receipt sx={{ fontSize: ICON_SIZE }} />, description: 'Revisa comprobantes de gastos' },
-  ],
-  'Agencia de viajes': [
-    { label: 'Atenciones', route: '/atenciones', icon: <Luggage sx={{ fontSize: ICON_SIZE }} />, description: 'Atiende solicitudes de viaje asignadas' },
-  ],
+const ICON_BY_KEY: Record<DashboardActionDefinition['iconKey'], React.ReactNode> = {
+  autorizaciones: <CheckCircle sx={{ fontSize: ICON_SIZE }} />,
+  usuarios: <Group sx={{ fontSize: ICON_SIZE }} />,
+  roles: <AdminPanelSettings sx={{ fontSize: ICON_SIZE }} />,
+  reglas: <Gavel sx={{ fontSize: ICON_SIZE }} />,
+  politicas: <ReceiptLong sx={{ fontSize: ICON_SIZE }} />,
+  exportar: <InsertDriveFile sx={{ fontSize: ICON_SIZE }} />,
+  crear: <NoteAdd sx={{ fontSize: ICON_SIZE }} />,
+  comprobar: <Receipt sx={{ fontSize: ICON_SIZE }} />,
+  reembolsos: <CurrencyExchange sx={{ fontSize: ICON_SIZE }} />,
+  cotizaciones: <PriceChange sx={{ fontSize: ICON_SIZE }} />,
+  comprobantes: <Receipt sx={{ fontSize: ICON_SIZE }} />,
+  atenciones: <Luggage sx={{ fontSize: ICON_SIZE }} />,
+  sociedades: <InsertDriveFile sx={{ fontSize: ICON_SIZE }} />,
+  grupos: <Hub sx={{ fontSize: ICON_SIZE }} />,
+  maestros: <ManageAccounts sx={{ fontSize: ICON_SIZE }} />,
+  bitacora: <History sx={{ fontSize: ICON_SIZE }} />,
 };
 
 interface DashboardProps {
+  userId: string;
   role: UserRole;
   userName: string;
+  token?: string;
+  permissionKeys?: string[];
 }
 
 /**
@@ -68,47 +68,91 @@ interface DashboardProps {
  * @param {string} userName - The name of the user for the welcome message
  * @returns {JSX.Element} A dashboard component with role-based actions
  */
-export default function Dashboard({ role, userName }: DashboardProps) {
-  const actions = DASHBOARD_ACTIONS[role] || [];
+export default function Dashboard({ userId, role, userName, token = '', permissionKeys = [] }: Readonly<DashboardProps>) {
+  const [preferredRoutes, setPreferredRoutes] = useState<string[]>([]);
+
+  const accessibleActions = useMemo(
+    () => getAccessibleDashboardActions(role, permissionKeys),
+    [role, permissionKeys]
+  );
+
+  useEffect(() => {
+    readDashboardPreferences(userId, token).then(setPreferredRoutes);
+  }, [token, userId]);
+
+  const actions = useMemo(() => {
+    if (!preferredRoutes.length) return [];
+
+    const visibleByRoute = new Map(accessibleActions.map((action) => [action.route, action]));
+    const selected = preferredRoutes
+      .map((route) => visibleByRoute.get(route))
+      .filter((action): action is DashboardActionDefinition => Boolean(action));
+
+    return selected.slice(0, MAX_DASHBOARD_QUICK_ACTIONS);
+  }, [accessibleActions, preferredRoutes]);
 
   const handleNavigate = (route: string) => {
-    window.location.href = route;
+    globalThis.location.href = route;
   };
 
   return (
     <div className="space-y-12">
+
       {/* Welcome Message */}
       <div>
         <h1 className="text-2xl font-bold text-text-primary mb-2">
           Bienvenido(a), {userName}
         </h1>
+
         <p className="text-lg text-text-secondary">
           ¿Qué deseas hacer hoy?
         </p>
       </div>
 
       {/* Quick Actions */}
-      <h2 className="text-lg font-semibold text-text-primary mb-2">
-        Acciones rápidas
-      </h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold text-text-primary">
+          Acciones rápidas
+        </h2>
+        <Button
+          variant="link"
+          color="secondary"
+          onClick={() => handleNavigate('/perfil-usuario')}
+        >
+          Personalizar
+        </Button>
+      </div>
+      {actions.length === 0 ? (
+        <p className="text-text-secondary">Agrega acciones preferidas en tu perfil de usuario</p>
+      ) : null}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {actions.map((action) => (
           <button
             key={action.route}
             onClick={() => handleNavigate(action.route)}
-            className="group relative overflow-hidden rounded-lg border border-border bg-card p-6 text-left transition-all duration-300 hover:border-secondary hover:shadow-lg hover:shadow-secondary/20 cursor-pointer"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleNavigate(action.route);
+              }
+            }}
+            className="group relative overflow-hidden rounded-lg border border-border bg-card p-6 text-left transition-all duration-300 hover:border-secondary hover:shadow-lg hover:shadow-secondary/20 hover:-translate-y-1 cursor-pointer focus:outline-none focus:ring-2 focus:ring-secondary"
           >
             <div className="flex h-full flex-col justify-between">
+
+              {/* Icon + arrow */}
               <div className="flex items-start justify-between mb-4">
                 <div className="text-secondary">
-                  {action.icon}
+                  {ICON_BY_KEY[action.iconKey]}
                 </div>
-                <div className="text-text-secondary text-2xl group-hover:translate-x-1 transition-transform">
+
+                <div className="text-text-secondary text-2xl transition-transform duration-300 group-hover:translate-x-1 group-hover:scale-110">
                   <ArrowForwardIos />
                 </div>
               </div>
 
-              <div className="flex flex-col align-start">
+              {/* Text */}
+              <div className="flex flex-col">
                 <h3 className="text-xl font-semibold text-text-primary mb-2">
                   {action.label}
                 </h3>
@@ -116,6 +160,7 @@ export default function Dashboard({ role, userName }: DashboardProps) {
                   {action.description}
                 </p>
               </div>
+
             </div>
           </button>
         ))}

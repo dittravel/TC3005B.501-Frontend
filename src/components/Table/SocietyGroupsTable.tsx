@@ -11,36 +11,47 @@ import UltimateWrapper from '@components/Modals/UltimateWrapper';
 interface SocietyGroup {
   id: number;
   description: string;
-  is_default?: boolean;
+  is_default?: boolean | number | string | null;
 }
 
 interface Props {
   data: any;
   token: string;
   role: string;
+  canCreate?: boolean;
+  canEdit?: boolean;
+  canDelete?: boolean;
 }
 
-export default function SocietyGroupsTable({ data, token, role }: Props) {
+export default function SocietyGroupsTable({ data, token, role, canCreate = false, canEdit = false, canDelete = false }: Props) {
+  const isDefaultGroupValue = (value: SocietyGroup['is_default']) =>
+    value === true || value === 1 || value === '1' || String(value).toLowerCase() === 'true';
+
   const columns = [
     { key: 'id', label: 'ID' },
     { key: 'description', label: 'Descripción' },
     { key: 'actions', label: 'Acciones' },
   ];
   
-  const rows = data.map((group: SocietyGroup) => ({
+  const rows = data.map((group: SocietyGroup) => {
+    const isDefaultGroup = isDefaultGroupValue(group.is_default);
+
+    return {
     id: group.id,
     description: group.description,
     actions: (
       <div className="flex gap-2">
-        <Button
-          name="Editar"
-          color="primary"
-          href={`/grupos-sociedades/${group.id}`}
-          className="w-full"
-        >
-          Editar
-        </Button>
-        {!group.is_default && (
+        {canEdit ? (
+          <Button
+            name="Editar"
+            color="primary"
+            href={`/grupos-sociedades/${group.id}`}
+            className="w-full"
+          >
+            Editar
+          </Button>
+        ) : null}
+        {!isDefaultGroup && canDelete ? (
           <UltimateWrapper
             id={group.id}
             endpoint="/society-groups"
@@ -50,17 +61,18 @@ export default function SocietyGroupsTable({ data, token, role }: Props) {
             color="warning"
             variant="filled"
             label="Eliminar"
-            redirectTo="/sociedades"
+            redirectTo="/grupos-sociedades"
             successMessage="Grupo de sociedad eliminado exitosamente."
             errorMessage="Error al eliminar el grupo de sociedad."
             token={token}
             method="DELETE"
             className="w-full"
           />
-        )}
+        ) : null}
       </div>
     )
-  }));
+    };
+  });
   
   return (
     <div>
@@ -68,15 +80,17 @@ export default function SocietyGroupsTable({ data, token, role }: Props) {
         <h2 className="text-2xl font-semibold">
           Grupos de sociedades {data.length > 0 && `(${data.length})`}
         </h2>
-        <Button
-          name="Crear Grupo"
-          color="secondary"
-          href="/grupos-sociedades/nuevo"
-        >
-          Crear Grupo
-        </Button>
+        {canCreate ? (
+          <Button
+            name="Crear Grupo"
+            color="secondary"
+            href="/grupos-sociedades/nuevo"
+          >
+            Crear Grupo
+          </Button>
+        ) : null}
       </div>
-      <DataTable columns={columns} rows={rows} role={role as any} />
+      <DataTable columns={columns} rows={rows} />
     </div>
   );
 }

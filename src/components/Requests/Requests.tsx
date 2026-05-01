@@ -6,7 +6,6 @@
  */
 
 import { useState, useMemo } from 'react';
-import type { UserRole } from '@type/roles';
 import Button from '@components/Buttons/Button';
 import Select from '@components/Utils/Select';
 import Card from '@components/Utils/Card';
