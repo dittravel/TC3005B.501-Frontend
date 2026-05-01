@@ -73,7 +73,7 @@ export default function ExpensesForm({
     isInternational: data ? data.currency !== "MXN" : false,
     exch_rate: data?.exch_rate
       ? parseFloat(data.exch_rate).toFixed(2).toString()
-      : "",
+      : "1",
   });
 
   // File states
@@ -170,7 +170,7 @@ export default function ExpensesForm({
   // or set to USD if switching to international
   useEffect(() => {
     if (!formData.isInternational && formData.currency !== "MXN") {
-      setFormData((prev) => ({ ...prev, currency: "MXN" }));
+      setFormData((prev) => ({ ...prev, currency: "MXN", exch_rate: "1" }));
     } else if (formData.isInternational && formData.currency === "MXN") {
       setFormData((prev) => ({ ...prev, currency: "USD" }));
       setXmlFile(null);
