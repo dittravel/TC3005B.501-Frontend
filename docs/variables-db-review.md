@@ -94,12 +94,12 @@ Encontré **20 usos** distribuidos en 13 archivos:
 El Frontend nunca habla directamente con la base de datos. Todo pasa por el Backend por HTTP, usando la URL definida en `PUBLIC_API_BASE_URL`. Básicamente el flujo es:
 
 ```
-.env  →  import.meta.env  →  apiClient.ts (BASE_URL)  →  fetch()  →  Backend
+.env  ->  import.meta.env  ->  apiClient.ts (BASE_URL)  ->  fetch()  ->  Backend
 ```
 
 ### 2.1 La constante `BASE_URL` en `apiClient.ts`
 
-`src/utils/apiClient.ts` es el archivo encargado de mover las llamadas HTTP al Backend. Define la constante `BASE_URL` así (línea 48):
+`src/utils/apiClient.ts` es el archivo encargado de mover las llamadas HTTP al Backend. Define la constante `BASE_URL` así (en la línea 48):
 
 ```ts
 const BASE_URL = import.meta.env.PUBLIC_API_BASE_URL || 'https://localhost:3000/api';
@@ -109,7 +109,7 @@ Lo importante de esta línea es que si la variable no está definida, cae en `'h
 
 ### 2.2 SSL local
 
-`astro.config.mjs` incluye el plugin `@vitejs/plugin-basic-ssl`, lo que hace que el Frontend funcione sobre **HTTPS en localhost** con un certificado autofirmado. El Backend también espera HTTPS en `https://localhost:3000`, así que ambos lados están alineados.
+`astro.config.mjs` incluye el plugin `@vitejs/plugin-basic-ssl`, lo que hace que el Frontend funcione sobre **HTTPS en localhost** con un certificado auto-firmado. El Backend también espera HTTPS en `https://localhost:3000`, así que ambos lados están alineados.
 
 Esto explica por qué la primera vez que se levanta el proyecto el navegador muestra una advertencia de certificado no confiable, y hay que aceptarla para ver el sistema funcional.
 
@@ -262,4 +262,26 @@ Pero el resto de archivos no la usa, sino que vuelven a leer `import.meta.env.PU
 
 ## 5. Recomendaciones
 
+A partir de lo encontrado en la Sección 4, propongo tres cambios para mejorar la configuración del Frontend. Todas son relativamente de bajo esfuerzo, aparte pueden hacerse como sub-tasks!
+
+**(CR significa Mejora de Configuración)**
+
+| ID | Qué hacer |
+|----|-----------|
+| MC-1 | Eliminar `PUBLIC_IS_DEV` de `.env.example` y de `astro.config.mjs`, ya que ningún archivo del Frontend la usa. |
+| MC-2 | Corregir la sintaxis de `apiClient.ts` (lo de la línea que usa .md en lgar de .ts) para que `isDevelopment` evalúe correctamente según el entorno. |
+| MC-3 | Refactorizar los 13 archivos que leen `PUBLIC_API_BASE_URL` directamente para que importen `BASE_URL` desde `apiClient.ts`. |
+
 ## 6. Conclusión
+
+A mi parecer nuestra configuración del Frontend está bien armada: las variables de entorno están separadas en sus archivos correspondientes, no hay cosas hardcodeadas, y todas las llamadas al Backend pasan por `PUBLIC_API_BASE_URL` sin tema.
+
+Los elementos que encontré (los la Sección 4) no son urgentes y tampoco es que rompan el sistema, pero sí son detalles que valdrían la pena arreglar para que el proyecto sea más fácil de mantener a la larga (sobre todo son buenas prácticas). Las tres recomendaciones que propuse (MC-1, MC-2, MC-3) son cambios que pueden hacerse en commits separados sin afectar el funcionamiento actual.
+
+---
+
+### Referencias
+- [Astro Docs: Environment Variables](https://docs.astro.build/en/guides/environment-variables/)
+- [Vite Docs: basic-ssl plugin](https://github.com/vitejs/vite-plugin-basic-ssl)
+- [Prisma Docs: Schema](https://www.prisma.io/docs/orm/prisma-schema)
+- [Prisma Docs: Migrations](https://www.prisma.io/docs/orm/prisma-migrate)

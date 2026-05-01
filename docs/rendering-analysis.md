@@ -235,6 +235,8 @@ Si alguno de estos componentes se convierte a `.astro`, ese archivo desaparece c
 
 En base a todo el análisis realizado previamente, a continuación propongo 4 acciones que se pueden hacer para mejorar el rendimiento del frontend. Algunas resultan sencillas porque solo involucran eliminar algo, pero otras involucran revisar los componentes listados en la Sección 4.
 
+**(MR significa Mejora de Rendimiento)**
+
 | ID | Qué hacer |
 |---|-----------|
 | MR-1 | Eliminar el import de `Check` no utilizado en `TravelSearchCard.tsx`. |
