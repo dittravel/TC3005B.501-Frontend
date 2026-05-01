@@ -8,23 +8,35 @@ import { apiRequest } from "@/utils/apiClient";
 import { getCookie } from "@data/cookies";
 import MaterialIcon from "@components/Utils/MaterialIcon.astro";
 import { formatDate } from '@utils/dateFormatter';
+import { resolveDashboardProfile, shouldShowDashboardMessages } from '@/utils/userExperience';
 
-// Status dictionary mapped by user role
-const statusByRole = {
-  'Solicitante': 1,
-  'Agencia de viajes': 2,
-  'Cuentas por pagar': 3,
-  'N1': 4,
-  'N2': 5,
-  'Administrador': 6,
-};
-
-type UserRole = keyof typeof statusByRole;
-const userRole = getCookie("role", Astro.cookies) as UserRole;
-const status = statusByRole[userRole];
-const alerts = await (async () => {
+function parseJwtPayload(token: string): Record<string, unknown> | null {
   try {
-    return await apiRequest(`/authorizer/get-alerts/${getCookie("id", Astro.cookies)}/${status}/10`, { cookies: Astro.cookies });
+    const parts = token.split('.');
+    if (parts.length < 2) return null;
+
+    const base64 = parts[1].replaceAll('-', '+').replaceAll('_', '/');
+    const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '=');
+    return JSON.parse(Buffer.from(padded, 'base64').toString('utf8'));
+  } catch {
+    return null;
+  }
+}
+
+const userRole = String(getCookie("role", Astro.cookies) || '');
+const token = String(getCookie("token", Astro.cookies) || '');
+const tokenPayload = parseJwtPayload(token);
+const permissionKeys = Array.isArray(tokenPayload?.permissions)
+  ? tokenPayload.permissions.map((permission: unknown) => String(permission).trim()).filter(Boolean)
+  : [];
+const profile = resolveDashboardProfile(userRole, permissionKeys);
+const alerts = await (async () => {
+  if (!shouldShowDashboardMessages(profile)) {
+    return [];
+  }
+
+  try {
+    return await apiRequest(`/authorizer/get-alerts/${getCookie("id", Astro.cookies)}/10`, { cookies: Astro.cookies });
   } catch (error) {
     return [];
   }

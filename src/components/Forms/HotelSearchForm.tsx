@@ -9,6 +9,7 @@ import React, { useState } from 'react';
 import type { TravelRoute } from '@/types/TravelRoute';
 import Button from '../Buttons/Button';
 import Card from '../Utils/Card';
+import Toast from '@/components/Utils/Toast';
 import { apiRequest } from '@/utils/apiClient';
 
 interface HotelSearchFormProps {
@@ -22,6 +23,7 @@ const HotelSearchForm = ({ token, route, routeIndex }: HotelSearchFormProps) => 
   const [loadingHotels, setLoadingHotels] = useState(false);
   const [shownHotels, setShownHotels] = useState(false);
   const [selectedHotel, setSelectedHotel] = useState<any>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' } | null>(null);
 
   const [address, setAddress] = useState(`${route.destination_city}, ${route.destination_country}` || '');
   const [checkInDate, setCheckInDate] = useState(route.beginning_date || '');
@@ -31,7 +33,7 @@ const HotelSearchForm = ({ token, route, routeIndex }: HotelSearchFormProps) => 
 
   const handleSearch = async () => {
     if (!checkInDate || !checkOutDate || !address) {
-      alert('Por favor completa todos los campos antes de buscar.');
+      setToast({ message: 'Por favor completa todos los campos antes de buscar.', type: 'warning' });
       return;
     }
 
@@ -58,7 +60,7 @@ const HotelSearchForm = ({ token, route, routeIndex }: HotelSearchFormProps) => 
       setShownHotels(true);
     } catch (error) {
       console.error('Error buscando hoteles:', error);
-      alert('Ocurrió un error al buscar hoteles. Por favor intenta de nuevo.');
+      setToast({ message: 'Ocurrió un error al buscar hoteles. Por favor intenta de nuevo.', type: 'error' });
       setShownHotels(true);
     } finally {
       setLoadingHotels(false);
@@ -71,18 +73,18 @@ const HotelSearchForm = ({ token, route, routeIndex }: HotelSearchFormProps) => 
 
   const handleSubmitHotel = async () => {
     if (!selectedHotel) {
-      alert('Por favor selecciona un hotel antes de continuar.');
+      setToast({ message: 'Por favor selecciona un hotel antes de continuar.', type: 'warning' });
       return;
     }
 
     if (!route.route_id) {
-      alert('No se encontró la ruta para guardar la tarifa del hotel.');
+      setToast({ message: 'No se encontró la ruta para guardar la tarifa del hotel.', type: 'error' });
       return;
     }
 
     const parsedHotelFee = Number(selectedHotel.cost);
     if (!Number.isFinite(parsedHotelFee) || parsedHotelFee < 0) {
-      alert('El precio del hotel seleccionado no es válido.');
+      setToast({ message: 'El precio del hotel seleccionado no es válido.', type: 'warning' });
       return;
     }
 
@@ -93,15 +95,16 @@ const HotelSearchForm = ({ token, route, routeIndex }: HotelSearchFormProps) => 
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      alert(`Has seleccionado ${selectedHotel.name} por ${selectedHotel.cost} ${selectedHotel.currency || ''} por noche.`);
+      setToast({ message: `Has seleccionado ${selectedHotel.name} por ${selectedHotel.cost} ${selectedHotel.currency || ''} por noche.`, type: 'success' });
     } catch (error) {
       console.error('Error guardando hotel_fee:', error);
-      alert('No se pudo guardar la tarifa del hotel. Intenta de nuevo.');
+      setToast({ message: 'No se pudo guardar la tarifa del hotel. Intenta de nuevo.', type: 'error' });
     }
   };
 
   return (
-    <Card className="mt-4 p-6 bg-gray-50 rounded-lg border space-y-6">
+    <>
+      <Card className="mt-4 p-6 bg-gray-50 rounded-lg border space-y-6">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 
         {/* Address */}
@@ -280,7 +283,9 @@ const HotelSearchForm = ({ token, route, routeIndex }: HotelSearchFormProps) => 
           )}
         </div>
       )}
-    </Card>
+      </Card>
+      {toast && <Toast message={toast.message} type={toast.type} />}
+    </>
   );
 };
 

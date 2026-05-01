@@ -34,7 +34,7 @@ const society = await (async () => {
     const data = await apiRequest(`/societies/current`, {
       cookies: Astro.cookies
     });
-    return data?.society || null;
+    return data || null;
   } catch (error) {
     console.error("Error al cargar la sociedad del usuario:", error);
     return null;
@@ -54,13 +54,13 @@ const token = getCookie("token", Astro.cookies) || "";
     <DefaultRefundPolicy
       client:load
       defaultPolicy={policies.find((p: any) => p.is_default)}
-      currency={society?.currency || "MXN"}
+      currency={society?.local_currency || "MXN"}
       token={token}
     />
     <RefundPoliciesList
       client:load
       data={policies}
-      currency={society?.currency || "MXN"}
+      currency={society?.local_currency || "MXN"}
       token={token}
     />
   </main>

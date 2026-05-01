@@ -10,50 +10,52 @@ import ImportDataButton from "@/components/Buttons/ImportDataButton";
 const exampleJson =
 `{
   "CeCo": [
-    { "Clave": 101, "Descripcion": "Finanzas" }
+    { "Clave": 101, "Descripcion": "CC-101" },
+    { "Clave": 102, "Descripcion": "CC-102" }
   ],
   "Departamentos": [
-    { "Clave": 1, "Descripcion": "Finanzas", "CeCo": 101 }
+    { "Clave": 1, "Descripcion": "Finanzas", "CeCo": 101 },
+    { "Clave": 2, "Descripcion": "Operaciones", "CeCo": 102 }
   ],
-  "Sociedades": [
+  "Empleados": [
     {
-      "Clave": 1,
-      "Descripcion": "Ditta Servicios",
-      "MonedaLocal": "MXN",
-      "Empleados": [
-        {
-          "NoEmpleado": "Emp001",
-          "Nombre": "Admin User",
-          "Usuario": "admin",
-          "Email": "admin@empresa.com",
-          "JefeInmediato": null,
-          "Proveedor": 2001,
-          "CeCo": 101,
-          "Departamento": 1,
-          "Status": "A",
-          "FechaAlta": "2023-01-01",
-          "FechaCambio": "2023-06-01"
-        },
-        {
-          "NoEmpleado": "Emp002",
-          "Nombre": "Carlos Ramos",
-          "Usuario": "carlos.ramos",
-          "Email": "carlos.ramos@empresa.com",
-          "JefeInmediato": "Emp001",
-          "Proveedor": 2002,
-          "CeCo": 101,
-          "Departamento": 1,
-          "Status": "A",
-          "FechaAlta": "2023-01-05",
-          "FechaCambio": "2023-06-01"
-        }
-      ]
+      "NoEmpleado": "Emp001",
+      "Nombre": "Admin User",
+      "Usuario": "admin",
+      "Email": "admin@empresa.com",
+      "JefeInmediato": null,
+      "Proveedor": 2001,
+      "CeCo": 101,
+      "Departamento": 1,
+      "Status": "A",
+      "FechaAlta": "2023-01-01",
+      "FechaCambio": "2023-06-01"
     },
     {
-      "Clave": 2,
-      "Descripcion": "Ditta Consulting",
-      "MonedaLocal": "USD",
-      "Empleados": []
+      "NoEmpleado": "Emp002",
+      "Nombre": "Carlos Ramos",
+      "Usuario": "carlos.ramos",
+      "Email": "carlos.ramos@empresa.com",
+      "JefeInmediato": "Emp001",
+      "Proveedor": 2002,
+      "CeCo": 101,
+      "Departamento": 1,
+      "Status": "A",
+      "FechaAlta": "2023-01-05",
+      "FechaCambio": "2023-06-01"
+    },
+    {
+      "NoEmpleado": "Emp003",
+      "Nombre": "Paula Martínez",
+      "Usuario": "paula.martinez",
+      "Email": "paula.martinez@empresa.com",
+      "JefeInmediato": "Emp002",
+      "Proveedor": 2003,
+      "CeCo": 101,
+      "Departamento": 1,
+      "Status": "A",
+      "FechaAlta": "2023-01-10",
+      "FechaCambio": "2023-06-01"
     }
   ]
 }`;

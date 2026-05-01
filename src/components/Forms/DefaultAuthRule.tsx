@@ -49,7 +49,7 @@ export default function DefaultAuthRule({ defaultRule, token }: Props) {
     initializeFormData(defaultRule);
   }, [defaultRule]);
   
-  // Clear toast after 3 seconds
+  // Clear toast after 3 seconds ( o lo que quieran idk)
   useEffect(() => {
     if (toast) {
       const timer = setTimeout(() => {

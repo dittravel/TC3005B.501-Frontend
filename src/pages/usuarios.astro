@@ -53,6 +53,29 @@ const societyName = await getSocietyName(Astro);
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
 const userName = getCookie("username", Astro.cookies) || "";
 const buttonLabel = roleLabels[role];
+
+function parseJwtPayload(jwtToken: string): Record<string, unknown> | null {
+  try {
+    const parts = jwtToken.split('.');
+    if (parts.length < 2) return null;
+
+    const base64 = parts[1].replaceAll('-', '+').replaceAll('_', '/');
+    const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '=');
+    return JSON.parse(Buffer.from(padded, 'base64').toString('utf8'));
+  } catch {
+    return null;
+  }
+}
+
+const token = getCookie("token", Astro.cookies) || "";
+const tokenPayload = parseJwtPayload(token);
+const permissionKeys = Array.isArray(tokenPayload?.permissions)
+  ? tokenPayload.permissions.map((permission: unknown) => String(permission).trim()).filter(Boolean)
+  : [];
+const permissionSet = new Set(permissionKeys);
+const canCreateUsers = permissionSet.has('users:create');
+const canEditUsers = permissionSet.has('users:edit');
+const canDeleteUsers = permissionSet.has('users:delete');
 ---
 
 <MainLayout title="Usuarios" data={{userName, buttonLabel, role}}>
@@ -80,7 +103,9 @@ const buttonLabel = roleLabels[role];
         <section class="w-full">
           <div class="flex justify-between items-start gap-4 mb-6">
              <h2 class="text-xl font-bold text-text-primary">{`Usuarios del Sistema (${users.length})`}</h2>
-             <Button href="/crear-usuario" color="secondary">Crear Usuario</Button>
+             {canCreateUsers && (
+              <Button href="/crear-usuario" color="secondary">Crear Usuario</Button>
+             )}
           </div>
 
           <div class="overflow-x-auto border border-border rounded-lg">
@@ -113,20 +138,28 @@ const buttonLabel = roleLabels[role];
                     <td class="px-4 py-4 text-sm text-text-primary">{user.department_name || 'Admin'}</td>
                     <td class="px-4 py-4 text-sm text-text-primary">{user.cost_center_name || 'N/A'}</td>
                     <td class="px-4 py-4 text-center">
-                      <Button href={`/editar-usuario/${user.user_id}`} color="primary">Editar</Button>
+                      {canEditUsers ? (
+                        <Button href={`/editar-usuario/${user.user_id}`} color="primary">Editar</Button>
+                      ) : (
+                        <span class="text-xs text-text-secondary">Sin permiso</span>
+                      )}
                     </td>
                     <td class="px-4 py-4">
-                      <UltimateWrapper
-                        client:only="react"
-                        id={user.user_id}
-                        endpoint="/admin/delete-user"
-                        title="Eliminar usuario"
-                        message={`¿Estás seguro de que deseas eliminar al usuario ${user.user_name}? Esta acción no se puede deshacer.`}
-                        modal_type="warning"
-                        color="warning"
-                        label="Eliminar"
-                        token={getCookie("token", Astro.cookies) || ""}
-                      />
+                      {canDeleteUsers ? (
+                        <UltimateWrapper
+                          client:only="react"
+                          id={user.user_id}
+                          endpoint="/admin/delete-user"
+                          title="Eliminar usuario"
+                          message={`¿Estás seguro de que deseas eliminar al usuario ${user.user_name}? Esta acción no se puede deshacer.`}
+                          modal_type="warning"
+                          color="warning"
+                          label="Eliminar"
+                          token={token}
+                        />
+                      ) : (
+                        <span class="text-xs text-text-secondary">Sin permiso</span>
+                      )}
                     </td>
                   </tr>
                 ))}

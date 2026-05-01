@@ -44,14 +44,35 @@ export default function SocietyForm({
     description: data?.description || "",
     local_currency: data?.local_currency || "",
     society_group_id: data?.society_group_id ? parseInt(data.society_group_id) : "",
+    admin: {
+      user_name: "",
+      password: "",
+      email: "",
+      workstation: "",
+      phone_number: "",
+    },
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const isCreateMode = mode === 'create';
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+
+    if (name.includes('.')) {
+      const [section, field] = name.split('.');
+      setFormData((prev) => ({
+        ...prev,
+        [section]: {
+          ...(prev as any)[section],
+          [field]: value,
+        },
+      }));
+      return;
+    }
+
     setFormData(prev => ({
       ...prev,
       [name]: name === "society_group_id" ? parseInt(value) : value,
@@ -64,13 +85,46 @@ export default function SocietyForm({
     setError(null);
 
     try {
+      if (isCreateMode) {
+        if (!formData.description.trim() || !formData.local_currency.trim() || !formData.society_group_id) {
+          setToast({ message: 'Descripción, moneda y grupo son requeridos', type: 'error' });
+          setLoading(false);
+          return;
+        }
+
+        if (!formData.admin.user_name.trim() || !formData.admin.password.trim() || !formData.admin.email.trim()) {
+          setToast({ message: 'El administrador es requerido (usuario, contraseña y correo)', type: 'error' });
+          setLoading(false);
+          return;
+        }
+      }
+
       const endpoint = mode === "create"
         ? "/societies"
         : `/societies/${data.id}`;
 
+      const payload = isCreateMode
+        ? {
+            description: formData.description,
+            local_currency: formData.local_currency,
+            society_group_id: formData.society_group_id,
+            admin: formData.admin.user_name.trim() ? {
+              user_name: formData.admin.user_name,
+              password: formData.admin.password,
+              email: formData.admin.email,
+              workstation: formData.admin.workstation || null,
+              phone_number: formData.admin.phone_number || null,
+            } : null,
+          }
+        : {
+            description: formData.description,
+            local_currency: formData.local_currency,
+            society_group_id: formData.society_group_id,
+          };
+
       await apiRequest(endpoint, {
         method: mode === "create" ? "POST" : "PUT",
-        data: formData,
+        data: payload,
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -129,6 +183,52 @@ export default function SocietyForm({
             </option>
           ))}
         </Select>
+
+        {isCreateMode ? (
+          <>
+            <div className="mt-8 border-t border-border pt-6">
+              <h2 className="text-lg font-semibold text-text-primary">Administrador</h2>
+              <p className="mb-4 text-sm text-text-secondary">Crea un administrador de la sociedad en el mismo flujo.</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input
+                  label="Usuario"
+                  name="admin.user_name"
+                  value={formData.admin.user_name}
+                  onChange={handleChange}
+                  required
+                />
+                <Input
+                  label="Contraseña"
+                  name="admin.password"
+                  type="password"
+                  value={formData.admin.password}
+                  onChange={handleChange}
+                  required
+                />
+                <Input
+                  label="Correo"
+                  name="admin.email"
+                  type="email"
+                  value={formData.admin.email}
+                  onChange={handleChange}
+                  required
+                />
+                <Input
+                  label="Estación"
+                  name="admin.workstation"
+                  value={formData.admin.workstation}
+                  onChange={handleChange}
+                />
+                <Input
+                  label="Teléfono"
+                  name="admin.phone_number"
+                  value={formData.admin.phone_number}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+          </>
+        ) : null}
       </div>
       <div className="flex justify-end gap-2 mt-4">
         <Button

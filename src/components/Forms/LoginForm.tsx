@@ -56,11 +56,27 @@ export default function LoginForm() {
       // Clear error message on successful login
       setErrorMessage("");
 
+      // Validate HTTPS before setting sensitive cookies
+      const isHttps = window.location.protocol === "https:";
+      if (!isHttps) {
+        setErrorMessage("Se requiere una conexión segura (HTTPS) para iniciar sesión.");
+        return;
+      }
+
+      // Persist session cookies in the frontend domain for Astro/React reads.
+      const commonAttrs = "; Path=/; SameSite=Lax; Secure";
+      const oneHour = 60 * 60;
+
+      document.cookie = `token=${encodeURIComponent(response.token)}${commonAttrs}; Max-Age=${oneHour}`;
+      document.cookie = `role=${encodeURIComponent(response.role)}${commonAttrs}; Max-Age=${oneHour}`;
+      document.cookie = `username=${encodeURIComponent(response.username)}${commonAttrs}; Max-Age=${oneHour}`;
+      document.cookie = `id=${encodeURIComponent(response.user_id)}${commonAttrs}; Max-Age=${oneHour}`;
+      document.cookie = `department_id=${encodeURIComponent(response.department_id)}${commonAttrs}; Max-Age=${oneHour}`;
       window.location.href = "/dashboard";
 
     } catch (error: any) {
       // Extract error message from API response or use default message
-      const msg = error?.response?.data?.error || "Error al iniciar sesión";
+      const msg = error?.response?.error || "Error al iniciar sesión";
       setErrorMessage(msg);
     }
   };

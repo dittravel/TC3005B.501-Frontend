@@ -7,7 +7,6 @@ import ModalWrapper from "../Modals/ModalWrapper";
 interface Props {
     token: string;
     route: TravelRoute;
-    routeIndex: number;
     routeId: number;
 }
 
@@ -15,7 +14,7 @@ export default function ConfirmationDocumentForm({
     token,
     route,
     routeId,
-}: Props) {
+}: Readonly<Props>) {
     const [flightPdfFile, setFlightPdfFile] = useState<File | null>(null);
     const [hotelPdfFile, setHotelPdfFile] = useState<File | null>(null);
 

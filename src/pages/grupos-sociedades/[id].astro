@@ -8,6 +8,7 @@
 import TextHeader from "@components/Layout/TextHeader.astro";
 import MainLayout from "@layouts/MainLayout.astro";
 import SocietyGroupForm from "@components/Forms/SocietyGroupForm";
+import SocietyGroupEditPanel from "@components/Forms/SocietyGroupEditPanel";
 import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
 import type { UserRole } from "@type/roles";
@@ -32,6 +33,29 @@ if (isEditing) {
     throw error;
   }
 }
+
+let groups = [];
+if (isEditing) {
+  try {
+    const response = await apiRequest('/society-groups', { cookies: Astro.cookies });
+    groups = Array.isArray(response) ? response : [];
+  } catch {
+    groups = [];
+  }
+}
+
+const currencies = await (async () => {
+  if (!isCreating) {
+    return [];
+  }
+
+  try {
+    const response = await apiRequest('/exchange-rate/catalog', { cookies: Astro.cookies });
+    return Array.isArray(response) ? response : (response?.data || []);
+  } catch {
+    return [];
+  }
+})();
 ---
 
 <MainLayout title={isCreating ? "Crear Grupo de Sociedad" : "Editar Grupo de Sociedad"} data={{userName, buttonLabel, role}}>
@@ -40,12 +64,23 @@ if (isEditing) {
       title={isCreating ? "Crear nuevo grupo de sociedad" : "Editar Grupo de Sociedad"}
       subtitle={isCreating ? "Complete el formulario con los datos del nuevo grupo de sociedad" : "Modifica los campos necesarios para actualizar la información del grupo de sociedad"}
     />
-    <SocietyGroupForm
-      client:load
-      mode={isCreating ? "create" : "edit"}
-      data={data}
-      token={token}
-      redirectTo="/sociedades"
-    />
+    {isCreating ? (
+      <SocietyGroupForm
+        client:load
+        mode="create"
+        token={token}
+        redirectTo="/grupos-sociedades"
+        currencies={currencies}
+      />
+    ) : (
+      <SocietyGroupEditPanel
+        client:load
+        token={token}
+        groupId={Number(id)}
+        groupData={data}
+        groups={groups}
+        redirectTo="/grupos-sociedades"
+      />
+    )}
   </div>
 </MainLayout>

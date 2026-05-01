@@ -387,16 +387,9 @@ export default function TravelRequestForm({
           Authorization: `Bearer ${token}`,
         },
       });
-      setToast({
-        message: "Solicitud creada y enviada exitosamente.",
-        type: "success",
-      });
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      if (role === "Solicitante") {
-        window.location.href = "/dashboard";
-      } else {
-        window.location.href = '/solicitudes';
-      }
+      setToast({ message: 'Solicitud creada y enviada exitosamente.', type: 'success' });
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      window.location.href = '/solicitudes';
     } catch (error) {
       console.error('Error al enviar la solicitud:', error);
       setError('Hubo un error al enviar la solicitud.');
@@ -895,7 +888,7 @@ export default function TravelRequestForm({
               await handleEditRequest(
                 e as unknown as React.FormEvent,
                 true,
-                "/dashboard",
+                "/solicitudes",
               );
             }}
             color="secondary"

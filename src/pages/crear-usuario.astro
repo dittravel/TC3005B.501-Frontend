@@ -14,19 +14,13 @@ import { apiRequest } from "@/utils/apiClient";
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
 const buttonLabel = roleLabels[role];
 const userName = getCookie("username", Astro.cookies) || "";
-const societyGroupId = getCookie("society_group_id", Astro.cookies) || "";
 
 // Get departments
 const departments = await (async () => {
   try {
-    const allDepartments = await apiRequest(`/admin/get-departments`, {
+    return await apiRequest(`/admin/get-departments`, {
       headers: { Authorization: `Bearer ${getCookie("token", Astro.cookies) || ""}` },
     });
-    // Filter departments to only show those in the admin's society group
-    if (societyGroupId) {
-      return allDepartments.filter((dept: any) => dept.society_group_id === parseInt(societyGroupId as string));
-    }
-    return allDepartments;
   } catch (error) {
     console.error("Error al cargar las reglas de autorización:", error);
     return [];
@@ -45,12 +39,32 @@ const roles = await (async () => {
   }
 })();
 
+const defaultRole = await (async () => {
+  try {
+    return await apiRequest('/admin/get-default-role', {
+      headers: { Authorization: `Bearer ${getCookie("token", Astro.cookies) || ""}` },
+      cookies: Astro.cookies,
+    });
+  } catch (error) {
+    console.error("Error loading default role:", error);
+    return null;
+  }
+})();
+
 // Get societies
 const societies = await (async () => {
   try {
-    return await apiRequest(`/societies`, {
+    if (role === 'Superadministrador') {
+      return await apiRequest(`/societies`, {
+        cookies: Astro.cookies
+      });
+    }
+
+    const currentSociety = await apiRequest(`/societies/current`, {
       cookies: Astro.cookies
     });
+
+    return currentSociety ? [currentSociety] : [];
   } catch (error) {
     console.error("Error loading societies:", error);
     return [];
@@ -63,7 +77,7 @@ const societies = await (async () => {
   <div>
     <TextHeader
       title="Crear nuevo usuario"
-      subtitle="Complete el formulario con los datos del nuevo usuario"
+      subtitle="Completa el formulario con los datos del nuevo usuario"
     />
     <AdminUserForm
       mode="create"
@@ -73,6 +87,8 @@ const societies = await (async () => {
       roles={roles}
       societies={societies}
       token={getCookie("token", Astro.cookies) || ""}
+      defaultRoleId={defaultRole?.role_id || null}
+      lockSocietySelection={role !== 'Superadministrador'}
     />
   </div>
 </MainLayout>

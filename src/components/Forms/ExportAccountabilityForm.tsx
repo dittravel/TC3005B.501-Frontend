@@ -96,7 +96,7 @@ export default function AccountingExportForm({ token }: Props) {
   };
 
   return (
-    <div className="max-w-4xl mx-auto mt-8 px-4">
+    <div className="px-4">
       <div className="bg-card border border-border rounded-2xl p-8 md:p-10 shadow-sm">
         <div className="text-center mb-8">
           <h2 className="text-2xl font-semibold">Exportar Pólizas</h2>

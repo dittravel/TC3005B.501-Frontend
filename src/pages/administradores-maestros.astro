@@ -1,0 +1,44 @@
+---
+/**
+ * Superadmin page for creating and listing master administrators.
+ */
+
+import TextHeader from '@components/Layout/TextHeader.astro';
+import MainLayout from '@layouts/MainLayout.astro';
+import { getCookie } from '@data/cookies';
+import { roleLabels } from '@config/role-labels';
+import type { UserRole } from '@type/roles';
+import { apiRequest } from '@/utils/apiClient';
+import MasterAdminsPanel from '@/components/Forms/MasterAdminsPanel';
+
+const role: UserRole = getCookie('role', Astro.cookies) as UserRole;
+const buttonLabel = roleLabels[role];
+const userName = getCookie('username', Astro.cookies) || '';
+const token = getCookie('token', Astro.cookies) || '';
+
+let initialAdmins: any[] = [];
+try {
+  const response = await apiRequest('/admin/master-admins', {
+    headers: { Authorization: `Bearer ${token}` },
+    cookies: Astro.cookies,
+  });
+  initialAdmins = Array.isArray(response) ? response : [];
+} catch (error) {
+  initialAdmins = [];
+}
+---
+
+<MainLayout title="Administradores Maestros" data={{ userName, buttonLabel, role }}>
+  <TextHeader
+    title="Administradores maestros"
+    subtitle="Gestiona usuarios superadministradores"
+  />
+
+  <main>
+    <MasterAdminsPanel
+      client:only="react"
+      token={token}
+      initialAdmins={initialAdmins}
+    />
+  </main>
+</MainLayout>

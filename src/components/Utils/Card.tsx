@@ -22,8 +22,8 @@ export default function Card({
       {/* Header */}
       {(tag || status) && (
         <div className="flex justify-between items-start gap-2 mb-4 pb-3 border-b border-border">
-          {tag && <Tag text={tag.text} type={tag.type} size="small" />}
-          {status && <Tag text={status.text} type={status.type} size="small" />}
+          {tag && <Tag text={tag.text} type={tag.type} size="medium" />}
+          {status && <Tag text={status.text} type={status.type} size="medium" />}
         </div>
       )}
       

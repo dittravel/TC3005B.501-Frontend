@@ -9,6 +9,7 @@ import React, { useEffect, useState } from 'react';
 import type { TravelRoute } from '@/types/TravelRoute';
 import Button from '../Buttons/Button';
 import Card from '../Utils/Card';
+import Toast from '@/components/Utils/Toast';
 import { apiRequest } from '@/utils/apiClient';
 
 // Define the props for the FlightSearchForm component
@@ -19,15 +20,6 @@ interface FlightSearchFormProps {
   tripType?: 'one_way' | 'round';
   ticketType?: 'economy' | 'premium_economy' | 'business' | 'first';
 }
-
-// Dummy airport options for testing
-const dummyAirports = [
-  { code: 'MEX', city: 'Aeropuerto Internacional Benito Juárez (MEX)' },
-  { code: 'CUN', city: 'Aeropuerto Internacional de Cancún (CUN)' },
-  { code: 'JFK', city: 'Aeropuerto Internacional John F. Kennedy (JFK)' },
-  { code: 'LAX', city: 'Aeropuerto Internacional de Los Ángeles (LAX)' },
-  { code: 'CDG', city: 'Aeropuerto Charles de Gaulle (CDG)' },
-];
 
 // Main component function
 const FlightSearchForm = ({ token, route, routeIndex, tripType, ticketType }: FlightSearchFormProps) => {
@@ -40,6 +32,22 @@ const FlightSearchForm = ({ token, route, routeIndex, tripType, ticketType }: Fl
   const [flights, setFlights] = useState<any[]>([]);
   const [loadingFlights, setLoadingFlights] = useState(false);
   const [selectedFlight, setSelectedFlight] = useState<any>(null);
+  const [airports, setAirports] = useState<{ city_id: number; city_name: string; iata_code: string | null }[]>([]);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' } | null>(null);
+
+  useEffect(() => {
+    apiRequest('/travel-agent/cities', {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((data) => {
+        const cities = Array.isArray(data) ? data.filter((c: any) => c.iata_code) : [];
+        setAirports(cities);
+      })
+      .catch((err) => {
+        console.error('Error loading airports:', err);
+      });
+  }, [token]);
 
   // Handle trip type change
   const handleTripTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -69,7 +77,7 @@ const FlightSearchForm = ({ token, route, routeIndex, tripType, ticketType }: Fl
   // Allows searching for flights based on selected filters and updates the flight options displayed
   const handleSearch = async () => {
     if (!selectedTripType || !selectedTicketType || !selectedDepartureAirport || !selectedArrivalAirport) {
-      alert('Por favor selecciona todos los campos antes de buscar.');
+      setToast({ message: 'Por favor selecciona todos los campos antes de buscar.', type: 'warning' });
       return;
     }
 
@@ -98,7 +106,7 @@ const FlightSearchForm = ({ token, route, routeIndex, tripType, ticketType }: Fl
       setShownFlights(true);
     } catch (error) {
       console.error('Error buscando vuelos:', error);
-      alert('Ocurrió un error al buscar vuelos. Por favor intenta de nuevo.');
+      setToast({ message: 'Ocurrió un error al buscar vuelos. Por favor intenta de nuevo.', type: 'error' });
       setShownFlights(true);
     } finally {
       setLoadingFlights(false);
@@ -113,18 +121,18 @@ const FlightSearchForm = ({ token, route, routeIndex, tripType, ticketType }: Fl
   // Handles submitting the selected flight and saving its price to the database
   const handleSubmitFlight = async () => {
     if (!selectedFlight) {
-      alert('Por favor selecciona un vuelo antes de continuar.');
+      setToast({ message: 'Por favor selecciona un vuelo antes de continuar.', type: 'warning' });
       return;
     }
 
     if (!route.route_id) {
-      alert('No se encontró la ruta para guardar la tarifa del vuelo.');
+      setToast({ message: 'No se encontró la ruta para guardar la tarifa del vuelo.', type: 'error' });
       return;
     }
 
     const parsedFlightFee = Number(selectedFlight.price);
     if (!Number.isFinite(parsedFlightFee) || parsedFlightFee < 0) {
-      alert('El precio del vuelo seleccionado no es válido.');
+      setToast({ message: 'El precio del vuelo seleccionado no es válido.', type: 'warning' });
       return;
     }
 
@@ -135,16 +143,17 @@ const FlightSearchForm = ({ token, route, routeIndex, tripType, ticketType }: Fl
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      alert(`Has seleccionado el vuelo de ${selectedFlight.owner} por ${selectedFlight.price} ${selectedFlight.currency}.`);
+      setToast({ message: `Has seleccionado el vuelo de ${selectedFlight.owner} por ${selectedFlight.price} ${selectedFlight.currency}.`, type: 'success' });
     } catch (error) {
       console.error('Error guardando flight_fee:', error);
-      alert('No se pudo guardar la tarifa del vuelo. Intenta de nuevo.');
+      setToast({ message: 'No se pudo guardar la tarifa del vuelo. Intenta de nuevo.', type: 'error' });
     }
   }
 
   return (
-    <Card className="mt-4 p-6 bg-gray-50 rounded-lg border space-y-6 bg-primary/5">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <>
+        <Card className="mt-4 p-6 bg-gray-50 rounded-lg border space-y-6 bg-primary/5">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <label
             htmlFor={`trip-type-${routeIndex}`}
@@ -210,9 +219,9 @@ const FlightSearchForm = ({ token, route, routeIndex, tripType, ticketType }: Fl
               className="w-full appearance-none rounded-md border border-gray-300 bg-white px-4 py-2.5 pr-10 text-sm text-tertiary shadow-sm transition focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
             >
               <option value="">Selecciona un aeropuerto</option>
-              {dummyAirports.map((airport) => (
-                <option key={airport.code} value={airport.code}>
-                  {airport.code} - {airport.city}
+              {airports.map((airport) => (
+                <option key={airport.city_id} value={airport.iata_code!}>
+                  {airport.iata_code} - {airport.city_name}
                 </option>
               ))}
             </select>
@@ -239,9 +248,9 @@ const FlightSearchForm = ({ token, route, routeIndex, tripType, ticketType }: Fl
               className="w-full appearance-none rounded-md border border-gray-300 bg-white px-4 py-2.5 pr-10 text-sm text-tertiary shadow-sm transition focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
             >
               <option disabled value="">Selecciona un aeropuerto</option>
-              {dummyAirports.map((airport) => (
-                <option key={airport.code} value={airport.code}>
-                  {airport.code} - {airport.city}
+              {airports.map((airport) => (
+                <option key={airport.city_id} value={airport.iata_code!}>
+                  {airport.iata_code} - {airport.city_name}
                 </option>
               ))}
             </select>
@@ -355,7 +364,9 @@ const FlightSearchForm = ({ token, route, routeIndex, tripType, ticketType }: Fl
           )}
         </div>
       )}
-    </Card>
+      </Card>
+      {toast ? <Toast message={toast.message} type={toast.type} /> : null}
+    </>
   );
 };
 

@@ -53,7 +53,7 @@ export default function AttendRequest({ request_id, token }: Props) {
       window.location.href = "/dashboard";
     } catch (error) {
       console.error("Error al asignar presupuesto:", error);
-      alert("Ocurrió un error al enviar la información.");
+      setToast({ message: 'Ocurrió un error al enviar la información.', type: 'error' });
     }
   }, [imposedFee, request_id]);
 
@@ -68,7 +68,7 @@ export default function AttendRequest({ request_id, token }: Props) {
         type="number"
         name="imposedFee"
         label="Presupuesto impuesto"
-        placeholder="0.00"
+        placeholder="0.00 MXN"
         value={imposedFee}
         onChange={(e) => setImposedFee(e.target.value)}
         error={errorMessage}
