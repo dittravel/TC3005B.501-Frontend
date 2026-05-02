@@ -266,7 +266,12 @@ Los elementos que encontré (los la Sección 4) no son urgentes y tampoco es que
 ---
 
 ### Referencias
-- [Astro Docs: Environment Variables](https://docs.astro.build/en/guides/environment-variables/)
-- [Vite Docs: basic-ssl plugin](https://github.com/vitejs/vite-plugin-basic-ssl)
-- [Prisma Docs: Schema](https://www.prisma.io/docs/orm/prisma-schema)
-- [Prisma Docs: Migrations](https://www.prisma.io/docs/orm/prisma-migrate)
+
+- Prisma Data, Inc. (s. f.-a). *Prisma Migrate: Database, Schema, SQL Migration Tool*. Prisma Documentation. https://www.prisma.io/docs/orm/prisma-migrate
+
+- Prisma Data, Inc. (s. f.-b). *Prisma schema*. Prisma Documentation. https://www.prisma.io/docs/orm/prisma-schema/overview
+
+- Using environment variables. (s. f.). *Docs*. https://docs.astro.build/en/guides/environment-variables/
+
+- Vitejs. (s. f.). *GitHub - vitejs/vite-plugin-basic-ssl: Basic https setup using an automatically generated self-signed certificate*. GitHub. https://github.com/vitejs/vite-plugin-basic-ssl
+

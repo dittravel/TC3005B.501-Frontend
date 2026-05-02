@@ -291,7 +291,11 @@ Las mejoras de rendimiento (MRs) propuestas no requieren cambios grandes (porque
 
 ---
 ### Referencias
-- [Astro Docs: Rendering Modes](https://v4.docs.astro.build/en/basics/rendering-modes/)
-- [Astro Docs: Client Directives](https://docs.astro.build/en/reference/directives-reference/#client-directives)
-- [Astro Docs: UI Frameworks](https://docs.astro.build/en/guides/framework-components/#hydrating-interactive-components)
-- [Vite Docs: Build](https://vitejs.dev/guide/build)
+
+- Building for production. (s. f.). *Vitejs*. https://vite.dev/guide/build
+
+- Front-end frameworks. (s. f.). *Docs*. https://docs.astro.build/en/guides/framework-components/#hydrating-interactive-components
+
+- Rendering modes. (s. f.). *Docs*. https://v4.docs.astro.build/en/basics/rendering-modes/
+
+- Template directives reference. (s. f.). *Docs*. https://docs.astro.build/en/reference/directives-reference/#client-directives
