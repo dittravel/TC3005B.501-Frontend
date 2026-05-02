@@ -236,21 +236,7 @@ El comando no devuelve resultados. En lugar de usar esa variable, `apiClient.ts`
 
 Es una variable que, aunque no rompe nada, puede llegar a confundir a quien lea el `.env.example` por primera vez pensando que tiene que configurarla.
 
-### 4.2 Línea de `apiClient.ts`
-
-Al revisar el archivo encontré esta línea:
-
-```ts
-const isDevelopment = [import.meta.env.DEV](http://import.meta.env.DEV) || import.meta.env.MODE === 'development';
-```
-
-tiene una sintaxis `[ ... ](url)` de un **link de Markdown**, no de TypeScript. 
-
-TypeScript no marca error o algo similar porque, técnicamente, `[algo aquí]` es válido y el resto se interpreta como una expresión válida. El problema es que `[import.meta.env.DEV]` siempre es un array de un elemento, así que `isDevelopment` da `true` sin importar el entorno.
-
-No causa daño en local porque ese bloque desactiva validaciones que ya queríamos desactivadas en desarrollo, pero es algo que vale la pena arreglar en el futuro.
-
-### 4.3 `PUBLIC_API_BASE_URL` se lee en 13 archivos diferentes
+### 4.2 `PUBLIC_API_BASE_URL` se lee en 13 archivos diferentes
 
 Como se menciona en la Sección 1.4, la variable `PUBLIC_API_BASE_URL` se lee directamente en 13 archivos distintos. El tema es que ya existe la constante `BASE_URL` en `apiClient.ts`:
 
@@ -262,21 +248,20 @@ Pero el resto de archivos no la usa, sino que vuelven a leer `import.meta.env.PU
 
 ## 5. Recomendaciones
 
-A partir de lo encontrado en la Sección 4, propongo tres cambios para mejorar la configuración del Frontend. Todas son relativamente de bajo esfuerzo, aparte pueden hacerse como sub-tasks!
+A partir de lo encontrado en la Sección 4, propongo dos cambios para mejorar la configuración del Frontend. Ambos son relativamente de bajo esfuerzo, aparte pueden hacerse como sub-tasks!
 
-**(CR significa Mejora de Configuración)**
+**(MC significa Mejora de Configuración)**
 
 | ID | Qué hacer |
 |----|-----------|
 | MC-1 | Eliminar `PUBLIC_IS_DEV` de `.env.example` y de `astro.config.mjs`, ya que ningún archivo del Frontend la usa. |
-| MC-2 | Corregir la sintaxis de `apiClient.ts` (lo de la línea que usa .md en lgar de .ts) para que `isDevelopment` evalúe correctamente según el entorno. |
-| MC-3 | Refactorizar los 13 archivos que leen `PUBLIC_API_BASE_URL` directamente para que importen `BASE_URL` desde `apiClient.ts`. |
+| MC-2 | Refactorizar los 13 archivos que leen `PUBLIC_API_BASE_URL` directamente para que importen `BASE_URL` desde `apiClient.ts`. |
 
 ## 6. Conclusión
 
 A mi parecer nuestra configuración del Frontend está bien armada: las variables de entorno están separadas en sus archivos correspondientes, no hay cosas hardcodeadas, y todas las llamadas al Backend pasan por `PUBLIC_API_BASE_URL` sin tema.
 
-Los elementos que encontré (los la Sección 4) no son urgentes y tampoco es que rompan el sistema, pero sí son detalles que valdrían la pena arreglar para que el proyecto sea más fácil de mantener a la larga (sobre todo son buenas prácticas). Las tres recomendaciones que propuse (MC-1, MC-2, MC-3) son cambios que pueden hacerse en commits separados sin afectar el funcionamiento actual.
+Los elementos que encontré (los la Sección 4) no son urgentes y tampoco es que rompan el sistema, pero sí son detalles que valdrían la pena arreglar para que el proyecto sea más fácil de mantener a la larga (sobre todo son buenas prácticas). Las dos recomendaciones que propuse (MC-1 y MC-2) son cambios que pueden hacerse en commits separados sin afectar el funcionamiento actual.
 
 ---
 
