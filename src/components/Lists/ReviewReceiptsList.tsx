@@ -114,7 +114,7 @@ export default function ReviewReceiptsList({
 
   return (
     <section className="w-full space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
         <h2 className="text-xl font-bold text-text-primary">Comprobantes ({expenses.length})</h2>
         <div className="flex gap-4">
           <UltimateWrapper

@@ -17,7 +17,7 @@ const buttonLabel = roleLabels[role];
 const requests = await (async () => {
   try {
     const userId = getCookie("id", Astro.cookies);
-    return await apiRequest(`/authorizer/get-pending-requests/${userId}/0`, { cookies: Astro.cookies });
+    return await apiRequest(`/requests/${userId}?status=Revisión&assignedOnly=true`, { cookies: Astro.cookies });
   } catch (error) {
     return [];
   }
@@ -31,7 +31,7 @@ const requests = await (async () => {
     ) : (
       <>
         <TextHeader
-          title={"Autorizaciones de " + userName}
+          title="Solicitudes por Autorizar"
           subtitle="Aquí puedes ver las solicitudes pendientes de autorizar"
         />
         <AuthRequestsList

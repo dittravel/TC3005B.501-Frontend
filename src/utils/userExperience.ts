@@ -11,7 +11,7 @@ export function resolveDashboardProfile(_role: string, permissionKeys: string[] 
     return 'admin';
   }
 
-  if (canAccess('/cotizaciones', permissionKeys) || canAccess('/comprobaciones', permissionKeys)) {
+  if (canAccess('/cotizaciones', permissionKeys)) {
     return 'accounts-payable';
   }
 

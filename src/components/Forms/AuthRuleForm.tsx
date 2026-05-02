@@ -61,7 +61,9 @@ export default function AuthRuleForm({ token, mode, data }: Props) {
   }, [toast]);
 
   // Handle submit of the form
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
     // Validate form
     const validation = validateForm();
     if (!validation.isValid) {
@@ -120,7 +122,7 @@ export default function AuthRuleForm({ token, mode, data }: Props) {
   };
 
   return (
-    <div className="space-y-6 mt-6">
+    <form onSubmit={handleSubmit} className="space-y-6 mt-6">
       {/* 1. Rule Name */}
       <div className="card">
         <div className="card-title">
@@ -315,14 +317,14 @@ export default function AuthRuleForm({ token, mode, data }: Props) {
           Cancelar
         </Button>
         <Button 
+          type="submit"
           variant="filled" 
           color="secondary" 
-          onClick={handleSubmit}
           disabled={loading}
         >
           {loading ? "Guardando..." : mode === "create" ? "Guardar regla" : "Actualizar regla"}
         </Button>
       </div>
-    </div>
+    </form>
   );
 }

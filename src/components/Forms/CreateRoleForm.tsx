@@ -50,7 +50,9 @@ export default function CreateRoleForm({ token, mode, data }: Readonly<Props>) {
     }
   }, [mode, data]);
 
-  async function handleSubmit() {
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
     if (!nombre.trim()) {
       setToast({ message: 'El nombre del rol es obligatorio', type: 'error' });
       return;
@@ -104,7 +106,7 @@ export default function CreateRoleForm({ token, mode, data }: Readonly<Props>) {
   }
 
   return (
-    <div className="space-y-6 mt-6">
+    <form onSubmit={handleSubmit} className="space-y-6 mt-6">
       {toast && <Toast message={toast.message} type={toast.type} />}
 
       {/* Role name */}
@@ -158,10 +160,10 @@ export default function CreateRoleForm({ token, mode, data }: Readonly<Props>) {
         <Button variant="filled" color="primary" href="/roles">
           Cancelar
         </Button>
-        <Button variant="filled" color="secondary" onClick={handleSubmit}>
+        <Button type="submit" variant="filled" color="secondary" disabled={isSubmitting}>
           {submitLabel}
         </Button>
       </div>
-    </div>
+    </form>
   );
 }

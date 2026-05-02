@@ -13,6 +13,8 @@ import LabeledValue from '@components/Utils/LabeledValue';
 import Pagination from '@components/Table/Pagination';
 import UltimateWrapper from '@components/Modals/UltimateWrapper';
 import { getStatusTagType } from '@utils/statusMapper';
+import { formatDate } from '@utils/dateFormatter';
+import Tag from '../Utils/Tag';
 
 interface TravelRequest {
   request_id: number;
@@ -175,15 +177,26 @@ export default function Requests({
               <div className="flex flex-col lg:flex-row justify-between gap-6">
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-1">
                   <LabeledValue
-                    label="Destino"
-                    value={`
-                      ${request.routes?.[0]?.destination_city === 'notSelected' ? '—' : request.routes?.[0]?.destination_city}, 
-                      ${request.routes?.[0]?.destination_country === 'notSelected' ? '—' : request.routes?.[0]?.destination_country}
-                    `}
+                    label="Destino(s)"
+                    value={
+                      <div className="flex items-center justify-between gap-3 w-full">
+                        <span>
+                          {request.routes?.[0]?.destination_city === 'notSelected' ? '—' : request.routes?.[0]?.destination_city},
+                          {' '}
+                          {request.routes?.[0]?.destination_country === 'notSelected' ? '—' : request.routes?.[0]?.destination_country}
+                        </span>
+                        {request.routes && request.routes.length > 1 && (
+                          <Tag
+                            text={`+${request.routes.length - 1}`}
+                            type="secondary"
+                          />
+                        )}
+                      </div>
+                    }
                   />
                   <LabeledValue
                     label="Fechas"
-                    value={`${request.routes?.[0]?.beginning_date ? new Date(request.routes[0].beginning_date).toLocaleDateString('es-MX') : '—'} - ${request.routes?.[0]?.ending_date ? new Date(request.routes[0].ending_date).toLocaleDateString('es-MX') : '—'}`}
+                    value={`${request.routes?.[0]?.beginning_date ? formatDate(request.routes[0].beginning_date) : '—'} - ${request.routes?.[0]?.ending_date ? formatDate(request.routes[request.routes.length-1].ending_date) : '—'}`}
                   />
                   <LabeledValue
                     label="Monto Solicitado"

@@ -8,6 +8,7 @@ import Input from '@/components/Utils/Input';
 import Select from '@/components/Utils/Select';
 import Button from '@/components/Buttons/Button';
 import Toast from '@/components/Utils/Toast';
+import Checkbox from '@/components/Utils/Checkbox';
 import { useState, useEffect, useMemo, type BaseSyntheticEvent } from 'react';
 import { apiRequest } from '@/utils/apiClient';
 import type { UserRole } from '@type/roles';
@@ -148,10 +149,10 @@ export default function UserProfile({
       <div className="card">
         <div className="card-title">
           <h2>Acciones rápidas del dashboard</h2>
+          <p>
+            Selecciona las tarjetas que quieres ver en el dashboard (máximo {MAX_DASHBOARD_QUICK_ACTIONS}).
+          </p>
         </div>
-        <p className="text-sm text-text-secondary mb-4">
-          Selecciona las tarjetas que quieres ver en el dashboard (máximo {MAX_DASHBOARD_QUICK_ACTIONS}).
-        </p>
 
         {availableQuickActions.length === 0 ? (
           <p className="text-sm text-text-secondary">No hay acciones disponibles para tu perfil actual.</p>
@@ -163,23 +164,15 @@ export default function UserProfile({
               const checkboxId = `quick-action-${action.route.replaceAll('/', '-').replaceAll('*', 'wildcard')}`;
 
               return (
-                <div
+                <Checkbox
                   key={action.route}
-                  className={`flex items-start gap-3 rounded-md border p-3 transition-colors ${checked ? 'border-secondary bg-secondary/5' : 'border-border'} ${atLimit ? 'opacity-60' : ''}`}
-                >
-                  <input
-                    id={checkboxId}
-                    type="checkbox"
-                    checked={checked}
-                    disabled={atLimit}
-                    onChange={() => handleQuickActionToggle(action.route)}
-                    className="mt-1 h-4 w-4"
-                  />
-                  <label htmlFor={checkboxId} className="cursor-pointer">
-                    <span className="block text-sm font-semibold text-text-primary">{action.label}</span>
-                    <span className="block text-xs text-text-secondary">{action.description}</span>
-                  </label>
-                </div>
+                  label={action.label}
+                  name={`quick-action-${action.route}`}
+                  value={action.route}
+                  checked={checked}
+                  disabled={atLimit}
+                  onChange={() => handleQuickActionToggle(action.route)}
+                />
               );
             })}
           </div>

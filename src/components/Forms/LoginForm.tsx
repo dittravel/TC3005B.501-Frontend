@@ -228,7 +228,7 @@ export default function LoginForm() {
             </Button>
             {/* Error Message */}
             {errorMessage && (
-              <p className="text-center text-sm text-warning-500">
+              <p className="text-center text-sm text-warning-400">
                 {errorMessage}
               </p>
             )}
