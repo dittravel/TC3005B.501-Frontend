@@ -6,7 +6,7 @@
  */
 
 import { useEffect, useState } from "react";
-import { Brightness4 } from "@mui/icons-material";
+import Icon from "@/components/Utils/Icon";
 
 const modeButtonStyle = `text-text-primary`;
 
@@ -71,7 +71,7 @@ export default function ThemeButton({ inHeader = false }: { inHeader?: boolean }
       className="cursor-pointer border-none bg-transparent p-0 hover:opacity-80 transition-opacity"
       title="Cambiar tema"
     >
-      <Brightness4 className={iconColor} />
+      <Icon name={isDark ? "light_mode" : "dark_mode"} className={iconColor} />
     </button>
   );
 }

@@ -11,6 +11,7 @@ export type DashboardActionDefinition = {
     | 'roles'
     | 'reglas'
     | 'politicas'
+    | 'importar'
     | 'exportar'
     | 'crear'
     | 'comprobar'
@@ -36,7 +37,7 @@ export const DASHBOARD_ACTION_CATALOG: DashboardActionDefinition[] = [
   { label: 'Roles', route: '/roles', iconKey: 'roles', description: 'Administra roles y permisos', requiredAllPermissions: ['roles:manage'], defaultPriority: 20 },
   { label: 'Reglas de autorización', route: '/reglas-autorizacion', iconKey: 'reglas', description: 'Configura reglas y montos de autorización', requiredAllPermissions: ['auth_rules:manage'], defaultPriority: 25 },
   { label: 'Políticas de reembolso', route: '/politicas-reembolso', iconKey: 'politicas', description: 'Administra políticas de reembolso', requiredAllPermissions: ['refund_policies:manage'], defaultPriority: 30 },
-  { label: 'Importar Datos', route: '/importar-datos', iconKey: 'exportar', description: 'Carga un archivo con la estructura organizacional', requiredAllPermissions: ['system:import_data'], defaultPriority: 32 },
+  { label: 'Importar Datos', route: '/importar-datos', iconKey: 'importar', description: 'Carga un archivo con la estructura organizacional', requiredAllPermissions: ['system:import_data'], defaultPriority: 32 },
   { label: 'Exportar datos contables', route: '/exportar-datos-contables', iconKey: 'exportar', description: 'Exporta datos contables para auditoría', requiredAllPermissions: ['system:export_accounting'], defaultPriority: 35 },
   { label: 'Bitácora', route: '/bitacora', iconKey: 'bitacora', description: 'Consulta el registro de acciones del sistema', requiredAllPermissions: ['system:audit_log'], defaultPriority: 36 },
   { label: 'Crear Solicitud', route: '/crear-solicitud', iconKey: 'crear', description: 'Inicia una nueva solicitud de viaje', requiredAllPermissions: ['travel:create'], defaultPriority: 40 },

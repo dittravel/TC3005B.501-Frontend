@@ -109,8 +109,10 @@ export const permissionRouteRules: PermissionRouteRule[] = [
   { pattern: '/exportar-datos-contables', permissions: ['system:export_accounting'] },
   { pattern: '/cotizaciones', permissions: ['receipts:approve'], mode: 'any' },
   { pattern: '/cotizar-solicitud/*', permissions: ['receipts:approve'], mode: 'any' },
-  { pattern: '/comprobaciones', permissions: ['receipts:approve'] },
-  { pattern: '/comprobar-gastos/*', permissions: ['receipts:approve'] },
+  { pattern: '/comprobaciones', permissions: ['receipts:approve'] }, // Accounts Payable
+  { pattern: '/comprobar-gastos/*', permissions: ['receipts:approve'] }, // Accounts Payable
+  { pattern: '/comprobar-gastos', permissions: ['receipts:create'], mode: 'any' }, // Aplicant
+  { pattern: '/comprobar-solicitud/*', permissions: ['receipts:create'], mode: 'any' }, // Aplicant
   { pattern: '/autorizaciones', permissions: ['travel:approve', 'travel:reject'], mode: 'any' },
   { pattern: '/autorizar-solicitud/*', permissions: ['travel:approve', 'travel:reject'], mode: 'any' },
   { pattern: '/atenciones', permissions: ['travel:view_flights', 'travel:view_hotels'], mode: 'any' },
@@ -121,8 +123,6 @@ export const permissionRouteRules: PermissionRouteRule[] = [
   { pattern: '/solicitudes', permissions: ['travel:view', 'travel:approve', 'travel:reject'], mode: 'any' },
   { pattern: '/editar-solicitud/*', permissions: ['travel:edit'] },
   { pattern: '/detalles-solicitud/*', permissions: ['travel:view'] },
-  { pattern: '/comprobar-solicitud/*', permissions: ['receipts:create'], mode: 'any' },
-  { pattern: '/comprobar-gastos', permissions: ['receipts:approve'], mode: 'any' },
   { pattern: '/subir-comprobante/*', permissions: ['receipts:create'] },
   { pattern: '/resubir-comprobante/*', permissions: ['receipts:edit'] },
   { pattern: '/editar-comprobante/*', permissions: ['receipts:edit'] },
