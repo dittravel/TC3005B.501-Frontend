@@ -5,7 +5,6 @@
 
 import type { MiddlewareHandler } from 'astro';
 import { roleRoutes, allWhitelistedRoutes, hasRoutePermission } from '@config/routeAccess';
-import { unauthorizedPage } from '@utils/unauthorizedPage';
 
 /**
  * Helper function to check if a path matches any of the given patterns.
@@ -49,11 +48,6 @@ export const publicRoutes = [
   // NOTE: Only authenticated users can access these,
   // but we allow them to be accessed without a role
   // for email links to work
-  '/detalles-solicitud/*',
-  '/comprobar-solicitud/*',
-  '/atender-solicitud/*',
-  '/cotizar-solicitud/*',
-  '/presupuesto-viaje/*',
   '/resultado-accion-email',
 ];
 
@@ -83,7 +77,6 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   const tokenMatch = /(?:^|;\s*)token=([^;]+)/.exec(cookieHeader);
   const token = tokenMatch ? decodeURIComponent(tokenMatch[1]) : '';
   const isAuthenticated = !!tokenMatch || !!role;
-  const html = unauthorizedPage(pathname, isAuthenticated);
 
   // If token is missing, force re-authentication instead of rendering protected pages.
   if (!tokenMatch) {
@@ -117,7 +110,7 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   // 3. Check if the route is registered in the system
   const isKnownRoute = matchPath(pathname, allWhitelistedRoutes);
   if (!isKnownRoute) {
-    return new Response(html, { status: 404, headers: { 'Content-Type': 'text/html' } });
+    return Response.redirect(new URL('/404', request.url), 302);
   }
 
   // 4. Check if the role and/or permission keys have access to the route
@@ -127,7 +120,7 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   const isAuthorized = authorizedByRole || authorizedByPermission;
 
   if (!isAuthorized) {
-    return new Response(html, { status: 404, headers: { 'Content-Type': 'text/html' } });
+    return Response.redirect(new URL('/404', request.url), 302);
   }
 
   return next();

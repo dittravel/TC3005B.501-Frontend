@@ -1,47 +1,36 @@
 ---
 /**
- * 404 page
+ * 404 page for unauthorized access or non-existent routes.
+ * It provides a user-friendly message and a button to navigate back to the appropriate page based 
+ * on authentication status.
  */
 
 import Layout from "@layouts/Layout.astro";
+import Button from "@components/Buttons/Button";
 const token = Astro.cookies.get("token")?.value;
 const isAuthenticated = !!token;
 ---
 
 <Layout title="Página no encontrada">
   <main
-    class="min-h-screen bg-[linear-gradient(135deg,#0f2027,#203a43,#2c5364)] text-white font-sans px-6 flex flex-col"
+    class="min-h-screen bg-background text-white px-6 flex flex-col"
   >
-    <div class="grow flex flex-col justify-center items-center text-center max-w-lg mx-auto">
-      <img
-        src="/favicon.svg"
-        alt="Not found icon"
-        width="64"
-        height="64"
-        class="mb-6 drop-shadow-[0_0_30px_black]"
-      />
+    <div class="grow flex flex-col gap-4 justify-center items-center text-center w-full">
       <h1 class="text-5xl font-extrabold flex gap-2 justify-center items-baseline">
-        <span class="text-warning-500">404:</span>
-        <span class="font-normal">Not Found</span>
+        <span class="text-warning-400">404:</span>
+        <span class="text-text-primary">No Encontrado</span>
       </h1>
-      <p class="mt-4 text-white/80 text-lg leading-relaxed">
+      <p class="text-text-primary text-lg leading-relaxed">
         ¡Ups! Parece que estás perdido o no tienes permiso para acceder a esta página.
       </p>
-      <p
-        class="border border-border mt-6 px-6 text-sm font-mono p-3 rounded-md select-all max-w-full overflow-auto"
+      <Button
+        href={isAuthenticated ? "/dashboard" : "/"}
+        variant="link"
+        color="secondary"
+        size="big"
       >
-        <code>Path: {Astro.url.pathname}</code>
-      </p>
-    </div>
-
-    <div class="flex justify-center mb-24">
-      <a
-        href={isAuthenticated ? "/dashboard" : "/login"}
-        class="text-white font-semibold hover:underline"
-        aria-label="Navigate"
-      >
-        {isAuthenticated ? "Volver al Dashboard" : "Ir a Login"}
-      </a>
+        {isAuthenticated ? "Volver al Dashboard" : "Volver a Inicio"}
+      </Button>
     </div>
   </main>
 </Layout>
