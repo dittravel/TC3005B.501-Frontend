@@ -122,7 +122,7 @@ export const permissionRouteRules: PermissionRouteRule[] = [
   { pattern: '/solicitudes', permissions: ['travel:view', 'travel:approve', 'travel:reject'], mode: 'any' },
   { pattern: '/editar-solicitud/*', permissions: ['travel:edit'] },
   { pattern: '/detalles-solicitud/*', permissions: ['travel:view'] },
-  { pattern: '/comprobar-solicitud/*', permissions: ['travel:view'] },
+  { pattern: '/comprobar-solicitud/*', permissions: ['receipts:create'], mode: 'any' },
   { pattern: '/comprobar-gastos', permissions: ['receipts:create', 'receipts:edit', 'receipts:view'], mode: 'any' },
   { pattern: '/subir-comprobante/*', permissions: ['receipts:create'] },
   { pattern: '/resubir-comprobante/*', permissions: ['receipts:edit'] },
