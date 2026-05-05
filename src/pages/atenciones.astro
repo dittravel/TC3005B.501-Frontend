@@ -39,7 +39,7 @@ const requests = await (async () => {
         subtitle="Aquí puedes ver las solicitudes pendientes de atender"
       />
       <AuthRequestsList
-        client:only="react"
+        client:load
         data={requests}
         role={role}
         type="atender-solicitud"

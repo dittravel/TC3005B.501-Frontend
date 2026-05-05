@@ -40,7 +40,7 @@ const societyName = await getSocietyName(Astro);
     subtitle={societyName}
   />
   <Requests
-    client:only="react"
+    client:load
     data={requests}
     role={role}
   />
