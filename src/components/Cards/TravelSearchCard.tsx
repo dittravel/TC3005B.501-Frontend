@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import FlightSearchForm from '@/components/Forms/FlightSearchForm';
 import HotelSearchForm from '@/components/Forms/HotelSearchForm';
 import type { TravelRoute } from '@/types/TravelRoute';
-import { Check } from '@mui/icons-material';
 import Checkbox from '../Utils/Checkbox';
 
 interface TravelSearchCardProps {
