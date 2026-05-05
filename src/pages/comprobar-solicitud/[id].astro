@@ -8,7 +8,7 @@ export const prerender = false;
 
 import MainLayout from "@layouts/MainLayout.astro";
 import TextHeader from "@components/Layout/TextHeader.astro";
-import ExpenseReceiptsList from "@/components/RequestsLists/ExpenseReceiptsList";
+import ApplicantReceiptsList from "@/components/Lists/ApplicantReceiptsList";
 
 import type { UserRole } from "@type/roles";
 import { getCookie } from "@data/cookies";
@@ -27,29 +27,19 @@ try {
   request = null;
   throw new Error(`No request found with ID ${id}`);
 }
-
-// Get authorization deadline for the request
-let deadlineStatus = null;
-try {
-  deadlineStatus = await apiRequest(`/applicant/deadline-status/${id}`, { cookies: Astro.cookies });
-} catch (error) {
-  deadlineStatus = null;
-}
 ---
 
 <MainLayout title={`Comprobantes de la solicitud #${id}`} data={{userName, role, buttonLabel}}>
+  <TextHeader
+    title={`Lista de comprobantes de la solicitud #${id}`}
+    subtitle="Aquí puedes ver o subir tus comprobantes de gasto"
+  />
   <main>
-    <TextHeader
-      title={`Lista de comprobantes de la solicitud #${id}`}
-      subtitle="Aquí puedes ver o subir tus comprobantes de gasto"
-    />
-    
-    <ExpenseReceiptsList
+    <ApplicantReceiptsList
       client:only="react"
       expenses={request.Expenses}
-      requestId={id}
+      requestId={id || ""}
       token={getCookie("token", Astro.cookies) || ""}
-      deadlineStatus={deadlineStatus}
     />
   </main>
 </MainLayout>

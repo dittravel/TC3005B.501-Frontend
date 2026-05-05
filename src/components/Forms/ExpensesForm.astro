@@ -51,7 +51,7 @@ const currencies = await (async () => {
       routes={request.routes || []}
       token={getCookie("token", Astro.cookies) || ""}
       mode="create"
-      societyCurrency={society.currency}
+      societyCurrency={society.local_currency}
       currencies={currencies}
       redirectTo={`/comprobar-solicitud/${request.request_id}`}
     />

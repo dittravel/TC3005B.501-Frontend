@@ -12,12 +12,76 @@ import { roleLabels } from "@config/role-labels";
 import type { UserRole } from "@type/roles";
 import RolesList from "@/components/Forms/RolesList";
 import RoleConfigurationForm from "@/components/Forms/RoleConfigurationForm";
-// import { apiRequest } from "@/utils/apiClient";
+import { apiRequest } from "@/utils/apiClient";
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
 const buttonLabel = roleLabels[role];
 const userName = getCookie("username", Astro.cookies) || "";
 const token = getCookie("token", Astro.cookies) || "";
+
+function parseJwtPayload(jwtToken: string): Record<string, unknown> | null {
+  try {
+    const parts = jwtToken.split('.');
+    if (parts.length < 2) return null;
+    const base64 = parts[1].replaceAll('-', '+').replaceAll('_', '/');
+    const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '=');
+    return JSON.parse(Buffer.from(padded, 'base64').toString('utf8'));
+  } catch {
+    return null;
+  }
+}
+
+const tokenPayload = parseJwtPayload(token);
+const permissionKeys = Array.isArray(tokenPayload?.permissions)
+  ? tokenPayload.permissions.map((permission: unknown) => String(permission).trim()).filter(Boolean)
+  : [];
+
+const canCreateRoles = permissionKeys.includes('users:create');
+const canEditRoles = permissionKeys.includes('users:edit');
+const canDeleteRoles = permissionKeys.includes('users:delete');
+
+const roles = await (async () => {
+  try {
+    const response = await apiRequest('/admin/get-roles', {
+      headers: { Authorization: `Bearer ${token}` },
+      cookies: Astro.cookies,
+    });
+
+    return (Array.isArray(response) ? response : [])
+      .filter((item: any) => typeof item?.role_name === 'string' && item.role_name.trim() !== '')
+      .map((item: any) => ({
+        role_id: item.role_id,
+        id: item.role_id,
+        name: item.role_name,
+        is_default: Boolean(item?.is_default),
+        permissions: Array.isArray(item?.permission_keys)
+          ? item.permission_keys
+          : Array.isArray(item?.permissions)
+            ? item.permissions
+            : [],
+      }))
+      .sort((a: any, b: any) => {
+        const permissionDelta = (b.permissions?.length || 0) - (a.permissions?.length || 0);
+        if (permissionDelta !== 0) return permissionDelta;
+        return (b.role_id || 0) - (a.role_id || 0);
+      });
+  } catch (error) {
+    console.error('Error loading roles:', error);
+    return [];
+  }
+})();
+
+const defaultRole = await (async () => {
+  try {
+    return await apiRequest('/admin/get-default-role', {
+      headers: { Authorization: `Bearer ${token}` },
+      cookies: Astro.cookies,
+    });
+  } catch (error) {
+    console.error('Error loading default role:', error);
+    return roles.find((role: any) => role.is_default) || null;
+  }
+})();
 ---
 
 <MainLayout title="Roles" data={{ userName, buttonLabel, role }}>
@@ -29,27 +93,20 @@ const token = getCookie("token", Astro.cookies) || "";
     <main>
       <div class="mb-8">
         <RoleConfigurationForm
-          role={role}
           token={token}
+          roles={roles}
+          defaultRole={defaultRole}
+          canEditDefaultRole={canEditRoles}
           client:only="react"
         />
       </div>
-      {/* AQUI VA LA LLAMADA A LA API */}
       <RolesList
         token={token}
         client:only="react"
-        data={[
-          {
-            id: 1,
-            name: "Solicitante",
-            permissions: ["Crear solicitudes", "Crear comprobantes", "Solicitar reembolsos"],
-          },
-          {
-            id: 2,
-            name: "Autorizador",
-            permissions: ["Autorizar/Rechazar solicitudes", "Ver solicitudes"],
-          },
-        ]}
+        data={roles}
+        canCreateRole={canCreateRoles}
+        canEditRole={canEditRoles}
+        canDeleteRole={canDeleteRoles}
       />
     </main>
   </div>

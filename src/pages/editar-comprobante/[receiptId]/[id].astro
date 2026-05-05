@@ -57,7 +57,7 @@ if (!receiptData || !travelData) {
         token={getCookie("token", Astro.cookies) || ""}
         mode="edit"
         data={receiptData}
-        societyCurrency={society?.currency}
+        societyCurrency={society?.local_currency}
         currencies={currencies}
         redirectTo={`/comprobar-solicitud/${requestId}`}
       />

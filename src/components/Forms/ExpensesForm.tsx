@@ -14,13 +14,13 @@ import { apiRequest } from "@/utils/apiClient";
 
 // Mapping of receipt concepts to their corresponding IDs in the backend
 const conceptoMap: Record<string, number> = {
-  "Transporte": 1,
-  "Hospedaje": 2,
-  "Comida": 3,
-  "Caseta": 4,
-  "Autobús": 5,
-  "Vuelo": 6,
-  "Otro": 7,
+  Transporte: 1,
+  Hospedaje: 2,
+  Comida: 3,
+  Caseta: 4,
+  Autobús: 5,
+  Vuelo: 6,
+  Otro: 7,
 };
 
 interface CurrencyOption {
@@ -65,12 +65,15 @@ export default function ExpensesForm({
   redirectTo,
 }: Props) {
   const [formData, setFormData] = useState({
-    routeId: data?.route_id || routes?.[0]?.route_id || null as number | null,
+    routeId: data?.route_id || routes?.[0]?.route_id || (null as number | null),
     concepto: data?.receipt_type_name || "Transporte",
-    receiptDate: data ? data.receipt_date.split('T')[0] : "",
-    monto: data?.amount?.toString() || "",
+    receiptDate: data ? data.receipt_date.split("T")[0] : "",
+    monto: data?.amount ? parseFloat(data.amount).toFixed(2).toString() : "",
     currency: data?.currency || "",
     isInternational: data ? data.currency !== "MXN" : false,
+    exch_rate: data?.exch_rate
+      ? parseFloat(data.exch_rate).toFixed(2).toString()
+      : "1",
   });
 
   // File states
@@ -80,7 +83,10 @@ export default function ExpensesForm({
 
   // Loading and error states
   const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
 
   // Local currency equivalent state
   const [localAmount, setLocalAmount] = useState<string>("");
@@ -100,6 +106,8 @@ export default function ExpensesForm({
       return;
     }
 
+    formData.exch_rate = "1";
+
     // Timer to only allow API calls every 500ms
     const timer = setTimeout(async () => {
       try {
@@ -108,10 +116,12 @@ export default function ExpensesForm({
         // Fetch exchange rate for a given currency and date (if provided)
         const fetchCurrencyRate = async (curr: string) => {
           // If currency is MXN, the rate is 1. No need to call API.
-          if (curr === 'MXN') return 1;
+          if (curr === "MXN") return 1;
 
           // Find the corresponding Banxico series ID for the currency
-          const series = currencies.find(c => c.currency === curr)?.banxico_series_id;
+          const series = currencies.find(
+            (c) => c.currency === curr,
+          )?.banxico_series_id;
           if (!series) return null;
 
           // Construct API URL with date if available
@@ -121,7 +131,9 @@ export default function ExpensesForm({
 
           const res = await fetch(url);
           const json = await res.json();
-          return json.success && json.data?.rate ? parseFloat(json.data.rate) : null;
+          return json.success && json.data?.rate
+            ? parseFloat(json.data.rate)
+            : null;
         };
 
         const fromRate = await fetchCurrencyRate(formData.currency);
@@ -133,6 +145,7 @@ export default function ExpensesForm({
           const equivalent = parseFloat(formData.monto) * finalRate;
           setLocalAmount(equivalent.toFixed(2));
           setApiFailedEquivalent(false);
+          formData.exch_rate = fromRate.toString();
         } else {
           setLocalAmount("");
           setApiFailedEquivalent(true);
@@ -144,15 +157,22 @@ export default function ExpensesForm({
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [formData.monto, formData.currency, formData.receiptDate, currencies, societyCurrency]);
+  }, [
+    formData.monto,
+    formData.currency,
+    formData.receiptDate,
+    formData.exch_rate,
+    currencies,
+    societyCurrency,
+  ]);
 
   // Reset currency to MXN if switching to national receipt,
   // or set to USD if switching to international
   useEffect(() => {
     if (!formData.isInternational && formData.currency !== "MXN") {
-      setFormData(prev => ({ ...prev, currency: "MXN" }));
+      setFormData((prev) => ({ ...prev, currency: "MXN", exch_rate: "1" }));
     } else if (formData.isInternational && formData.currency === "MXN") {
-      setFormData(prev => ({ ...prev, currency: "USD" }));
+      setFormData((prev) => ({ ...prev, currency: "USD" }));
       setXmlFile(null);
       setCfdiValidation(null);
     }
@@ -170,7 +190,7 @@ export default function ExpensesForm({
 
   // Handle form field changes
   const handleChange = (field: keyof typeof formData, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   // Handle XML file selection and preview
@@ -186,15 +206,19 @@ export default function ExpensesForm({
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        credentials: "include"
+        credentials: "include",
       });
 
       if (!response.ok) {
         setXmlFile(null);
         if (response.status === 400) {
-          throw new Error("El formato del archivo XML es inválido. Por favor, verifica que sea un archivo XML válido.");
+          throw new Error(
+            "El formato del archivo XML es inválido. Por favor, verifica que sea un archivo XML válido.",
+          );
         } else if (response.status === 500) {
-          throw new Error("El archivo XML no se pudo procesar. Verifica que sea un CFDI válido.");
+          throw new Error(
+            "El archivo XML no se pudo procesar. Verifica que sea un CFDI válido.",
+          );
         }
         throw new Error(`Error: ${response.status}`);
       }
@@ -204,14 +228,14 @@ export default function ExpensesForm({
         const { fecha, total, moneda } = data.cfdiData;
 
         // Update form fields with extracted data from XML
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
-          receiptDate: fecha.split('T')[0],
+          receiptDate: fecha.split("T")[0],
           monto: total,
           currency: moneda,
         }));
 
-        setToast({ message: "XML procesado correctamente", type: 'success' });
+        setToast({ message: "XML procesado correctamente", type: "success" });
 
         // Validate CFDI using the extracted XML file
         const validateFormData = new FormData();
@@ -223,7 +247,7 @@ export default function ExpensesForm({
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          credentials: "include"
+          credentials: "include",
         });
 
         if (validateResponse.ok) {
@@ -234,7 +258,10 @@ export default function ExpensesForm({
         }
       }
     } catch (err) {
-      setToast({ message: err instanceof Error ? err.message : "Error al procesar XML", type: 'error' });
+      setToast({
+        message: err instanceof Error ? err.message : "Error al procesar XML",
+        type: "error",
+      });
     }
   };
 
@@ -246,37 +273,72 @@ export default function ExpensesForm({
 
       // Validation checks
       if (!formData.routeId) {
-        setToast({ message: "Por favor, selecciona un destino válido.", type: 'error' });
+        setToast({
+          message: "Por favor, selecciona un destino válido.",
+          type: "error",
+        });
         setLoading(false);
         return;
       }
 
-      if (!formData.concepto || !formData.monto || isNaN(parseFloat(formData.monto))) {
-        setToast({ message: "Por favor, completa todos los campos correctamente.", type: 'error' });
+      if (
+        !formData.concepto ||
+        !formData.monto ||
+        isNaN(parseFloat(formData.monto))
+      ) {
+        setToast({
+          message: "Por favor, completa todos los campos correctamente.",
+          type: "error",
+        });
         setLoading(false);
         return;
       }
 
-      if (mode === "create" && (!pdfFile || (!formData.isInternational && !xmlFile))) {
-        setToast({ message: "Por favor, adjunta todos los archivos requeridos.", type: 'error' });
+      if (
+        mode === "create" &&
+        (!pdfFile || (!formData.isInternational && !xmlFile))
+      ) {
+        setToast({
+          message: "Por favor, adjunta todos los archivos requeridos.",
+          type: "error",
+        });
         setLoading(false);
         return;
       }
 
-      if (pdfFile && !pdfFile.name.toLowerCase().endsWith('.pdf')) {
-        setToast({ message: "El archivo PDF debe tener extensión .pdf válida.", type: 'error' });
+      if (pdfFile && !pdfFile.name.toLowerCase().endsWith(".pdf")) {
+        setToast({
+          message: "El archivo PDF debe tener extensión .pdf válida.",
+          type: "error",
+        });
         setLoading(false);
         return;
       }
 
-      if (!formData.isInternational && xmlFile && !xmlFile.name.toLowerCase().endsWith('.xml')) {
-        setToast({ message: "El archivo XML debe tener extensión .xml válida.", type: 'error' });
+      if (
+        !formData.isInternational &&
+        xmlFile &&
+        !xmlFile.name.toLowerCase().endsWith(".xml")
+      ) {
+        setToast({
+          message: "El archivo XML debe tener extensión .xml válida.",
+          type: "error",
+        });
         setLoading(false);
         return;
       }
 
-      if (!formData.isInternational && xmlFile && cfdiValidation && !cfdiValidation.validationResult?.valid) {
-        setToast({ message: "El CFDI no es válido según el SAT. Por favor, verifica el archivo XML.", type: 'error' });
+      if (
+        !formData.isInternational &&
+        xmlFile &&
+        cfdiValidation &&
+        !cfdiValidation.validationResult?.valid
+      ) {
+        setToast({
+          message:
+            "El CFDI no es válido según el SAT. Por favor, verifica el archivo XML.",
+          type: "error",
+        });
         setLoading(false);
         return;
       }
@@ -287,22 +349,35 @@ export default function ExpensesForm({
         const submitData = new FormData();
         submitData.append("request_id", requestId.toString());
         submitData.append("route_id", formData.routeId.toString());
-        submitData.append("receipt_type_id", conceptoMap[formData.concepto].toString());
-        submitData.append("amount", formData.monto);
+        submitData.append(
+          "receipt_type_id",
+          conceptoMap[formData.concepto].toString(),
+        );
+        submitData.append("amount", parseFloat(formData.monto).toFixed(2));
         submitData.append("currency", formData.currency);
         submitData.append("receipt_date", formData.receiptDate);
-        submitData.append("local_amount", localAmount || formData.monto);
+        submitData.append(
+          "local_amount",
+          parseFloat(localAmount || formData.monto).toFixed(2),
+        );
+        submitData.append(
+          "exch_rate",
+          parseFloat(formData.exch_rate).toFixed(2),
+        );
         if (pdfFile) submitData.append("pdf", pdfFile);
         if (xmlFile) submitData.append("xml", xmlFile);
 
-        const response = await fetch(`${baseUrl}/applicant/create-expense-with-files`, {
-          method: "POST",
-          body: submitData,
-          headers: {
-            Authorization: `Bearer ${token}`,
+        const response = await fetch(
+          `${baseUrl}/applicant/create-expense-with-files`,
+          {
+            method: "POST",
+            body: submitData,
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            credentials: "include",
           },
-          credentials: "include"
-        });
+        );
 
         if (!response.ok) {
           const error = await response.json();
@@ -315,13 +390,16 @@ export default function ExpensesForm({
         const updateData: any = {
           route_id: formData.routeId,
           receipt_type_name: formData.concepto,
-          amount: parseFloat(formData.monto),
+          amount: parseFloat(parseFloat(formData.monto).toFixed(2)),
           currency: formData.currency,
           receipt_date: formData.receiptDate,
-          local_amount: parseFloat(localAmount || formData.monto),
+          local_amount: parseFloat(
+            parseFloat(localAmount || formData.monto).toFixed(2),
+          ),
+          exch_rate: parseFloat(parseFloat(formData.exch_rate).toFixed(2)),
         };
 
-        // If resubmitting a rejected receipt, 
+        // If resubmitting a rejected receipt,
         // reset validation status to "Pendiente"
         if (mode === "resubmit") {
           updateData.validation = "Pendiente";
@@ -332,7 +410,7 @@ export default function ExpensesForm({
           data: updateData,
           headers: {
             Authorization: `Bearer ${token}`,
-          }
+          },
         });
 
         if (pdfFile || xmlFile) {
@@ -340,14 +418,17 @@ export default function ExpensesForm({
           if (pdfFile) fileData.append("pdf", pdfFile);
           if (xmlFile) fileData.append("xml", xmlFile);
 
-          const fileResponse = await fetch(`${baseUrl}/files/upload-receipt-files/${data.receipt_id}`, {
-            method: "POST",
-            body: fileData,
-            headers: {
-              Authorization: `Bearer ${token}`,
+          const fileResponse = await fetch(
+            `${baseUrl}/files/upload-receipt-files/${data.receipt_id}`,
+            {
+              method: "POST",
+              body: fileData,
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              credentials: "include",
             },
-            credentials: "include"
-          });
+          );
 
           if (!fileResponse.ok) {
             const error = await fileResponse.json();
@@ -358,12 +439,18 @@ export default function ExpensesForm({
 
       setToast({
         message: `Comprobante ${mode === "create" ? "creado" : "actualizado"} exitosamente.`,
-        type: 'success'
+        type: "success",
       });
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       window.location.href = redirectTo;
     } catch (err) {
-      setToast({ message: err instanceof Error ? err.message : "Ocurrió un error al crear el comprobante.", type: 'error' });
+      setToast({
+        message:
+          err instanceof Error
+            ? err.message
+            : "Ocurrió un error al crear el comprobante.",
+        type: "error",
+      });
       setLoading(false);
     }
   };
@@ -376,13 +463,23 @@ export default function ExpensesForm({
           label="Comprobante Nacional"
           name="isInternational"
           checked={!formData.isInternational}
-          onChange={(e) => setFormData(prev => ({ ...prev, isInternational: !e.target.checked }))}
+          onChange={(e) =>
+            setFormData((prev) => ({
+              ...prev,
+              isInternational: !e.target.checked,
+            }))
+          }
         />
         <Checkbox
           label="Comprobante Internacional"
           name="isInternational"
           checked={formData.isInternational}
-          onChange={(e) => setFormData(prev => ({ ...prev, isInternational: e.target.checked }))}
+          onChange={(e) =>
+            setFormData((prev) => ({
+              ...prev,
+              isInternational: e.target.checked,
+            }))
+          }
         />
       </div>
       {/* General details */}
@@ -395,13 +492,19 @@ export default function ExpensesForm({
             name="routeId"
             label="Destino"
             value={formData.routeId || ""}
-            onChange={(e) => handleChange("routeId", e.target.value ? Number(e.target.value) : null)}
+            onChange={(e) =>
+              handleChange(
+                "routeId",
+                e.target.value ? Number(e.target.value) : null,
+              )
+            }
             required={true}
           >
             <option value="">Selecciona un destino</option>
             {routes?.map((route: any, idx: number) => (
               <option key={idx} value={route.route_id || ""}>
-                {route.destination_city}, {route.destination_country} ({route.beginning_date} - {route.ending_date})
+                {route.destination_city}, {route.destination_country} (
+                {route.beginning_date} - {route.ending_date})
               </option>
             ))}
           </Select>
@@ -440,7 +543,9 @@ export default function ExpensesForm({
             label="Archivo PDF"
             type="file"
             accept=".pdf"
-            onChange={(e) => setPdfFile(e.target.files ? e.target.files[0] : null)}
+            onChange={(e) =>
+              setPdfFile(e.target.files ? e.target.files[0] : null)
+            }
             required={mode === "create"}
           />
           {!formData.isInternational && (
@@ -468,7 +573,9 @@ export default function ExpensesForm({
                       ? `CFDI Válido - Estado: ${cfdiValidation.validationResult.estado}`
                       : `CFDI No válido - Estado: ${cfdiValidation.validationResult?.estado || "No encontrado"}`
                   }
-                  type={cfdiValidation.validationResult?.valid ? "success" : "alert"}
+                  type={
+                    cfdiValidation.validationResult?.valid ? "success" : "alert"
+                  }
                 />
               )}
             </div>
@@ -513,7 +620,7 @@ export default function ExpensesForm({
               disabled={!formData.receiptDate}
             >
               {currencies.length > 0 ? (
-                currencies.map(c => (
+                currencies.map((c) => (
                   <option key={c.currency} value={c.currency}>
                     {c.currency} - {c.name}
                   </option>
@@ -529,32 +636,39 @@ export default function ExpensesForm({
               )}
             </Select>
           </div>
-          {(localAmount || apiFailedEquivalent) && formData.monto && formData.currency !== societyCurrency && (
-            <div>
-              {apiFailedEquivalent && (
-                <Reminder
-                  text="No se pudo obtener la conversión automática. Ingresa el monto en moneda local manualmente."
-                  type="warning"
+          {(localAmount || apiFailedEquivalent) &&
+            formData.monto &&
+            formData.currency !== societyCurrency && (
+              <div>
+                {apiFailedEquivalent && (
+                  <Reminder
+                    text="No se pudo obtener la conversión automática. Ingresa el monto en moneda local manualmente."
+                    type="warning"
+                  />
+                )}
+                <Input
+                  name="localAmount"
+                  label={`Equivalente en ${societyCurrency}`}
+                  type="number"
+                  placeholder="Ej. 800.00"
+                  value={localAmount}
+                  onChange={(e) => setLocalAmount(e.target.value)}
+                  disabled={!apiFailedEquivalent}
+                  altText={!apiFailedEquivalent ? "Cálculo automático" : ""}
                 />
-              )}
-              <Input
-                name="localAmount"
-                label={`Equivalente en ${societyCurrency}`}
-                type="number"
-                placeholder="Ej. 800.00"
-                value={localAmount}
-                onChange={(e) => setLocalAmount(e.target.value)}
-                disabled={!apiFailedEquivalent}
-                altText={!apiFailedEquivalent ? "Cálculo automático" : ""}
-              />
-            </div>
-          )}
+              </div>
+            )}
         </div>
       </div>
       {/* Actions */}
       <div className="flex flex-col sm:flex-row justify-end gap-3">
         <a href={`/comprobar-solicitud/${requestId}`} className="md:auto">
-          <Button variant="filled" color="primary" className="w-full md:auto" disabled={loading}>
+          <Button
+            variant="filled"
+            color="primary"
+            className="w-full md:auto"
+            disabled={loading}
+          >
             Cancelar
           </Button>
         </a>
@@ -572,9 +686,7 @@ export default function ExpensesForm({
           </ModalWrapper>
         </div>
       </div>
-      {toast && (
-        <Toast message={toast.message} type={toast.type} />
-      )}
+      {toast && <Toast message={toast.message} type={toast.type} />}
     </div>
   );
 }

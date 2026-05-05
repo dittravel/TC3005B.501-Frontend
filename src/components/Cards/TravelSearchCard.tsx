@@ -8,16 +8,13 @@ interface TravelSearchCardProps {
   token: string;
   route: TravelRoute;
   routeIndex: number;
-  onSelectFlight?: (flight: any) => void;
-  onChange: (index: number, name: string, value: any) => void;
-  onSelectHotel?: (hotel: any) => void;
 }
 
-const TravelSearchCard = ({ token, route, routeIndex, onSelectFlight, onSelectHotel, onChange }: TravelSearchCardProps) => {
+const TravelSearchCard = ({ token, route, routeIndex }: TravelSearchCardProps) => {
   const [isFlightSearchOpen, setIsFlightSearchOpen] = useState(false);
   const [isHotelSearchOpen, setIsHotelSearchOpen] = useState(false);
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target;
+    const { name } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
 
     if (name === "plane_form") {

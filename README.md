@@ -46,7 +46,7 @@ TC3005B.501-Frontend/
    ├─ README.md                 # Source README
    ├─ assets/                   # Static assets
    ├─ components/               # Reusable UI components (Astro, TSX)
-   │  ├─ RequestsLists/         # Components for request lists
+   │  ├─ Lists/         # Components for request lists
    │  └─ Table/                 # Table-related components
    ├─ config/                   # Configuration files (e.g., modal config)
    ├─ data/                     # Data files or constants
@@ -94,6 +94,76 @@ pnpm install
 npm install
 ```
 
+### Dockerized Setup (Recommended)
+
+For full integration testing, run frontend and backend with Docker.
+
+#### 1. Start backend stack first
+
+From [../TC3005B.501-Backend](../TC3005B.501-Backend):
+
+```sh
+docker compose up -d --build
+```
+
+This is required because frontend Docker compose expects the backend Docker network and service.
+
+#### 2. Start frontend stack
+
+From the frontend root:
+
+```sh
+docker compose up -d --build
+```
+
+#### 3. Verify containers
+
+Backend project:
+
+```sh
+cd ../TC3005B.501-Backend
+docker compose ps
+```
+
+Frontend project:
+
+```sh
+cd ../TC3005B.501-Frontend
+docker compose ps
+```
+
+Expected frontend URL:
+
+- `https://localhost:4321`
+- `https://localhost:4321/login`
+
+#### 4. Smoke-check the dockerized version
+
+1. Open `https://localhost:4321/login`
+2. Login with a valid user (for example `admin.tec` / `123` or `andres.gomez` / `123`)
+3. Confirm redirect to `/dashboard`
+4. Confirm protected routes do not bounce back to login unexpectedly
+5. Check logs if needed:
+
+```sh
+docker compose logs -f frontend
+```
+
+#### 5. Stop services
+
+Frontend:
+
+```sh
+docker compose down
+```
+
+Backend:
+
+```sh
+cd ../TC3005B.501-Backend
+docker compose down
+```
+
 ### Running
 
 To run the Frontend, utilize whichever package manager you used for dependencies to run the project.
@@ -124,12 +194,28 @@ The application is fully integrated with the backend API. To start using the app
    ```
 
 3. **Login**: Use the login interface to authenticate with your credentials. The available roles are:
-   - **Solicitante** (Applicant) - Create and manage travel requests
-   - **Agencia de viajes** (Travel Agency) - Attend to travel requests
-   - **Cuentas por pagar** (Accounts Payable) - Validate and check receipts
-   - **N1** - Authorize level 1 requests
-   - **N2** - Authorize level 2 requests
-   - **Administrador** (Administrator) - Manage users and system settings
+   - **Requester (Solicitante)** - Manages own travel requests and receipts
+   - **Travel Agency (Agencia de viajes)** - Handles requests and reviews flight/hotel options
+   - **Accounts Payable (Cuentas por pagar)** - Reviews and approves/rejects receipts
+   - **Authorizer (Autorizador)** - Requester capabilities + request approval/rejection
+   - **Administrator (Administrador)** - Full system management
+
+### Default role permissions (base and dummy)
+
+The default permission matrix is defined in backend seed logic (`prisma/seedShared.js`) and is the same for:
+
+- base seed (`pnpm prisma:seed`)
+- dummy seed (`pnpm prisma:seed:dummy`)
+
+In dummy mode, these defaults are duplicated across dummy society groups and users.
+
+| Role | Module summary | Default permission keys |
+| --- | --- | --- |
+| Requester (Solicitante) | Travel, Receipts | `travel:view`, `travel:create`, `travel:edit`, `receipts:create`, `receipts:edit` |
+| Travel Agency (Agencia de viajes) | Travel | `travel:view`, `travel:edit`, `travel:view_flights`, `travel:view_hotels`, `travel:approve` |
+| Accounts Payable (Cuentas por pagar) | Receipts | `receipts:view`, `receipts:approve` |
+| Authorizer (Autorizador) | Travel, Receipts | `travel:view`, `travel:create`, `travel:edit`, `travel:approve`, `travel:reject`, `receipts:create`, `receipts:edit` |
+| Administrator (Administrador) | All modules | all `permission_key` values available in `Permission` |
 
 
 
@@ -159,3 +245,16 @@ The application is fully integrated with the backend API. To start using the app
 [typescript-badge]: https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white&color=blue
 [tailwind-badge]: https://img.shields.io/badge/Tailwind-ffffff?style=for-the-badge&logo=tailwindcss&logoColor=38bdf8
 [react-badge]: https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black&color=blue
+
+### Frontend Optimization Tests
+
+Open console in your browser (right click -> inspect -> console) to visualize frontend performance. 
+We use Google´s web vitals library to conduct these tests. Find below a guide of what each acronym means:
+
+| Metric   | When it fires                                   |
+| -------- | ----------------------------------------------- |
+| **TTFB** | immediately on page load  |
+| **FCP**  | when first content paints                       |
+| **LCP**  | when largest element finishes loading           |
+| **CLS**  | when layout shifts happen                       |
+| **INP**  | when you interact (click/type)                  |

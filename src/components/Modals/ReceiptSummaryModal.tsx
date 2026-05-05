@@ -88,21 +88,28 @@ export default function ReceiptSummaryModal({
               <div className="border-t border-border pt-3">
                 <p className="text-sm text-text-secondary">
                   {hasAdvance
-                    ? totalApproved > 0
-                      ? "Usuario Debe"
-                      : "Reembolso"
+                    ? reimbursement < 0
+                      ? "Balance a Favor del Usuario"
+                      : totalApproved > 0
+                        ? "Usuario Debe"
+                        : "Reembolso"
                     : "Reembolso a Hacer"
                   }
                 </p>
                 <p className="text-2xl font-bold text-success">
-                  {hasAdvance && totalApproved === 0 ? "Sin Reembolso" : `$${reimbursement.toFixed(2)}`}
+                  {hasAdvance && totalApproved === 0 ? "Sin Reembolso" : `$${Math.abs(reimbursement).toFixed(2)}`}
                 </p>
               </div>
             </div>
 
             {/* Description */}
             {hasAdvance ? (
-              totalApproved > 0 ? (
+              reimbursement < 0 ? (
+                <Reminder
+                  type="success"
+                  text={`El usuario comprobó $${Math.abs(reimbursement).toFixed(2)} más de lo solicitado.`}
+                />
+              ) : totalApproved > 0 ? (
                 <Reminder
                   type="info"
                   text={`Se descontarán $${totalApproved.toFixed(2)} del anticipo. El usuario debe $${reimbursement.toFixed(2)}.`}

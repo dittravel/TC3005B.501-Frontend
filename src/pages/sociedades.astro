@@ -21,9 +21,36 @@ const userName = getCookie("username", Astro.cookies) || "";
 const token = getCookie("token", Astro.cookies) || "";
 const societyGroupId = getCookie("society_group_id", Astro.cookies) || "";
 
+function parseJwtPayload(jwtToken: string): Record<string, unknown> | null {
+  try {
+    const parts = jwtToken.split('.');
+    if (parts.length < 2) return null;
+    const base64 = parts[1].replaceAll('-', '+').replaceAll('_', '/');
+    const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '=');
+    return JSON.parse(Buffer.from(padded, 'base64').toString('utf8'));
+  } catch {
+    return null;
+  }
+}
+
+const tokenPayload = parseJwtPayload(token);
+const permissionKeys = Array.isArray(tokenPayload?.permissions)
+  ? tokenPayload.permissions.map((permission: unknown) => String(permission).trim()).filter(Boolean)
+  : [];
+
+const canManageSocietyGroups = permissionKeys.includes('superadmin:manage_groups');
+const canViewSocieties = canManageSocietyGroups || permissionKeys.includes('societies:view');
+const canCreateSociety = canManageSocietyGroups || permissionKeys.includes('societies:create');
+const canEditSociety = canManageSocietyGroups || permissionKeys.includes('societies:edit');
+const canDeleteSociety = canManageSocietyGroups || permissionKeys.includes('societies:delete');
+
 // Get society groups
 let isDefaultGroup = false;
 const societyGroups = await (async () => {
+  if (!canManageSocietyGroups) {
+    return [];
+  }
+
   try {
     const groups = await apiRequest(`/society-groups`, {
       cookies: Astro.cookies
@@ -42,6 +69,10 @@ const societyGroups = await (async () => {
 
 // Get societies
 const societies = await (async () => {
+  if (!canViewSocieties) {
+    return [];
+  }
+
   try {
     return await apiRequest(`/societies`, {
       cookies: Astro.cookies
@@ -60,20 +91,17 @@ const societies = await (async () => {
   />
   <main>
     <div class="flex flex-col gap-8">
-      {isDefaultGroup && (
-        <SocietyGroupsTable
+      {canViewSocieties ? (
+        <SocietiesTable
           client:load
-          data={societyGroups}
+          data={societies}
           token={token}
           role={role}
+          canCreate={canCreateSociety}
+          canEdit={canEditSociety}
+          canDelete={canDeleteSociety}
         />
-      )}
-      <SocietiesTable
-        client:load
-        data={societies}
-        token={token}
-        role={role}
-      />
+      ) : null}
     </div>
   </main>
 </MainLayout>

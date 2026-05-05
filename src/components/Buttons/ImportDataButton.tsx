@@ -20,25 +20,21 @@ interface ImportResponse {
   success: boolean;
   message: string;
   summary?: {
-    societies: {
+    users: {
+      created: string[];
+      updated: string[];
+      deactivated: string[];
+      skipped: string[];
+    };
+    departments: {
       created: string[];
       updated: string[];
       skipped: string[];
     };
-    departments: {
-      created: Array<{ name: string, cost_center: string }>;
-      updated: Array<{ name: string, old_cost_center_id: string | null, new_cost_center_id: string | null }>;
-      skipped: string[];
-    };
     costCenters: {
       created: string[];
-      updated: Array<{ name: string, old_name: string | null, new_name: string | null }>;
+      updated: string[];
       skipped: string[];
-    };
-    users: {
-      created: Array<{ username: string; role: string; department: string }>;
-      updated: Array<{ username: string; role: string; department: string }>;
-      deactivated: Array<{ username: string; role: string; department: string }>;
     };
   };
   error?: string;
@@ -114,6 +110,7 @@ export default function ImportDataButton({ endpoint, token }: Props) {
     setError(null);
     setSuccess(null);
     setShowSummary(false);
+    setImportData(null);
 
     // Send the file to the backend
     try {
@@ -182,61 +179,62 @@ export default function ImportDataButton({ endpoint, token }: Props) {
         <div>
           <h2 className="text-xl font-semibold mb-4">Resumen de Importación</h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-            {/* Societies */}
-            {importData.summary.societies && (
-              <SummaryCard title="Sociedades">
-                <SummaryItem
-                  label="Creadas"
-                  items={importData.summary.societies.created}
-                  type="success"
-                />
-                <SummaryItem
-                  label="Actualizadas"
-                  items={importData.summary.societies.updated}
-                  type="success"
-                />
-                <SummaryItem label="Omitidas" items={importData.summary.societies.skipped} type="warning" />
-              </SummaryCard>
-            )}
-            {/* Departments */}
-            <SummaryCard title="Departamentos">
-              <SummaryItem
-                label="Creados"
-                items={importData.summary.departments.created.map(d => `${d.name} (CC: ${d.cost_center})`)}
-                type="success"
-              />
-              <SummaryItem
-                label="Actualizados"
-                items={importData.summary.departments.updated.map(d => `${d.name} (CC: ${d.old_cost_center_id} → ${d.new_cost_center_id})`)}
-                type="success"
-              />
-              <SummaryItem label="Omitidos" items={importData.summary.departments.skipped} type="warning" />
-            </SummaryCard>
-            {/* Cost Centers */}
-            <SummaryCard title="Centros de Costo">
-              <SummaryItem label="Creados" items={importData.summary.costCenters.created} type="success" />
-              <SummaryItem
-                label="Actualizados"
-                items={importData.summary.costCenters.updated.map(cc => `${cc.name} (Desc: ${cc.old_name} → ${cc.new_name})`)}
-                type="success"
-              />
-              <SummaryItem label="Omitidos" items={importData.summary.costCenters.skipped} type="warning" />
-            </SummaryCard>
             {/* Users */}
             <SummaryCard title="Usuarios">
               <SummaryItem
                 label="Creados"
-                items={importData.summary.users.created.map(u => u.username)}
+                items={importData.summary.users.created}
                 type="success"
               />
               <SummaryItem
                 label="Actualizados"
-                items={importData.summary.users.updated.map(u => u.username)}
+                items={importData.summary.users.updated}
                 type="success"
               />
               <SummaryItem
+                label="Omitidos"
+                items={importData.summary.users.skipped}
+                type="warning"
+              />
+              <SummaryItem
                 label="Desactivados"
-                items={importData.summary.users.deactivated.map(u => u.username)}
+                items={importData.summary.users.deactivated}
+                type="warning"
+              />
+            </SummaryCard>
+            {/* Departments */}
+            <SummaryCard title="Departamentos">
+              <SummaryItem
+                label="Creados"
+                items={importData.summary.departments.created}
+                type="success"
+              />
+              <SummaryItem
+                label="Actualizados"
+                items={importData.summary.departments.updated}
+                type="success"
+              />
+              <SummaryItem
+                label="Omitidos"
+                items={importData.summary.departments.skipped}
+                type="warning"
+              />
+            </SummaryCard>
+            {/* Cost Centers */}
+            <SummaryCard title="Centros de Costo">
+              <SummaryItem
+                label="Creados"
+                items={importData.summary.costCenters.created}
+                type="success"
+              />
+              <SummaryItem
+                label="Actualizados"
+                items={importData.summary.costCenters.updated}
+                type="success"
+              />
+              <SummaryItem
+                label="Omitidos"
+                items={importData.summary.costCenters.skipped}
                 type="warning"
               />
             </SummaryCard>

@@ -10,15 +10,42 @@ import type { UserRole } from "@type/roles";
 
 import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
+import { resolveDashboardProfile, shouldShowDashboardMessages } from "@/utils/userExperience";
+
+function parseJwtPayload(jwtToken: string): Record<string, unknown> | null {
+  try {
+    const parts = jwtToken.split('.');
+    if (parts.length < 2) return null;
+
+    const base64 = parts[1].replaceAll('-', '+').replaceAll('_', '/');
+    const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '=');
+    return JSON.parse(Buffer.from(padded, 'base64').toString('utf8'));
+  } catch {
+    return null;
+  }
+}
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
 const userName = getCookie("username", Astro.cookies) || "";
+const userId = getCookie("id", Astro.cookies) || "";
+const token = getCookie("token", Astro.cookies) || "";
+const tokenPayload = parseJwtPayload(token);
+const permissionKeys = Array.isArray(tokenPayload?.permissions)
+  ? tokenPayload.permissions.map((permission: unknown) => String(permission).trim()).filter(Boolean)
+  : [];
 
-const buttonLabel = roleLabels[role];
-
-const showMessages: boolean = role !== "Solicitante" && role !== "Administrador";
+const buttonLabel = roleLabels[role] || role || "Usuario";
+const profile = resolveDashboardProfile(role, permissionKeys);
+const showMessages = shouldShowDashboardMessages(profile);
 ---
 
 <MainLayout title="Dashboard" data={{userName, buttonLabel, role}} showMessages={showMessages}>
-  <DashboardComponent client:only="react" role={role} userName={userName} />
+  <DashboardComponent
+    client:only="react"
+    userId={String(userId)}
+    role={role}
+    userName={userName}
+    token={String(token)}
+    permissionKeys={permissionKeys}
+  />
 </MainLayout>

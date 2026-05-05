@@ -1,13 +1,15 @@
 ---
 /**
- * Main page of the application. 
- * It serves as a sandbox for testing components and layouts during development.
+ * Root entrypoint.
+ * Redirects authenticated users to dashboard and unauthenticated users to login.
  */
 
-import SandBox from '@components/UI/SandBox.astro';
-import Layout from '@layouts/Layout.astro';
----
+const token = Astro.cookies.get('token')?.value;
+const role = Astro.cookies.get('role')?.value;
 
-<Layout title="Inicio">
-	<SandBox />
-</Layout>
+if (token && role) {
+  return Astro.redirect('/dashboard');
+}
+
+return Astro.redirect('/login');
+---

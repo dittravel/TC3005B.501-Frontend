@@ -1,0 +1,63 @@
+---
+/**
+ * Edit Refund Policy Page
+ */
+
+import TextHeader from "@components/Layout/TextHeader.astro";
+import MainLayout from "@layouts/MainLayout.astro";
+import RefundPolicyForm from "@components/Forms/RefundPolicyForm";
+import { getCookie } from "@data/cookies";
+import { roleLabels } from "@config/role-labels";
+import type { UserRole } from "@type/roles";
+import { apiRequest } from "@/utils/apiClient";
+
+const { id } = Astro.params;
+const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
+const buttonLabel = roleLabels[role];
+const userName = getCookie("username", Astro.cookies) || "";
+
+// Get refund policy
+const policy = await (async () => {
+  try {
+    return await apiRequest(`/refund-policy/${id}`, {
+      cookies: Astro.cookies
+    });
+  } catch (error) {
+    console.error("Error al cargar la política de reembolso:", error);
+    return null;
+  }
+})();
+
+// Get society info (for local currency)
+const society = await (async () => {
+  try {
+    const data = await apiRequest(`/societies/current`, {
+      cookies: Astro.cookies
+    });
+    return data || null;
+  } catch (error) {
+    console.error("Error al cargar la sociedad del usuario:", error);
+    return null;
+  }
+})();
+
+// Get token
+const token = getCookie("token", Astro.cookies) || "";
+---
+
+<MainLayout title="Editar Política de Reembolso" data={{userName, buttonLabel, role}}>
+  <TextHeader
+    title="Editar Política de Reembolso"
+    subtitle="Modifica los parámetros de la política de reembolso"
+  />
+  <main>
+    <RefundPolicyForm
+      client:load
+      mode="edit"
+      data={policy}
+      currency={society?.local_currency || "MXN"}
+      token={token}
+      redirectTo="/politicas-reembolso"
+    />
+  </main>
+</MainLayout>

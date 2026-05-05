@@ -9,7 +9,7 @@
  * when messages are shown.
  */
 
-import '@styles/global.css'
+import '@styles/global.css' 
 import PageHeader from "@components/Layout/PageHeader.astro";
 import SideBar from "@components/Layout/Sidebar.astro";
 import Messages from "@/components/UI/Messages.astro"
@@ -95,5 +95,7 @@ const { title, data, showMessages = false } = Astro.props;
       // Handle resize
       window.addEventListener('resize', initElementsState);
     </script>
+
+<script type="module" src="/src/tests/webVitalsClient.ts"></script>
   </body>
 </html>
