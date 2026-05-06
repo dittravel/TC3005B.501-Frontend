@@ -96,6 +96,29 @@ Antes de hacer el cambio se verificó que ninguno de los componentes afectados u
  
 ## 3. MRs descartadas
 ### MR-3 — Convertir componentes a .astro
+
+El análisis original identificó cinco componentes como candidatos para convertir a `.astro` basándose en su tamaño: `CreateRoleForm`, `ExpensesForm`, `Card`, `Tag` y `Checkbox`.
+ 
+Tras una inspección manual de cada uno, ninguno resultó convertible:
+ 
+| Componente | Razón para no convertir |
+|---|---|
+| `CreateRoleForm.tsx` | Usa `useState` y `useEffect` porque es un formulario interactivo con llamadas al backend. |
+| `ExpensesForm.tsx` | Usa `useState` y `useEffect` extensamente porque maneja archivos, tipo de cambio y validación CFDI. |
+| `Checkbox.tsx` | Recibe `onChange` como prop. Se importa dentro de componentes React como `CreateRoleForm` y `ExpensesForm`. Los componentes `.astro` no pueden importarse dentro de archivos `.tsx`. |
+| `Card.tsx` | Se importa en al menos 10 archivos `.tsx` diferentes. Convertirlo a `.astro` puede romper todos esos usos. |
+| `Tag.tsx` | Se importa en múltiples archivos `.tsx`. Es la misma restricción que con `Card`. |
+ 
+Esta MR estaba explícitamente marcada como **"requiere inspección manual"** en el análisis previamente hecho. La inspección confirmó que ninguno es apto para el cambio.
+
 ### MR-5 — Eliminar imports de useMemo no utilizados
+
+En el análisis original reportamos 20 archivos que tenían `useMemo` importado pero no utilizado. Al verificar el estado más reciente del repositorio con:
+ 
+```bash
+grep -rn "useMemo" src/ --include="*.ts" --include="*.tsx"
+```
+ 
+Se encontró que `useMemo` **sí se usa activamente** en los archivos donde aparece (`Requests.tsx` y `BitacoraTable.tsx`). El equipo ya había limpiado esos imports. Por lo que esta MR ya no aplica.
 
 ## 4. Comparativa
