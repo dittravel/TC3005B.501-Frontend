@@ -35,7 +35,7 @@ const requests = await (async () => {
           subtitle="Aquí puedes ver las solicitudes pendientes de autorizar"
         />
         <AuthRequestsList
-          client:only="react"
+          client:load
           data={requests}
           role={role}
           type="autorizar-solicitud"
