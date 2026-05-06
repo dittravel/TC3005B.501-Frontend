@@ -122,3 +122,25 @@ grep -rn "useMemo" src/ --include="*.ts" --include="*.tsx"
 Se encontró que `useMemo` **sí se usa activamente** en los archivos donde aparece (`Requests.tsx` y `BitacoraTable.tsx`). El equipo ya había limpiado esos imports. Por lo que esta MR ya no aplica.
 
 ## 4. Comparativa
+
+Ambos builds (antes y después de los cambios) tienen los mismos tamaños de archivos `.js`. Esto es esperado porque los cambios realizados no modifican qué JavaScript se manda al navegador, sino cuándo y cómo se inicializa.
+ 
+| Archivo | Tamaño (antes y después) |
+|---|---|
+| `client.js` (React runtime) | 186.62 kB |
+| `createSvgIcon.js` (MUI icons) | 74.44 kB |
+| `TravelRequestForm.js` | 18.32 kB |
+| `TravelSearchCard.js` | 14.85 kB |
+| `ExpensesForm.js` | 10.12 kB |
+ 
+El impacto real de los cambios se va a ver e el runtime, no en el tamaño de los archivos.
+ 
+- Las páginas de autenticación ahora se entregan como HTML estático sin procesamiento del servidor.
+- Las 6 páginas con `client:load` ahora envían HTML con contenido visible desde el servidor, en lugar de una página en blanco mientras React carga.
+
+Para medir el impacto en tiempos de carga reales podríamos usar Lighthouse o WebPageTest con el servidor corriendo.
+
+### Referencias
+- Astro. (s. f.). *On-demand rendering*. Docs. https://docs.astro.build/en/guides/on-demand-rendering/
+- Astro. (s. f.). *Rendering modes*. Docs. https://v4.docs.astro.build/en/basics/rendering-modes/
+- Astro. (s. f.). *Template directives reference*. Docs. https://docs.astro.build/en/reference/directives-reference/#client-directives
