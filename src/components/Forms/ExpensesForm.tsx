@@ -674,6 +674,7 @@ export default function ExpensesForm({
         </a>
         <div>
           <ModalWrapper
+            className="w-full sm:w-auto block"
             title={mode === "edit" ? "Editar Comprobante" : "Subir Comprobante"}
             message="¿Estas seguro de que deseas realizar esta acción?"
             modal_type="confirm"

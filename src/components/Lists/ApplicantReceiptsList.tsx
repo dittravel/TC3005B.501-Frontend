@@ -53,7 +53,33 @@ export default function ApplicantReceiptsList({
     if (days === null) return false; // If no days info, assume not expired
     return days <= 0;
   })();
+  const downloadFile = async (
+  url: string,
+  type: "pdf" | "xml"
+) => {
+  const response = await fetch(url);
+  const blob = await response.blob();
 
+  const objectUrl = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  const filenameFromUrl = url.split("/").pop() || "archivo";
+
+  const extension = type === "xml" ? ".xml" : ".pdf";
+
+  link.href = objectUrl;
+
+  link.download =
+    filenameFromUrl.includes(".")
+      ? filenameFromUrl
+      : `${filenameFromUrl}${extension}`;
+
+  document.body.appendChild(link);
+  link.click();
+
+  link.remove();
+  window.URL.revokeObjectURL(objectUrl);
+};
   return (
     <section className="space-y-6 w-full">
       <div className="flex justify-between items-center">
@@ -190,14 +216,19 @@ export default function ApplicantReceiptsList({
                           <Tag text="PDF" type="secondary" />
                           <p className="text-xs text-text-primary truncate">{expense.pdf_name}</p>
                         </div>
-                        <Button
-                          color="secondary"
-                          variant="border"
-                          size="small"
-                          href={`${apiBaseUrl}/files/receipt-file/${expense.pdf_id}`}
-                        >
-                          Descargar
-                        </Button>
+                       <Button
+                        onClick={() =>
+                          downloadFile(
+                            `${apiBaseUrl}/files/receipt-file/${expense.pdf_id}`,
+                            "pdf"
+                          )
+                        }
+                        color="secondary"
+                        variant="border"
+                        size="small"
+                      >
+                        Descargar
+                      </Button>
                       </div>
                     )}
 
@@ -208,10 +239,15 @@ export default function ApplicantReceiptsList({
                           <p className="text-xs text-text-primary truncate">{expense.xml_name}</p>
                         </div>
                         <Button
+                          onClick={() =>
+                            downloadFile(
+                              `${apiBaseUrl}/files/receipt-file/${expense.xml_id}`,
+                              "xml"
+                            )
+                          }
                           color="secondary"
                           variant="border"
                           size="small"
-                          href={`${apiBaseUrl}/files/receipt-file/${expense.xml_id}`}
                         >
                           Descargar
                         </Button>
