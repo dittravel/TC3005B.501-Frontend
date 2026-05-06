@@ -51,7 +51,7 @@ export default function RolesList(props: Readonly<Props>) {
             color="secondary"
             href="/crear-rol"
           >
-            + Crear Rol
+            Crear Rol
           </Button>
         ) : null}
       </div>

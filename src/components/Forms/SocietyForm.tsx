@@ -141,8 +141,11 @@ export default function SocietyForm({
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div className="card">
+        <div className="card-title">
+          <h2>1. Información de la sociedad</h2>
+        </div>
         <Input
           label="Descripción"
           name="description"
@@ -183,57 +186,59 @@ export default function SocietyForm({
             </option>
           ))}
         </Select>
-
+      </div>
+        
+      <div>
         {isCreateMode ? (
-          <>
-            <div className="mt-8 border-t border-border pt-6">
-              <h2 className="text-lg font-semibold text-text-primary">Administrador</h2>
-              <p className="mb-4 text-sm text-text-secondary">Crea un administrador de la sociedad en el mismo flujo.</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input
-                  label="Usuario"
-                  name="admin.user_name"
-                  value={formData.admin.user_name}
-                  onChange={handleChange}
-                  required
-                />
-                <Input
-                  label="Contraseña"
-                  name="admin.password"
-                  type="password"
-                  value={formData.admin.password}
-                  onChange={handleChange}
-                  required
-                />
-                <Input
-                  label="Correo"
-                  name="admin.email"
-                  type="email"
-                  value={formData.admin.email}
-                  onChange={handleChange}
-                  required
-                />
-                <Input
-                  label="Estación"
-                  name="admin.workstation"
-                  value={formData.admin.workstation}
-                  onChange={handleChange}
-                />
-                <Input
-                  label="Teléfono"
-                  name="admin.phone_number"
-                  value={formData.admin.phone_number}
-                  onChange={handleChange}
-                />
-              </div>
+          <div className="card">
+            <div className="card-title">
+              <h2>2. Administrador de la sociedad</h2>
+              <p>Crea un administrador para gestionar la sociedad</p>
             </div>
-          </>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="Usuario"
+                name="admin.user_name"
+                value={formData.admin.user_name}
+                onChange={handleChange}
+                required
+              />
+              <Input
+                label="Contraseña"
+                name="admin.password"
+                type="password"
+                value={formData.admin.password}
+                onChange={handleChange}
+                required
+              />
+              <Input
+                label="Correo"
+                name="admin.email"
+                type="email"
+                value={formData.admin.email}
+                onChange={handleChange}
+                required
+              />
+              <Input
+                label="Estación"
+                name="admin.workstation"
+                value={formData.admin.workstation}
+                onChange={handleChange}
+              />
+              <Input
+                label="Teléfono"
+                name="admin.phone_number"
+                value={formData.admin.phone_number}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
         ) : null}
       </div>
       <div className="flex justify-end gap-2 mt-4">
         <Button
           name="Cancelar"
-          color="secondary"
+          color="primary"
           href="/sociedades"
           disabled={loading}
         >
@@ -241,7 +246,7 @@ export default function SocietyForm({
         </Button>
         <Button
           name={mode === "create" ? "Crear Sociedad" : "Guardar Cambios"}
-          color="primary"
+          color="secondary"
           type="submit"
           disabled={loading}
         >

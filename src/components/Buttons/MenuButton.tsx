@@ -4,7 +4,7 @@
  * A button that toggles the visibility of the sidebar.
  */
 
-import { Menu } from "@mui/icons-material";
+import Icon from "@/components/Utils/Icon";
 
 export default function MenuButton() {
   const handleMenuClick = () => {
@@ -21,7 +21,7 @@ export default function MenuButton() {
       aria-label="Toggle sidebar"
       type="button"
     >
-      <Menu />
+      <Icon name="menu" />
     </button>
   );
 }

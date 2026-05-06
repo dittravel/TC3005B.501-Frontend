@@ -60,7 +60,9 @@ export default function DefaultAuthRule({ defaultRule, token }: Props) {
   }, [toast]);
 
   // Handle submit of the form
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
     if (!defaultRule || !defaultRule.rule_id) {
       setToast({ 
         message: "No se encontró la regla por defecto",
@@ -119,7 +121,7 @@ export default function DefaultAuthRule({ defaultRule, token }: Props) {
   };
 
   return (
-    <div className="card">
+    <form onSubmit={handleSubmit} className="card">
       <div className="card-title">
         <h2>Regla por Defecto</h2>
         <p>
@@ -131,10 +133,8 @@ export default function DefaultAuthRule({ defaultRule, token }: Props) {
           label="Niveles de autorización"
           name="num_levels"
           type="number"
-          placeholder="Número"
+          placeholder="1-10"
           altText="Ingresa un valor entre 1 y 10"
-          min={1}
-          max={10}
           required
           value={formData.num_levels}
           onChange={handleChange}
@@ -215,14 +215,14 @@ export default function DefaultAuthRule({ defaultRule, token }: Props) {
           Recargar
         </Button>
         <Button
+          type="submit"
           variant="filled"
           color="secondary"
-          onClick={handleSubmit}
           disabled={loading}
         >
           {loading ? "Guardando..." : "Guardar cambios"}
         </Button>
       </div>
-    </div>
+    </form>
   );
 }

@@ -4,6 +4,7 @@
 
 import React, { useState } from "react";
 import Button from "@/components/Buttons/Button";
+import Reminder from "@/components/Utils/Reminder";
 import { apiRequest } from "@utils/apiClient";
 
 interface Props {
@@ -96,67 +97,58 @@ export default function AccountingExportForm({ token }: Props) {
   };
 
   return (
-    <div className="px-4">
-      <div className="bg-card border border-border rounded-2xl p-8 md:p-10 shadow-sm">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-semibold">Exportar Pólizas</h2>
-          <p className="text-muted-foreground mt-2">
-            Haz clic en el botón para exportar todas las pólizas en formato JSON
-          </p>
-        </div>
+    <div className="card">
+      <div className="card-title">
+        <h2>Exportar Pólizas</h2>
+        <p>Haz clic en el botón para exportar todas las pólizas en formato JSON</p>
+      </div>
 
-        <div className="flex justify-center">
-          <Button
-            type="button"
-            variant="filled"
-            color="secondary"
-            onClick={handleSubmit}
-            disabled={loading}
-            className="px-12 py-3 text-lg"
-          >
-            {loading ? "Exportando..." : "Exportar pólizas"}
-          </Button>
-        </div>
+      <Button
+        type="button"
+        variant="filled"
+        color="secondary"
+        onClick={handleSubmit}
+        disabled={loading}
+      >
+        {loading ? "Exportando..." : "Exportar pólizas"}
+      </Button>
 
-        {/* Mensaje de error */}
-        {errorMessage && (
-          <div className="mt-6 p-4 bg-yellow-100 border border-yellow-400 text-yellow-800 rounded-xl text-center font-medium">
-            {errorMessage}
-          </div>
-        )}
+      {/* Error message */}
+      {errorMessage && (
+        <Reminder 
+          text={errorMessage}
+          type="warning"
+        />
+      )}
 
-        {/* Resultado JSON */}
-        {result && (
-          <div className="mt-10">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-2xl font-semibold">Resultado:</h3>
-
+      {/* Resultado JSON */}
+      {result && (
+        <div>
+          <div className="flex justify-between items-center mt-4 mb-4">
+            <h3 className="text-2xl font-semibold">Resultado</h3>
             <div className="flex items-center gap-3">
               <Button
                 type="button"
-                color="primary"
-                className="px-4 py-2"
-                onClick={handleDownload}
-              >
-                Descargar JSON
-              </Button>
-
-              <Button
-                type="button"
-                variant="empty"
-                className="px-3 py-2"
+                color="secondary"
+                variant="link"
                 onClick={handleClear}
               >
                 Limpiar
               </Button>
-            </div>
-        </div>
-            <div className="bg-zinc-950 text-zinc-100 p-6 rounded-2xl overflow-auto max-h-[650px] font-mono text-sm border border-border">
-              <pre>{JSON.stringify(result, null, 2)}</pre>
+              <Button
+                type="button"
+                color="secondary"
+                onClick={handleDownload}
+              >
+                Descargar JSON
+              </Button>
             </div>
           </div>
-        )}
-      </div>
+          <div className="bg-background text-text-primary p-6 rounded-md overflow-auto max-h-[650px] font-mono text-sm border border-border">
+            <pre>{JSON.stringify(result, null, 2)}</pre>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

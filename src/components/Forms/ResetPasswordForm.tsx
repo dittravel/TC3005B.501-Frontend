@@ -8,8 +8,8 @@
 import React, { useState, useEffect } from "react";
 import Button from "@/components/Buttons/Button";
 import Input from "@/components/Utils/Input";
+import Icon from "@/components/Utils/Icon";
 import { apiRequest } from "@utils/apiClient";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const visibleIconStyle = `
   absolute right-3 top-2.5
@@ -103,9 +103,9 @@ export default function ResetPasswordForm() {
                   placeholder="Nueva contraseña"
                 />
                 {showPassword ? (
-                  <Visibility className={visibleIconStyle} onClick={() => setShowPassword(false)} />
+                  <Icon name="visibility" className={visibleIconStyle} onClick={() => setShowPassword(false)} />
                 ) : (
-                  <VisibilityOff className={visibleIconStyle} onClick={() => setShowPassword(true)} />
+                  <Icon name="visibility_off" className={visibleIconStyle} onClick={() => setShowPassword(true)} />
                 )}
               </div>
 

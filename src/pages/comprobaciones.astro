@@ -18,11 +18,10 @@ const buttonLabel = roleLabels[role];
 
 import { apiRequest } from "@/utils/apiClient";
 
-// Status corresponding to Accounts Payable
-const status = 6;
 const requests = await (async () => {
   try {
-    return await apiRequest(`/user/get-travel-requests/${getCookie("id", Astro.cookies)}/${status}`, { cookies: Astro.cookies });
+    const userId = getCookie("id", Astro.cookies);
+    return await apiRequest(`/requests/${userId}?status=Validación de comprobantes&assignedOnly=true`, { cookies: Astro.cookies });
   } catch (error) {
     return [];
   }
@@ -35,7 +34,7 @@ const requests = await (async () => {
       <TableFallback />
     ) : (
       <TextHeader
-        title={`Comprobaciones de ${userName}`}
+        title="Solicitudes por Comprobar"
         subtitle="Aquí puedes ver las solicitudes pendientes de comprobar"
       />
       <AuthRequestsList

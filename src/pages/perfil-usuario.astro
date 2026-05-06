@@ -36,7 +36,8 @@ const tokenPayload = parseJwtPayload(String(token || ''));
 const permissionKeys = Array.isArray(tokenPayload?.permissions)
   ? tokenPayload.permissions.map((permission: unknown) => String(permission).trim()).filter(Boolean)
   : [];
-const canManageAbsence = resolveDashboardProfile(role, permissionKeys) !== 'applicant';
+const profile = resolveDashboardProfile(role, permissionKeys);
+const canManageAbsence = profile === 'travel-agency' || profile === 'accounts-payable' || profile === 'authorizer';
 
 const userData = await apiRequest(`/user/get-user-data/${userId}`, { cookies: Astro.cookies });
 

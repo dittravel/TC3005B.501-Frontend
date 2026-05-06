@@ -41,7 +41,7 @@ export default function AuthRuleForm({ token, mode, data }: Props) {
     handleSuperiorLevelChange,
     validateForm,
     initializeFormData
-  } = useAuthRuleForm(false);
+  } = useAuthRuleForm(false, mode === "create");
 
   // Pre-fill form fields in edit mode
   useEffect(() => {
@@ -61,7 +61,9 @@ export default function AuthRuleForm({ token, mode, data }: Props) {
   }, [toast]);
 
   // Handle submit of the form
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
     // Validate form
     const validation = validateForm();
     if (!validation.isValid) {
@@ -120,7 +122,7 @@ export default function AuthRuleForm({ token, mode, data }: Props) {
   };
 
   return (
-    <div className="space-y-6 mt-6">
+    <form onSubmit={handleSubmit} className="space-y-6 mt-6">
       {/* 1. Rule Name */}
       <div className="card">
         <div className="card-title">
@@ -149,7 +151,7 @@ export default function AuthRuleForm({ token, mode, data }: Props) {
             label="Niveles de autorización"
             name="num_levels"
             type="number"
-            placeholder="Número"
+            placeholder="1-10"
             altText="Ingresa un valor entre 1 y 10"
             min={1}
             max={10}
@@ -254,9 +256,8 @@ export default function AuthRuleForm({ token, mode, data }: Props) {
             name="min_duration"
             type="number"
             placeholder="0"
-            min={0}
             required
-            value={formData.min_duration}
+            value={formData.min_duration ?? ""}
             onChange={handleChange}
           />
           <Input
@@ -264,9 +265,8 @@ export default function AuthRuleForm({ token, mode, data }: Props) {
             name="max_duration"
             type="number"
             placeholder="0"
-            min={0}
             required
-            value={formData.max_duration}
+            value={formData.max_duration ?? ""}
             onChange={handleChange}
           />
         </div>
@@ -285,7 +285,7 @@ export default function AuthRuleForm({ token, mode, data }: Props) {
             placeholder="0.00"
             min={0}
             required
-            value={formData.min_amount}
+            value={formData.min_amount ?? ""}
             onChange={handleChange}
           />
           <Input
@@ -295,7 +295,7 @@ export default function AuthRuleForm({ token, mode, data }: Props) {
             placeholder="0.00"
             min={0}
             required
-            value={formData.max_amount}
+            value={formData.max_amount ?? ""}
             onChange={handleChange}
           />
         </div>
@@ -315,14 +315,14 @@ export default function AuthRuleForm({ token, mode, data }: Props) {
           Cancelar
         </Button>
         <Button 
+          type="submit"
           variant="filled" 
           color="secondary" 
-          onClick={handleSubmit}
           disabled={loading}
         >
           {loading ? "Guardando..." : mode === "create" ? "Guardar regla" : "Actualizar regla"}
         </Button>
       </div>
-    </div>
+    </form>
   );
 }

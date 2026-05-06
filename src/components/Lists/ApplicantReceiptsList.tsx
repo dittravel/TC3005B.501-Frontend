@@ -82,7 +82,7 @@ export default function ApplicantReceiptsList({
 };
   return (
     <section className="space-y-6 w-full">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col lg:flex-row justify-between items-center gap-4 ">
         <h2 className="text-xl font-bold text-text-primary">Comprobantes ({expenses.length})</h2>
         {!expired ? (
           <div className="flex gap-4">
@@ -129,9 +129,9 @@ export default function ApplicantReceiptsList({
                 tag={{ text: `Comprobante #${expense.receipt_id}`, type: 'secondary' }}
                 status={{ text: expense.validation, type: (stateColors[expense.validation] || 'default') as TagType }}
               >
-                <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-20">
+                <div className="flex flex-col lg:flex-row items-center justify-between gap-4 lg:gap-20">
                   {/* Expense Details */}
-                  <div className="flex fex-col md:flex-row items-center justify-between gap-8">
+                  <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
                     <LabeledValue
                       label="Tipo de gasto"
                       value={expense.receipt_type_name}
@@ -209,10 +209,10 @@ export default function ApplicantReceiptsList({
                   )}
 
                   {/* PDF */}
-                  <div className="flex flex-col md:flex-row gap-4">
+                  <div className="flex flex-col lg:flex-row gap-4">
                     {hasPdf && (
                       <div className="flex w-full bg-card-hover p-2 border border-border rounded-md gap-4 items-center justify-between">
-                        <div className="flex items-center justify-center gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
                           <Tag text="PDF" type="secondary" />
                           <p className="text-xs text-text-primary truncate">{expense.pdf_name}</p>
                         </div>
@@ -234,7 +234,7 @@ export default function ApplicantReceiptsList({
 
                     {hasXml && (
                       <div className="flex w-full bg-card-hover p-2 border border-border rounded-md gap-4 items-center justify-between">
-                        <div className="flex items-center justify-center gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
                           <Tag text="XML" type="secondary" />
                           <p className="text-xs text-text-primary truncate">{expense.xml_name}</p>
                         </div>

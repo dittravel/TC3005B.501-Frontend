@@ -15,24 +15,34 @@ import MaterialIcon from "@components/Utils/MaterialIcon.astro";
   aria-label="Toggle theme"
   title="Cambiar tema"
 >
-  <MaterialIcon icon="brightness_4" />
+  <span id="theme-icon" class="material-symbols-outlined">brightness_4</span>
 </button>
 
 <script is:inline>
   const button = document.getElementById("theme-toggle");
+  const icon = document.getElementById("theme-icon");
+
+  // Function to update the icon based on the current theme
+  const updateIcon = (isDark) => {
+    icon.textContent = isDark ? "light_mode" : "dark_mode";
+  };
 
   const applyTheme = (theme) => {
-    if (theme === "dark") {
+    const isDark = theme === "dark";
+    if (isDark) {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
+    updateIcon(isDark);
   };
 
   // Load saved theme from localStorage on page load
   const savedTheme = localStorage.getItem("theme");
   if (savedTheme) {
     applyTheme(savedTheme);
+  } else {
+    updateIcon(false);
   }
 
   button?.addEventListener("click", () => {

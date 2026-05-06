@@ -1,4 +1,11 @@
-describe('Creación de una solicitud de viaje por el solicitante', () =>{
+/**
+ * Create Request Test
+ * 
+ * This test verifies that an applicant can
+ * successfully create a travel request.
+ */
+
+describe('Create travel request', () =>{
   beforeEach(() => {
     cy.login(Cypress.env('SOLICITANTE_USER'), Cypress.env('SOLICITANTE_PASSWORD'));
   });
@@ -7,29 +14,40 @@ describe('Creación de una solicitud de viaje por el solicitante', () =>{
     cy.logout();
   });
 
-  it('debe permitir completar y enviar exitosamente una nueva solicitud de viaje', () => {
-    cy.contains('SOLICITA UN NUEVO VIAJE').should('exist').click();
-    cy.url().should('eq', 'https://localhost:4321/crear-solicitud');
+  it('Crear request', () => {
+    cy.visit('/crear-solicitud');
 
-    cy.get('input[placeholder*="País Origen"]').type('México');
-    cy.get('input[placeholder*="Ciudad Origen"]').type('CDMX');
-    cy.get('input[placeholder*="País Destino"]').type('EEUU');
-    cy.get('input[placeholder*="Ciudad Destino"]').type('Nueva York');
+    // Select origin country and city
+    cy.get('select[name="origin_country_name"]').select('México');
+    cy.get('select[name="origin_city_name"]').select('CDMX');
 
-    cy.get('input[name="beginning_date"]').type('2025-10-12');
-    cy.get('input[name="ending_date"]').type('2025-10-20');
+    // Select destination country and city
+    cy.get('select[name="destination_country_name"]').select('Estados Unidos');
+    cy.get('select[name="destination_city_name"]').select('Nueva York');
 
+    // Set dates and times
+    cy.get('input[name="beginning_date"]').type('2028-10-12');
     cy.get('input[name="beginning_time"]').type('10:23');
+    cy.get('input[name="ending_date"]').type('2028-10-20');
     cy.get('input[name="ending_time"]').type('23:00');
 
-    cy.get('input[name="plane_needed"]').click();
-    cy.get('input[name="hotel_needed"]').click();
+    // Select additional services
+    cy.contains('label', '¿Requiere Avión?').click();
+    cy.contains('label', '¿Requiere Hotel?').click();
 
-    cy.get('input[placeholder*="Anticipo Esperado (MXN)"]').type('10000');
-    cy.get('textarea[name="notes"]').type('Esta solicitud fue creada con una prueba Cypress :)')
+    // Enable advance and set amount
+    cy.contains('label', '¿Requiere Anticipo?').click();
+    cy.get('input[name="requested_fee"]').type('1000');
 
-    cy.contains('Enviar Solicitud').should('exist').click();
-    cy.url().should('eq', 'https://localhost:4321/dashboard')
+    // Add notes
+    cy.get('textarea[name="notes"]').type('Esta solicitud fue creada con una prueba Cypress :)');
+
+    cy.contains('button', /enviar/i).click();
+    cy.url().should('include', '/solicitudes');
+
+    // Verify the new request appears in the list with correct details
+    cy.contains('Nueva York, Estados Unidos').should('be.visible');
+    cy.contains('$1000').should('be.visible');
   })
 
 })

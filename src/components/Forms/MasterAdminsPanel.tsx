@@ -92,11 +92,8 @@ export default function MasterAdminsPanel({ token, initialAdmins = [] }: Readonl
 
   return (
     <div className="space-y-8">
-      <section className="card">
-        <div className="card-header">
-          <h2 className="card-title font-semibold text-text-primary">Administradores maestros</h2>
-          <p className="text-text-secondary text-sm">Total: {admins.length}</p>
-        </div>
+      <section className="space-y-4">
+        <h2 className="text-2xl font-bold text-text-primary">Administradores maestros ({admins.length})</h2>
         <DataTable columns={columns} rows={rows} />
       </section>
 

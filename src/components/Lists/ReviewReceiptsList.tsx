@@ -114,7 +114,7 @@ export default function ReviewReceiptsList({
 
   return (
     <section className="w-full space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
         <h2 className="text-xl font-bold text-text-primary">Comprobantes ({expenses.length})</h2>
         <div className="flex gap-4">
           <UltimateWrapper
@@ -162,7 +162,7 @@ export default function ReviewReceiptsList({
                   type: (validationColors[receipt.validation] || 'default') as TagType
                 }}
               >
-                <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-20">
+                <div className="flex flex-col lg:flex-row items-center justify-between gap-4 lg:gap-20">
                   {/* Receipt Details */}
                   <div className="flex flex-col md:flex-row items-center justify-between gap-8">
                     <LabeledValue
@@ -267,11 +267,11 @@ export default function ReviewReceiptsList({
 
                 {/* Files */}
                 <div>
-                  <div className="flex flex-col md:flex-row gap-4">
+                  <div className="flex flex-col lg:flex-row gap-4">
                     {/* PDF */}
                     {pdf && pdf.fileId && (
                       <div className="flex w-full bg-card-hover p-2 border border-border rounded-md gap-4 items-center justify-between">
-                        <div className="flex items-center justify-center gap-2">
+                        <div className="flex items-center justify-center gap-2 min-w-0">
                           <Tag text="PDF" type="secondary" />
                           <p className="text-xs text-text-primary truncate">{pdf.fileName}</p>
                         </div>
@@ -289,7 +289,7 @@ export default function ReviewReceiptsList({
                     {/* XML */}
                     {xml && xml.fileId && (
                       <div className="flex w-full bg-card-hover p-2 border border-border rounded-md gap-4 items-center justify-between">
-                        <div className="flex items-center justify-center gap-2">
+                        <div className="flex items-center justify-center gap-2 min-w-0">
                           <Tag text="XML" type="secondary" />
                           <p className="text-xs text-text-primary truncate">{xml.fileName}</p>
                         </div>

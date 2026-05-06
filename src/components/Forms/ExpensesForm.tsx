@@ -129,7 +129,11 @@ export default function ExpensesForm({
             ? `${baseUrl}/exchange-rate?series=${series}&date=${formData.receiptDate}`
             : `${baseUrl}/exchange-rate?series=${series}`;
 
-          const res = await fetch(url);
+          const res = await fetch(url, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
           const json = await res.json();
           return json.success && json.data?.rate
             ? parseFloat(json.data.rate)

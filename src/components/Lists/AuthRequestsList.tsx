@@ -4,15 +4,38 @@
  * The component also handles pagination logic to show a limited number of requests per page.
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import Card from '@/components/Utils/Card';
 import Button from '@/components/Buttons/Button';
+import LabeledValue from '@/components/Utils/LabeledValue';
 import Pagination from '@components/Table/Pagination';
+import Tag from '@/components/Utils/Tag';
 import type { UserRole } from "@type/roles";
 import { formatDate } from '@utils/dateFormatter';
+import { getStatusTagType } from '@utils/statusMapper';
+
+interface TravelRequest {
+  request_id: number;
+  request_status: string;
+  notes: string;
+  requested_fee: number;
+  imposed_fee: number;
+  request_days: number;
+  creation_date: string;
+  assigned_to_name?: string;
+  routes: Array<{
+    route_id: number;
+    origin_country: string;
+    origin_city: string;
+    destination_country: string;
+    destination_city: string;
+    beginning_date: string;
+    ending_date: string;
+  }>;
+}
 
 interface Props {
-  data: any[];
+  data: TravelRequest[];
   type?: string;
   role: UserRole;
   title?: string;
@@ -31,14 +54,12 @@ interface Props {
 export default function AuthorizerRequestsList({ data, type, role, title = "Solicitudes", subtitle }: Props) {
   const requestsPerPage = 10;
   const [page, setPage] = useState(1);
-  const [visibleRequests, setVisibleRequests] = useState<Record<string, any>[]>([]);
   const totalPages = Math.ceil(data.length / requestsPerPage);
   
-  useEffect(() => {
+  const paginatedRequests = useMemo(() => {
     const start = (page - 1) * requestsPerPage;
     const end = start + requestsPerPage;
-    
-    setVisibleRequests(data.slice(start, end));
+    return data.slice(start, end);
   }, [page, data]);
   
   return (
@@ -49,28 +70,54 @@ export default function AuthorizerRequestsList({ data, type, role, title = "Soli
       </div>
       {data.length > 0 ? (
         <div className="space-y-6">
-          {visibleRequests.map((request: any) => (
+          {paginatedRequests.map((request: TravelRequest) => (
             <Card
               key={request.request_id}
               tag={{ text: `Solicitud #${request.request_id}`, type: 'secondary' }}
-              status={{ text: request.request_status, type: 'default' }}
+              status={{
+                text: request.request_status || 'Desconocido',
+                type: getStatusTagType(request.request_status),
+              }}
             >
-              <div className="card-content-grid">
-                <div className="space-y-2 text-sm text-text-primary">
-                  <p className="text-lg font-semibold">{request.destination_country}</p>
-                  <p>
-                    <span className="font-medium">Inicio:</span> {formatDate(request.beginning_date)}
-                    <span className="font-medium ml-2">Fin:</span> {formatDate(request.ending_date)}
-                  </p>
+              <div className="flex flex-col lg:flex-row justify-between gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-1">
+                  <LabeledValue
+                    label="Destino(s)"
+                    value={
+                      <div className="flex items-center justify-between gap-3 w-full">
+                        <span>
+                          {request.routes?.[0]?.destination_city === 'notSelected' ? '—' : request.routes?.[0]?.destination_city},
+                          {' '}
+                          {request.routes?.[0]?.destination_country === 'notSelected' ? '—' : request.routes?.[0]?.destination_country}
+                        </span>
+                        {request.routes && request.routes.length > 1 && (
+                          <Tag
+                            text={`+${request.routes.length - 1}`}
+                            type="secondary"
+                          />
+                        )}
+                      </div>
+                    }
+                  />
+                  <LabeledValue
+                    label="Fechas"
+                    value={`${request.routes?.[0]?.beginning_date ? formatDate(request.routes[0].beginning_date) : '—'} - ${request.routes?.[0]?.ending_date ? formatDate(request.routes[request.routes.length-1].ending_date) : '—'}`}
+                  />
+                  <LabeledValue
+                    label="Monto Solicitado"
+                    value={`$${request.requested_fee}`}
+                  />
+                  <LabeledValue
+                    label="Asignado a"
+                    value={request.assigned_to_name || 'Sin asignar'}
+                  />
                 </div>
                 
-                <div className="flex flex-col gap-2 w-full">
+                <div className="flex gap-4 items-end">
                   <a href={`/${type}/${request.request_id}`} className="block">
                     <Button
                       color="secondary"
                       variant="filled"
-                      size="medium"
-                      className="w-full"
                     >
                       Revisar
                     </Button>
@@ -83,7 +130,7 @@ export default function AuthorizerRequestsList({ data, type, role, title = "Soli
             totalPages={totalPages}
             page={page}
             setPage={setPage}
-            maxVisible={5}
+            maxVisible={10}
           />
         </div>
       ) : (

@@ -217,13 +217,8 @@ export default function TravelRequestForm({
       }
 
       // 1. Check if beginning_date is in the past
-      // Compare normalized dates to ignore time component
-      const beginningDateOnly = new Date(
-        beginning_date.getFullYear(),
-        beginning_date.getMonth(),
-        beginning_date.getDate(),
-      );
-      if (beginningDateOnly < today) {
+      const todayString = today.toISOString().split('T')[0];
+      if (route.beginning_date < todayString) {
         return `Ruta #${idx + 1}: La fecha de inicio (${route.beginning_date}) no puede ser una fecha pasada.`;
       }
 
@@ -234,12 +229,12 @@ export default function TravelRequestForm({
         ending_date.getMonth(),
         ending_date.getDate(),
       );
-      if (endingDateOnly < beginningDateOnly) {
+      if (route.ending_date < route.beginning_date) {
         return `Ruta #${idx + 1}: La fecha de fin (${route.ending_date}) debe ser igual o posterior a la fecha de inicio (${route.beginning_date}).`;
       }
 
       // 3. If dates are the same, check times
-      if (endingDateOnly.getTime() === beginningDateOnly.getTime()) {
+      if (route.ending_date === route.beginning_date) {
         if (!route.beginning_time || !route.ending_time) {
           return `Ruta #${idx + 1}: Las horas de inicio y fin son obligatorias cuando las fechas son las mismas.`;
         }

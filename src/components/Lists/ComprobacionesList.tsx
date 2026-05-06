@@ -40,7 +40,7 @@ function getStatusTag(stats: any): CardTag {
 export default function ComprobacionesList({ data, title = "Comprobaciones", subtitle }: Props) {
   return (
     <section className="space-y-6 w-full">
-      <div className="flex items-center justify-between gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         <InfoCard
           value={data.filter((r: any) => {
             const stats = getVerificationStats(r);

@@ -4,7 +4,7 @@
  * A button that toggles the visibility of the notifications sidebar.
  */
 
-import { Notifications } from "@mui/icons-material";
+import Icon from "@/components/Utils/Icon";
 
 export default function NotificationsButton() {
   const handleNotificationsClick = () => {
@@ -21,7 +21,7 @@ export default function NotificationsButton() {
       aria-label="Toggle notifications sidebar"
       type="button"
     >
-      <Notifications />
+      <Icon name="notifications" />
     </button>
   );
 }

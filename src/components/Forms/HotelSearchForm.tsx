@@ -8,8 +8,9 @@
 import React, { useState } from 'react';
 import type { TravelRoute } from '@/types/TravelRoute';
 import Button from '../Buttons/Button';
-import Card from '../Utils/Card';
 import Toast from '@/components/Utils/Toast';
+import Select from '@/components/Utils/Select';
+import Input from '@/components/Utils/Input';
 import { apiRequest } from '@/utils/apiClient';
 
 interface HotelSearchFormProps {
@@ -103,189 +104,142 @@ const HotelSearchForm = ({ token, route, routeIndex }: HotelSearchFormProps) => 
   };
 
   return (
-    <>
-      <Card className="mt-4 p-6 bg-gray-50 rounded-lg border space-y-6">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div>
+      <div className="card">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 
-        {/* Address */}
-        <div className="space-y-2">
-          <label
-            htmlFor={`address-${routeIndex}`}
-            className="block text-sm font-medium text-tertiary"
-          >
-            Destino <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <input
-              id={`address-${routeIndex}`}
-              type="text"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              className="w-full rounded-md border border-gray-300 bg-card px-4 py-2.5 text-sm text-tertiary shadow-sm transition focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
-            />
-          </div>
-        </div>
+          {/* Address */}
+          <Input
+            name={`address-${routeIndex}`}
+            label="Destino"
+            type="text"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            required
+          />
 
-        {/* Guests */}
-        <div className="space-y-2">
-          <label
-            htmlFor={`guests-${routeIndex}`}
-            className="block text-sm font-medium text-tertiary"
+          {/* Guests */}
+          <Select
+            name={`guests-${routeIndex}`}
+            label="Número de huéspedes"
+            value={guests}
+            onChange={(e) => setGuests(parseInt(e.target.value))}
+            required
           >
-            Número de huéspedes <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <select
-              id={`guests-${routeIndex}`}
-              value={guests}
-              onChange={(e) => setGuests(parseInt(e.target.value))}
-              className="w-full appearance-none rounded-md border border-gray-300 bg-white px-4 py-2.5 pr-10 text-sm text-tertiary shadow-sm transition focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
+            <option value={1}>1</option>
+            <option value={2}>2</option>
+            <option value={3}>3</option>
+            <option value={4}>4</option>
+            <option value={5}>5+</option>
+          </Select>
+
+          {/* Check-in Date */}
+          <Input
+            name={`checkin-${routeIndex}`}
+            label="Check-In"
+            type="date"
+            value={checkInDate}
+            onChange={(e) => setCheckInDate(e.target.value)}
+            required
+          />
+
+          {/* Check-out Date */}
+          <Input
+            name={`checkout-${routeIndex}`}
+            label="Check-Out"
+            type="date"
+            value={checkOutDate}
+            onChange={(e) => setCheckOutDate(e.target.value)}
+            required
+          />
+
+          {/* Page Size */}
+          <Select
+            name={`pagesize-${routeIndex}`}
+            label="Número de resultados"
+            value={pageSize}
+            onChange={(e) => setPageSize(parseInt(e.target.value))}
+            required
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+          </Select>
+
+          {/* Search Button */}
+          <div className="col-span-full text-sm text-secondary flex justify-end items-center border-t border-border pt-4">
+            <Button
+              type="button"
+              onClick={handleSearch}
+              color="secondary"
             >
-              <option value={1}>1 huésped</option>
-              <option value={2}>2 huéspedes</option>
-              <option value={3}>3 huéspedes</option>
-              <option value={4}>4 huéspedes</option>
-              <option value={5}>5+ huéspedes</option>
-            </select>
-            <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">▼</span>
+              Buscar hoteles
+            </Button>
           </div>
         </div>
 
-        {/* Check-in Date */}
-        <div className="space-y-2">
-          <label
-            htmlFor={`checkin-${routeIndex}`}
-            className="block text-sm font-medium text-tertiary"
-          >
-            Check-In <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <input
-              id={`checkin-${routeIndex}`}
-              type="date"
-              value={checkInDate}
-              onChange={(e) => setCheckInDate(e.target.value)}
-              className="w-full rounded-md border border-gray-300 bg-card px-4 py-2.5 text-sm text-tertiary shadow-sm transition focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
-            />
-          </div>
-        </div>
+        {/* Loading */}
+        {loadingHotels && <p className="text-sm text-gray-500">Buscando hoteles...</p>}
 
-        {/* Check-out Date */}
-        <div className="space-y-2">
-          <label
-            htmlFor={`checkout-${routeIndex}`}
-            className="block text-sm font-medium text-tertiary"
-          >
-            Check-Out <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <input
-              id={`checkout-${routeIndex}`}
-              type="date"
-              value={checkOutDate}
-              onChange={(e) => setCheckOutDate(e.target.value)}
-              className="w-full rounded-md border border-gray-300 bg-card px-4 py-2.5 text-sm text-tertiary shadow-sm transition focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
-            />
-          </div>
-        </div>
+        {/* Results */}
+        {shownHotels && (
+          <div className="space-y-3">
+            {hotels.length === 0 ? (
+              <p className="text-sm text-gray-500 text-center py-4">
+                No se encontraron hoteles para esta búsqueda.
+              </p>
+            ) : (
+              <>
+                {hotels.map((hotel, index) => {
+                  const isSelected = selectedHotel?.name === hotel.name;
 
-        {/* Page Size */}
-        <div className="space-y-2">
-          <label
-            htmlFor={`pagesize-${routeIndex}`}
-            className="block text-sm font-medium text-tertiary"
-          >
-            Número de resultados <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <select
-              id={`pagesize-${routeIndex}`}
-              value={pageSize}
-              onChange={(e) => setPageSize(parseInt(e.target.value))}
-              className="w-full appearance-none rounded-md border border-gray-300 bg-white px-4 py-2.5 pr-10 text-sm text-tertiary shadow-sm transition focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-            </select>
-            <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">▼</span>
-          </div>
-        </div>
-
-        {/* Search Button */}
-        <div className="col-span-full text-sm text-secondary flex justify-end items-center border-t border-gray-200 pt-4">
-          <Button
-            type="button"
-            onClick={handleSearch}
-            color="secondary"
-          >
-            Buscar hoteles
-          </Button>
-        </div>
-      </div>
-
-      {/* Loading */}
-      {loadingHotels && <p className="text-sm text-gray-500">Buscando hoteles...</p>}
-
-      {/* Results */}
-      {shownHotels && (
-        <div className="space-y-3">
-          {hotels.length === 0 ? (
-            <p className="text-sm text-gray-500 text-center py-4">
-              No se encontraron hoteles para esta búsqueda.
-            </p>
-          ) : (
-            <>
-              {hotels.map((hotel, index) => {
-                const isSelected = selectedHotel?.name === hotel.name;
-
-                return (
-                  <div
-                    key={index}
-                    className={`rounded-md border p-4 shadow-sm transition ${
-                      isSelected
-                        ? 'border-gray-200 bg-secondary/5 ring-2 ring-secondary/30'
-                        : 'border-gray-200 bg-tertiary hover:border-gray-300 hover:bg-secondary/5'
-                    }`}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => handleChooseHotel(hotel)}
-                      className="w-full text-left"
+                  return (
+                    <div
+                      key={index}
+                      className={`rounded-md border p-4 shadow-sm transition ${
+                        isSelected
+                          ? 'border-secondary bg-secondary/10 ring-2 ring-secondary/30'
+                          : 'border-border bg-tertiary hover:border-secondary hover:bg-secondary/5'
+                      }`}
                     >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium text-tertiary">{hotel.name}</p>
-                          <p className="text-sm text-gray-500">
-                            ⭐ {hotel.rating ?? 'Sin calificación'} | {hotel.installation ?? 'Sin tipo'}
-                          </p>
+                      <button
+                        type="button"
+                        onClick={() => handleChooseHotel(hotel)}
+                        className="w-full text-left hover:cursor-pointer"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-medium text-tertiary">{hotel.name}</p>
+                            <p className="text-sm text-gray-500">
+                              ⭐ {hotel.rating ?? 'Sin calificación'} | {hotel.installation ?? 'Sin tipo'}
+                            </p>
+                          </div>
+                            <p className="font-semibold text-tertiary">
+                              {hotel.cost ? `$${hotel.cost} ${hotel.currency ?? 'USD'} / noche` : 'Precio no disponible'}
+                            </p>
                         </div>
-                          <p className="font-semibold text-tertiary">
-                            {hotel.cost ? `$${hotel.cost} ${hotel.currency ?? 'USD'} / noche` : 'Precio no disponible'}
-                          </p>
-                      </div>
-                    </button>
-                  </div>
-                );
-              })}
+                      </button>
+                    </div>
+                  );
+                })}
 
-              {/* Submit Button */}
-              <div className="col-span-full text-sm text-secondary flex justify-end items-center border-t border-gray-200 pt-4">
-                <Button
-                  type="button"
-                  onClick={handleSubmitHotel}
-                  color="secondary"
-                >
-                  Seleccionar hotel
-                </Button>
-              </div>
-            </>
-          )}
-        </div>
-      )}
-      </Card>
+                {/* Submit Button */}
+                <div className="col-span-full text-sm text-secondary flex justify-end items-center border-t border-border pt-4">
+                  <Button
+                    type="button"
+                    onClick={handleSubmitHotel}
+                    color="secondary"
+                  >
+                    Seleccionar hotel
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </div>
       {toast && <Toast message={toast.message} type={toast.type} />}
-    </>
+    </div>
   );
 };
 

@@ -17,11 +17,11 @@ const userName = getCookie("username", Astro.cookies) || "";
 const buttonLabel = roleLabels[role];
 
 import { apiRequest } from '@utils/apiClient';
-//Status corresponding to Accounts Payable
-const status = 3;
+
 const requests = await (async () => {
   try {
-    return await apiRequest(`/user/get-travel-requests/${getCookie("id", Astro.cookies)}/${status}`, { cookies: Astro.cookies });
+    const userId = getCookie("id", Astro.cookies);
+    return await apiRequest(`/requests/${userId}?status=Cotización del Viaje&assignedOnly=true`, { cookies: Astro.cookies });
   } catch (error) {
     return [];
   }
@@ -34,7 +34,7 @@ const requests = await (async () => {
       <TableFallback />
     ) : (
       <TextHeader
-        title={`Cotizaciones de ${userName}`}
+        title="Solicitudes por Cotizar"
         subtitle="Aquí puedes ver las solicitudes pendientes de cotizar"
       />
       <AuthRequestsList

@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
 import type { ChangeEvent } from 'react';
 import Button from '@/components/Buttons/Button';
 import Toast from '@/components/Utils/Toast';
+import Select from '@/components/Utils/Select';
 import { apiRequest } from '@/utils/apiClient';
 import { permissionLabelToKey, permissionsByCategory } from '@/config/permissionCatalog';
 
@@ -128,33 +129,28 @@ export default function RoleConfigurationForm({ token, defaultRole, roles = [], 
             {/* Default Role Section */}
             <div className="card">
                 <div className="card-title">
-                    <h3 className="text-lg font-bold text-text-primary">Configuración por defecto</h3>
+                    <h3 className="text-lg font-bold text-text-primary">Rol por defecto</h3>
                     <p className="text-sm text-text-secondary">
                         Este será el rol aplicado por defecto para los usuarios del sistema.
                     </p>
                 </div>
 
                 <form onSubmit={handleRoleConfigurationSubmit} className="space-y-4">
-                    <div className="flex flex-wrap items-center gap-3">
-                        <label htmlFor="defaultRole" className="text-sm font-medium text-text-primary">
-                            Rol por defecto
-                        </label>
-                        <select
-                            id="defaultRole"
-                            name="defaultRole"
-                            value={roleConfigurationData.defaultRole}
-                            onChange={handleRoleConfigurationChange}
-                            disabled={!canEditDefaultRole}
-                            className="border border-border-primary rounded-md px-3 py-2 text-sm text-text-primary bg-background-primary focus:outline-none focus:ring-2 focus:ring-secondary"
-                        >
-                            <option value="" disabled>Selecciona un rol</option>
-                            {roles.map(role => (
-                                <option key={role.role_id} value={String(role.role_id)}>
-                                    {role.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                    <Select
+                        label="Rol por defecto"
+                        name="defaultRole"
+                        value={roleConfigurationData.defaultRole}
+                        onChange={handleRoleConfigurationChange}
+                        disabled={!canEditDefaultRole}
+                        className="border border-border-primary rounded-md px-3 py-2 text-sm text-text-primary bg-background-primary focus:outline-none focus:ring-2 focus:ring-secondary"
+                    >
+                        <option value="" disabled>Selecciona un rol</option>
+                        {roles.map(role => (
+                            <option key={role.role_id} value={String(role.role_id)}>
+                                {role.name}
+                            </option>
+                        ))}
+                    </Select>
 
                     {roleConfigurationErrors.defaultRole && (
                         <p className="text-sm text-red-500">{roleConfigurationErrors.defaultRole}</p>
@@ -179,25 +175,20 @@ export default function RoleConfigurationForm({ token, defaultRole, roles = [], 
                     </p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3">
-                    <label htmlFor="definedRole" className="text-sm font-medium text-text-primary">
-                        Roles definidos en el sistema
-                    </label>
-                    <select
-                        id="definedRole"
-                        name="definedRole"
-                        value={selectedRoleId}
-                        onChange={(e) => setSelectedRoleId(e.target.value)}
-                        className="border border-border-primary rounded-md px-3 py-2 text-sm text-text-primary bg-background-primary focus:outline-none focus:ring-2 focus:ring-secondary"
-                    >
-                        <option value="">Selecciona un rol</option>
-                        {roles.map(role => (
-                            <option key={role.role_id} value={role.role_id}>
-                                {role.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+                <Select
+                    label="Roles definidos en el sistema"
+                    name="definedRole"
+                    value={selectedRoleId}
+                    onChange={(e) => setSelectedRoleId(e.target.value)}
+                    className="border border-border-primary rounded-md px-3 py-2 text-sm text-text-primary bg-background-primary focus:outline-none focus:ring-2 focus:ring-secondary"
+                >
+                    <option value="">Selecciona un rol</option>
+                    {roles.map(role => (
+                        <option key={role.role_id} value={role.role_id}>
+                            {role.name}
+                        </option>
+                    ))}
+                </Select>
 
                 {selectedRole && (
                     <div className="flex flex-col card-secondary mt-4">
