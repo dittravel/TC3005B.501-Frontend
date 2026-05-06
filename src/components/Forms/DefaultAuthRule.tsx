@@ -133,10 +133,8 @@ export default function DefaultAuthRule({ defaultRule, token }: Props) {
           label="Niveles de autorización"
           name="num_levels"
           type="number"
-          placeholder="1"
+          placeholder="1-10"
           altText="Ingresa un valor entre 1 y 10"
-          min={1}
-          max={10}
           required
           value={formData.num_levels}
           onChange={handleChange}

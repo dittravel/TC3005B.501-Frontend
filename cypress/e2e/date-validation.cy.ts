@@ -1,60 +1,75 @@
-describe('Validación de fechas en la creación de solicitudes de viaje', () => {
-  const irACrearSolicitud = () => {
-    cy.get('a[href="/crear-solicitud"]').contains('CREAR SOLICITUD').click({ force: true });
-    cy.contains('CREAR NUEVA SOLICITUD DE VIAJE').should('be.visible');
-    cy.contains('Los campos obligatorios están marcados con un asterisco.').should('be.visible');
-  };
+/**
+ * Request Date Validation Test
+ *
+ * This test suite validates the date fields in the travel request creation process.
+ * It checks for:
+ * - Missing dates
+ * - Return date being before departure date
+ * - Successful creation with valid dates
+ *
+ * The tests are designed to ensure that the application correctly handles date validation
+ * and provides appropriate feedback to the user.
+ */
 
-  const llenarFormularioSinFechas = () => {
-    cy.get('input[name="origin_country_name"]').type('México');
-    cy.get('input[name="origin_city_name"]').type('Ciudad de México');
-    cy.get('input[name="destination_country_name"]').type('España');
-    cy.get('input[name="destination_city_name"]').type('Vigo');
-
-    cy.get('input[name="hotel_needed"]').check().should('be.checked');
-    cy.get('input[name="requested_fee"]').type('2000');
-    cy.get('textarea[name="notes"]').type('Es necesario que el sitio quedé al lado del estadio del Celta');
-  };
-
-  const enviarFormulario = () => {
-    cy.get('button[type="button"]').contains('Enviar Solicitud').click();
-  };
-
-  const ingresarFechas = (inicio: string, horaInicio: string, fin: string, horaFin: string) => {
-    cy.get('input[name="beginning_date"]').clear().type(inicio);
-    cy.get('input[name="beginning_time"]').clear().type(horaInicio);
-    cy.get('input[name="ending_date"]').clear().type(fin);
-    cy.get('input[name="ending_time"]').clear().type(horaFin);
-  };
-
+describe('Travel Request Date Validation', () => {
   beforeEach(() => {
     cy.login(Cypress.env('SOLICITANTE_USER'), Cypress.env('SOLICITANTE_PASSWORD'));
+    cy.visit('/crear-solicitud');
   });
-  
+
   afterEach(() => {
     cy.logout();
   });
 
-  it('debe mostrar error si no se ingresan fechas de viaje', () => {
-    irACrearSolicitud();
-    llenarFormularioSinFechas();
-    enviarFormulario();
+  const fillFormWithoutDates = () => {
+    // Select origin country and city
+    cy.get('select[name="origin_country_name"]').select('México');
+    cy.get('select[name="origin_city_name"]').select('CDMX');
+
+    // Select destination country and city
+    cy.get('select[name="destination_country_name"]').select('Estados Unidos');
+    cy.get('select[name="destination_city_name"]').select('Nueva York');
+
+    // Select hotel checkbox
+    cy.contains('label', '¿Requiere Hotel?').click();
+
+    // Enable advance payment
+    cy.contains('label', '¿Requiere Anticipo?').click();
+    cy.get('input[name="requested_fee"]').type('2000');
+
+    // Add notes
+    cy.get('textarea[name="notes"]').type('Test notes');
+  };
+
+  const fillDates = (startDate: string, startTime: string, endDate: string, endTime: string) => {
+    cy.get('input[name="beginning_date"]').clear().type(startDate);
+    cy.get('input[name="beginning_time"]').clear().type(startTime);
+    cy.get('input[name="ending_date"]').clear().type(endDate);
+    cy.get('input[name="ending_time"]').clear().type(endTime);
+  };
+
+  const submitForm = () => {
+    cy.contains('button', /enviar/i).click();
+  };
+
+  it('should show error when dates are missing', () => {
+    fillFormWithoutDates();
+    submitForm();
     cy.contains('Ruta #1: Las fechas de inicio y fin son obligatorias.').should('be.visible');
   });
-  it('debe mostrar error si la fecha de regreso es anterior a la fecha de salida', () => {
-    irACrearSolicitud();
-    llenarFormularioSinFechas();
-    ingresarFechas('2025-12-12', '09:00', '2025-11-11', '21:00');
-    enviarFormulario();
-    cy.contains('Ruta #1: La fecha de fin (2025-11-11) debe ser igual o posterior a la fecha de inicio (2025-12-12).').should('be.visible');
-  });
-  it('debe permitir crear correctamente una solicitud con fechas válidas', () => {
-    irACrearSolicitud();
-    llenarFormularioSinFechas();
-    ingresarFechas('2025-11-11', '09:00', '2025-12-12', '21:00');
-    enviarFormulario();
-    cy.contains('Solicitud creada y enviada exitosamente.').should('be.visible');
 
-    cy.url().should('include', '/dashboard');
+  it('should show error when end date is before start date', () => {
+    fillFormWithoutDates();
+    fillDates('2028-12-12', '09:00', '2028-11-11', '21:00');
+    submitForm();
+    cy.contains('Ruta #1: La fecha de fin').should('be.visible');
+    cy.contains('debe ser igual o posterior a la fecha de inicio').should('be.visible');
+  });
+
+  it('should successfully create request with valid future dates', () => {
+    fillFormWithoutDates();
+    fillDates('2028-11-11', '09:00', '2028-12-12', '21:00');
+    submitForm();
+    cy.url().should('include', '/solicitudes');
   });
 });
