@@ -5,7 +5,7 @@
  * POST /user/reset-password with the new password.
  */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Button from "@/components/Buttons/Button";
 import Input from "@/components/Utils/Input";
 import Icon from "@/components/Utils/Icon";
@@ -24,7 +24,11 @@ export default function ResetPasswordForm() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const token = new URLSearchParams(window.location.search).get("token") ?? "";
+  const [token, setToken] = useState("");
+
+  useEffect(() => {
+  setToken(new URLSearchParams(window.location.search).get("token") ?? "");
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -248,6 +248,8 @@ html, body, #app, #content {
 #messages { 
   grid-area: messages;
   width: 16rem;
+  height: 100%;
+  overflow: hidden;
 }
 
 /* Sidebar closed */

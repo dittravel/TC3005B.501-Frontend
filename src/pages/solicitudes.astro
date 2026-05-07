@@ -42,7 +42,7 @@ const token = getCookie("token", Astro.cookies) || "";
   />
   <main>
     <Requests
-      client:only="react"
+      client:load
       data={requests}
       token={token}
     />

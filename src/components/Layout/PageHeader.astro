@@ -40,10 +40,12 @@ import NotificationsButton from "@components/Buttons/NotificationsButton.astro";
     <ThemeButton />
 
     <!-- User Role -->
-    <span class="text-brand-200 font-bold text-sm">
+    <span
+      class="text-brand-200 font-bold text-sm max-w-[80px] truncate sm:max-w-none sm:overflow-visible sm:whitespace-normal"
+      title={buttonLabel}
+    >
       {buttonLabel}
     </span>
-
     <!-- User Info -->
     <UserMenu client:load>
       <span class="text-black">{userName}</span>
