@@ -18,6 +18,7 @@ import { apiRequest } from "@/utils/apiClient";
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
 const buttonLabel = roleLabels[role];
 const userName = getCookie("username", Astro.cookies) || "";
+const token = getCookie("token", Astro.cookies) || "";
 
 let initialData: any[] = [];
 let initialMeta = { count: 0, total_count: 0, has_more: false, filters: {} };
@@ -44,6 +45,7 @@ try {
       initialData={initialData}
       initialMeta={initialMeta}
       role={role}
+      token={token}
     />
   </main>
 </MainLayout>

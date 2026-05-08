@@ -5,11 +5,12 @@
  * and actor name, plus pagination.
  */
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import DataTable from "./DataTable";
 import Pagination from "./Pagination";
 import Select from "@/components/Utils/Select";
 import Input from "@/components/Utils/Input";
+import { apiRequest } from "@/utils/apiClient";
 
 interface AuditEntry {
   audit_log_id: number;
@@ -36,9 +37,12 @@ interface Props {
   role: string;
   initialSocietyGroupId?: string;
   societyGroups?: Array<{ id: number; description: string }>;
+  token: string;
 }
 
 // Constants
+
+// Mapping of action types to user-friendly labels
 const ACTION_TYPE_LABELS: Record<string, string> = {
   USER_CREATED: "Usuario creado",
   USER_UPDATED: "Usuario editado",
@@ -49,15 +53,38 @@ const ACTION_TYPE_LABELS: Record<string, string> = {
   REQUEST_RECEIPTS_VALIDATED: "Comprobantes validados",
   RECEIPT_APPROVED: "Comprobante aprobado",
   RECEIPT_REJECTED: "Comprobante rechazado",
-  REFUND_PROCESSED: "Reembolso procesado",
   POLICY_CREATED: "Política creada",
   POLICY_UPDATED: "Política editada",
   POLICY_DEACTIVATED: "Política desactivada",
   RECEIPTS_RETURNED: "Comprobantes devueltos",
   RECEIPT_AMOUNT_EDITED: "Monto del comprobante editado",
   RECEIPT_NOTES_EDITED: "Notas del comprobante editadas",
+  ROLE_CREATED: "Rol creado",
+  ROLE_UPDATED: "Rol editado",
+  ROLE_DELETED: "Rol eliminado",
+  ROLE_DEFAULT_UPDATED: "Rol por defecto actualizado",
+  MASTER_ADMIN_CREATED: "Superadministrador creado",
+  SOCIETY_CREATED: "Sociedad creada",
+  SOCIETY_UPDATED: "Sociedad editada",
+  SOCIETY_DELETED: "Sociedad eliminada",
+  SOCIETY_GROUP_CREATED: "Grupo de sociedad creado",
+  SOCIETY_GROUP_UPDATED: "Grupo de sociedad editado",
+  SOCIETY_GROUP_DELETED: "Grupo de sociedad eliminado",
+  SOCIETY_TRANSFERRED_TO_GROUP: "Sociedad transferida a grupo",
 };
 
+// Mapping of entities
+const ENTITY_TYPES: Record<string, string> = {
+  User: "Usuarios",
+  Request: "Solicitudes",
+  Receipt: "Comprobantes",
+  Role: "Roles",
+  Policy: "Políticas",
+  Society: "Sociedades",
+  SocietyGroup: "Grupos de Sociedades",
+};
+
+// Columns to display in the table
 const COLUMNS = [
   { key: "event_timestamp", label: "Fecha" },
   { key: "actor_user_name", label: "Usuario" },
@@ -99,13 +126,19 @@ function formatMetadata(metadata: Record<string, any> | null): string {
  * @param {string} role - User role for access control
  * @returns {JSX.Element} The audit log table component
  */
-export default function BitacoraTable({ initialData, initialMeta, role, initialSocietyGroupId = '', societyGroups = [] }: Readonly<Props>) {
+export default function BitacoraTable({
+  initialData,
+  initialMeta,
+  initialSocietyGroupId = '',
+  societyGroups = [],
+  token
+}: Readonly<Props>) {
   const [data, setData] = useState<AuditEntry[]>(initialData);
   const [meta, setMeta] = useState<Meta>(initialMeta);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [filterAction, setFilterAction] = useState("");
+  const [filterEntity, setFilterEntity] = useState("");
   const [filterName, setFilterName] = useState("");
   const [selectedSocietyGroupId, setSelectedSocietyGroupId] = useState(initialSocietyGroupId);
 
@@ -121,14 +154,12 @@ export default function BitacoraTable({ initialData, initialMeta, role, initialS
         offset: String((newPage - 1) * LIMIT),
         include_metadata: "true",
       });
-      if (selectedSocietyGroupId) {
+      if (selectedSocietyGroupId && selectedSocietyGroupId !== "") {
         params.set('society_group_id', selectedSocietyGroupId);
       }
-      const res = await fetch(`/api/audit-log/get-logs?${params}`, {
-        credentials: "include",
+      const json = await apiRequest(`/audit-log/get-logs?${params}`, {
+        headers: { Authorization: `Bearer ${token}` }
       });
-      if (!res.ok) throw new Error(`Error ${res.status}`);
-      const json = await res.json();
       setData(json.data ?? []);
       setMeta(json.meta);
       setPage(newPage);
@@ -144,7 +175,7 @@ export default function BitacoraTable({ initialData, initialMeta, role, initialS
   const rows = useMemo(
     () =>
       data
-        .filter((e) => (filterAction ? e.action_type === filterAction : true))
+        .filter((e) => (filterEntity ? e.entity_type === filterEntity : true))
         .filter((e) =>
           filterName
             ? e.actor_user_name.toLowerCase().includes(filterName.toLowerCase())
@@ -159,14 +190,18 @@ export default function BitacoraTable({ initialData, initialMeta, role, initialS
           source_ip: e.source_ip,
           metadata_detail: formatMetadata(e.metadata),
         })),
-    [data, filterAction, filterName, selectedSocietyGroupId]
+    [data, filterEntity, filterName, selectedSocietyGroupId]
   );
 
   function handleSocietyGroupChange(event: React.ChangeEvent<HTMLSelectElement>) {
     const value = event.target.value;
     setSelectedSocietyGroupId(value);
-    fetchPage(1);
   }
+
+  // Refetch data when selected society group changes
+  useEffect(() => {
+    fetchPage(1);
+  }, [selectedSocietyGroupId]);
 
   return (
     <div>
@@ -191,13 +226,13 @@ export default function BitacoraTable({ initialData, initialMeta, role, initialS
         ) : null}
         <div className="w-full md:flex-1 [&>div]:mb-0">
           <Select
-            name="filter-action"
-            label="Tipo de acción"
-            value={filterAction}
-            onChange={(e) => setFilterAction(e.target.value)}
+            name="filter-entity"
+            label="Entidad"
+            value={filterEntity}
+            onChange={(e) => setFilterEntity(e.target.value)}
           >
             <option value="">Todas</option>
-            {Object.entries(ACTION_TYPE_LABELS).map(([value, label]) => (
+            {Object.entries(ENTITY_TYPES).map(([value, label]) => (
               <option key={value} value={value}>
                 {label}
               </option>
