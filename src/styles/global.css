@@ -203,8 +203,48 @@
   font-display: swap;
 }
 
+/* Open Dyslexic fonts */
+@font-face {
+  font-family: 'Open Dyslexic';
+  src: url('/fonts/OpenDyslexic-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Open Dyslexic';
+  src: url('/fonts/OpenDyslexic-Bold.otf') format('opentype');
+  font-weight: 600;
+  font-display: swap;
+}
+
 html {
   font-family: 'Roboto', var(--font-fallback);
+}
+
+html.font-roboto {
+  font-family: 'Roboto', var(--font-fallback);
+}
+
+html.font-opendyslexic {
+  font-family: 'Open Dyslexic', var(--font-fallback);
+}
+
+/* Text size options */
+html {
+  font-size: 16px;
+}
+
+html.text-pequeno {
+  font-size: 14px;
+}
+
+html.text-mediano {
+  font-size: 16px;
+}
+
+html.text-grande {
+  font-size: 18px;
 }
 
 html, body {
@@ -353,4 +393,41 @@ select option:checked {
   background: var(--color-secondary-500) !important;
   background-color: var(--color-secondary-500) !important;
   color: var(--color-card) !important;
+}
+
+/* Input type styling */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="week"],
+input[type="color"] {
+  color-scheme: light;
+}
+
+.dark input[type="date"],
+.dark input[type="time"],
+.dark input[type="datetime-local"],
+.dark input[type="month"],
+.dark input[type="week"],
+.dark input[type="color"] {
+  color-scheme: dark;
+}
+
+/* Calendar icon styling for date inputs */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+input[type="month"]::-webkit-calendar-picker-indicator,
+input[type="week"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(0.5);
+}
+
+.dark input[type="date"]::-webkit-calendar-picker-indicator,
+.dark input[type="time"]::-webkit-calendar-picker-indicator,
+.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+.dark input[type="month"]::-webkit-calendar-picker-indicator,
+.dark input[type="week"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.5);
 }

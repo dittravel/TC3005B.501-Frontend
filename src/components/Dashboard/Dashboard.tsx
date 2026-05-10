@@ -89,8 +89,7 @@ export default function Dashboard({ userId, role, userName, token = '', permissi
         <h1 className="text-2xl font-bold text-text-primary mb-2">
           Bienvenido(a), {userName}
         </h1>
-
-        <p className="text-lg text-text-secondary">
+        <p className="text-l text-text-secondary">
           ¿Qué deseas hacer hoy?
         </p>
       </div>

@@ -29,5 +29,10 @@ try {
 ---
 
 <MainLayout title={`Solicitud #${request.request_id}`} data={{userName, buttonLabel, role}} >
-  <RequestDetail request={request} title={`Solicitud #${request.request_id}`} subtitle="Detalles de solicitud de viaje" />
+  <RequestDetail
+    request={request}
+    title={`Solicitud #${request.request_id}`}
+    subtitle="Detalles de solicitud de viaje"
+    showStepper={true}
+  />
 </MainLayout>

@@ -1,14 +1,27 @@
 ---
 /**
  * Author: Eduardo Porto Morales
- * 
- * This component is used to display a header with a title and subtitle 
+ *
+ * This component is used to display a header with a title and subtitle
  * for the travel request pages.
  **/
-const { title, subtitle } = Astro.props;
+import Icon from "@/components/Utils/Icon";
+
+const { title, subtitle, backHref } = Astro.props;
 ---
 
-<section class="mb-8 w-full pb-4 border-b-2 border-secondary">
-  <h1 class="text-3xl font-bold text-text-primary">{title}</h1>
-  <p class="text-lg font-semibold text-text-secondary mt-2">{subtitle}</p>
+<section class="mb-8 w-full pb-4 border-b border-secondary">
+  {backHref && (
+    <a
+      href={backHref}
+      class="text-secondary hover:text-secondary flex items-center justify-start"
+    >
+      <Icon name="arrow_back" style={{ fontSize: '1.2rem' }} />
+      <p class="text-sm">Volver</p>
+    </a>
+  )}
+  <div class="flex flex-col gap-2 mt-2">
+    <h1 class="text-2xl font-bold text-text-primary">{title}</h1>
+    <p class="text-l text-text-secondary">{subtitle}</p>
+  </div>
 </section>
