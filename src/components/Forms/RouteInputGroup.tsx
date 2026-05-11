@@ -12,6 +12,7 @@ import React, { useState } from 'react';
 import Button from '@/components/Buttons/Button';
 import Input from '@/components/Utils/Input';
 import Checkbox from '@/components/Utils/Checkbox';
+import Icon from '@/components/Utils/Icon';
 import type { TravelRoute } from '@/types/TravelRoute';
 import Select from '@/components/Utils/Select';
 
@@ -97,10 +98,7 @@ const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, inde
         {/* Origin and destination section */}
         <div className="mb-6">
           <h4 className="text-base font-semibold text-text-primary mb-4 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
-            </svg>
+            <Icon name="location_on" />
             Origen y Destino
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -170,9 +168,7 @@ const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, inde
         {/* Dates section */}
         <div className="mb-6">
           <h4 className="text-base font-semibold text-text-primary mb-4 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-            </svg>
+            <Icon name="schedule" />
             Fechas y Horarios
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -226,9 +222,7 @@ const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, inde
         {/* Additional services section */}
         <div>
           <h4 className="text-base font-semibold text-text-primary mb-4 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="m21 7.5-2.25-1.313M21 7.5v2.25m0-2.25-2.25 1.313M3 7.5l2.25-1.313M3 7.5l2.25 1.313M3 7.5v2.25m9 3 2.25-1.313M12 12.75l-2.25-1.313M12 12.75V15m0 6.75 2.25-1.313M12 21.75V19.5m0 2.25-2.25-1.313m0-16.875L12 2.25l2.25 1.313M21 14.25v2.25l-2.25 1.313m-13.5 0L3 16.5v-2.25" />
-            </svg>
+            <Icon name="deployed_code" />
             Servicios Adicionales
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

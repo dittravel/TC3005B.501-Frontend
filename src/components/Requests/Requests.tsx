@@ -138,7 +138,7 @@ export default function Requests({
   return (
     <div className="space-y-6">
       {/* Filters */}
-      <div className="flex flex-col-reverse lg:flex-row gap-3 lg:items-center lg:justify-between mb-8">
+      <div className="flex flex-col-reverse lg:flex-row gap-3 lg:items-end lg:justify-between mb-8">
         <div className="grid grid-cols-2 lg:flex lg:flex-row gap-3 w-full lg:w-auto">
           {!hideFilters && (
             <div className="[&>div]:mb-0">
@@ -173,7 +173,6 @@ export default function Requests({
             onClick={() => window.location.href = '/crear-solicitud'}
             variant="filled"
             color="secondary"
-            className="w-full lg:w-auto"
           >
             Crear Solicitud
           </Button>
@@ -203,8 +202,8 @@ export default function Requests({
                 type: getStatusTagType(request.request_status),
               }}
             >
-              <div className="flex flex-col lg:flex-row justify-between gap-6">
-                <div className="grid grid-cols-3 lg:grid-cols-4 gap-6 lg:w-4/5">
+              <div className="grid flex-cols-1 lg:grid-cols-[1fr_10rem] justify-between gap-6">
+                <div className="grid grid-cols-3 lg:grid-cols-4 gap-6">
                   <LabeledValue
                     label="Destino(s)"
                     value={
@@ -228,8 +227,8 @@ export default function Requests({
                     value={`${request.routes?.[0]?.beginning_date ? formatDate(request.routes[0].beginning_date) : '—'} - ${request.routes?.[0]?.ending_date ? formatDate(request.routes[request.routes.length-1].ending_date) : '—'}`}
                   />
                   <LabeledValue
-                    label="Monto Solicitado"
-                    value={`$${request.requested_fee}`}
+                    label={`${request.imposed_fee > 0 ? 'Anticipo' : 'Monto Solicitado'}`}
+                    value={`$${request.imposed_fee > 0 ? request.imposed_fee.toFixed(2) : request.requested_fee.toFixed(2)}`}
                   />
                   <div className="hidden md:block">
                     <LabeledValue
@@ -239,7 +238,7 @@ export default function Requests({
                   </div>
                 </div>
                 
-                <div className="flex gap-2 items-center justify-center w-max">
+                <div className="flex gap-2 items-center justify-end">
                   {!actionRoute && (
                     <Button
                       variant="filled"
