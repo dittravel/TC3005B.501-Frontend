@@ -5,18 +5,18 @@
 
 import MainLayout from "@layouts/MainLayout.astro";
 import TextHeader from "@components/Layout/TextHeader.astro";
-import AuthRequestsList from "@/components/Lists/AuthRequestsList";
+import Requests from "@/components/Requests/Requests";
 import TableFallback from "@/components/Table/TableFallback.astro";
 
 import type { UserRole } from "@type/roles";
 import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
+import { apiRequest } from "@/utils/apiClient";
 
 const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
 const userName = getCookie("username", Astro.cookies) || "";
 const buttonLabel = roleLabels[role];
-
-import { apiRequest } from "@/utils/apiClient";
+const token = getCookie("token", Astro.cookies) || "";
 
 const requests = await (async () => {
   try {
@@ -29,21 +29,19 @@ const requests = await (async () => {
 ---
 
 <MainLayout title="Comprobaciones Pendientes" data={{userName, buttonLabel, role}}>
-  <div>
-    {requests && requests.length === 0 ? (
-      <TableFallback />
-    ) : (
-      <TextHeader
-        title="Solicitudes por Comprobar"
-        subtitle="Aquí puedes ver las solicitudes pendientes de comprobar"
-      />
-      <AuthRequestsList
-        client:load
-        data={requests}
-        role={role}
-        type="comprobar-gastos"
-      />
-    )}
-    </div>
-  </div>
+  <TextHeader
+    title="Solicitudes por Comprobar"
+    subtitle="Aquí puedes ver las solicitudes pendientes de comprobar"
+  />
+  {requests && requests.length === 0 ? (
+    <TableFallback />
+  ) : (
+    <Requests
+      client:load
+      data={requests}
+      token={token}
+      hideFilters={true}
+      actionRoute="/comprobar-gastos"
+    />
+  )}
 </MainLayout>

@@ -7,30 +7,66 @@
 
 import Layout from "@layouts/Layout.astro";
 import Button from "@components/Buttons/Button";
+import Icon from "@components/Utils/Icon";
+import Tag from "@components/Utils/Tag";
 const token = Astro.cookies.get("token")?.value;
 const isAuthenticated = !!token;
 ---
 
 <Layout title="Página no encontrada">
-  <main
-    class="min-h-screen bg-background text-white px-6 flex flex-col"
-  >
-    <div class="grow flex flex-col gap-4 justify-center items-center text-center w-full">
-      <h1 class="text-5xl font-extrabold flex gap-2 justify-center items-baseline">
-        <span class="text-warning-400">404:</span>
-        <span class="text-text-primary">No Encontrado</span>
-      </h1>
-      <p class="text-text-primary text-lg leading-relaxed">
-        ¡Ups! Parece que estás perdido o no tienes permiso para acceder a esta página.
-      </p>
-      <Button
-        href={isAuthenticated ? "/dashboard" : "/"}
-        variant="link"
-        color="secondary"
-        size="big"
-      >
-        {isAuthenticated ? "Volver al Dashboard" : "Volver a Inicio"}
-      </Button>
+  <main class="flex justify-center items-center w-screen h-screen bg-background text-white px-6">
+    <div class="card max-w-lg">
+      <div class="flex flex-col justify-center items-center gap-8 text-center">
+        {/* Warning message */}
+        <div class="flex flex-col items-center gap-4">
+          <Icon name="map_search" style={{ fontSize: "4rem", color: "#E53E3E" }} />
+          <Tag type="warning" size="medium" text="Error 404" />
+        </div>
+        {/* Main message */}
+        <div class="flex flex-col gap-4">
+          <h1 class="text-4xl font-bold text-text-primary">
+            Página no encontrada
+          </h1>
+          <p class="text-text-primary text-lg leading-relaxed">
+            La ruta que buscas no existe o no tienes permisos para acceder.
+          </p>
+        </div>
+        <div class="w-full border-t border-border"></div>
+        {/* Buttons */}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 justify-center">
+          {isAuthenticated ? (
+            <Button
+              href="/dashboard"
+              variant="filled"
+              color="secondary"
+              size="medium"
+            >
+              Volver al Dashboard
+            </Button>
+            <Button
+              href="/login"
+              variant="filled"
+              color="secondary"
+              size="medium"
+            >
+              Volver al Inicio de Sesion
+            </Button>
+          ) : (
+            <Button
+              href="/login"
+              variant="filled"
+              color="secondary"
+              size="big"
+            >
+              Volver a Inicio
+            </Button>
+          )}
+        </div>
+        {/* Further Help */}
+        <p class="text-text-secondary text-sm">
+          Si necesitas ayuda adicional, por favor contacta a un administrador
+        </p>
+      </div>
     </div>
   </main>
 </Layout>

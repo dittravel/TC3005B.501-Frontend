@@ -21,8 +21,8 @@ interface Props {
 export default function LabeledValue({ label, value }: Props) {
   return (
     <div className="flex flex-col items-start">
-      <p className="text-sm text-text-secondary">{label}</p>
-      <div className="font-medium text-text-primary">{value}</div>
+      <p className="text-xs text-text-secondary">{label}</p>
+      <div className="text-sm font-medium text-text-primary">{value}</div>
     </div>
   );
 }

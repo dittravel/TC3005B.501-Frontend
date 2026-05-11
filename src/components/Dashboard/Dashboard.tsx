@@ -89,8 +89,7 @@ export default function Dashboard({ userId, role, userName, token = '', permissi
         <h1 className="text-2xl font-bold text-text-primary mb-2">
           Bienvenido(a), {userName}
         </h1>
-
-        <p className="text-lg text-text-secondary">
+        <p className="text-l text-text-secondary">
           ¿Qué deseas hacer hoy?
         </p>
       </div>
@@ -111,7 +110,7 @@ export default function Dashboard({ userId, role, userName, token = '', permissi
       {actions.length === 0 ? (
         <p className="text-text-secondary">Agrega acciones preferidas en tu perfil de usuario</p>
       ) : null}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className={`grid grid-cols-1 gap-6 ${actions.length < 3 ? "lg:grid-cols-2" : "lg:grid-cols-3"}`}>
         {actions.map((action) => (
           <button
             key={action.route}

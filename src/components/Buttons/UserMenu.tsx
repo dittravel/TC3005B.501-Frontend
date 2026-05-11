@@ -1,5 +1,6 @@
 /**
  * UserMenu Component
+ * 
  * Dropdown menu component for user account actions (settings and logout).
  * Displays a customizable button that toggles a dropdown menu on click
  * and automatically closes when clicking outside the component.
@@ -63,9 +64,9 @@ export default function UserMenu({ children }: UserMenuProps) {
       <button
         onClick={() => setShowMenu(!showMenu)}
         className="h-full flex items-center gap-2 bg-white text-black py-1 px-3
-                  rounded-full font-bold text-sm cursor-pointer
-                  transition-all duration-200
-                  hover:opacity-80"
+          rounded-full font-bold text-sm cursor-pointer
+          transition-all duration-200
+          hover:opacity-80"
         title="Menú de usuario"> {/* Tooltip */}
         {children}
       </button>

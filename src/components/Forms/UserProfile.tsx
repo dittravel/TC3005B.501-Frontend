@@ -246,12 +246,11 @@ export default function UserProfile({
                 ))}
               </Select>
             </div>
-          </div>
-
-          <div className="flex justify-end mt-6">
-            <Button type="submit" color="secondary" disabled={isSubmitting}>
-              {isSubmitting ? 'Guardando...' : 'Guardar Cambios'}
-            </Button>
+            <div className="flex justify-end">
+              <Button type="submit" color="secondary" disabled={isSubmitting}>
+                {isSubmitting ? 'Guardando...' : 'Guardar Preferencias'}
+              </Button>
+            </div>
           </div>
           {toast && (
             <div className="fixed top-4 right-4 z-50">

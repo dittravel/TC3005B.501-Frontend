@@ -850,7 +850,7 @@ export default function TravelRequestForm({
         <Button
           type="button"
           onClick={handleResetForm}
-          variant="filled"
+          variant="border"
           color="primary"
           disabled={loading}
         >
@@ -861,7 +861,7 @@ export default function TravelRequestForm({
             <Button
               type="button"
               onClick={handleSaveDraft}
-              color="secondary"
+              color="primary"
               disabled={loading}
             >
               Guardar Borrador
@@ -869,7 +869,7 @@ export default function TravelRequestForm({
             <Button
               type="submit"
               onClick={handleSubmitRequest}
-              color="success"
+              color="secondary"
               disabled={loading}
             >
               Enviar Solicitud

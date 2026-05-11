@@ -79,16 +79,18 @@ const FlightSearchForm = ({ token, route, routeIndex, tripType, ticketType }: Fl
   const handleSearch = async () => {
     if (!selectedTripType || !selectedTicketType || !selectedDepartureAirport || !selectedArrivalAirport) {
       setToast({ message: 'Por favor selecciona todos los campos antes de buscar.', type: 'warning' });
+      setTimeout(() => setToast(null), 3000);
       return;
     }
 
     setLoadingFlights(true);
     setShownFlights(false);
+    setToast(null);
 
     const payload = {
       origin: selectedDepartureAirport,
       destination: selectedArrivalAirport,
-      departureDate: route.beginning_date, 
+      departureDate: route.beginning_date,
       ...(selectedTripType === 'round' && { returnDate: route.ending_date }),
       tripType: selectedTripType,
       cabinClass: selectedTicketType,
@@ -105,9 +107,15 @@ const FlightSearchForm = ({ token, route, routeIndex, tripType, ticketType }: Fl
       const offers = Array.isArray(response?.offers) ? response.offers : [];
       setFlights(offers);
       setShownFlights(true);
+
+      if (offers.length === 0) {
+        setToast({ message: 'No se encontraron vuelos con los criterios seleccionados.', type: 'warning' });
+        setTimeout(() => setToast(null), 3000);
+      }
     } catch (error) {
       console.error('Error buscando vuelos:', error);
-      setToast({ message: 'Ocurrió un error al buscar vuelos. Por favor intenta de nuevo.', type: 'error' });
+      setToast({ message: 'No se encontraron resultados para este viaje.', type: 'error' });
+      setTimeout(() => setToast(null), 3000);
       setShownFlights(true);
     } finally {
       setLoadingFlights(false);

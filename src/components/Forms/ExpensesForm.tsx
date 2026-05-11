@@ -682,7 +682,7 @@ export default function ExpensesForm({
             title={mode === "edit" ? "Editar Comprobante" : "Subir Comprobante"}
             message="¿Estas seguro de que deseas realizar esta acción?"
             modal_type="confirm"
-            color="success"
+            color="secondary"
             variant="filled"
             onConfirm={handleSubmit}
             disabled={loading}

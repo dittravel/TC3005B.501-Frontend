@@ -8,9 +8,83 @@ import { useState, useEffect } from "react";
 import Input from "@/components/Utils/Input";
 import Checkbox from "@/components/Utils/Checkbox";
 import Button from "@/components/Buttons/Button";
+import Select from "@/components/Utils/Select";
 import { apiRequest } from "@/utils/apiClient";
 import Toast from "@/components/Utils/Toast";
 import { permissionLabelToKey, permissionsByCategory } from "@/config/permissionCatalog";
+
+const roleTemplates = [
+  {
+    label: "Superadministrador",
+    permissions: [
+      "superadmin:manage_groups",
+      "superadmin:manage_master_admins",
+      "superadmin:view_group_audit_log",
+    ],
+  },
+  {
+    label: "Administrador",
+    permissions: [
+      "users:view",
+      "users:create",
+      "users:edit",
+      "users:delete",
+      "roles:manage",
+      "system:import_data",
+      "system:export_accounting",
+      "system:audit_log",
+      "auth_rules:manage",
+      "refund_policies:manage",
+    ],
+  },
+  {
+    label: "Solicitante",
+    permissions: [
+      "travel:view",
+      "travel:create",
+      "travel:edit",
+      "travel:delete",
+      "receipts:view",
+      "receipts:create",
+      "receipts:edit",
+    ],
+  },
+  {
+    label: "Autorizador",
+    permissions: [
+      "travel:view",
+      "travel:create",
+      "travel:edit",
+      "travel:delete",
+      "travel:approve",
+      "travel:reject",
+      "receipts:view",
+      "receipts:create",
+      "receipts:edit",
+    ],
+  },
+  {
+    label: "Agencia de viajes",
+    permissions: [
+      "travel:view",
+      "travel:edit",
+      "travel:view_flights",
+      "travel:view_hotels",
+    ],
+  },
+  {
+    label: "Cuentas por pagar",
+    permissions: [
+      "travel:view",
+      "receipts:edit",
+      "receipts:def_amount",
+      "receipts:view",
+      "receipts:edit",
+      "receipts:approve",
+      "refunds:create",
+    ],
+  },
+];
 
 interface Props {
   token: string;
@@ -23,6 +97,8 @@ export default function CreateRoleForm({ token, mode, data }: Readonly<Props>) {
   const [selectedPermissions, setSelectedPermissions] = useState<Set<string>>(new Set());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [template, setTemplate] = useState<string>("");
+
   const visiblePermissionsByCategory = permissionsByCategory.map(({ category, permissions }) => ({
     category,
     permissions: permissions.filter((permission) => !permission.key.startsWith('superadmin:') && !permission.key.startsWith('society_groups:')),
@@ -49,6 +125,21 @@ export default function CreateRoleForm({ token, mode, data }: Readonly<Props>) {
       }
     }
   }, [mode, data]);
+
+  // Handle template selection and update permissions accordingly
+  async function handleTemplate(e: React.ChangeEvent<HTMLSelectElement>) {
+    const selectedTemplate = roleTemplates.find(t => t.label === e.target.value);
+    
+    if (selectedTemplate) {
+      // If a template is selected, update permissions to match the template
+      setSelectedPermissions(new Set(selectedTemplate.permissions));
+      setTemplate(e.target.value);
+    } else {
+      // If no template is selected, clear permissions
+      setSelectedPermissions(new Set());
+      setTemplate("");
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -134,6 +225,18 @@ export default function CreateRoleForm({ token, mode, data }: Readonly<Props>) {
             Selecciona los permisos a los que tendrá acceso este rol
           </h2>
         </div>
+        {/* Template selector */}
+        <Select
+          label="Plantilla"
+          name="template"
+          value={template}
+          onChange={handleTemplate}
+        >
+          <option value="">Selecciona una plantilla</option>
+          {roleTemplates.map((t) => (
+            <option key={t.label} value={t.label}>{t.label}</option>
+          ))}
+        </Select>
         <div className="space-y-6 mt-4">
           {visiblePermissionsByCategory.map(({ category, permissions }) => (
             <div key={category} className="card-secondary p-4 rounded-lg">
