@@ -48,6 +48,43 @@ Por esta razón, **todas las mediciones se realizaron en modo `dev`**. Esto sign
 
 ## 3. Verificación de MR-1 y MR-2
 
+Estas dos mejoras son verificables directamente mediante el output de `npm run build`, sin necesidad de métricas de Lighthouse.
+
+### 3.1 MR-1: Eliminación del import no utilizado
+
+Antes de la optimización, el build emitía el siguiente warning:
+
+```
+[WARN] [vite] "Check" is imported from external module "@mui/icons-material"
+but never used in "src/components/Cards/TravelSearchCard.tsx"
+```
+
+Después de eliminar el import, el warning desapareció completamente del output del build. Esto confirma que MR-1 fue exitosa.
+
+### 3.2 MR-2: Prerender de páginas de autenticación
+
+Antes de la optimización, el output del build mostraba:
+
+```
+prerendering static routes
+✓ Completed in 25ms.
+```
+
+Sin ninguna página listada, lo que indicaba que no había rutas estáticas pregeneradas. Después de la optimización, el output del build en `luis-frontend-perf-optimization` muestra:
+
+```
+prerendering static routes
+▶ src/pages/forgot-password.astro
+   └─ /forgot-password/index.html
+▶ src/pages/login.astro
+   └─ /login/index.html
+▶ src/pages/reset-password.astro
+   └─ /reset-password/index.html
+✓ Completed in 20ms.
+```
+
+Las tres páginas de autenticación ahora se generan como archivos HTML estáticos en tiempo de compilación. Esto confirma que MR-2 fue exitosa. Estas páginas se entregan directamente como archivos sin procesamiento del servidor en cada visita.
+
 ## 4. Resultados de "Lighthouse"
 
 ## 5. Resultados de "Network"
