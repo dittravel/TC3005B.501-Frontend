@@ -7,7 +7,44 @@
 
 ## 1. Contexto
 
+Este documento registra las pruebas de rendimiento realizadas después de implementar las mejoras descritas en `load-optimization.md`. El objetivo es verificar que las optimizaciones tuvieron el efecto esperado y ver su impacto en la medida de lo posible.
+
+Las ramas comparadas son:
+
+| Rama | Descripción |
+|---|---|
+| `luis-frontend-perf-analysis` | Frontend antes de las optimizaciones |
+| `luis-frontend-perf-optimization` | Frontend después de aplicar MR-1, MR-2 y MR-4 |
+
+Las páginas seleccionadas para las pruebas fueron:
+
+| Página | Razón |
+|---|---|
+| `/login` | Afectada por MR-2 (prerender) |
+| `/forgot-password` | Afectada por MR-2 (prerender) |
+| `/solicitudes` | Afectada por MR-4 (client:load) |
+
+
 ## 2. Metodología
+
+### 2.1 Herramientas utilizadas
+
+- **Lighthouse** (Chrome DevTools) — para métricas de rendimiento percibido: FCP, LCP, TBT, CLS y Speed Index.
+- **Chrome DevTools (Tab de Network)** — para métricas de transferencia: número de requests, MB transferidos y tiempos de carga.
+
+### 2.2 Condiciones de prueba
+
+- **Todas las mediciones se realizaron en la misma computadora, una MacBook Air 16GB, procesador M4.**
+- Todas las mediciones se realizaron en la misma red Wi-Fi.
+- Se utilizó `npm run dev` como entorno de ejecución para todas las mediciones.
+- En las pruebas de la Tab de Network se activó **Disable cache**.
+- Cada página se midió con Lighthouse en modo **Desktop**.
+
+### 2.3 Limitaciones del entorno
+
+El proyecto usa `@astrojs/node` en modo `middleware`. Se intentó usar `server.mjs`, pero las páginas prerenderizadas (MR-2) generan un redirect que el servidor local no interpreta correctamente.
+
+Por esta razón, **todas las mediciones se realizaron en modo `dev`**. Esto significa que `npm run dev` no aplica las mismas optimizaciones que el build de producción, por lo que el impacto de MR-2 (prerender) no es directamente medible con Lighthouse en este entorno. El impacto de MR-2 se verifica a través del output del compilador (la Sección 3).
 
 ## 3. Verificación de MR-1 y MR-2
 
