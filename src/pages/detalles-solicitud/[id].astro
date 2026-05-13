@@ -24,11 +24,15 @@ let request = null;
 try {
   request = await apiRequest(`/user/get-travel-request/${id}`, { cookies: Astro.cookies });
 } catch (error) {
-  request = null;
-  throw new Error(`No request found with ID ${id}`);
+  return Astro.redirect("/404");
 }
 ---
 
 <MainLayout title={`Solicitud #${request.request_id}`} data={{userName, buttonLabel, role}} >
-  <RequestDetail request={request} title={`Solicitud #${request.request_id}`} subtitle="Detalles de solicitud de viaje" />
+  <RequestDetail
+    request={request}
+    title={`Solicitud #${request.request_id}`}
+    subtitle="Detalles de solicitud de viaje"
+    showStepper={true}
+  />
 </MainLayout>

@@ -24,8 +24,7 @@ let request = null;
 try {
   request = await apiRequest(`/user/get-travel-request/${id}`, { cookies: Astro.cookies });
 } catch (error) {
-  request = null;
-  throw new Error(`No request found with ID ${id}`);
+  return Astro.redirect('/404');
 }
 
 ---
@@ -35,6 +34,7 @@ try {
     request={request}
     title={`Solicitud #${request.request_id}`}
     subtitle="Detalles de la solicitud a atender"
+    backHref="/atenciones"
   />
   <div class="flex justify-end gap-4 mt-8">
     <AproveRequestModal
@@ -46,7 +46,7 @@ try {
       modal_type="success"
       color="success"
       variant="filled"
-      label="Aprobar"
+      label="Aprobar y Finalizar"
       token={getCookie("token", Astro.cookies) || ""}
     />
   </div>

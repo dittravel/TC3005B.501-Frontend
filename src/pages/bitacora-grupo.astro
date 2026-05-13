@@ -16,6 +16,7 @@ const role: UserRole = getCookie('role', Astro.cookies) as UserRole;
 const buttonLabel = roleLabels[role];
 const userName = getCookie('username', Astro.cookies) || '';
 const societyGroupId = getCookie('society_group_id', Astro.cookies) || '';
+const token = getCookie('token', Astro.cookies) || '';
 const initialSocietyGroupId = role === 'Superadministrador' ? '' : societyGroupId;
 
 let societyGroups: any[] = [];
@@ -57,6 +58,7 @@ try {
       role={role}
       initialSocietyGroupId={initialSocietyGroupId}
       societyGroups={societyGroups}
+      token={token}
     />
   </main>
 </MainLayout>

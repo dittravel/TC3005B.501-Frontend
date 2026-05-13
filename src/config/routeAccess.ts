@@ -32,7 +32,6 @@ export const roleRoutes: Record<UserRole, string[]> = {
   'Cuentas por pagar': [
     '/dashboard',
     '/perfil-usuario',
-    '/reembolsos',
     '/cotizaciones',
     '/comprobaciones',
     '/cotizar-solicitud/*',
@@ -108,10 +107,12 @@ export const permissionRouteRules: PermissionRouteRule[] = [
   { pattern: '/administradores-maestros', permissions: ['superadmin:manage_master_admins'] },
   { pattern: '/bitacora-grupo', permissions: ['superadmin:view_group_audit_log'] },
   { pattern: '/exportar-datos-contables', permissions: ['system:export_accounting'] },
-  { pattern: '/cotizaciones', permissions: ['travel:view_flights', 'travel:view_hotels', 'receipts:view'], mode: 'any' },
-  { pattern: '/cotizar-solicitud/*', permissions: ['travel:view_flights', 'travel:view_hotels', 'receipts:view'], mode: 'any' },
-  { pattern: '/comprobaciones', permissions: ['receipts:approve'] },
-  { pattern: '/comprobar-gastos/*', permissions: ['receipts:create'] },
+  { pattern: '/cotizaciones', permissions: ['receipts:approve'], mode: 'any' },
+  { pattern: '/cotizar-solicitud/*', permissions: ['receipts:approve'], mode: 'any' },
+  { pattern: '/comprobaciones', permissions: ['receipts:approve'] }, // Accounts Payable
+  { pattern: '/comprobar-gastos/*', permissions: ['receipts:approve'] }, // Accounts Payable
+  { pattern: '/comprobar-gastos', permissions: ['receipts:create'], mode: 'any' }, // Aplicant
+  { pattern: '/comprobar-solicitud/*', permissions: ['receipts:create'], mode: 'any' }, // Aplicant
   { pattern: '/autorizaciones', permissions: ['travel:approve', 'travel:reject'], mode: 'any' },
   { pattern: '/autorizar-solicitud/*', permissions: ['travel:approve', 'travel:reject'], mode: 'any' },
   { pattern: '/atenciones', permissions: ['travel:view_flights', 'travel:view_hotels'], mode: 'any' },
@@ -122,8 +123,6 @@ export const permissionRouteRules: PermissionRouteRule[] = [
   { pattern: '/solicitudes', permissions: ['travel:view', 'travel:approve', 'travel:reject'], mode: 'any' },
   { pattern: '/editar-solicitud/*', permissions: ['travel:edit'] },
   { pattern: '/detalles-solicitud/*', permissions: ['travel:view'] },
-  { pattern: '/comprobar-solicitud/*', permissions: ['travel:view'] },
-  { pattern: '/comprobar-gastos', permissions: ['receipts:create', 'receipts:edit', 'receipts:view'], mode: 'any' },
   { pattern: '/subir-comprobante/*', permissions: ['receipts:create'] },
   { pattern: '/resubir-comprobante/*', permissions: ['receipts:edit'] },
   { pattern: '/editar-comprobante/*', permissions: ['receipts:edit'] },

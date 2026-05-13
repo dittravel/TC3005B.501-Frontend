@@ -17,6 +17,7 @@ interface Props {
   modal_type: "success" | "warning";
   color?: "success" | "warning" | "primary" | "secondary";
   variant?: "filled" | "border" | "empty";
+  size?: "small" | "medium" | "big";
   label?: string;
   token: string;
   method?: "PUT" | "DELETE";
@@ -41,6 +42,7 @@ export default function UltimateWrapper({
   modal_type = "warning",
   color = "warning",
   variant = "filled",
+  size = "medium",
   label = "Confirmar",
   method = "PUT",
   successMessage = "Operación realizada exitosamente.",
@@ -80,6 +82,7 @@ export default function UltimateWrapper({
         color={color}
         modal_type={modal_type}
         variant={variant}
+        size={size}
         onConfirm={handleConfirm}
         disabled={loading}
         className={className}

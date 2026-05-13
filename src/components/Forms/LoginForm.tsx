@@ -9,7 +9,7 @@ import React, { useState, useEffect } from "react";
 import Button from "@/components/Buttons/Button";
 import { apiRequest } from "@utils/apiClient";
 import ThemeButton from "@/components/Buttons/ThemeButton";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import Icon from "@/components/Utils/Icon";
 import { useTheme } from "@hooks/useTheme";
 import Input from "@/components/Utils/Input";
 import Reminder from "@/components/Utils/Reminder";
@@ -157,7 +157,7 @@ export default function LoginForm() {
                 alt="Logo Dittravel"
               />
             )}
-            {/* Theme Toggle Button */}
+            {/* Theme Toggle */}
             <ThemeButton />
           </div>
           {/* Main Form */}
@@ -205,12 +205,14 @@ export default function LoginForm() {
                 placeholder="*****"
               />
               {showPassword ? (
-                <Visibility
+                <Icon
+                  name="visibility"
                   className={visibleIconStyle}
                   onClick={() => setShowPassword(false)}
                 />
               ) : (
-                <VisibilityOff
+                <Icon
+                  name="visibility_off"
                   className={visibleIconStyle}
                   onClick={() => setShowPassword(true)}
                 />
@@ -228,7 +230,7 @@ export default function LoginForm() {
             </Button>
             {/* Error Message */}
             {errorMessage && (
-              <p className="text-center text-sm text-warning-500">
+              <p className="text-center text-sm text-warning-400">
                 {errorMessage}
               </p>
             )}

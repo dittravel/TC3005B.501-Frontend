@@ -18,6 +18,7 @@ import UserMenu from "@/components/Buttons/UserMenu";
 import ThemeButton from "@components/Buttons/ThemeButton.astro";
 import MenuButton from "@components/Buttons/MenuButton.astro";
 import NotificationsButton from "@components/Buttons/NotificationsButton.astro";
+import AccessibilityButton from "@/components/Buttons/AccessibilityButton";
 ---
 
 <header class="h-15 flex justify-between items-center bg-header-bg px-4 py-3 border-b border-border">
@@ -39,11 +40,16 @@ import NotificationsButton from "@components/Buttons/NotificationsButton.astro";
     <!-- Theme Toggle Button -->
     <ThemeButton />
 
+    <!-- Accessibility Button -->
+    <AccessibilityButton client:load />
+
     <!-- User Role -->
-    <span class="text-brand-200 font-bold text-sm">
+    <span
+      class="text-brand-200 font-bold text-sm max-w-[80px] truncate sm:max-w-none sm:overflow-visible sm:whitespace-normal"
+      title={buttonLabel}
+    >
       {buttonLabel}
     </span>
-
     <!-- User Info -->
     <UserMenu client:load>
       <span class="text-black">{userName}</span>

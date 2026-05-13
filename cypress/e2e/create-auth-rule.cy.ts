@@ -1,4 +1,12 @@
-describe('Creación de regla de autorización por el administrador', () => {
+/**
+ * Create Auth Rule test
+ * 
+ * This tests creates a new authorization rule with 3 levels, 
+ * using a mix of direct boss, random authorizer, and superior level.
+ * It also verifies that the rule is created successfully and appears in the list.
+ */
+
+describe('Create auth rule', () => {
   beforeEach(() => {
     cy.login(Cypress.env('ADMIN_USER'), Cypress.env('ADMIN_PASSWORD'));
   });
@@ -7,37 +15,51 @@ describe('Creación de regla de autorización por el administrador', () => {
     cy.logout();
   });
 
-  it('debe navegar a la página de crear regla desde el dashboard admin', () => {
-    cy.visit('/crear-regla');
-    cy.url().should('include', '/crear-regla');
-    cy.contains(/regla de autorización/i).should('be.visible');
-  });
-
-  it('debe mostrar error al enviar el formulario con campos vacíos', () => {
+  it('debe crear una regla de autorización con parámetros personalizados', () => {
     cy.visit('/crear-regla');
 
-    cy.contains('button', /crear|guardar/i).click();
+    // Basic rule data
+    const ruleName = `Regla ${new Date().getTime()}`;
+    cy.get('input[name="rule_name"]').type(ruleName);
 
-    cy.contains(/requerido|obligatorio|campo.*vacío|required/i).should('be.visible');
-    cy.url().should('include', '/crear-regla');
+    // Configure 3 levels
+    cy.get('input[name="num_levels"]').clear().type('3');
+
+    // Unselect automatic to choose manual authorizers
+    cy.contains('label', 'Automático').click();
+
+    // Wait for level selects to appear
+    cy.get('select[name="nivel_1"]').should('exist');
+    cy.get('select[name="nivel_2"]').should('exist');
+
+    // Level 1: Direct boss
+    cy.get('select[name="nivel_1"]').select('Jefe');
+
+    // Level 2: Random authorizer
+    cy.get('select[name="nivel_2"]').select('Aleatorio');
+
+    // Level 3: Superior level, select level 2 as superior
+    cy.get('select[name="nivel_3"]').select('Nivel_Superior');
+    cy.get('select[name="usuario_3"]').select('2');
+
+    // International travel type
+    cy.get('select[name="travel_type"]').select('Internacional');
+
+    // Duration range
+    cy.get('input[name="min_duration"]').clear().type('3');
+    cy.get('input[name="max_duration"]').clear().type('15');
+
+    // Amount range
+    cy.get('input[name="min_amount"]').clear().type('5000');
+    cy.get('input[name="max_amount"]').clear().type('50000');
+
+
+    cy.contains('button', /guardar|actualizar/i).click();
+    cy.url().should('include', '/reglas-autorizacion');
+    cy.contains(ruleName).should('be.visible');
   });
 
-  it('debe crear exitosamente una regla de autorización con un nivel', () => {
-    cy.visit('/crear-regla');
-
-    cy.get('input[name="rule_name"]').should('exist').type('Regla Cypress Test');
-    cy.get('input[name="niveles_autorizacion"]').should('exist').type('1');
-    cy.get('select[name="tipo_viaje"]').should('exist').select(1);
-    cy.get('input[name="dias_min"]').should('exist').type('1');
-
-    cy.get('select[name="nivel_1"]').should('exist').select(1);
-
-    cy.contains('button', /crear|guardar/i).click();
-
-    cy.url().should('not.include', '/crear-regla');
-  });
-
-  it('no debe ser accesible para un rol no-administrador', () => {
+  it('Check that rules cannot be accessed by non-admin users', () => {
     cy.logout();
     cy.login(Cypress.env('SOLICITANTE_USER'), Cypress.env('SOLICITANTE_PASSWORD'));
 

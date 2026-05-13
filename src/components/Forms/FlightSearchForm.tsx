@@ -10,6 +10,7 @@ import type { TravelRoute } from '@/types/TravelRoute';
 import Button from '../Buttons/Button';
 import Card from '../Utils/Card';
 import Toast from '@/components/Utils/Toast';
+import Select from '@/components/Utils/Select';
 import { apiRequest } from '@/utils/apiClient';
 
 // Define the props for the FlightSearchForm component
@@ -78,16 +79,18 @@ const FlightSearchForm = ({ token, route, routeIndex, tripType, ticketType }: Fl
   const handleSearch = async () => {
     if (!selectedTripType || !selectedTicketType || !selectedDepartureAirport || !selectedArrivalAirport) {
       setToast({ message: 'Por favor selecciona todos los campos antes de buscar.', type: 'warning' });
+      setTimeout(() => setToast(null), 3000);
       return;
     }
 
     setLoadingFlights(true);
     setShownFlights(false);
+    setToast(null);
 
     const payload = {
       origin: selectedDepartureAirport,
       destination: selectedArrivalAirport,
-      departureDate: route.beginning_date, 
+      departureDate: route.beginning_date,
       ...(selectedTripType === 'round' && { returnDate: route.ending_date }),
       tripType: selectedTripType,
       cabinClass: selectedTicketType,
@@ -104,9 +107,15 @@ const FlightSearchForm = ({ token, route, routeIndex, tripType, ticketType }: Fl
       const offers = Array.isArray(response?.offers) ? response.offers : [];
       setFlights(offers);
       setShownFlights(true);
+
+      if (offers.length === 0) {
+        setToast({ message: 'No se encontraron vuelos con los criterios seleccionados.', type: 'warning' });
+        setTimeout(() => setToast(null), 3000);
+      }
     } catch (error) {
       console.error('Error buscando vuelos:', error);
-      setToast({ message: 'Ocurrió un error al buscar vuelos. Por favor intenta de nuevo.', type: 'error' });
+      setToast({ message: 'No se encontraron resultados para este viaje.', type: 'error' });
+      setTimeout(() => setToast(null), 3000);
       setShownFlights(true);
     } finally {
       setLoadingFlights(false);
@@ -151,72 +160,34 @@ const FlightSearchForm = ({ token, route, routeIndex, tripType, ticketType }: Fl
   }
 
   return (
-      <>
-        <Card className="mt-4 p-6 bg-gray-50 rounded-lg border space-y-6 bg-primary/5">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <label
-            htmlFor={`trip-type-${routeIndex}`}
-            className="block text-sm font-medium text-tertiary"
-          >
-            Tipo de viaje <span className="text-red-500">*</span>
-          </label>
-
-          <div className="relative">
-            <select
-              id={`trip-type-${routeIndex}`}
+      <div>
+        <div className="card">
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+            <Select
+              name={`trip-type-${routeIndex}`}
+              label="Tipo de viaje"
               value={selectedTripType}
               onChange={handleTripTypeChange}
-              className="w-full appearance-none rounded-md border border-gray-300 bg-white px-4 py-2.5 pr-10 text-sm text-tertiary shadow-sm transition focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
             >
               <option value="one_way">Directo</option>
               <option value="round">Redondo</option>
-            </select>
-
-            <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
-              ▼
-            </span>
-          </div>
-        </div>
-        <div className="space-y-2">
-          <label
-            htmlFor={`trip-type-${routeIndex}`}
-            className="block text-sm font-medium"
-          >
-            Tipo de boleto <span className="text-red-500">*</span>
-          </label>
-
-          <div className="relative">
-            <select
-              id={`ticket-type-${routeIndex}`}
+            </Select>
+            <Select
+              name={`ticket-type-${routeIndex}`}
+              label="Tipo de boleto"
               value={selectedTicketType}
               onChange={handleTicketTypeChange}
-              className="w-full appearance-none rounded-md border border-gray-300 bg-white px-4 py-2.5 pr-10 text-sm text-tertiary shadow-sm transition focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
             >
               <option value="economy">Economy</option>
               <option value="premium_economy">Premium Economy</option>
               <option value="business">Business</option>
               <option value="first">First Class</option>
-            </select>
-            <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
-              ▼
-            </span>
-          </div>
-        </div>
-        <div className="space-y-2">
-          <label
-            htmlFor={`departure-airport-${routeIndex}`}
-            className="block text-sm font-medium text-tertiary"
-          >
-            Aeropuerto de Salida <span className="text-red-500">*</span>
-          </label>
-
-          <div className="relative">
-            <select
-              id={`departure-airport-${routeIndex}`}
+            </Select>
+            <Select
+              name={`departure-airport-${routeIndex}`}
+              label="Aeropuerto de Salida"
               value={selectedDepartureAirport}
               onChange={handleDepartureAirportChange}
-              className="w-full appearance-none rounded-md border border-gray-300 bg-white px-4 py-2.5 pr-10 text-sm text-tertiary shadow-sm transition focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
             >
               <option value="">Selecciona un aeropuerto</option>
               {airports.map((airport) => (
@@ -224,28 +195,12 @@ const FlightSearchForm = ({ token, route, routeIndex, tripType, ticketType }: Fl
                   {airport.iata_code} - {airport.city_name}
                 </option>
               ))}
-            </select>
-
-            <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
-              ▼
-            </span>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <label
-            htmlFor={`arrival-airport-${routeIndex}`}
-            className="block text-sm font-medium"
-          >
-            Aeropuerto de Llegada <span className="text-red-500">*</span>
-          </label>
-
-          <div className="relative">
-            <select
-              id={`arrival-airport-${routeIndex}`}
+            </Select>
+            <Select
+              name={`arrival-airport-${routeIndex}`}
+              label="Aeropuerto de Llegada"
               value={selectedArrivalAirport}
               onChange={handleArrivalAirportChange}
-              className="w-full appearance-none rounded-md border border-gray-300 bg-white px-4 py-2.5 pr-10 text-sm text-tertiary shadow-sm transition focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
             >
               <option disabled value="">Selecciona un aeropuerto</option>
               {airports.map((airport) => (
@@ -253,120 +208,101 @@ const FlightSearchForm = ({ token, route, routeIndex, tripType, ticketType }: Fl
                   {airport.iata_code} - {airport.city_name}
                 </option>
               ))}
-            </select>
-
-            <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
-              ▼
-            </span>
-          </div>
-        </div>
-        <div className="space-y-2">
-          <label
-            htmlFor={`arrival-airport-${routeIndex}`}
-            className="block text-sm font-medium"
-          >
-            Número de resultados <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <select
-              id={`results-number-${routeIndex}`}
+            </Select>
+            <Select
+              name={`results-number-${routeIndex}`}
+              label="Número de resultados"
               value={selectedResultsNumber}
               onChange={handleResultsNumberChange}
-              className="w-full appearance-none rounded-md border border-gray-300 bg-white px-4 py-2.5 pr-10 text-sm text-tertiary shadow-sm transition focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
             >
               <option disabled value="">Selecciona un número</option>
               <option value={5}>5</option>
               <option value={10}>10</option>
               <option value={20}>20</option>
-            </select>
-            <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
-              ▼
-            </span>
-          </div>
-        </div>
+            </Select>
 
-        <div className="col-span-full text-sm text-secondary flex justify-end items-center border-t border-gray-200 pt-4">
-          <Button
-            type='button'
-            onClick={handleSearch}
-            color='secondary'
-          >
-            Buscar vuelos
-          </Button>
-        </div>
-      </div>
-      {loadingFlights && <p className="text-sm text-gray-500">Buscando vuelos...</p>}
-      {shownFlights && (
-        <div className="space-y-3">
-          {flights.map((flight) => {
-            const isSelected = selectedFlight?.id === flight.id;
-
-            return (
-              <div
-                key={flight.id}
-                className={`rounded-md border p-4 shadow-sm transition ${isSelected
-                  ? 'border-gray-200 bg-secondary/5 ring-2 ring-secondary/30'
-                  : 'border-gray-200 bg-tertiary hover:border-gray-300 hover:bg-secondary/5'
-                  }`}
-              >
-                <button
-                  type="button"
-                  onClick={() => handleChooseFlight(flight)}
-                  className="w-full text-left"
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-tertiary">{flight.owner}</p>
-                      <p className="text-sm text-gray-500">
-                        {flight.totalDuration}
-                      </p>
-                    </div>
-                    <p className="font-semibold text-tertiary">
-                      {flight.price} {flight.currency}
-                    </p>
-                  </div>
-                </button>
-
-
-                {isSelected && (
-                  <div className="mt-4 border-t border-gray-200 pt-3 space-y-2">
-                    {flight.segments?.map((segment: any, index: number) => (
-                      <div key={`${segment.flightNumber}-${index}`} className="rounded-md bg-primary p-3 border border-gray-100">
-                        <p className="text-sm font-medium text-secondary">
-                          {segment.from} → {segment.to}
-                        </p>
-                        <p className="text-xs text-tertiary">
-                          Salida: {new Date(segment.departure).toLocaleString()}
-                        </p>
-                        <p className="text-xs text-tertiary">
-                          Llegada: {new Date(segment.arrival).toLocaleString()}
-                        </p>
-                        <p className="text-xs text-tertiary">
-                          Vuelo {segment.flightNumber} {segment.aircraft}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-          {flights.length > 0 && (
-            <div className="col-span-full text-sm text-secondary flex justify-end items-center border-t border-gray-200 pt-4">
+            <div className="col-span-full text-sm text-secondary flex justify-end items-center border-t border-border pt-4">
               <Button
                 type='button'
-                onClick={handleSubmitFlight}
+                onClick={handleSearch}
                 color='secondary'
               >
-                Seleccionar vuelo
+                Buscar vuelos
               </Button>
             </div>
+          </div>
+          {loadingFlights && <p className="text-sm text-gray-500">Buscando vuelos...</p>}
+          {shownFlights && (
+            <div className="space-y-3">
+              {flights.map((flight) => {
+                const isSelected = selectedFlight?.id === flight.id;
+
+                return (
+                  <div
+                    key={flight.id}
+                    className={`rounded-md border p-4 shadow-sm transition ${isSelected
+                      ? 'border-secondary bg-secondary/10 ring-2 ring-secondary/30'
+                      : 'border-border bg-tertiary hover:border-secondary hover:bg-secondary/5'
+                      }`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => handleChooseFlight(flight)}
+                      className="w-full text-left hover:cursor-pointer"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-tertiary">{flight.owner}</p>
+                          <p className="text-sm text-gray-500">
+                            {flight.totalDuration}
+                          </p>
+                        </div>
+                        <p className="font-semibold text-tertiary">
+                          {flight.price} {flight.currency}
+                        </p>
+                      </div>
+                    </button>
+
+
+                    {isSelected && (
+                      <div className="mt-4 pt-3 space-y-2">
+                        {flight.segments?.map((segment: any, index: number) => (
+                          <div key={`${segment.flightNumber}-${index}`} className="bg-secondary/10 rounded-l p-3 border border-secondary">
+                            <p className="text-sm font-medium text-secondary">
+                              {segment.from} → {segment.to}
+                            </p>
+                            <p className="text-xs text-tertiary">
+                              Salida: {new Date(segment.departure).toLocaleString()}
+                            </p>
+                            <p className="text-xs text-tertiary">
+                              Llegada: {new Date(segment.arrival).toLocaleString()}
+                            </p>
+                            <p className="text-xs text-tertiary">
+                              Vuelo {segment.flightNumber} {segment.aircraft}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+              {flights.length > 0 && (
+                <div className="col-span-full text-sm text-secondary flex justify-end items-center border-t border-border pt-4">
+                  <Button
+                    type='button'
+                    onClick={handleSubmitFlight}
+                    color='secondary'
+                  >
+                    Seleccionar vuelo
+                  </Button>
+                </div>
+              )}
+            </div>
           )}
-        </div>
-      )}
-      </Card>
+      </div>
       {toast ? <Toast message={toast.message} type={toast.type} /> : null}
-    </>
+    </div>
   );
 };
 

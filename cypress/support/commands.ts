@@ -1,11 +1,18 @@
-// Extensión del namespace de Cypress para declarar el comando personalizado 'login'
+/**
+ * General command definitions for Cypress tests
+ * 
+ * This file contains custom commands that can be reused across multiple test files, 
+ * such as login and logout functions.
+ */
+
+// Cypress namespace extension to declare the custom 'login' command
 declare namespace Cypress {
   interface Chainable {
     login(username: string, password: string): Chainable<void>;
   }
 }
 
-// Extensión del namespace de Cypress para declarar el comando personalizado 'logout'
+// Cypress namespace extension to declare the custom 'logout' command
 declare namespace Cypress {
   interface Chainable {
     logout(): Chainable<void>;
@@ -13,54 +20,49 @@ declare namespace Cypress {
 }
 
 /**
- * Comando personalizado para iniciar sesión en la aplicación.
- * Visita la URL base, limpia cookies y localStorage, completa el formulario
- * de login y verifica que la redirección al dashboard sea exitosa.
- *
- * @param username - Nombre de usuario para autenticarse
- * @param password - Contraseña del usuario
+ * Custom command to perform user login in the application.
+ * It navigates to the main page, fills in the username and password,
+ * @param {string} username - Username of the user to log in
+ * @param {string} password - Password of the user to log in
+ * @returns {void} 
  */
 Cypress.Commands.add('login', (username: string, password: string) => {
-  // Navega a la página principal de la aplicación
-  cy.visit('https://localhost:4321');
+  // Navigate to the login page
+  cy.visit('https://localhost:4321/login');
 
-  // Limpia cookies y almacenamiento local para evitar sesiones residuales
+  // Clear cookies and local storage only on first login
   cy.clearCookies();
   cy.clearLocalStorage();
 
-  // Ingresa el nombre de usuario en el campo correspondiente
-  cy.get('input[placeholder*="Usuario"]').type(username);
+  // Enter the username
+  cy.get('input[name="username"]').type(username);
 
-  // Ingresa la contraseña y envía el formulario con Enter
-  cy.get('input[placeholder*="Contraseña"]').type(password + '{enter}');
+  // Enter the password
+  cy.get('input[name="password"]').type(password);
 
-  // Verifica que la alerta de éxito contenga el mensaje esperado
-  cy.on('window:alert', (text) => {
-    expect(text).to.contains('Inicio de sesión exitoso');
-  });
+  // Submit the form
+  cy.contains('button', 'Ingresar').click();
 
-  // Acepta automáticamente cualquier diálogo de confirmación del navegador
-  cy.on('window:confirm', () => true);
-
-  // Confirma que la URL incluye 'dashboard' tras el login exitoso
-  cy.url().should('include', 'dashboard');
+  // Confirm successful login - wait for dashboard redirect
+  cy.url().should('include', '/dashboard');
 });
 
 /**
- * Comando personalizado para cerrar sesión en la aplicación.
- * Espera un momento, hace clic en el ícono de logout y confirma
- * el cierre de sesión, verificando la redirección a la página de login.
+ * Custom command to perform user logout from the application.
+ * It clicks on the user menu to reveal the logout option, then clicks on 'Cerrar Sesión',
+ * and finally verifies that the URL includes '/login' to confirm successful logout.
+ * @returns {void} 
  */
 Cypress.Commands.add('logout', () => {
-  // Espera 1 segundo para asegurar que la UI esté completamente cargada
-  cy.wait(1000);
+  // Wait briefly to ensure any pending operations are completed
+  cy.wait(500);
 
-  // Hace clic en el ícono de logout del menú
-  cy.get('span.material-symbols-outlined').contains('logout').click();
+  // Click on the user menu button
+  cy.get('button[title="Menú de usuario"]').click({ force: true });
 
-  // Confirma el cierre de sesión en el diálogo de confirmación
-  cy.contains('button', 'Cerrar Sesión').should('be.visible').click();
+  // Click on 'Cerrar Sesión' button in dropdown
+  cy.contains('button', 'Cerrar Sesión').click({ force: true });
 
-  // Verifica que el usuario fue redirigido a la página de login
+  // Confirm successful logout
   cy.url().should('include', '/login');
 });

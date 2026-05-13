@@ -6,23 +6,7 @@
  */
 
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-  NoteAdd,
-  Receipt,
-  CheckCircle,
-  PriceChange,
-  Luggage,
-  CurrencyExchange,
-  ArrowForwardIos,
-  InsertDriveFile,
-  History,
-  Hub,
-  ManageAccounts,
-  Group,
-  AdminPanelSettings,
-  Gavel,
-  ReceiptLong,
-} from '@mui/icons-material';
+import Icon from '@/components/Utils/Icon';
 import type { UserRole } from '@type/roles';
 import {
   getAccessibleDashboardActions,
@@ -32,25 +16,27 @@ import {
 import Button from '@components/Buttons/Button';
 import { readDashboardPreferences } from '@/utils/dashboardPreferences';
 
-const ICON_SIZE = 40;
+const ICON_SIZE = { fontSize: '2rem' };
 
+// Icons match SIDEBAR_CONFIG for consistency
 const ICON_BY_KEY: Record<DashboardActionDefinition['iconKey'], React.ReactNode> = {
-  autorizaciones: <CheckCircle sx={{ fontSize: ICON_SIZE }} />,
-  usuarios: <Group sx={{ fontSize: ICON_SIZE }} />,
-  roles: <AdminPanelSettings sx={{ fontSize: ICON_SIZE }} />,
-  reglas: <Gavel sx={{ fontSize: ICON_SIZE }} />,
-  politicas: <ReceiptLong sx={{ fontSize: ICON_SIZE }} />,
-  exportar: <InsertDriveFile sx={{ fontSize: ICON_SIZE }} />,
-  crear: <NoteAdd sx={{ fontSize: ICON_SIZE }} />,
-  comprobar: <Receipt sx={{ fontSize: ICON_SIZE }} />,
-  reembolsos: <CurrencyExchange sx={{ fontSize: ICON_SIZE }} />,
-  cotizaciones: <PriceChange sx={{ fontSize: ICON_SIZE }} />,
-  comprobantes: <Receipt sx={{ fontSize: ICON_SIZE }} />,
-  atenciones: <Luggage sx={{ fontSize: ICON_SIZE }} />,
-  sociedades: <InsertDriveFile sx={{ fontSize: ICON_SIZE }} />,
-  grupos: <Hub sx={{ fontSize: ICON_SIZE }} />,
-  maestros: <ManageAccounts sx={{ fontSize: ICON_SIZE }} />,
-  bitacora: <History sx={{ fontSize: ICON_SIZE }} />,
+  autorizaciones: <Icon name="check_box" style={ICON_SIZE} />,
+  usuarios: <Icon name="person" style={ICON_SIZE} />,
+  roles: <Icon name="admin_panel_settings" style={ICON_SIZE} />,
+  reglas: <Icon name="gavel" style={ICON_SIZE} />,
+  politicas: <Icon name="receipt_long" style={ICON_SIZE} />,
+  importar: <Icon name="file_upload" style={ICON_SIZE} />,
+  exportar: <Icon name="draft" style={ICON_SIZE} />,
+  crear: <Icon name="note_add" style={ICON_SIZE} />,
+  comprobar: <Icon name="receipt" style={ICON_SIZE} />,
+  reembolsos: <Icon name="currency_exchange" style={ICON_SIZE} />,
+  cotizaciones: <Icon name="price_change" style={ICON_SIZE} />,
+  comprobantes: <Icon name="receipt" style={ICON_SIZE} />,
+  atenciones: <Icon name="luggage" style={ICON_SIZE} />,
+  sociedades: <Icon name="domain" style={ICON_SIZE} />,
+  grupos: <Icon name="hub" style={ICON_SIZE} />,
+  maestros: <Icon name="admin_panel_settings" style={ICON_SIZE} />,
+  bitacora: <Icon name="history" style={ICON_SIZE} />,
 };
 
 interface DashboardProps {
@@ -103,8 +89,7 @@ export default function Dashboard({ userId, role, userName, token = '', permissi
         <h1 className="text-2xl font-bold text-text-primary mb-2">
           Bienvenido(a), {userName}
         </h1>
-
-        <p className="text-lg text-text-secondary">
+        <p className="text-l text-text-secondary">
           ¿Qué deseas hacer hoy?
         </p>
       </div>
@@ -125,7 +110,7 @@ export default function Dashboard({ userId, role, userName, token = '', permissi
       {actions.length === 0 ? (
         <p className="text-text-secondary">Agrega acciones preferidas en tu perfil de usuario</p>
       ) : null}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className={`grid grid-cols-1 gap-6 ${actions.length < 3 ? "lg:grid-cols-2" : "lg:grid-cols-3"}`}>
         {actions.map((action) => (
           <button
             key={action.route}
@@ -146,8 +131,8 @@ export default function Dashboard({ userId, role, userName, token = '', permissi
                   {ICON_BY_KEY[action.iconKey]}
                 </div>
 
-                <div className="text-text-secondary text-2xl transition-transform duration-300 group-hover:translate-x-1 group-hover:scale-110">
-                  <ArrowForwardIos />
+                <div className="text-text-secondary transition-transform duration-300 group-hover:translate-x-1 group-hover:scale-110">
+                  <Icon name="arrow_forward_ios" className="text-2xl" />
                 </div>
               </div>
 

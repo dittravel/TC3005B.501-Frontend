@@ -28,19 +28,20 @@ interface FormData {
 /**
  * Custom hook to manage auth rule form state and logic
  * @param isDefault - Flag to indicate if this is the default rule form
+ * @param isCreateMode - Flag to indicate if form is in create mode (affects initial values)
  * @returns An object containing form data, change handlers, validation function, and initialization function
  */
-export const useAuthRuleForm = (isDefault: boolean = false) => {
+export const useAuthRuleForm = (isDefault: boolean = false, isCreateMode: boolean = true) => {
   const [formData, setFormData] = useState<FormData>({
     rule_name: isDefault ? "Regla por Defecto" : "",
     is_default: isDefault,
     num_levels: 1,
     automatic: true,
     travel_type: "",
-    min_duration: 0,
-    max_duration: 0,
-    min_amount: 0,
-    max_amount: 0,
+    min_duration: isCreateMode ? undefined : 0,
+    max_duration: isCreateMode ? undefined : 0,
+    min_amount: isCreateMode ? undefined : 0,
+    max_amount: isCreateMode ? undefined : 0,
     levels: []
   });
 
@@ -59,7 +60,7 @@ export const useAuthRuleForm = (isDefault: boolean = false) => {
     if (type === "checkbox") {
       inputValue = checked;
     } else if (type === "number") {
-      inputValue = parseInt(value) || 0;
+      inputValue = parseInt(value);
     }
 
     // Update formData state with the new value

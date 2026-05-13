@@ -60,7 +60,7 @@ export default function AttendRequest({ request_id, token }: Props) {
   return (
     <div className="card">
       <div className="card-title">
-        <h2 className="text-lg font-semibold text-text-primary">Atender Solicitud</h2>
+        <h2 className="text-lg font-semibold text-text-primary">Cotizar Solicitud</h2>
         <p className="text-sm text-text-secondary">Asigna un presupuesto a esta solicitud de viaje.</p>
       </div>
 

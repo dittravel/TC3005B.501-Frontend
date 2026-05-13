@@ -126,8 +126,11 @@ export default function SocietyGroupForm({
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div className="card">
+        <div className="card-title">
+          <h2>Información del grupo de sociedad</h2>
+        </div>
         <Input
           label="Descripción"
           name="description"
@@ -136,86 +139,91 @@ export default function SocietyGroupForm({
           onChange={handleChange}
           required
         />
-
-        {isCreateMode ? (
-          <>
-            <div className="mt-8 border-t border-border pt-6">
-              <h2 className="text-lg font-semibold text-text-primary">Sociedad inicial</h2>
-              <p className="mb-4 text-sm text-text-secondary">Crea la primera sociedad del grupo para evitar que el grupo quede vacío.</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input
-                  label="Descripción de la sociedad"
-                  name="society.description"
-                  placeholder="Nombre de la sociedad"
-                  value={formData.society.description}
-                  onChange={handleChange}
-                  required
-                />
-                <Select
-                  label="Moneda local"
-                  name="society.local_currency"
-                  value={formData.society.local_currency}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Selecciona una moneda</option>
-                  {availableCurrencies.map((currency) => (
-                    <option key={currency.currency} value={currency.currency}>
-                      {currency.currency} - {currency.name}
-                    </option>
-                  ))}
-                </Select>
-              </div>
-            </div>
-
-            <div className="mt-8 border-t border-border pt-6">
-              <h2 className="text-lg font-semibold text-text-primary">Administrador inicial</h2>
-              <p className="mb-4 text-sm text-text-secondary">Este usuario se creará como administrador de la sociedad nueva dentro del mismo flujo.</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input
-                  label="Usuario"
-                  name="regular_admin.user_name"
-                  value={formData.regular_admin.user_name}
-                  onChange={handleChange}
-                  required
-                />
-                <Input
-                  label="Contraseña"
-                  name="regular_admin.password"
-                  type="password"
-                  value={formData.regular_admin.password}
-                  onChange={handleChange}
-                  required
-                />
-                <Input
-                  label="Correo"
-                  name="regular_admin.email"
-                  type="email"
-                  value={formData.regular_admin.email}
-                  onChange={handleChange}
-                  required
-                />
-                <Input
-                  label="Estación"
-                  name="regular_admin.workstation"
-                  value={formData.regular_admin.workstation}
-                  onChange={handleChange}
-                />
-                <Input
-                  label="Teléfono"
-                  name="regular_admin.phone_number"
-                  value={formData.regular_admin.phone_number}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-          </>
-        ) : null}
       </div>
+
+      {isCreateMode ? (
+        <div className="space-y-6">
+          <div className="card">
+            <div className="card-title">
+              <h2>Sociedad inicial</h2>
+              <p>Crea la primera sociedad del grupo para evitar que el grupo quede vacío.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="Descripción de la sociedad"
+                name="society.description"
+                placeholder="Nombre de la sociedad"
+                value={formData.society.description}
+                onChange={handleChange}
+                required
+              />
+              <Select
+                label="Moneda local"
+                name="society.local_currency"
+                value={formData.society.local_currency}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Selecciona una moneda</option>
+                {availableCurrencies.map((currency) => (
+                  <option key={currency.currency} value={currency.currency}>
+                    {currency.currency} - {currency.name}
+                  </option>
+                ))}
+              </Select>
+            </div>
+          </div>
+
+          <div className="card">
+            <div className="card-title">
+              <h2>Administrador inicial</h2>
+              <p>Este usuario se creará como administrador de la sociedad nueva dentro del mismo flujo.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="Usuario"
+                name="regular_admin.user_name"
+                value={formData.regular_admin.user_name}
+                onChange={handleChange}
+                required
+              />
+              <Input
+                label="Contraseña"
+                name="regular_admin.password"
+                type="password"
+                value={formData.regular_admin.password}
+                onChange={handleChange}
+                required
+              />
+              <Input
+                label="Correo"
+                name="regular_admin.email"
+                type="email"
+                value={formData.regular_admin.email}
+                onChange={handleChange}
+                required
+              />
+              <Input
+                label="Estación"
+                name="regular_admin.workstation"
+                value={formData.regular_admin.workstation}
+                onChange={handleChange}
+              />
+              <Input
+                label="Teléfono"
+                name="regular_admin.phone_number"
+                value={formData.regular_admin.phone_number}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <div className="flex justify-end gap-2 mt-4">
         <Button
           name="Cancelar"
-          color="secondary"
+          color="primary"
           href={redirectTo}
           disabled={loading}
         >
@@ -223,7 +231,7 @@ export default function SocietyGroupForm({
         </Button>
         <Button
           name={mode === "create" ? "Crear Grupo" : "Guardar Cambios"}
-          color="primary"
+          color="secondary"
           type="submit"
           disabled={loading}
         >
