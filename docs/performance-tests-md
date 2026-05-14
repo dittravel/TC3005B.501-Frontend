@@ -42,7 +42,7 @@ Las páginas seleccionadas para las pruebas fueron:
 
 ### 2.3 Limitaciones del entorno
 
-El proyecto usa `@astrojs/node` en modo `middleware`. Se intentó usar `server.mjs`, pero las páginas prerenderizadas (MR-2) generan un redirect que el servidor local no interpreta correctamente.
+El proyecto usa `@astrojs/node` en modo `middleware`. Se intentó usar `server.mjs`, pero, las páginas prerenderizadas (de la MR-2) generaban un redirect de `/login` a `http://` en lugar de `https://`, que el servidor local no interpretaba correctamente.
 
 Por esta razón, **todas las mediciones se realizaron en modo `dev`**. Esto significa que `npm run dev` no aplica las mismas optimizaciones que el build de producción, por lo que el impacto de MR-2 (prerender) no es directamente medible con Lighthouse en este entorno. El impacto de MR-2 se verifica a través del output del compilador (la Sección 3).
 
@@ -171,6 +171,31 @@ Al igual que con Lighthouse, los resultados del Network tab en `dev` son idénti
 
 ## 6. Impacto esperado
 
+Dado que las limitaciones del entorno me impidieron medir el impacto completo y real de las optimizaciones, a continuación describo el impacto esperado:
+
+| Optimización | Impacto esperado en producción |
+|---|---|
+| MR-1: Eliminar import Check | El warning de compilación desaparece. |
+| MR-2: Prerender de auth pages | `/login`, `/forgot-password` y `/reset-password` son HTMLs estáticos. El servidor no las procesa en cada visita, reduciendo el tiempo de respuesta inicial y el TBT. |
+| MR-4: client:load en solicitudes | Las 6 páginas afectadas envían HTML con contenido visible desde el servidor en lugar de una página en blanco. El FCP y LCP deberían reducirse porque el usuario ve contenido antes de que React termine de inicializarse. |
+
 ## 7. Conclusión
 
+Las tres optimizaciones implementadas fueron verificadas en la medida de lo posible:
+
+- **MR-1** se confirma por la desaparición del warning en el build.
+- **MR-2** se confirma por la aparición de las tres rutas estáticas en el output del build.
+- **MR-4** se confirma a nivel de código: el cambio de `client:only` a `client:load` es correcto y su impacto es medible.
+
+Las métricas de Lighthouse y Network tab en modo `dev` no reflejan el impacto real de las optimizaciones porque `npm run dev` no aplica las mismas optimizaciones que `npm run build`.
+
+Se intentó medir en build de producción usando `server.mjs`. El servidor levantó correctamente, pero las páginas prerenderizadas generaban un redirect de `/login` a `http://` en lugar de `https://` que el servidor local no interpretaba bien. Resolver esto requeriría ajustar la configuración de protocolo del servidor local, lo cual está fuera del alcance de esta task.
+
 ## Referencias
+
+- First Contentful paint (FCP). (2023, 6 diciembre). web.dev. https://web.dev/articles/fcp?hl=es-419
+- Largest Contentful Paint (LCP). (2025, 20 marzo). web.dev. https://web.dev/articles/lcp?hl=es-419
+- On-demand rendering. (s. f.). Docs. https://docs.astro.build/en/guides/on-demand-rendering/
+- Puntuación de rendimiento de Lighthouse. (2019, 19 septiembre). Chrome For Developers. https://developer.chrome.com/docs/lighthouse/performance/performance-scoring?hl=es-419
+- Template directives reference. (s. f.). Docs. https://docs.astro.build/en/reference/directives-reference/#client-directives
+- Tiempo de bloqueo total (TBT). (2024, 4 noviembre). web.dev. https://web.dev/articles/tbt?hl=es-419
