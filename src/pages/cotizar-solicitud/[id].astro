@@ -40,6 +40,7 @@ try {
     <AttendRequest
       client:only="react"
       request_id = {request.request_id}
+      currency = {request.society_currency || 'MXN'}
       token={getCookie("token", Astro.cookies) || ""}
     />
   </div>

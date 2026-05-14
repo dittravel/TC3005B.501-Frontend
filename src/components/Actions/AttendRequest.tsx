@@ -15,9 +15,10 @@ import Input from "@/components/Utils/Input";
 interface Props {
   request_id: string;
   token: string;
+  currency?: string;
 }
 
-export default function AttendRequest({ request_id, token }: Props) {
+export default function AttendRequest({ request_id, token, currency = 'MXN' }: Props) {
   const [imposedFee, setImposedFee] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -68,7 +69,7 @@ export default function AttendRequest({ request_id, token }: Props) {
         type="number"
         name="imposedFee"
         label="Presupuesto impuesto"
-        placeholder="0.00 MXN"
+        placeholder={`0.00 ${currency}`}
         value={imposedFee}
         onChange={(e) => setImposedFee(e.target.value)}
         error={errorMessage}

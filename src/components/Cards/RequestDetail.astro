@@ -97,12 +97,12 @@ const requiresAgency = request.routes?.some(
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <LabeledValue
                 label="Cuota Solicitada"
-                value={`$${request.requested_fee.toFixed(2)}`}
+                value={`$${request.requested_fee.toFixed(2)} ${request.currency || 'MXN'}`}
               />
               <LabeledValue
                 label="Cuota Impuesta"
                 value={typeof request.imposed_fee === 'number' && request.imposed_fee > 0
-                  ? `$${request.imposed_fee.toFixed(2)}`
+                  ? `$${request.imposed_fee.toFixed(2)} ${request.currency || 'MXN'}`
                   : 'Sin asignar'}
               />
             </div>
