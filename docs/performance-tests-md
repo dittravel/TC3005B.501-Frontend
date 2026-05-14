@@ -1,0 +1,201 @@
+# Pruebas de Rendimiento Después de las Optimizaciones
+**Task:** Pruebas de rendimiento después de las optimizaciones
+**Autores:** Luis Emilio Veledíaz Flores - A01029829
+**Fecha:** 07/05/2026
+
+---
+
+## 1. Contexto
+
+Este documento registra las pruebas de rendimiento realizadas después de implementar las mejoras descritas en `load-optimization.md`. El objetivo es verificar que las optimizaciones tuvieron el efecto esperado y ver su impacto en la medida de lo posible.
+
+Las ramas comparadas son:
+
+| Rama | Descripción |
+|---|---|
+| `luis-frontend-perf-analysis` | Frontend antes de las optimizaciones |
+| `luis-frontend-perf-optimization` | Frontend después de aplicar MR-1, MR-2 y MR-4 |
+
+Las páginas seleccionadas para las pruebas fueron:
+
+| Página | Razón |
+|---|---|
+| `/login` | Afectada por MR-2 (prerender) |
+| `/forgot-password` | Afectada por MR-2 (prerender) |
+| `/solicitudes` | Afectada por MR-4 (client:load) |
+
+
+## 2. Metodología
+
+### 2.1 Herramientas utilizadas
+
+- **Lighthouse** (Chrome DevTools) — para métricas de rendimiento percibido: FCP, LCP, TBT, CLS y Speed Index.
+- **Chrome DevTools (Tab de Network)** — para métricas de transferencia: número de requests, MB transferidos y tiempos de carga.
+
+### 2.2 Condiciones de prueba
+
+- **Todas las mediciones se realizaron en la misma computadora, una MacBook Air 16GB, procesador M4.**
+- Todas las mediciones se realizaron en la misma red Wi-Fi.
+- Se utilizó `npm run dev` como entorno de ejecución para todas las mediciones.
+- En las pruebas de la Tab de Network se activó **Disable cache**.
+- Cada página se midió con Lighthouse en modo **Desktop**.
+
+### 2.3 Limitaciones del entorno
+
+El proyecto usa `@astrojs/node` en modo `middleware`. Se intentó usar `server.mjs`, pero, las páginas prerenderizadas (de la MR-2) generaban un redirect de `/login` a `http://` en lugar de `https://`, que el servidor local no interpretaba correctamente.
+
+Por esta razón, **todas las mediciones se realizaron en modo `dev`**. Esto significa que `npm run dev` no aplica las mismas optimizaciones que el build de producción, por lo que el impacto de MR-2 (prerender) no es directamente medible con Lighthouse en este entorno. El impacto de MR-2 se verifica a través del output del compilador (la Sección 3).
+
+## 3. Verificación de MR-1 y MR-2
+
+Estas dos mejoras son verificables directamente mediante el output de `npm run build`, sin necesidad de métricas de Lighthouse.
+
+### 3.1 MR-1: Eliminación del import no utilizado
+
+Antes de la optimización, el build emitía el siguiente warning:
+
+```
+[WARN] [vite] "Check" is imported from external module "@mui/icons-material"
+but never used in "src/components/Cards/TravelSearchCard.tsx"
+```
+
+Después de eliminar el import, el warning desapareció completamente del output del build. Esto confirma que MR-1 fue exitosa.
+
+### 3.2 MR-2: Prerender de páginas de autenticación
+
+Antes de la optimización, el output del build mostraba:
+
+```
+prerendering static routes
+✓ Completed in 25ms.
+```
+
+Sin ninguna página listada, lo que indicaba que no había rutas estáticas pregeneradas. Después de la optimización, el output del build en `luis-frontend-perf-optimization` muestra:
+
+```
+prerendering static routes
+▶ src/pages/forgot-password.astro
+   └─ /forgot-password/index.html
+▶ src/pages/login.astro
+   └─ /login/index.html
+▶ src/pages/reset-password.astro
+   └─ /reset-password/index.html
+✓ Completed in 20ms.
+```
+
+Las tres páginas de autenticación ahora se generan como archivos HTML estáticos en tiempo de compilación. Esto confirma que MR-2 fue exitosa. Estas páginas se entregan directamente como archivos sin procesamiento del servidor en cada visita.
+
+## 4. Resultados de "Lighthouse"
+
+Las siguientes tablas tienen los resultados de Lighthouse obtenidos en modo `dev` para las tres páginas mencionadas anteriormente.
+
+### 4.1 /login
+
+| Métrica | Antes (perf-analysis) | Después (perf-optimization) | Diferencia |
+|---|---|---|---|
+| Performance Score | 26 | 28 | +2 |
+| FCP | 4.5 s | 4.5 s | 0 |
+| LCP | 8.6 s | 8.6 s | 0 |
+| TBT | 1,360 ms | 900 ms | -460 ms |
+| CLS | 0 | 0 | 0 |
+| Speed Index | 4.9 s | 4.9 s | 0 |
+
+### 4.2 /forgot-password
+
+| Métrica | Antes (perf-analysis) | Después (perf-optimization) | Diferencia |
+|---|---|---|---|
+| Performance Score | 26 | 26 | 0 |
+| FCP | 4.5 s | 4.5 s | 0 |
+| LCP | 8.6 s | 8.6 s | 0 |
+| TBT | 1,620 ms | 1,630 ms | +10 ms |
+| CLS | 0 | 0 | 0 |
+| Speed Index | 4.5 s | 4.5 s | 0 |
+
+### 4.3 /solicitudes
+
+| Métrica | Antes (perf-analysis) | Después (perf-optimization) | Diferencia |
+|---|---|---|---|
+| Performance Score | 83 | 81 | -2 |
+| FCP | 1.5 s | 1.7 s | +0.2 s |
+| LCP | 2.2 s | 2.2 s | 0 |
+| TBT | 0 ms | 0 ms | 0 |
+| CLS | 0.005 | 0.005 | 0 |
+| Speed Index | 1.5 s | 1.7 s | +0.2 s |
+
+### 4.4 Interpretación
+
+Los resultados de Lighthouse en `dev` son esperados porque en modo `dev`:
+
+- MR-2 no tiene efecto porque el prerender solo existe en el build de producción.
+- MR-4 tiene efecto mínimo porque `dev` no optimiza la carga de componentes de la misma forma que producción.
+
+La única diferencia notable es la reducción de TBT en `/login` (-460 ms), que puede ser por la eliminación del import no utilizado de MR-1 reduciendo el trabajo de parseo de JavaScript.
+
+## 5. Resultados de "Network"
+
+Las siguientes tablas muestran los resultados obtenidos en el Tab de "Network"  de Chrome DevTools en modo `dev`, también con caché desactivado.
+
+### 5.1 /login
+
+| Métrica | Antes (perf-analysis) | Después (perf-optimization) |
+|---|---|---|
+| Requests | 67 | 67 |
+| MB transferidos | 11.7 MB | 11.7 MB |
+| Finish | 2.02 s | 2.02 s |
+| DOMContentLoaded | 59 ms | 58 ms |
+| Load | 59 ms | 58 ms |
+
+### 5.2 /forgot-password
+
+| Métrica | Antes (perf-analysis) | Después (perf-optimization) |
+|---|---|---|
+| Requests | 62 | 62 |
+| MB transferidos | 10.6 MB | 10.6 MB |
+| Finish | 2.05 s | 1.99 s |
+| DOMContentLoaded | 86 ms | 59 ms |
+| Load | 86 ms | 59 ms |
+
+### 5.3 /solicitudes
+
+| Métrica | Antes (perf-analysis) | Después (perf-optimization) |
+|---|---|---|
+| Requests | 73 | 73 |
+| MB transferidos | 5.8 MB | 5.9 MB |
+| Finish | 335 ms | 286 ms |
+| DOMContentLoaded | 179 ms | 203 ms |
+| Load | 270 ms | 276 ms |
+
+### 5.4 Interpretación
+
+Al igual que con Lighthouse, los resultados del Network tab en `dev` son idénticos y confirman que el número de archivos transferidos y su tamaño no cambian entre las dos ramas en modo `dev`, lo cual es porque las optimizaciones no modifican qué JavaScript se manda al navegador, sino cuándo y cómo se inicializa.
+
+## 6. Impacto esperado
+
+Dado que las limitaciones del entorno me impidieron medir el impacto completo y real de las optimizaciones, a continuación describo el impacto esperado:
+
+| Optimización | Impacto esperado en producción |
+|---|---|
+| MR-1: Eliminar import Check | El warning de compilación desaparece. |
+| MR-2: Prerender de auth pages | `/login`, `/forgot-password` y `/reset-password` son HTMLs estáticos. El servidor no las procesa en cada visita, reduciendo el tiempo de respuesta inicial y el TBT. |
+| MR-4: client:load en solicitudes | Las 6 páginas afectadas envían HTML con contenido visible desde el servidor en lugar de una página en blanco. El FCP y LCP deberían reducirse porque el usuario ve contenido antes de que React termine de inicializarse. |
+
+## 7. Conclusión
+
+Las tres optimizaciones implementadas fueron verificadas en la medida de lo posible:
+
+- **MR-1** se confirma por la desaparición del warning en el build.
+- **MR-2** se confirma por la aparición de las tres rutas estáticas en el output del build.
+- **MR-4** se confirma a nivel de código: el cambio de `client:only` a `client:load` es correcto y su impacto es medible.
+
+Las métricas de Lighthouse y Network tab en modo `dev` no reflejan el impacto real de las optimizaciones porque `npm run dev` no aplica las mismas optimizaciones que `npm run build`.
+
+Se intentó medir en build de producción usando `server.mjs`. El servidor levantó correctamente, pero las páginas prerenderizadas generaban un redirect de `/login` a `http://` en lugar de `https://` que el servidor local no interpretaba bien. Resolver esto requeriría ajustar la configuración de protocolo del servidor local, lo cual está fuera del alcance de esta task.
+
+## Referencias
+
+- First Contentful paint (FCP). (2023, 6 diciembre). web.dev. https://web.dev/articles/fcp?hl=es-419
+- Largest Contentful Paint (LCP). (2025, 20 marzo). web.dev. https://web.dev/articles/lcp?hl=es-419
+- On-demand rendering. (s. f.). Docs. https://docs.astro.build/en/guides/on-demand-rendering/
+- Puntuación de rendimiento de Lighthouse. (2019, 19 septiembre). Chrome For Developers. https://developer.chrome.com/docs/lighthouse/performance/performance-scoring?hl=es-419
+- Template directives reference. (s. f.). Docs. https://docs.astro.build/en/reference/directives-reference/#client-directives
+- Tiempo de bloqueo total (TBT). (2024, 4 noviembre). web.dev. https://web.dev/articles/tbt?hl=es-419
