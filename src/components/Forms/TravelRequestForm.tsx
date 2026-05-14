@@ -85,12 +85,14 @@ export default function TravelRequestForm({
 
   useEffect(() => {
     if (data) {
+      const clean = (val: string | undefined) =>
+        val && val !== 'notSelected' ? val : '';
       const transformedRoutes = data.routes.map((route: any) => ({
         ...route,
-        origin_country_name: route.origin_country || "",
-        origin_city_name: route.origin_city || "",
-        destination_country_name: route.destination_country || "",
-        destination_city_name: route.destination_city || "",
+        origin_country_name: clean(route.origin_country),
+        origin_city_name: clean(route.origin_city),
+        destination_country_name: clean(route.destination_country),
+        destination_city_name: clean(route.destination_city),
       }));
       const newData = {
         ...data,
