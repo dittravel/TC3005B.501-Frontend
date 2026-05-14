@@ -117,7 +117,7 @@ export default function ReceiptSummaryModal({
               ) : (
                 <Reminder
                   type="info"
-                  text="No hay comprobantes aprobados. El anticipo ya fue descontado del balance del usuario."
+                  text="No hay comprobantes aprobados con archivos adjuntos. El anticipo ya fue descontado del balance del usuario."
                 />
               )
             ) : (

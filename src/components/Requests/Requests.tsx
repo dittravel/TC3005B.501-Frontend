@@ -22,6 +22,7 @@ interface TravelRequest {
   notes: string;
   requested_fee: number;
   imposed_fee: number;
+  currency: string;
   request_days: number;
   creation_date: string;
   authorization_level?: number;
@@ -228,7 +229,7 @@ export default function Requests({
                   />
                   <LabeledValue
                     label={`${request.imposed_fee > 0 ? 'Anticipo' : 'Monto Solicitado'}`}
-                    value={`$${request.imposed_fee > 0 ? request.imposed_fee.toFixed(2) : request.requested_fee.toFixed(2)}`}
+                    value={`$${request.imposed_fee > 0 ? request.imposed_fee.toFixed(2) : request.requested_fee.toFixed(2)} ${request.currency}`}
                   />
                   <div className="hidden md:block">
                     <LabeledValue
