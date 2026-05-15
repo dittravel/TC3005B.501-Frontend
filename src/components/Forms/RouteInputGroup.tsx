@@ -8,7 +8,7 @@
  * Svg icons obtained from Heroicons (https://heroicons.com/)
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '@/components/Buttons/Button';
 import Input from '@/components/Utils/Input';
 import Checkbox from '@/components/Utils/Checkbox';
@@ -39,6 +39,18 @@ interface RouteInputGroupProps {
 const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, index, onRemove, isRemovable, countries, cities }) => {
   const [selectedOriginCountryId, setSelectedOriginCountryId] = useState<number | ''>('');
   const [selectedDestCountryId,   setSelectedDestCountryId]   = useState<number | ''>('');
+
+  useEffect(() => {
+    if (!countries || countries.length === 0) return;
+    if (route.origin_country_name) {
+      const c = countries.find(c => c.country_name === route.origin_country_name);
+      if (c) setSelectedOriginCountryId(c.country_id);
+    }
+    if (route.destination_country_name) {
+      const c = countries.find(c => c.country_name === route.destination_country_name);
+      if (c) setSelectedDestCountryId(c.country_id);
+    }
+  }, [route.origin_country_name, route.destination_country_name, countries]);
 
   const originCities = (cities ?? []).filter(c => c.country_id === selectedOriginCountryId);
   const destCities   = (cities ?? []).filter(c => c.country_id === selectedDestCountryId);
