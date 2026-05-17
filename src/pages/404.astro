@@ -8,65 +8,138 @@
 import Layout from "@layouts/Layout.astro";
 import Button from "@components/Buttons/Button";
 import Icon from "@components/Utils/Icon";
-import Tag from "@components/Utils/Tag";
 const token = Astro.cookies.get("token")?.value;
 const isAuthenticated = !!token;
 ---
 
 <Layout title="Página no encontrada">
-  <main class="flex justify-center items-center w-screen h-screen bg-background text-white px-6">
-    <div class="card max-w-lg">
-      <div class="flex flex-col justify-center items-center gap-8 text-center">
-        {/* Warning message */}
-        <div class="flex flex-col items-center gap-4">
-          <Icon name="map_search" style={{ fontSize: "4rem", color: "#E53E3E" }} />
-          <Tag type="warning" size="medium" text="Error 404" />
+  <main class="min-h-screen bg-background text-text-primary px-6 py-10 md:px-10 md:py-16">
+    <div class="mx-auto flex min-h-[calc(100vh-5rem)] max-w-6xl items-center justify-center">
+      <section class="not-found-shell grid w-full gap-6 overflow-hidden rounded-[28px] border border-border bg-card shadow-sm md:grid-cols-[1.15fr_0.85fr]">
+        <div class="relative overflow-hidden px-8 py-10 md:px-12 md:py-14">
+          <div class="not-found-glow not-found-glow-primary"></div>
+          <div class="not-found-glow not-found-glow-secondary"></div>
+
+          <div class="relative z-10 flex h-full flex-col justify-between gap-8">
+            <div class="space-y-6">
+              <div class="inline-flex items-center gap-3 rounded-full border border-secondary/15 bg-secondary/5 px-4 py-2 text-sm font-semibold text-secondary">
+                <span class="tracking-[0.24em] text-xs uppercase">Error 404</span>
+              </div>
+
+              <div class="space-y-4">
+                <h1 class="max-w-xl text-4xl font-semibold leading-tight text-text-primary md:text-5xl">
+                  Esta página no está disponible para tu cuenta o no existe.
+                </h1>
+                <p class="max-w-2xl text-base leading-7 text-text-secondary md:text-lg">
+                  ¿Por qué se llegó a este error?
+                </p>
+              </div>
+
+              <div class="grid gap-3 text-sm text-text-secondary md:grid-cols-2">
+                <div class="rounded-2xl border border-border bg-card-hover px-4 py-4">
+                  <p class="font-semibold text-text-primary">Acceso restringido</p>
+                  <p class="mt-1">Si esperabas ver esta pantalla, valida que tu perfil tenga el permiso correspondiente.</p>
+                </div>
+                <div class="rounded-2xl border border-border bg-card-hover px-4 py-4">
+                  <p class="font-semibold text-text-primary">Ruta no encontrada</p>
+                  <p class="mt-1">También puede ocurrir cuando el enlace fue modificado, removido o escrito de forma incorrecta.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-3 sm:flex-row">
+              {isAuthenticated ? (
+                <>
+                  <Button
+                    href="/dashboard"
+                    variant="filled"
+                    color="secondary"
+                    size="medium"
+                  >
+                    Volver al dashboard
+                  </Button>
+                  <Button
+                    href="/login"
+                    variant="border"
+                    color="secondary"
+                    size="medium"
+                  >
+                    Iniciar sesión
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  href="/login"
+                  variant="filled"
+                  color="secondary"
+                  size="medium"
+                >
+                  Iniciar sesión
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
-        {/* Main message */}
-        <div class="flex flex-col gap-4">
-          <h1 class="text-4xl font-bold text-text-primary">
-            Página no encontrada
-          </h1>
-          <p class="text-text-primary text-lg leading-relaxed">
-            La ruta que buscas no existe o no tienes permisos para acceder.
-          </p>
-        </div>
-        <div class="w-full border-t border-border"></div>
-        {/* Buttons */}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 justify-center">
-          {isAuthenticated ? (
-            <Button
-              href="/dashboard"
-              variant="filled"
-              color="secondary"
-              size="medium"
-            >
-              Volver al Dashboard
-            </Button>
-            <Button
-              href="/login"
-              variant="filled"
-              color="secondary"
-              size="medium"
-            >
-              Volver al Inicio de Sesion
-            </Button>
-          ) : (
-            <Button
-              href="/login"
-              variant="filled"
-              color="secondary"
-              size="big"
-            >
-              Volver a Inicio
-            </Button>
-          )}
-        </div>
-        {/* Further Help */}
-        <p class="text-text-secondary text-sm">
-          Si necesitas ayuda adicional, por favor contacta a un administrador
-        </p>
-      </div>
+
+        <aside class="not-found-panel relative flex min-h-[320px] items-center justify-center border-t border-border bg-card-hover px-8 py-10 md:min-h-full md:border-l md:border-t-0">
+          <div class="relative z-10 flex w-full max-w-sm flex-col gap-6">
+            <div class="flex h-20 w-20 items-center justify-center rounded-3xl border border-secondary/20 bg-secondary/10 text-secondary shadow-sm">
+              <Icon name="map_search" style={{ fontSize: "2.75rem" }} />
+            </div>
+
+            <div class="space-y-3">
+              <p class="text-sm font-semibold uppercase tracking-[0.22em] text-text-secondary">Navegación asistida</p>
+              <p class="text-base leading-7 text-text-secondary">
+                Vuelve al dashboard para continuar dentro de una sección autorizada.
+              </p>
+            </div>
+
+            <div class="rounded-2xl border border-border bg-card px-5 py-5">
+              <p class="text-sm font-semibold text-text-primary">Siguiente paso recomendado</p>
+              <p class="mt-2 text-sm leading-6 text-text-secondary">
+                Si el acceso debería estar habilitado para tu rol, contacta a un administrador para revisar permisos y visibilidad de rutas.
+              </p>
+            </div>
+          </div>
+        </aside>
+      </section>
     </div>
   </main>
 </Layout>
+
+<style>
+  .not-found-shell {
+    background:
+      radial-gradient(circle at top left, color-mix(in srgb, var(--color-secondary) 9%, transparent), transparent 34%),
+      linear-gradient(180deg, var(--color-card) 0%, var(--color-card-hover) 100%);
+  }
+
+  .not-found-panel {
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--color-secondary-50) 55%, var(--color-card-hover)) 0%, var(--color-card-hover) 100%);
+  }
+
+  .not-found-glow {
+    position: absolute;
+    border-radius: 999px;
+    filter: blur(10px);
+    opacity: 0.85;
+    pointer-events: none;
+  }
+
+  .not-found-glow-primary {
+    top: -5rem;
+    left: -4rem;
+    width: 16rem;
+    height: 16rem;
+    background: color-mix(in srgb, var(--color-secondary-100) 75%, transparent);
+  }
+
+  .not-found-glow-secondary {
+    right: 3rem;
+    bottom: -4rem;
+    width: 12rem;
+    height: 12rem;
+    background: color-mix(in srgb, var(--color-secondary-50) 65%, transparent);
+  }
+</style>
