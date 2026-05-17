@@ -8,11 +8,18 @@
 import Layout from "@layouts/Layout.astro";
 import Button from "@components/Buttons/Button";
 import Icon from "@components/Utils/Icon";
+import ThemeButton from "@components/Buttons/ThemeButton.astro";
+import AccessibilityButton from "@/components/Buttons/AccessibilityButton";
 const token = Astro.cookies.get("token")?.value;
 const isAuthenticated = !!token;
 ---
 
 <Layout title="Página no encontrada">
+  <div class="fixed right-4 top-4 z-50 flex items-center gap-2 rounded-full border border-border bg-secondary px-3 py-2 shadow-sm md:right-6 md:top-6">
+    <ThemeButton />
+    <AccessibilityButton client:load />
+  </div>
+
   <main class="min-h-screen bg-background text-text-primary px-6 py-10 md:px-10 md:py-16">
     <div class="mx-auto flex min-h-[calc(100vh-5rem)] max-w-6xl items-center justify-center">
       <section class="not-found-shell grid w-full gap-6 overflow-hidden rounded-[28px] border border-border bg-card shadow-sm md:grid-cols-[1.15fr_0.85fr]">
