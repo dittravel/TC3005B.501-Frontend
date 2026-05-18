@@ -224,7 +224,7 @@ export const RequestStepper: React.FC<Props> = ({
                 <span className="text-xs text-secodary">En proceso</span>
               )}
               {status === 'active' && isError && (
-                <span className="text-xs text-red-400">Rechazado</span>
+                <span className="text-xs text-red-400">{currentStatus}</span>
               )}
             </div>
           </div>
