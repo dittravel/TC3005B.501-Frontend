@@ -5,17 +5,21 @@
 * from a file. When clicked, it triggers a hidden file input that accepts files
 */
 
-import { useState } from "react";
-import Button from "@/components/Buttons/Button";
+import { useState, useRef } from "react";
 import Tag from "@/components/Utils/Tag";
 import Reminder from "@/components/Utils/Reminder";
+import ImportPreview from "@/components/Modals/ImportPreview";
+import Icon from "@/components/Utils/Icon";
 
+// Interfaces for the component props and data structures used in the import process
+
+// Props for the ImportDataButton component
 interface Props {
-  endpoint: string; // API endpoint to send the file for processing
+  endpoint: string;
   token: string;
 }
 
-// Structure of the response expected from the backend after importing data
+// Interface for the response received after importing data
 interface ImportResponse {
   success: boolean;
   message: string;
@@ -40,9 +44,50 @@ interface ImportResponse {
   error?: string;
 }
 
+// Raw data structures for employees, departments, and cost centers as received from the preview endpoint
+interface EmpleadoRaw {
+  NoEmpleado: string;
+  Nombre: string;
+  Usuario: string;
+  Email: string;
+  JefeInmediato: string | null;
+  Proveedor: number;
+  CeCo: number;
+  Departamento: number;
+  Status: string;
+  FechaAlta: string;
+  FechaCambio: string;
+  Rol?: string;
+}
+
+interface DepartamentoRaw {
+  Clave: number;
+  Descripcion: string;
+  CeCo: number;
+}
+
+interface CeCoRaw {
+  Clave: number;
+  Descripcion: string;
+}
+
+// Interface for the parsed import data that will be used in the preview
+interface ParsedImportData {
+  Empleados: EmpleadoRaw[];
+  Departamentos: DepartamentoRaw[];
+  CeCo: CeCoRaw[];
+}
+
+// Props for the SummaryCard component
 interface SummaryCardProps {
   title: string;
   children: React.ReactNode;
+}
+
+interface SummaryItemProps {
+  label: string;
+  items: string[];
+  type: 'success' | 'warning';
 }
 
 /**
@@ -60,12 +105,6 @@ function SummaryCard({ title, children }: SummaryCardProps) {
       <div className="space-y-2">{children}</div>
     </div>
   );
-}
-
-interface SummaryItemProps {
-  label: string;
-  items: string[];
-  type: 'success' | 'warning';
 }
 
 /**
@@ -92,94 +131,142 @@ function SummaryItem({ label, items, type }: SummaryItemProps) {
   );
 }
 
+/**
+ * Import Data Button Component
+ * This component allows administrators to import data from a file.
+ * It handles file selection, previewing the data, and displaying a summary of the import results.
+ * @param {endpoint} - The API endpoint to which the file will be uploaded for import.
+ * @param {token} - The authentication token to be included in the request headers.
+ */
 export default function ImportDataButton({ endpoint, token }: Props) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // States to manage the import process
   const [showSummary, setShowSummary] = useState(false);
   const [importData, setImportData] = useState<ImportResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [parsedData, setParsedData] = useState<ParsedImportData | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
+  const [fileName, setFileName] = useState<string | null>(null);
 
-  // Handle file input
+  // Handler for file selection and processing
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append("file", file);
+    setFileName(file.name);
 
-    // Reset states before new import
-    setError(null);
-    setSuccess(null);
-    setShowSummary(false);
-    setImportData(null);
-
-    // Send the file to the backend
     try {
-      const response = await fetch(`${import.meta.env.PUBLIC_API_BASE_URL}${endpoint}`, {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      // Send the file to the preview endpoint before importing
+      const response = await fetch(`${import.meta.env.PUBLIC_API_BASE_URL}${endpoint.replace('/import-data', '/preview-import')}`, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
-      const data: ImportResponse = await response.json();
 
-      if (!response.ok || !data.success) {
-        // Mostrar el mensaje de error del backend
-        setError("Error al importar el archivo: " + (data.error || data.message));
-        setSuccess(null);
-        setImportData(null);
-        setShowSummary(false);
-      } else {
-        setImportData(data);
-        setShowSummary(true);
-        setError(null);
-        setSuccess("Archivo importado exitosamente: " + data.message);
-      }
-    } catch (error) {
-      setError(`Error al importar archivo: ${error instanceof Error ? error.message : "Desconocido"}`);
-      setSuccess(null);
-      setImportData(null);
+      const result = await response.json();
       setShowSummary(false);
+
+      if (!response.ok || !result.success) {
+        setError(result.error || "Error al procesar el archivo");
+        setParsedData(null);
+        setShowPreview(false);
+        return;
+      }
+
+      // Map the preview data to the format expected
+      const previewData: ParsedImportData = {
+        Empleados: result.preview.employees.map((emp: any) => ({
+          NoEmpleado: emp.employee_code,
+          Nombre: emp.full_name,
+          Usuario: emp.user_name,
+          Email: emp.email,
+          JefeInmediato: emp.boss_user,
+          Proveedor: emp.supplier,
+          CeCo: emp.cost_center_code,
+          Departamento: emp.department_clave,
+          Status: emp.active ? 'A' : 'I',
+          Rol: emp.role,
+        })),
+        Departamentos: result.preview.departments.map((dept: any) => ({
+          Clave: dept.department_clave,
+          Descripcion: dept.department_name,
+          CeCo: dept.cost_center_code,
+        })),
+        CeCo: result.preview.costCenters.map((cc: any) => ({
+          Clave: cc.cost_center_code,
+          Descripcion: cc.cost_center_name,
+        })),
+      };
+
+      setParsedData(previewData);
+      setShowPreview(true);
+      setError(null);
+    } catch (err) {
+      setError("Error al procesar el archivo: " + (err instanceof Error ? err.message : "Desconocido"));
+      setParsedData(null);
+      setShowPreview(false);
     }
+  };
+
+  // Handler for successful import, which updates the state to show the summary and any success message
+  const handleImportSuccess = (result: ImportResponse) => {
+    setShowPreview(false);
+    setParsedData(null);
+    setImportData(result);
+    setShowSummary(true);
+    setError(null);
+    setSuccess("Datos importados exitosamente");
   };
 
   return (
     <div className="space-y-4">
-      {/* Error message */}
-      {error && (
-        <Reminder type="warning" text={error} />
-      )}
-      {/* Acceptance message */}
-      {success && (
-        <Reminder type="success" text={success} />
-      )}
-      {/* Import data button */}
-      <Button
-        variant="filled"
-        color="secondary"
-        onClick={() => document.getElementById("fileInput")?.click()}
-      >
-        <div className="flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-4">
-            <path d="M7.25 10.25a.75.75 0 0 0 1.5 0V4.56l2.22 2.22a.75.75 0 1 0 1.06-1.06l-3.5-3.5a.75.75 0 0 0-1.06 0l-3.5 3.5a.75.75 0 0 0 1.06 1.06l2.22-2.22v5.69Z" />
-            <path d="M3.5 9.75a.75.75 0 0 0-1.5 0v1.5A2.75 2.75 0 0 0 4.75 14h6.5A2.75 2.75 0 0 0 14 11.25v-1.5a.75.75 0 0 0-1.5 0v1.5c0 .69-.56 1.25-1.25 1.25h-6.5c-.69 0-1.25-.56-1.25-1.25v-1.5Z" />
-          </svg>
-          Subir archivo JSON
+      {error && <Reminder type="warning" text={error} />}
+      {success && <Reminder type="success" text={success} />}
+      {/* File Input */}
+      <div className="relative flex p-2 border-2 border-dashed border-border rounded-lg cursor-pointer">
+        <input
+          ref={fileInputRef}
+          type="file"
+          id="fileInput"
+          accept=".json"
+          onChange={handleFile}
+          className="absolute inset-0 opacity-0 cursor-pointer"
+        />
+        <div className="p-4 w-full h-full flex flex-col items-center">
+          <Icon name="upload" className="text-text-secondary" />
+          <span className="text-text-secondary pointer-events-none">
+            Selecciona un archivo JSON o arrastralo aquí
+          </span>
+          <p className="text-text-secondary text-sm">
+            {fileName? `${fileName}` : "Ningún archivo seleccionado"}
+          </p>
         </div>
-      </Button>
-      <input
-        type="file"
-        id="fileInput"
-        accept=".json"
-        className="hidden"
-        onChange={handleFile}
-      />
-      {/* Summary of import results */}
+      </div>
+      {/* Import Preview */}
+      {showPreview && parsedData && (
+        <ImportPreview
+          data={parsedData}
+          endpoint={endpoint}
+          token={token}
+          onClose={() => {
+            if (fileInputRef.current) fileInputRef.current.value = "";
+            setFileName(null);
+            setShowPreview(false);
+            setParsedData(null);
+          }}
+          onImportSuccess={handleImportSuccess}
+        />
+      )}
+      {/* Import Summary */}
       {showSummary && importData && importData.summary && (
         <div>
           <h2 className="text-xl font-semibold mb-4">Resumen de Importación</h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-            {/* Users */}
             <SummaryCard title="Usuarios">
               <SummaryItem
                 label="Creados"
@@ -196,13 +283,7 @@ export default function ImportDataButton({ endpoint, token }: Props) {
                 items={importData.summary.users.skipped}
                 type="warning"
               />
-              <SummaryItem
-                label="Desactivados"
-                items={importData.summary.users.deactivated}
-                type="warning"
-              />
             </SummaryCard>
-            {/* Departments */}
             <SummaryCard title="Departamentos">
               <SummaryItem
                 label="Creados"
@@ -220,7 +301,6 @@ export default function ImportDataButton({ endpoint, token }: Props) {
                 type="warning"
               />
             </SummaryCard>
-            {/* Cost Centers */}
             <SummaryCard title="Centros de Costo">
               <SummaryItem
                 label="Creados"

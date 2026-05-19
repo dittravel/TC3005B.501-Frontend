@@ -9,6 +9,7 @@ import Select from '@/components/Utils/Select';
 import Button from '@/components/Buttons/Button';
 import Toast from '@/components/Utils/Toast';
 import Checkbox from '@/components/Utils/Checkbox';
+import ArbolJerarquia from '@/components/Users/ApproverHierarchyTree';
 import { useState, useEffect, useMemo, type BaseSyntheticEvent } from 'react';
 import { apiRequest } from '@/utils/apiClient';
 import type { UserRole } from '@type/roles';
@@ -38,6 +39,7 @@ export default function UserProfile({
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedQuickActionRoutes, setSelectedQuickActionRoutes] = useState<string[]>([]);
+  const canViewUsuariosPage = permissionKeys.includes('users:view');
 
   const availableQuickActions = useMemo(
     () => getAccessibleDashboardActions(role, permissionKeys),
@@ -161,7 +163,6 @@ export default function UserProfile({
             {availableQuickActions.map((action) => {
               const checked = selectedQuickActionRoutes.includes(action.route);
               const atLimit = !checked && selectedQuickActionRoutes.length >= MAX_DASHBOARD_QUICK_ACTIONS;
-              const checkboxId = `quick-action-${action.route.replaceAll('/', '-').replaceAll('*', 'wildcard')}`;
 
               return (
                 <Checkbox
@@ -207,6 +208,20 @@ export default function UserProfile({
           </div>
         </div>
       </div>
+
+      {!canViewUsuariosPage && (
+        <div className="card">
+          <div className="card-title">
+            <h2>Estructura organizacional</h2>
+            <p>Visualiza tu posición en la cadena de mando y las personas que dependen de ti.</p>
+          </div>
+          <ArbolJerarquia
+            initialUserId={Number(userData.user_id)}
+            token={token}
+            compact
+          />
+        </div>
+      )}
 
       {/* Out of office preferences */}
       {canManageAbsence && (

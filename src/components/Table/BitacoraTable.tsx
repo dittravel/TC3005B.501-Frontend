@@ -96,7 +96,7 @@ const COLUMNS = [
 ];
 
 // Limit of entries per page
-const LIMIT = 50;
+const LIMIT = 20;
 
 // Helpers
 function formatDate(isoString: string): string {
@@ -206,7 +206,7 @@ export default function BitacoraTable({
   return (
     <div>
       {/* Filters */}
-      <div className="flex flex-col md:flex-row gap-3 items-end mb-8">
+      <div className="flex flex-col md:flex-row gap-3 items-end mb-2">
         {societyGroups.length > 0 ? (
           <div className="w-full md:flex-1 [&>div]:mb-0">
             <Select
@@ -249,11 +249,11 @@ export default function BitacoraTable({
             onChange={(e) => setFilterName(e.target.value)}
           />
         </div>
-
-        <span className="text-sm text-text-secondary md:ml-10 md:whitespace-nowrap">
-          {rows.length} resultado{rows.length === 1 ? "" : "s"} en esta página
-        </span>
       </div>
+
+      <span className="text-sm text-text-secondary md:whitespace-nowrap">
+        Mostrando {rows.length} de {meta.total_count} resultados
+      </span>
 
       {/* Error */}
       {error && (
