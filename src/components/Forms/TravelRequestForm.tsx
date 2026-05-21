@@ -541,16 +541,6 @@ export default function TravelRequestForm({
         );
         return false;
       }
-    } else {
-      const routeError = validateRoutes();
-      if (routeError) {
-        handleSetToast(
-          routeError +
-            " Los cambios se guardarán, pero los campos de fecha/hora inválidos deberán corregirse para enviar la solicitud.",
-          "error",
-          5000,
-        );
-      }
     }
 
     setError(null);
@@ -613,8 +603,12 @@ export default function TravelRequestForm({
       editedData.additionalRoutes = [];
     }
 
+    const endpoint = completeForm
+      ? `/applicant/edit-travel-request/${request_id}`
+      : `/applicant/edit-draft-travel-request/${request_id}`;
+
     try {
-      await apiRequest(`/applicant/edit-travel-request/${request_id}`, {
+      await apiRequest(endpoint, {
         method: "PUT",
         data: editedData,
         headers: {
