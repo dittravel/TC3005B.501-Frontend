@@ -1,14 +1,15 @@
 FROM node:22-alpine AS base
 WORKDIR /app
-RUN corepack enable
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 FROM base AS deps
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+RUN printf 'onlyBuiltDependencies:\n  - cypress\n  - esbuild\n  - sharp\n' > pnpm-workspace.yaml && \
+    pnpm install --no-frozen-lockfile
 
 FROM deps AS build
-ARG PUBLIC_API_BASE_URL=https://localhost:3000/api
-ARG SERVER_API_BASE_URL=https://backend:3000/api
+ARG PUBLIC_API_BASE_URL=https://172.16.60.186:3000/api
+ARG SERVER_API_BASE_URL=https://172.16.60.186:3000/api
 ARG PUBLIC_IS_DEV=false
 ENV PUBLIC_API_BASE_URL=$PUBLIC_API_BASE_URL
 ENV SERVER_API_BASE_URL=$SERVER_API_BASE_URL

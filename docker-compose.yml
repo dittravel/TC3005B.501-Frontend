@@ -4,29 +4,21 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        PUBLIC_API_BASE_URL: https://localhost:3000/api
-        SERVER_API_BASE_URL: https://backend:3000/api
+        PUBLIC_API_BASE_URL: https://172.16.60.186:3000/api
+        SERVER_API_BASE_URL: https://172.16.60.186:3000/api
         PUBLIC_IS_DEV: "false"
     restart: unless-stopped
     environment:
-      PUBLIC_API_BASE_URL: https://localhost:3000/api
-      SERVER_API_BASE_URL: https://backend:3000/api
+      PUBLIC_API_BASE_URL: https://172.16.60.186:3000/api
+      SERVER_API_BASE_URL: https://172.16.60.186:3000/api
       PUBLIC_IS_DEV: false
       NODE_TLS_REJECT_UNAUTHORIZED: "0"
       HOST: 0.0.0.0
       PORT: 4321
       HTTPS_KEY_PATH: /app/certs/server.key
       HTTPS_CERT_PATH: /app/certs/server.crt
-      HTTPS_CA_PATH: /app/certs/ca.crt
+      HTTPS_CA_PATH: /app/certs/server.ca
     volumes:
-      - ../TC3005B.501-Backend/certs:/app/certs:ro
-    networks:
-      - default
-      - backend_net
+      - /home/dittravel/certs:/app/certs:ro
     ports:
       - "4321:4321"
-
-networks:
-  backend_net:
-    external: true
-    name: tc3005b501-backend_default
