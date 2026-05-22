@@ -3,9 +3,8 @@ WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 FROM base AS deps
-COPY package.json pnpm-lock.yaml ./
-RUN printf 'onlyBuiltDependencies:\n  - cypress\n  - esbuild\n  - sharp\n' > pnpm-workspace.yaml && \
-    pnpm install --no-frozen-lockfile
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm install --frozen-lockfile
 
 FROM deps AS build
 ARG PUBLIC_API_BASE_URL=https://172.16.60.186:3000/api
