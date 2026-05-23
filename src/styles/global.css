@@ -247,6 +247,20 @@ html.text-grande {
   font-size: 18px;
 }
 
+/* Contrast options */
+
+/* Light mode  */
+html.contrast-high {
+  --color-border: #333333;
+  --color-text-secondary: #505050;
+}
+
+/* Dark mode  */
+.dark.contrast-high {
+  --color-border: #cccccc;
+  --color-text-secondary: #b0b0b0;
+}
+
 html, body {
   background-color: var(--color-background);
   color: var(--color-text-primary);

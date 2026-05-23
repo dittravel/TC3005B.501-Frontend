@@ -85,6 +85,7 @@ export default function Requests({
 }: RequestsProps) {
   // State for filters, sorting, and pagination
   const [statusFilter, setStatusFilter] = useState('all');
+  const [dateField, setDateField] = useState('beginning_date');
   const [sort, setSort] = useState('desc');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -113,6 +114,7 @@ export default function Requests({
     { value: "Rechazado", label: "Rechazado" },
   ];
 
+  // Filter and sort requests based on current state
   const filteredAndSortedRequests = useMemo(() => {
     let filtered = data || [];
 
@@ -121,15 +123,26 @@ export default function Requests({
       filtered = filtered.filter(req => req.request_status === statusFilter);
     }
 
-    // Apply sorting
+    // Filter by date
     filtered = [...filtered].sort((a, b) => {
-      const dateA = new Date(a.creation_date).getTime();
-      const dateB = new Date(b.creation_date).getTime();
+      let dateA: number, dateB: number;
+
+      if (dateField === 'creation_date') {
+        // Order by creation date
+        dateA = new Date(a.creation_date).getTime();
+        dateB = new Date(b.creation_date).getTime();
+      } else {
+        // Order by beginning date of the trip
+        dateA = new Date(a.routes[0].beginning_date).getTime();
+        dateB = new Date(b.routes[0].beginning_date).getTime();
+      }
+
+      // Sort based on selected order
       return sort === 'desc' ? dateB - dateA : dateA - dateB;
     });
 
     return filtered;
-  }, [data, statusFilter, sort]);
+  }, [data, statusFilter, dateField, sort]);
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredAndSortedRequests.length / itemsPerPage);
@@ -140,7 +153,7 @@ export default function Requests({
     <div className="space-y-6">
       {/* Filters */}
       <div className="flex flex-col-reverse lg:flex-row gap-3 lg:items-end lg:justify-between mb-8">
-        <div className="grid grid-cols-2 lg:flex lg:flex-row gap-3 w-full lg:w-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 w-full lg:w-auto">
           {!hideFilters && (
             <div className="[&>div]:mb-0">
               <Select
@@ -159,8 +172,22 @@ export default function Requests({
           )}
           <div className="[&>div]:mb-0">
             <Select
-              name="filter-sort"
-              label="Ordenar"
+              name="filter-date-field"
+              label="Fecha"
+              value={dateField}
+              onChange={(e) => {
+                setDateField(e.target.value);
+                setCurrentPage(1);
+              }}
+            >
+              <option value="beginning_date">Inicio del viaje</option>
+              <option value="creation_date">Creación</option>
+            </Select>
+          </div>
+          <div className="[&>div]:mb-0">
+            <Select
+              name="filter-date-order"
+              label="Orden"
               value={sort}
               onChange={(e) => handleSortChange(e.target.value as 'asc' | 'desc')}
             >

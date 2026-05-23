@@ -28,6 +28,7 @@ const rule = await apiRequest(`/admin/auth-rules/${id}`, { cookies: Astro.cookie
   <TextHeader
     title="Editar regla de autorización"
     subtitle="Modifica las condiciones y niveles de autorización"
+    backHref="/reglas-autorizacion"
   />
   <main>
     <AuthRuleForm

@@ -96,6 +96,7 @@ const currencies = await (async () => {
     <TextHeader
       title={isCreating ? "Crear nueva sociedad" : "Editar Sociedad"}
       subtitle={isCreating ? "Complete el formulario con los datos de la nueva sociedad" : "Modifica los campos necesarios para actualizar la información de la sociedad"}
+      backHref="/sociedades"
     />
     <SocietyForm
       client:load

@@ -7,6 +7,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Icon from '@/components/Utils/Icon';
 import Select from '@/components/Utils/Select';
+import Button from '@/components/Buttons/Button';
 
 /**
  * Accessibility Button Component
@@ -16,6 +17,7 @@ import Select from '@/components/Utils/Select';
 export default function AccessibilityButton() {
   const [currentFont, setCurrentFont] = useState<string>('roboto');
   const [currentSize, setCurrentSize] = useState<string>('mediano');
+  const [currentContrast, setCurrentContrast] = useState<string>('normal');
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -27,10 +29,13 @@ export default function AccessibilityButton() {
     if (typeof document !== 'undefined') {
       const savedFont = localStorage.getItem('fontFamily') || 'roboto';
       const savedSize = localStorage.getItem('textSize') || 'mediano';
+      const savedContrast = localStorage.getItem('contrast') || 'normal';
       setCurrentFont(savedFont);
       setCurrentSize(savedSize);
+      setCurrentContrast(savedContrast);
       applyFont(savedFont);
       applyTextSize(savedSize);
+      applyContrast(savedContrast);
     }
 
     // Close dropdown when clicking outside
@@ -64,6 +69,14 @@ export default function AccessibilityButton() {
     localStorage.setItem('textSize', sizeId);
   };
 
+  // Apply the selected contrast mode to the html element and save in localStorage
+  const applyContrast = (contrastId: string) => {
+    const html = document.documentElement;
+    html.classList.remove('contrast-normal', 'contrast-high');
+    html.classList.add(`contrast-${contrastId}`);
+    localStorage.setItem('contrast', contrastId);
+  };
+
   // Handle font change from dropdown selection
   const handleFontChange = (fontId: string) => {
     setCurrentFont(fontId);
@@ -74,6 +87,19 @@ export default function AccessibilityButton() {
   const handleSizeChange = (sizeId: string) => {
     setCurrentSize(sizeId);
     applyTextSize(sizeId);
+  };
+
+  // Handle contrast change from dropdown selection
+  const handleContrastChange = (contrastId: string) => {
+    setCurrentContrast(contrastId);
+    applyContrast(contrastId);
+  };
+
+  // Reset all preferences to default values
+  const resetPreferences = () => {
+    handleFontChange('roboto');
+    handleSizeChange('mediano');
+    handleContrastChange('normal');
   };
 
   if (!mounted) return null;
@@ -89,7 +115,7 @@ export default function AccessibilityButton() {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full w-60 left-1/2 -translate-x-1/2 mt-2
+        <div className="absolute top-full w-80 left-1/2 -translate-x-1/2 mt-2
           bg-card shadow-xl rounded-lg
           p-4 z-50 border border-border"
         >
@@ -115,6 +141,25 @@ export default function AccessibilityButton() {
               <option value="roboto">Regular</option>
               <option value="opendyslexic">Open Dyslexic</option>
             </Select>
+            {/* Contrast */}
+            <Select
+              label="Contraste"
+              name="contrastSelect"
+              value={currentContrast}
+              onChange={(e) => handleContrastChange(e.target.value)}
+            >
+              <option value="normal">Normal</option>
+              <option value="high">Alto</option>
+            </Select>
+            {/* Reset button */}
+            <Button
+              variant="filled"
+              color="primary"
+              onClick={resetPreferences}
+              className="w-full"
+            >
+              Restablecer Preferencias
+            </Button>
           </div>
         </div>
       )}
