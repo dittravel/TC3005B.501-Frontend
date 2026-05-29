@@ -6,7 +6,10 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "env:devLocal": "bash switch-env.sh devLocal",
+    "env:devDocker": "bash switch-env.sh devDocker",
+    "env:serverDocker": "bash switch-env.sh serverDocker"
   },
   "dependencies": {
     "@astrojs/react": "^4.4.2",

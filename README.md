@@ -1,260 +1,147 @@
 # TC3005B.501-Frontend
-Web Application of the travel management system portal developed during course TC3005B by group 501.
 
-## Project Structure
+Frontend app for Dittravel.
 
-```
-TC3005B.501-Frontend/
-├─ .env.example                # Example environment variables file
-├─ .gitignore                  # Git ignore rules
-├─ astro.config.mjs            # Astro configuration file
-├─ ASTRO.md                    # Astro-specific documentation
-├─ CHANGELOG.md                # Changelog of project updates
-├─ CONTRIBUTING.md             # Guidelines for contributing to the project
-├─ cypress.config.ts           # Cypress configuration for end-to-end testing
-├─ package.json                # Node.js dependencies and scripts
-├─ pnpm-lock.yaml              # Lock file for pnpm package manager
-├─ pnpm-workspace.yaml         # Pnpm workspace configuration
-├─ README.md                   # Project README
-├─ tsconfig.json               # TypeScript configuration
-├─ .github/                    # GitHub-specific files
-│  ├─ pull_request_template.md # Pull request template
-│  ├─ codeql/                  # CodeQL security analysis
-│  │  └─ codeql-config.yml     # CodeQL configuration
-│  ├─ ISSUE_TEMPLATE/          # Issue templates
-│  │  ├─ 4-task.yml            # Task issue template
-│  │  ├─ 5-sub_task.yml        # Sub-task issue template
-│  │  └─ config.yml            # Issue template configuration
-│  ├─ PULL_REQUEST_TEMPLATE/   # Pull request templates
-│  │  ├─ chore_pr.md           # Chore PR template
-│  │  ├─ feature_pr.md         # Feature PR template
-│  │  └─ release_pr.md         # Release PR template
-│  └─ workflows/               # GitHub Actions workflows
-│     └─ codeql-analysis.yml   # CodeQL analysis workflow
-├─ .vscode/                    # VS Code configuration
-│  ├─ extensions.json          # Recommended extensions
-│  └─ launch.json              # Debug launch configuration
-├─ cypress/                    # End-to-end testing with Cypress
-│  ├─ e2e/                     # Test files for various features (login, requests, etc.)
-│  ├─ fixtures/                # Test data files
-│  └─ support/                 # Cypress support files and commands
-├─ public/                     # Static assets served directly
-│  ├─ default.xml              # Default XML file
-│  └─ fonts/                   # Font files
-└─ src/                        # Source code
-   ├─ middleware.ts             # Astro middleware
-   ├─ README.md                 # Source README
-   ├─ assets/                   # Static assets
-   ├─ components/               # Reusable UI components (Astro, TSX)
-   │  ├─ Lists/         # Components for request lists
-   │  └─ Table/                 # Table-related components
-   ├─ config/                   # Configuration files (e.g., modal config)
-   ├─ data/                     # Data files or constants
-   ├─ layouts/                  # Astro page layouts
-   ├─ pages/                    # Astro pages/routes
-   ├─ styles/                   # CSS and styling files
-   ├─ types/                    # TypeScript type definitions
-   ├─ utils/                    # Utility functions
-   └─ views/                    # View components or pages
-```
+## Quick Start
 
-## Getting Started
+### Prerequisites
 
-In order to run this Frontend, the following steps are required:
+- Node.js 22+
+- `pnpm`
+- Backend configured and running
+- Docker Desktop for `devDocker`
 
-### Installing
+### Environment Modes
 
-The only option currently is to clone the repository locally from GitHub.
+| Mode | Use case | Backend target | Result |
+| --- | --- | --- | --- |
+| `devLocal` | Native frontend on your machine | `https://localhost:3000/api` | Patches `.env` only |
+| `devDocker` | Frontend container on your machine | `https://backend:3000/api` inside the container | Rewrites `docker-compose.yml`, rebuilds, starts container |
+| `serverDocker` | Frontend container on server | `https://<SERVER_DOCKER_BACKEND_IP>:3000/api` inside the container | Rewrites `docker-compose.yml`, rebuilds, starts container |
 
-#### Using `git`
+### Configure Once (recommended)
+
+Set this once in frontend `.env`:
+
+- `SERVER_DOCKER_BACKEND_IP`
+
+Then use mode commands without passing IP via CLI.
+
+## Installation
 
 ```sh
 git clone https://github.com/dittravel/TC3005B.501-Frontend.git
-```
-
-#### Using `gh` (GitHub CLI)
-
-```sh
-gh repo clone dittravel/TC3005B.501-Frontend
-```
-
-### Dependencies
-
-The dependencies for this project are managed using [the pnpm package manager](https://pnpm.io/), so it is recommended to use this. However, [npm](https://www.npmjs.com/) can also be used. The dependencies are automatically managed by `pnpm` in the `package.json` file, so they are installed automatically when issuing the install command.
-
-#### Using `pnpm`
-
-```sh
+cd TC3005B.501-Frontend
 pnpm install
 ```
 
-#### Using `npm`
+Create `.env` once:
 
 ```sh
-npm install
+# PowerShell
+Copy-Item .env.example .env
+
+# Bash
+cp .env.example .env
 ```
 
-### Dockerized Setup (Recommended)
+## Daily Use
 
-For full integration testing, run frontend and backend with Docker.
+### devLocal
 
-#### 1. Start backend stack first
-
-From [../TC3005B.501-Backend](../TC3005B.501-Backend):
+Use this when the frontend runs natively.
 
 ```sh
-docker compose up -d --build
+pnpm env:devLocal
+pnpm dev
 ```
 
-This is required because frontend Docker compose expects the backend Docker network and service.
+This expects the backend API to be available at `https://localhost:3000/api`.
 
-#### 2. Start frontend stack
+### devDocker
 
-From the frontend root:
+Use this when frontend and backend are both containerized locally.
 
-```sh
-docker compose up -d --build
-```
-
-#### 3. Verify containers
-
-Backend project:
+Backend first:
 
 ```sh
 cd ../TC3005B.501-Backend
-docker compose ps
+pnpm env:devDocker
 ```
 
-Frontend project:
+Then frontend:
 
 ```sh
 cd ../TC3005B.501-Frontend
+pnpm env:devDocker
 docker compose ps
 ```
 
-Expected frontend URL:
+### serverDocker
+
+Use this on the frontend server instance.
+
+```sh
+pnpm env:serverDocker
+docker compose ps
+```
+
+## Setup Flows
+
+### Native local flow
+
+```sh
+pnpm env:devLocal
+pnpm dev
+```
+
+### Local Docker flow
+
+```sh
+cd ../TC3005B.501-Backend
+pnpm env:devDocker
+
+cd ../TC3005B.501-Frontend
+pnpm env:devDocker
+```
+
+Open:
 
 - `https://localhost:4321`
 - `https://localhost:4321/login`
 
-#### 4. Smoke-check the dockerized version
-
-1. Open `https://localhost:4321/login`
-2. Login with a valid user (for example `admin.tec` / `123` or `andres.gomez` / `123`)
-3. Confirm redirect to `/dashboard`
-4. Confirm protected routes do not bounce back to login unexpectedly
-5. Check logs if needed:
+### Stop containers
 
 ```sh
+docker compose down
+```
+
+## Key Commands
+
+```sh
+pnpm env:devLocal
+pnpm env:devDocker
+pnpm env:serverDocker
+
+pnpm dev
+docker compose ps
 docker compose logs -f frontend
-```
-
-#### 5. Stop services
-
-Frontend:
-
-```sh
 docker compose down
 ```
 
-Backend:
+## Notes
 
-```sh
-cd ../TC3005B.501-Backend
-docker compose down
-```
+- `PUBLIC_API_BASE_URL` stays `https://localhost:3000/api` so the browser always uses the local HTTPS endpoint or SSH tunnel.
+- `SERVER_API_BASE_URL` changes by mode because server-side requests run inside the process/container.
+- `devDocker` and `serverDocker` rebuild with `--no-cache` because the API base URLs are baked into the frontend build.
+- `serverDocker` reads backend target from `.env` key `SERVER_DOCKER_BACKEND_IP` (CLI `BACKEND_IP` is optional override only).
 
-### Running
+## Smoke Test
 
-To run the Frontend, utilize whichever package manager you used for dependencies to run the project.
+1. Open `https://localhost:4321/login`.
+2. Log in with a valid seeded user.
+3. Confirm redirect to `/dashboard`.
+4. Confirm authenticated API requests work.
 
-#### Using `pnpm`
-
-```sh
-pnpm run dev
-```
-
-#### Using `npm`
-
-```sh
-npm run dev
-```
-
-The application will start in development mode. Open your browser to the displayed local URL (typically `http://localhost:3000`). You'll see the login page, where you can authenticate with your credentials.
-
-### Configuring
-
-The application is fully integrated with the backend API. To start using the application:
-
-1. **Backend Setup**: Ensure the backend server is running (see [TC3005B.501-Backend](../TC3005B.501-Backend) for setup instructions).
-
-2. **Environment Variables**: Create a `.env` file in the project root based on `.env.example`:
-   ```
-   PUBLIC_API_BASE_URL=http://localhost:3000
-   ```
-
-3. **Login**: Use the login interface to authenticate with your credentials. The available roles are:
-   - **Requester (Solicitante)** - Manages own travel requests and receipts
-   - **Travel Agency (Agencia de viajes)** - Handles requests and reviews flight/hotel options
-   - **Accounts Payable (Cuentas por pagar)** - Reviews and approves/rejects receipts
-   - **Authorizer (Autorizador)** - Requester capabilities + request approval/rejection
-   - **Administrator (Administrador)** - Full system management
-
-### Default role permissions (base and dummy)
-
-The default permission matrix is defined in backend seed logic (`prisma/seedShared.js`) and is the same for:
-
-- base seed (`pnpm prisma:seed`)
-- dummy seed (`pnpm prisma:seed:dummy`)
-
-In dummy mode, these defaults are duplicated across dummy society groups and users.
-
-| Role | Module summary | Default permission keys |
-| --- | --- | --- |
-| Requester (Solicitante) | Travel, Receipts | `travel:view`, `travel:create`, `travel:edit`, `receipts:create`, `receipts:edit` |
-| Travel Agency (Agencia de viajes) | Travel | `travel:view`, `travel:edit`, `travel:view_flights`, `travel:view_hotels`, `travel:approve` |
-| Accounts Payable (Cuentas por pagar) | Receipts | `receipts:view`, `receipts:approve` |
-| Authorizer (Autorizador) | Travel, Receipts | `travel:view`, `travel:create`, `travel:edit`, `travel:approve`, `travel:reject`, `receipts:create`, `receipts:edit` |
-| Administrator (Administrador) | All modules | all `permission_key` values available in `Permission` |
-
-
-
-4. **Development/Testing**: For development purposes when the backend is unavailable, the application uses a mock session located in [/src/data/cookies.ts](/src/data/cookies.ts):
-   ```typescript
-   const mockSession: Session = {
-     username: "John Doe",
-     id: "1",
-     department_id: "1",
-     role: "Solicitante" as UserRole,
-     token: "token",
-   };
-   ```
-
-### Development Stack
-
-- [![Astro][astro-badge]][astro-url] — The web framework for content-driven websites.
-- [![TypeScript][typescript-badge]][typescript-url] — Strongly typed JavaScript for scalable applications.
-- [![Tailwind CSS][tailwind-badge]][tailwind-url] — A utility-first CSS framework for building custom designs efficiently.
-- [![React][react-badge]][react-url] — A JavaScript library for building user interfaces.
-
-[astro-url]: https://astro.build/
-[typescript-url]: https://www.typescriptlang.org/
-[tailwind-url]: https://tailwindcss.com/
-[react-url]: https://reactjs.org/
-[astro-badge]: https://img.shields.io/badge/Astro-fff?style=for-the-badge&logo=astro&logoColor=bd303a&color=352563
-[typescript-badge]: https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white&color=blue
-[tailwind-badge]: https://img.shields.io/badge/Tailwind-ffffff?style=for-the-badge&logo=tailwindcss&logoColor=38bdf8
-[react-badge]: https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black&color=blue
-
-### Frontend Optimization Tests
-
-Open console in your browser (right click -> inspect -> console) to visualize frontend performance. 
-We use Google´s web vitals library to conduct these tests. Find below a guide of what each acronym means:
-
-| Metric   | When it fires                                   |
-| -------- | ----------------------------------------------- |
-| **TTFB** | immediately on page load  |
-| **FCP**  | when first content paints                       |
-| **LCP**  | when largest element finishes loading           |
-| **CLS**  | when layout shifts happen                       |
+If the backend is intentionally unavailable during UI-only development, the mock session lives in `src/data/cookies.ts`.
 | **INP**  | when you interact (click/type)                  |
