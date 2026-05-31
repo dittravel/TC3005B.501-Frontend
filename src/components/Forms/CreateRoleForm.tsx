@@ -36,6 +36,10 @@ const roleTemplates = [
       "system:audit_log",
       "auth_rules:manage",
       "refund_policies:manage",
+      "accounts:view",
+      "accounts:create",
+      "accounts:edit",
+      "accounts:delete",
     ],
   },
   {
@@ -101,6 +105,7 @@ const categoryIcons: Record<string, string> = {
   "Reembolsos": "currency_exchange",
   "Sistema": "history",
   "Superadmin": "hub",
+  "Cuentas Contables": "account_balance",
 };
 
 // Group categories into broader sections
@@ -111,6 +116,7 @@ const categoryGrouping: Record<string, string> = {
   "Configuración": "Gestión",
   "Sistema": "Gestión",
   "Superadmin": "Gestión",
+  "Cuentas Contables": "Gestión",
   "Solicitudes de viaje": "Viajes y Gastos",
   "Autorizaciones": "Viajes y Gastos",
   "Cotizaciones": "Viajes y Gastos",

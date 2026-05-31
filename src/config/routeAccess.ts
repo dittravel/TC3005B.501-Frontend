@@ -62,6 +62,7 @@ export const roleRoutes: Record<UserRole, string[]> = {
     '/reglas-autorizacion','/crear-regla','/editar-regla/*',
     '/roles','/crear-rol','/editar-rol/*',
     '/politicas-reembolso', '/editar-politica-reembolso/*', '/crear-politica-reembolso',
+    '/cuentas-contables', '/cuentas-contables/nueva', '/cuentas-contables/*',
     '/exportar-datos-contables',
     '/bitacora',
   ],
@@ -127,6 +128,8 @@ export const permissionRouteRules: PermissionRouteRule[] = [
   { pattern: '/resubir-comprobante/*', permissions: ['receipts:edit'] },
   { pattern: '/editar-comprobante/*', permissions: ['receipts:edit'] },
   { pattern: '/reembolsos', permissions: ['travel:create'] },
+  { pattern: '/cuentas-contables', permissions: ['accounts:view'] },
+  { pattern: '/cuentas-contables/*', permissions: ['accounts:view'] },
 ];
 
 export function hasRoutePermission(pathname: string, permissionKeys: string[] = []): boolean {

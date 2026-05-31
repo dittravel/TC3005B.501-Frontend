@@ -1,13 +1,14 @@
 ---
 /**
- * Society Groups and Society Page
+ * Accounting Accounts Page
  * 
- * This page displays the society groups and societies in the system.
+ * This page displays the accounting accounts for the selected society 
+ * and allows users with the appropriate permissions to manage them.
  */
 
 import TextHeader from '@components/Layout/TextHeader.astro';
 import MainLayout from "@layouts/MainLayout.astro";
-import SocietiesTable from "@components/Table/SocietiesTable";
+import AccountsTable from "@components/Table/AccountsTable";
 
 import { getCookie } from "@data/cookies";
 import { roleLabels } from "@config/role-labels";
@@ -18,7 +19,6 @@ const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
 const buttonLabel = roleLabels[role];
 const userName = getCookie("username", Astro.cookies) || "";
 const token = getCookie("token", Astro.cookies) || "";
-const societyGroupId = getCookie("society_group_id", Astro.cookies) || "";
 
 function parseJwtPayload(jwtToken: string): Record<string, unknown> | null {
   try {
@@ -37,48 +37,47 @@ const permissionKeys = Array.isArray(tokenPayload?.permissions)
   ? tokenPayload.permissions.map((permission: unknown) => String(permission).trim()).filter(Boolean)
   : [];
 
-const canManageSocietyGroups = permissionKeys.includes('superadmin:manage_groups');
-const canViewSocieties = canManageSocietyGroups || permissionKeys.includes('societies:view');
-const canCreateSociety = canManageSocietyGroups || permissionKeys.includes('societies:create');
-const canEditSociety = canManageSocietyGroups || permissionKeys.includes('societies:edit');
-const canDeleteSociety = canManageSocietyGroups || permissionKeys.includes('societies:delete');
+const canViewAccounts = permissionKeys.includes('accounts:view');
+const canCreateAccount = permissionKeys.includes('accounts:create');
+const canEditAccount = permissionKeys.includes('accounts:edit');
+const canDeleteAccount = permissionKeys.includes('accounts:delete');
 
-// Get societies
-const societies = await (async () => {
-  if (!canViewSocieties) {
+// Get accounting accounts
+const accounts = await (async () => {
+  if (!canViewAccounts) {
     return Astro.redirect('/404');
   }
 
   try {
-    return await apiRequest(`/societies`, {
+    const result = await apiRequest(`/accounts`, {
       cookies: Astro.cookies
     });
+    return result || [];
   } catch (error) {
-    console.error("Error al cargar las sociedades:", error);
+    console.error("Error al cargar las cuentas contables:", error);
     return [];
   }
 })();
 ---
 
-<MainLayout title="Sociedades" data={{userName, buttonLabel, role}}>
+<MainLayout title="Cuentas Contables" data={{userName, buttonLabel, role}}>
   <TextHeader
-    title="Sociedades"
-    subtitle="Configura las sociedades del sistema"
+    title="Cuentas Contables"
+    subtitle="Configura las cuentas contables del sistema"
   />
   <main>
-    <div class="flex flex-col gap-8">
-      {canViewSocieties ? (
-        <SocietiesTable
-          client:load
-          data={societies}
-          token={token}
-          role={role}
-          canCreate={canCreateSociety}
-          canEdit={canEditSociety}
-          canDelete={canDeleteSociety}
-        />
-      ) : null}
-    </div>
+    {canViewAccounts ? (
+      <AccountsTable
+        client:load
+        data={accounts}
+        token={token}
+        canCreate={canCreateAccount}
+        canEdit={canEditAccount}
+        canDelete={canDeleteAccount}
+      />
+    ) : (
+      null
+    )}
   </main>
 </MainLayout>
 
