@@ -5,13 +5,14 @@
  * Allows users to quickly access actions based on the status of each request.
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Button from '@components/Buttons/Button';
 import Select from '@components/Utils/Select';
 import Card from '@components/Utils/Card';
 import LabeledValue from '@components/Utils/LabeledValue';
 import Pagination from '@components/Table/Pagination';
 import UltimateWrapper from '@components/Modals/UltimateWrapper';
+import { apiRequest } from "@utils/apiClient";
 import { getStatusTagType } from '@utils/statusMapper';
 import { formatDate } from '@utils/dateFormatter';
 import Tag from '../Utils/Tag';
@@ -37,6 +38,11 @@ interface TravelRequest {
     beginning_date: string;
     ending_date: string;
   }>;
+}
+
+interface Country {
+  country_id: number;
+  country_name: string;
 }
 
 interface RequestsProps {
@@ -81,14 +87,32 @@ export default function Requests({
   data,
   token,
   hideFilters = false,
-  actionRoute
+  actionRoute,
 }: RequestsProps) {
   // State for filters, sorting, and pagination
   const [statusFilter, setStatusFilter] = useState('all');
   const [dateField, setDateField] = useState('beginning_date');
   const [sort, setSort] = useState('desc');
   const [currentPage, setCurrentPage] = useState(1);
+  const [countryFilter, setCountryFilter] = useState('');
+  const [countries, setCountries] = useState<Country[]>([]);
   const itemsPerPage = 10;
+
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const response = await apiRequest('/countries', {
+          method: 'GET',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setCountries(response);
+      } catch (error) {
+        console.error('Error fetching countries:', error);
+      }
+    };
+
+    fetchCountries();
+  }, []);
 
   // Reset to page 1 when filter or sort changes
   const handleFilterChange = (newFilter: string) => {
@@ -123,8 +147,16 @@ export default function Requests({
       filtered = filtered.filter(req => req.request_status === statusFilter);
     }
 
-    // Filter by date
+    // Apply country filter
+    if (countryFilter) {
+      filtered = filtered.filter(req => 
+        req.routes.some(route => route.destination_country === countryFilter)
+      );
+    }
+
+    // Sort by selected date field and order
     filtered = [...filtered].sort((a, b) => {
+      // Filter by date
       let dateA: number, dateB: number;
 
       if (dateField === 'creation_date') {
@@ -142,7 +174,15 @@ export default function Requests({
     });
 
     return filtered;
-  }, [data, statusFilter, dateField, sort]);
+  }, [data, statusFilter, dateField, sort, countryFilter]);
+
+  const resetFilters = () => {
+    setStatusFilter('all');
+    setDateField('beginning_date');
+    setSort('desc');
+    setCountryFilter('');
+    setCurrentPage(1);
+  };
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredAndSortedRequests.length / itemsPerPage);
@@ -152,10 +192,10 @@ export default function Requests({
   return (
     <div className="space-y-6">
       {/* Filters */}
-      <div className="flex flex-col-reverse lg:flex-row gap-3 lg:items-end lg:justify-between mb-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 w-full lg:w-auto">
+      <div className="flex flex-col-reverse gap-4 lg:items-end lg:justify-between mb-2">
+        <div className="flex flex-col lg:flex-row gap-3 w-full">
           {!hideFilters && (
-            <div className="[&>div]:mb-0">
+            <div className="w-full flex-1">
               <Select
                 name="filter-status"
                 label="Estado"
@@ -170,7 +210,7 @@ export default function Requests({
               </Select>
             </div>
           )}
-          <div className="[&>div]:mb-0">
+          <div className="w-full flex-1">
             <Select
               name="filter-date-field"
               label="Fecha"
@@ -184,7 +224,7 @@ export default function Requests({
               <option value="creation_date">Creación</option>
             </Select>
           </div>
-          <div className="[&>div]:mb-0">
+          <div className="w-full flex-1">
             <Select
               name="filter-date-order"
               label="Orden"
@@ -193,6 +233,21 @@ export default function Requests({
             >
               <option value="desc">Más reciente primero</option>
               <option value="asc">Más antigua primero</option>
+            </Select>
+          </div>
+          <div className="w-full flex-1">
+            <Select
+              name="filter-country"
+              label="País de destino"
+              value={countryFilter}
+              onChange={(e) => setCountryFilter(e.target.value)}
+            >
+              <option value="">Todos</option>
+              {countries.map((country: any) => (
+                <option key={country.country_id} value={country.country_name}>
+                  {country.country_name}
+                </option>
+              ))}
             </Select>
           </div>
         </div>
@@ -209,11 +264,19 @@ export default function Requests({
 
       {/* Requests List */}
       <div className="space-y-2">
-        {filteredAndSortedRequests.length > 0 && (
+        <div className="flex items-center justify-between">
           <p className="text-sm text-text-secondary">
             Mostrando {paginatedRequests.length} de {filteredAndSortedRequests.length} resultados
           </p>
-        )}
+          <Button 
+            variant="link"
+            size="small"
+            color="secondary"
+            onClick={resetFilters}
+          >
+            Limpiar filtros
+          </Button>
+        </div>
         {paginatedRequests.length === 0 ? (
           <Card className="text-center py-8">
             <p className="text-text-secondary font-semibold">
