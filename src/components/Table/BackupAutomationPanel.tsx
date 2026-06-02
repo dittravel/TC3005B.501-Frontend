@@ -238,7 +238,10 @@ export default function BackupAutomationPanel({ token, role }: Readonly<Props>) 
         configFile: config.configFile,
       }));
       setScheduleUi(parseCronToUi(config.schedule));
-      setSuccess('Configuración de automatización de respaldos actualizada.');
+      const cronNotice = response?.cronApplied === false
+        ? ' La configuración se guardó, pero la tarea cron no se pudo aplicar automáticamente en este entorno.'
+        : '';
+      setSuccess(`Configuración de automatización de respaldos actualizada.${cronNotice}`);
     } catch (requestError: any) {
       setError(requestError?.message || 'No fue posible actualizar la configuración.');
     } finally {
