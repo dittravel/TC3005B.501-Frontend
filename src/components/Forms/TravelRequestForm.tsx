@@ -557,10 +557,8 @@ export default function TravelRequestForm({
     includeIfExists("router_index", firstRoute.router_index);
     editedData.notes =
       typeof formData.notes === "string" ? formData.notes.trim() : "";
-    includeIfExists(
-      "requested_fee",
-      parseFloat(formData.requested_fee as string),
-    );
+    const parsedFee = parseFloat(String(formData.requested_fee ?? ''));
+    if (!isNaN(parsedFee)) editedData.requested_fee = parsedFee;
     includeIfExists("currency", formData.currency);
     editedData.imposed_fee = 0;
     includeIfExists("origin_country_name", firstRoute.origin_country_name);
