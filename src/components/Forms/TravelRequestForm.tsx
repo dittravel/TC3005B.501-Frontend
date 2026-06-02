@@ -781,6 +781,7 @@ export default function TravelRequestForm({
                   label="Anticipo Esperado"
                   placeholder="Ej: 1500.00"
                   type="number"
+                  min="0"
                   value={
                     formData.requested_fee === 0 ? "" : formData.requested_fee
                   }

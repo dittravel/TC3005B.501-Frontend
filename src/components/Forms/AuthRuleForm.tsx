@@ -256,6 +256,7 @@ export default function AuthRuleForm({ token, mode, data }: Props) {
             name="min_duration"
             type="number"
             placeholder="0"
+            min="0"
             required
             value={formData.min_duration ?? ""}
             onChange={handleChange}
@@ -265,6 +266,7 @@ export default function AuthRuleForm({ token, mode, data }: Props) {
             name="max_duration"
             type="number"
             placeholder="0"
+            min={formData.min_duration || 0}
             required
             value={formData.max_duration ?? ""}
             onChange={handleChange}
@@ -293,7 +295,7 @@ export default function AuthRuleForm({ token, mode, data }: Props) {
             name="max_amount"
             type="number"
             placeholder="0.00"
-            min={0}
+            min={formData.min_amount || 0}
             required
             value={formData.max_amount ?? ""}
             onChange={handleChange}

@@ -322,6 +322,7 @@ export default function ReviewReceiptsList({
                           value={editAmount}
                           onChange={(e) => setEditAmount(e.target.value)}
                           placeholder="0.00"
+                          min="0"
                         />
                         <div className="flex gap-2 justify-end w-full">
                           <Button

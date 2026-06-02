@@ -18,7 +18,7 @@ export default function Input(props: BaseInputProps) {
 	// Reference to the input element for handling date/time picker
 	const inputRef = useRef<HTMLInputElement>(null);
 
-  	// Default props for the input component
+  // Default props for the input component
 	const {
 		label,
 		name,
