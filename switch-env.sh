@@ -35,9 +35,13 @@ case "$MODE" in
 esac
 
 if [[ ! -f .env ]]; then
-  echo "Error: .env not found in $(pwd)"
-  echo "Hint: cp .env.example .env"
-  exit 1
+  if [[ -f .env.example ]]; then
+    cp .env.example .env
+    echo "Bootstrapped .env from .env.example (fill in secrets before using)."
+  else
+    echo "Error: .env not found in $(pwd) and no .env.example available."
+    exit 1
+  fi
 fi
 
 # Read KEY=value from .env (last occurrence wins).

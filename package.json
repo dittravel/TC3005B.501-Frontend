@@ -9,7 +9,10 @@
     "astro": "astro",
     "env:devLocal": "bash switch-env.sh devLocal",
     "env:devDocker": "bash switch-env.sh devDocker",
-    "env:serverDocker": "bash switch-env.sh serverDocker"
+    "env:serverDocker": "bash switch-env.sh serverDocker",
+    "up:devLocal": "node scripts/up.mjs devLocal",
+    "up:devDocker": "node scripts/up.mjs devDocker",
+    "up:serverDocker": "node scripts/up.mjs serverDocker"
   },
   "dependencies": {
     "@astrojs/react": "^4.4.2",

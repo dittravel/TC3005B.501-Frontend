@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { apiRequest } from '@/utils/apiClient';
 import Input from '@/components/Utils/Input';
 import Select from '@/components/Utils/Select';
+import Button from '@/components/Buttons/Button';
 
 interface BackupConfig {
   enabled: boolean;
@@ -238,10 +239,16 @@ export default function BackupAutomationPanel({ token, role }: Readonly<Props>) 
         configFile: config.configFile,
       }));
       setScheduleUi(parseCronToUi(config.schedule));
-      const cronNotice = response?.cronApplied === false
-        ? ' La configuración se guardó, pero la tarea cron no se pudo aplicar automáticamente en este entorno.'
-        : '';
-      setSuccess(`Configuración de automatización de respaldos actualizada.${cronNotice}`);
+      let noticeMessage = '';
+      if (response?.cronApplied === true) {
+        noticeMessage = ' La tarea cron del servidor backend también se actualizó.';
+      } else if (response?.cronInstallationAttempted === false) {
+        noticeMessage =
+          ' La configuración queda guardada en backup.env; el cron lo lee directamente el servidor de base de datos (no se aplica desde aquí).';
+      } else if (response?.cronInstallError) {
+        noticeMessage = ` No se pudo actualizar el cron automáticamente: ${response.cronInstallError}`;
+      }
+      setSuccess(`Configuración de automatización de respaldos actualizada.${noticeMessage}`);
     } catch (requestError: any) {
       setError(requestError?.message || 'No fue posible actualizar la configuración.');
     } finally {
@@ -250,10 +257,10 @@ export default function BackupAutomationPanel({ token, role }: Readonly<Props>) 
   };
 
   return (
-    <section className="mb-6 rounded-lg border border-border bg-white p-4">
+    <section className="mb-6 rounded-lg border border-border bg-card p-4">
       <h2 className="text-lg font-semibold text-text-primary">Automatización de respaldos</h2>
       <p className="mt-1 text-sm text-text-secondary">
-        Esta configuración actualiza el archivo de respaldo y la tarea cron del servidor donde corre el backend.
+        Esta configuración actualiza el archivo de respaldo (<code>backup.env</code>) que lee el cron del servidor de base de datos.
       </p>
 
       {loading ? (
@@ -533,16 +540,19 @@ export default function BackupAutomationPanel({ token, role }: Readonly<Props>) 
           ) : null}
 
           {error ? <p className="mt-3 text-sm text-red-600">{error}</p> : null}
-          {success ? <p className="mt-3 text-sm text-green-700">{success}</p> : null}
+          {success ? <p className="mt-3 text-sm text-green-700 dark:text-green-400">{success}</p> : null}
 
-          <button
+          <Button
             type="button"
             onClick={onSave}
             disabled={saving}
-            className="mt-4 rounded-md bg-primary px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+            variant="filled"
+            color="primary"
+            size="medium"
+            className="mt-4"
           >
             {saving ? 'Guardando...' : 'Guardar configuración'}
-          </button>
+          </Button>
         </>
       )}
     </section>

@@ -83,10 +83,12 @@ Then use mode commands without passing IP via CLI.
 ### Daily mode commands
 
 ```sh
-pnpm env:devLocal
-pnpm env:devDocker
-pnpm env:serverDocker
+pnpm up:devLocal
+pnpm up:devDocker
+pnpm up:serverDocker
 ```
+
+`pnpm up:*` is the streamlined path: it auto-creates `.env` from `.env.example` if needed, switches the environment, rebuilds when needed, and starts the container flow for that mode. The older `pnpm env:*` commands are still available when you only want to switch files.
 
 Cloud VM usage (no Node/pnpm required on cloud instances):
 
