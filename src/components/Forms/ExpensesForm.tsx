@@ -91,18 +91,22 @@ export default function ExpensesForm({
   // Local currency equivalent state
   const [localAmount, setLocalAmount] = useState<string>("");
   const [apiFailedEquivalent, setApiFailedEquivalent] = useState(false);
+  // Effective date (dd/mm/yyyy) reported by Banxico for the rate currently shown
+  const [rateFecha, setRateFecha] = useState<string | null>(null);
 
   // Calculate local currency equivalent when amount, currency, or receipt date changes
   useEffect(() => {
     if (!formData.monto || isNaN(parseFloat(formData.monto))) {
       setLocalAmount("");
       setApiFailedEquivalent(false);
+      setRateFecha(null);
       return;
     }
 
     if (formData.currency === societyCurrency) {
       setLocalAmount("");
       setApiFailedEquivalent(false);
+      setRateFecha(null);
       return;
     }
 
@@ -116,7 +120,7 @@ export default function ExpensesForm({
         // Fetch exchange rate for a given currency and date (if provided)
         const fetchCurrencyRate = async (curr: string) => {
           // If currency is MXN, the rate is 1. No need to call API.
-          if (curr === "MXN") return 1;
+          if (curr === "MXN") return { rate: 1, fecha: null as string | null };
 
           // Find the corresponding Banxico series ID for the currency
           const series = currencies.find(
@@ -136,27 +140,31 @@ export default function ExpensesForm({
           });
           const json = await res.json();
           return json.success && json.data?.rate
-            ? parseFloat(json.data.rate)
+            ? { rate: parseFloat(json.data.rate), fecha: json.data.fecha ?? null }
             : null;
         };
 
-        const fromRate = await fetchCurrencyRate(formData.currency);
-        const toRate = await fetchCurrencyRate(societyCurrency);
+        const from = await fetchCurrencyRate(formData.currency);
+        const to = await fetchCurrencyRate(societyCurrency);
 
-        if (fromRate !== null && toRate !== null) {
+        if (from !== null && to !== null) {
           // Calculate equivalent amount in local currency
-          const finalRate = fromRate / toRate;
+          const finalRate = from.rate / to.rate;
           const equivalent = parseFloat(formData.monto) * finalRate;
           setLocalAmount(equivalent.toFixed(2));
           setApiFailedEquivalent(false);
-          formData.exch_rate = fromRate.toString();
+          // Prefer the from-currency fecha; fall back to to-currency if needed
+          setRateFecha(from.fecha ?? to.fecha ?? null);
+          formData.exch_rate = from.rate.toString();
         } else {
           setLocalAmount("");
           setApiFailedEquivalent(true);
+          setRateFecha(null);
         }
       } catch {
         setLocalAmount("");
         setApiFailedEquivalent(true);
+        setRateFecha(null);
       }
     }, 500);
 
@@ -646,7 +654,7 @@ export default function ExpensesForm({
               <div>
                 {apiFailedEquivalent && (
                   <Reminder
-                    text="No se pudo obtener la conversión automática. Ingresa el monto en moneda local manualmente."
+                    text="No se pudo obtener la conversión automática (la API de Banxico no respondió). Ingresa el monto en moneda local manualmente."
                     type="warning"
                   />
                 )}
@@ -657,9 +665,16 @@ export default function ExpensesForm({
                   placeholder="Ej. 800.00"
                   value={localAmount}
                   onChange={(e) => setLocalAmount(e.target.value)}
-                  disabled={!apiFailedEquivalent}
-                  altText={!apiFailedEquivalent ? "Cálculo automático" : ""}
+                  altText={
+                    apiFailedEquivalent ? "Captura manual" : "Cálculo automático (editable)"
+                  }
                 />
+                {!apiFailedEquivalent && rateFecha && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Último tipo de cambio publicado por Banxico: <strong>{rateFecha}</strong>.
+                    Si conoces uno distinto para esta fecha, puedes sobrescribir el monto.
+                  </p>
+                )}
               </div>
             )}
         </div>
