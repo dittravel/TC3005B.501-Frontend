@@ -13,7 +13,7 @@ import { InputPatterns } from '@type/input.ts';
  * @param {BaseInputProps} props - The properties for the input component
  * @returns {JSX.Element} The rendered input component
  */
-export default function Input(props: BaseInputProps) {
+export default function Input(props: Readonly<BaseInputProps>) {
   // Default props for the input component
 	const {
 		label,
@@ -33,9 +33,10 @@ export default function Input(props: BaseInputProps) {
 		max,
 		altText,
 		accept,
+		onWheel,
 	} = props;
 
-	const finalPattern = pattern ?? InputPatterns[type as keyof typeof InputPatterns];
+	const finalPattern = pattern ?? InputPatterns[type];
 
   // Styles for the input component
 	const base = `
@@ -74,6 +75,7 @@ export default function Input(props: BaseInputProps) {
 				value={value}
 				defaultValue={defaultValue}
 				onChange={onChange}
+				onWheel={type === 'number' ? (event) => event.currentTarget.blur() : onWheel}
 				autoComplete={autoComplete}
 				min={min}
 				max={max}

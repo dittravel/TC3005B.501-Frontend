@@ -665,15 +665,15 @@ export default function ExpensesForm({
                   placeholder="Ej. 800.00"
                   value={localAmount}
                   onChange={(e) => setLocalAmount(e.target.value)}
+                  min={0}
                   disabled={!apiFailedEquivalent}
                   altText={
-                    apiFailedEquivalent ? "Captura manual" : "Cálculo automático (editable)"
+                    apiFailedEquivalent ? "Captura manual" : "Dato oficial Banxico -- no editable"
                   }
                 />
                 {!apiFailedEquivalent && rateFecha && (
                   <p className="text-xs text-gray-500 mt-1">
-                    Último tipo de cambio publicado por Banxico: <strong>{rateFecha}</strong>.
-                    Si conoces uno distinto para esta fecha, puedes sobrescribir el monto.
+                    Dato oficial Banxico -- no editable. Último tipo de cambio publicado por Banxico: <strong>{rateFecha}</strong>.
                   </p>
                 )}
               </div>
