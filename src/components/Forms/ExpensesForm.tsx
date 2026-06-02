@@ -665,6 +665,7 @@ export default function ExpensesForm({
                   placeholder="Ej. 800.00"
                   value={localAmount}
                   onChange={(e) => setLocalAmount(e.target.value)}
+                  disabled={!apiFailedEquivalent}
                   altText={
                     apiFailedEquivalent ? "Captura manual" : "Cálculo automático (editable)"
                   }
