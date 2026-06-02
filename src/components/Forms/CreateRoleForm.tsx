@@ -291,7 +291,12 @@ export default function CreateRoleForm({ token, mode, data }: Readonly<Props>) {
               <h3 className="text-base font-semibold text-text-primary mb-3">{category}</h3>
               <div className="space-y-2">
                 {items.map(({ category: subCategory, permissions }) => (
-                  <Accordion key={subCategory} title={subCategory} icon={categoryIcons[subCategory]} tag={`${permissions.length} permisos`}>
+                  <Accordion
+                    key={subCategory}
+                    title={subCategory}
+                    icon={categoryIcons[subCategory]}
+                    tag={`${permissions.length} ${permissions.length > 1 ? 'permisos' : 'permiso'}`}
+                  >
                     <div className="border border-border rounded-md p-4 bg-card">
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                         {permissions.map((permission) => (
