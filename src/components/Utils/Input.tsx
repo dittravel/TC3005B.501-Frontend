@@ -5,6 +5,7 @@
  * 
  */
 
+import { useRef } from 'react';
 import type { BaseInputProps } from '@type/input.ts';
 import { InputPatterns } from '@type/input.ts';
 
@@ -14,6 +15,9 @@ import { InputPatterns } from '@type/input.ts';
  * @returns {JSX.Element} The rendered input component
  */
 export default function Input(props: BaseInputProps) {
+	// Reference to the input element for handling date/time picker
+	const inputRef = useRef<HTMLInputElement>(null);
+
   // Default props for the input component
 	const {
 		label,
@@ -35,9 +39,18 @@ export default function Input(props: BaseInputProps) {
 		accept,
 	} = props;
 
+	// Handle click for date and time inputs to show the picker
+	const handleDateTimeClick = () => {
+		// Only trigger the picker for date and time types
+		if (inputRef.current && (type === 'date' || type === 'time')) {
+			// Focus the input and show the picker
+			inputRef.current.showPicker();
+		}
+	};
+
 	const finalPattern = pattern ?? InputPatterns[type as keyof typeof InputPatterns];
 
-  // Styles for the input component
+  	// Styles for the input component
 	const base = `
     w-full rounded-md px-3 py-2
     text-text-primary placeholder:text-text-secondary
@@ -63,6 +76,7 @@ export default function Input(props: BaseInputProps) {
 				</label>
 			)}
 			<input
+				ref={inputRef}
 				id={name}
 				name={name}
 				type={type}
@@ -78,6 +92,7 @@ export default function Input(props: BaseInputProps) {
 				min={min}
 				max={max}
 				accept={accept}
+				onClick={handleDateTimeClick}
 			/>
 			{altText && (
 				<p className="text-xs text-text-secondary mt-1">

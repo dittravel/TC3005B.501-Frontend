@@ -124,6 +124,7 @@ export default function DefaultRefundPolicy({
                 name="min_amount"
                 type="number"
                 placeholder="0"
+                min="0"
                 value={formData.min_amount}
                 onChange={handleChange}
                 required
@@ -135,6 +136,7 @@ export default function DefaultRefundPolicy({
                 name="max_amount"
                 type="number"
                 placeholder="10000"
+                min={formData.min_amount || "0"}
                 value={formData.max_amount}
                 onChange={handleChange}
                 required

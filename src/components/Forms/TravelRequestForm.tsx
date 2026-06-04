@@ -358,7 +358,7 @@ export default function TravelRequestForm({
       requested_fee: parseFloat(formData.requested_fee as string) || 0,
       imposed_fee: 0,
       currency: formData.currency,
-      exch_rate: 0, // valor a obtener de algún lado
+      exch_rate: 0,
       requires_advance: formData.requires_advance,
       travel_type: travelType,
       origin_country_name: firstRoute.origin_country_name,
@@ -403,6 +403,7 @@ export default function TravelRequestForm({
    */
   const handleSaveDraft = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
 
     const routeError = validateRoutes();
     if (routeError) {
@@ -488,6 +489,7 @@ export default function TravelRequestForm({
         "Hubo un error al guardar el borrador. Por favor, inténtalo de nuevo.",
         "error",
       );
+      setLoading(false);
     }
   };
 
@@ -527,8 +529,7 @@ export default function TravelRequestForm({
         firstRoute.beginning_time,
         firstRoute.ending_date,
         firstRoute.ending_time,
-        formData.requires_advance && formData.requested_fee,
-        formData.requires_advance && formData.notes,
+        ...(formData.requires_advance ? [formData.requested_fee, formData.notes] : [])
       ].some((field) => !field);
 
       if (missingFields) {
@@ -636,73 +637,6 @@ export default function TravelRequestForm({
   };
 
   /**
-   * Completes a draft by finalizing it as a submitted request.
-   * Performs full validation before completing the draft.
-   * @param {React.FormEvent} e - The form submission event
-   * @returns {Promise<void>}
-   */
-  const handleFinishDraft = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const routeError = validateRoutes();
-    if (routeError) {
-      setError(routeError);
-      handleSetToast(
-        "Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.",
-        "error",
-      );
-      return;
-    }
-
-    const firstRoute = formData.routes[0];
-    if (
-      !firstRoute.origin_country_name ||
-      !firstRoute.origin_city_name ||
-      !firstRoute.destination_country_name ||
-      !firstRoute.destination_city_name ||
-      !firstRoute.beginning_date ||
-      !firstRoute.beginning_time ||
-      !firstRoute.ending_date ||
-      !firstRoute.ending_time ||
-      (formData.requires_advance && !formData.requested_fee) ||
-      (formData.requires_advance && !formData.notes)
-    ) {
-      setError(
-        "Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.",
-      );
-      handleSetToast(
-        "Por favor, completa todos los campos requeridos de forma correcta antes de enviar la solicitud.",
-        "error",
-      );
-      return;
-    }
-
-    const editSuccess = await handleEditRequest(e, true);
-    if (!editSuccess) return;
-
-    try {
-      await apiRequest(`/applicant/confirm-draft-travel-request/${user_id}/${request_id}`, {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      handleSetToast('Borrador completado exitosamente.', 'success');
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      window.location.href = '/solicitudes';
-    } catch (err) {
-      // TODO: Implement proper error handling to extract specific error messages from API
-      setError(
-        "Hubo un error al completar el borrador. Por favor, inténtalo de nuevo.",
-      );
-      handleSetToast(
-        "Hubo un error al completar el borrador. Por favor, inténtalo de nuevo.",
-        "error",
-      );
-    }
-  };
-
-  /**
    * Resets the form to its initial state and clears any error/toast messages.
    * @returns {void}
    */
@@ -773,6 +707,7 @@ export default function TravelRequestForm({
                   label="Anticipo Esperado"
                   placeholder="Ej: 1500.00"
                   type="number"
+                  min="0"
                   value={
                     formData.requested_fee === 0 ? "" : formData.requested_fee
                   }
@@ -900,7 +835,7 @@ export default function TravelRequestForm({
             </Button>
             <Button
               type="submit"
-              onClick={handleFinishDraft}
+              onClick={handleSubmitRequest}
               color="success"
               disabled={loading}
             >

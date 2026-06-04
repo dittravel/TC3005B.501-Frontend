@@ -50,6 +50,7 @@ export const DASHBOARD_ACTION_CATALOG: DashboardActionDefinition[] = [
   { label: 'Grupos de sociedades', route: '/grupos-sociedades', iconKey: 'grupos', description: 'Gestiona grupos de sociedades y alta inicial por grupo', requiredRoles: ['Superadministrador'], requiredAllPermissions: ['superadmin:manage_groups'], defaultPriority: 5 },
   { label: 'Administradores maestros', route: '/administradores-maestros', iconKey: 'maestros', description: 'Crea y gestiona superadministradores del sistema', requiredRoles: ['Superadministrador'], requiredAllPermissions: ['superadmin:manage_master_admins'], defaultPriority: 12 },
   { label: 'Bitácora por grupo', route: '/bitacora-grupo', iconKey: 'bitacora', description: 'Consulta bitácoras filtradas por grupo de sociedades', requiredRoles: ['Superadministrador'], requiredAllPermissions: ['superadmin:view_group_audit_log'], defaultPriority: 18 },
+  { label: 'Cuentas contables', route: '/cuentas-contables', iconKey: 'comprobantes', description: 'Consulta y gestiona cuentas contables', requiredAllPermissions: ['accounts:view'], defaultPriority: 75 },
 ];
 
 export function getAccessibleDashboardActions(role: UserRole, permissionKeys: string[] = []): DashboardActionDefinition[] {

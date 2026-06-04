@@ -36,9 +36,9 @@ const permissionKeys = Array.isArray(tokenPayload?.permissions)
   ? tokenPayload.permissions.map((permission: unknown) => String(permission).trim()).filter(Boolean)
   : [];
 
-const canCreateRoles = permissionKeys.includes('users:create');
-const canEditRoles = permissionKeys.includes('users:edit');
-const canDeleteRoles = permissionKeys.includes('users:delete');
+const canCreateRoles = permissionKeys.includes('roles:manage');
+const canEditRoles = permissionKeys.includes('roles:manage');
+const canDeleteRoles = permissionKeys.includes('roles:manage');
 
 const roles = await (async () => {
   try {

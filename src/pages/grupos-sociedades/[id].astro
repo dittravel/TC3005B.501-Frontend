@@ -1,8 +1,8 @@
 ---
 /**
  * Generic page for creating or editing a society group
- * - /grupos-sociedades/nuevo → Create new society group
- * - /grupos-sociedades/123 → Edit society group with ID 123
+ * - /grupos-sociedades/nuevo - Create new society group
+ * - /grupos-sociedades/123 - Edit society group with ID 123
  */
 
 import TextHeader from "@components/Layout/TextHeader.astro";
@@ -63,6 +63,7 @@ const currencies = await (async () => {
     <TextHeader
       title={isCreating ? "Crear nuevo grupo de sociedad" : "Editar Grupo de Sociedad"}
       subtitle={isCreating ? "Complete el formulario con los datos del nuevo grupo de sociedad" : "Modifica los campos necesarios para actualizar la información del grupo de sociedad"}
+      backHref="/grupos-sociedades"
     />
     {isCreating ? (
       <SocietyGroupForm

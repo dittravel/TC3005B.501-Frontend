@@ -42,8 +42,9 @@ if (!hasRoutePermission('/crear-regla', permissionKeys)) {
 
 <MainLayout title="Crear Regla de Autorización" data={{userName, buttonLabel, role}}>
   <TextHeader
-      title="Crear Regla de Autorización"
-      subtitle="Define los niveles de autorización y condiciones para esta regla"
+    title="Crear Regla de Autorización"
+    subtitle="Define los niveles de autorización y condiciones para esta regla"
+    backHref="/reglas-autorizacion"
   />
   <main>
     <AuthRuleForm

@@ -103,6 +103,15 @@ export const permissionsByCategory: PermissionCategory[] = [
       { key: 'superadmin:view_group_audit_log', label: 'Ver bitácora por grupo' },
     ],
   },
+  {
+    category: 'Cuentas Contables',
+    permissions: [
+      { key: 'accounts:view', label: 'Ver cuentas contables' },
+      { key: 'accounts:create', label: 'Crear cuentas contables' },
+      { key: 'accounts:edit', label: 'Editar cuentas contables' },
+      { key: 'accounts:delete', label: 'Eliminar cuentas contables' },
+    ],
+  },
 ];
 
 export const permissionLabelToKey: Record<string, string> = {
@@ -153,4 +162,8 @@ export const permissionLabelToKey: Record<string, string> = {
   'Administrar grupos de sociedades': 'superadmin:manage_groups',
   'Administrar administradores maestros': 'superadmin:manage_master_admins',
   'Ver bitácora por grupo': 'superadmin:view_group_audit_log',
+  'Ver cuentas contables': 'accounts:view',
+  'Crear cuentas contables': 'accounts:create',
+  'Editar cuentas contables': 'accounts:edit',
+  'Eliminar cuentas contables': 'accounts:delete',
 };

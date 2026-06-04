@@ -11,6 +11,7 @@ import Pagination from "./Pagination";
 import Select from "@/components/Utils/Select";
 import Input from "@/components/Utils/Input";
 import { apiRequest } from "@/utils/apiClient";
+import Button from "../Buttons/Button";
 
 interface AuditEntry {
   audit_log_id: number;
@@ -140,6 +141,8 @@ export default function BitacoraTable({
   const [error, setError] = useState<string | null>(null);
   const [filterEntity, setFilterEntity] = useState("");
   const [filterName, setFilterName] = useState("");
+  const [filterStartDate, setFilterStartDate] = useState("");
+  const [filterEndDate, setFilterEndDate] = useState("");
   const [selectedSocietyGroupId, setSelectedSocietyGroupId] = useState(initialSocietyGroupId);
 
   const totalPages = Math.ceil(meta.total_count / LIMIT);
@@ -181,6 +184,23 @@ export default function BitacoraTable({
             ? e.actor_user_name.toLowerCase().includes(filterName.toLowerCase())
             : true
         )
+        .filter((e) => {
+          // Only compare date part of the timestamp (YYYY-MM-DD)
+          const eventDateStr = e.event_timestamp.split('T')[0];
+          if (filterStartDate && filterEndDate) {
+            // If both dates provided, check event timestamp is within the range
+            return eventDateStr >= filterStartDate && eventDateStr <= filterEndDate;
+          }
+          if (filterStartDate) {
+            // Only start date provided
+            return eventDateStr >= filterStartDate;
+          }
+          if (filterEndDate) {
+            // Only end date provided
+            return eventDateStr <= filterEndDate;
+          }
+          return true;
+        })
         .map((e) => ({
           event_timestamp: formatDate(e.event_timestamp),
           actor_user_name: e.actor_user_name,
@@ -190,13 +210,21 @@ export default function BitacoraTable({
           source_ip: e.source_ip,
           metadata_detail: formatMetadata(e.metadata),
         })),
-    [data, filterEntity, filterName, selectedSocietyGroupId]
+    [data, filterEntity, filterName, filterStartDate, filterEndDate, selectedSocietyGroupId]
   );
 
   function handleSocietyGroupChange(event: React.ChangeEvent<HTMLSelectElement>) {
     const value = event.target.value;
     setSelectedSocietyGroupId(value);
   }
+
+  // Reset filters
+  const resetFilters = () => {
+    setFilterEntity("");
+    setFilterName("");
+    setFilterStartDate("");
+    setFilterEndDate("");
+  };
 
   // Refetch data when selected society group changes
   useEffect(() => {
@@ -249,11 +277,41 @@ export default function BitacoraTable({
             onChange={(e) => setFilterName(e.target.value)}
           />
         </div>
+        <div className="w-full md:flex-1">
+          <Input
+            name="filter-start-date"
+            type="date"
+            label="Fecha Inicio"
+            max={filterEndDate || ""}
+            value={filterStartDate}
+            onChange={(e) => setFilterStartDate(e.target.value)}
+          />
+        </div>
+        <div className="w-full md:flex-1">
+          <Input
+            name="filter-end-date"
+            type="date"
+            label="Fecha Fin"
+            min={filterStartDate || ""}
+            value={filterEndDate}
+            onChange={(e) => setFilterEndDate(e.target.value)}
+          />
+        </div>
       </div>
-
-      <span className="text-sm text-text-secondary md:whitespace-nowrap">
-        Mostrando {rows.length} de {meta.total_count} resultados
-      </span>
+      
+      <div className="flex items-center justify-between mt-4 mb-2">
+        <p className="text-sm text-text-secondary md:whitespace-nowrap">
+          Mostrando {rows.length} de {meta.total_count} resultados
+        </p>
+        <Button
+          variant="link"
+          color="secondary"
+          size="small"
+          onClick={resetFilters}
+        >
+          Limpiar filtros
+        </Button>
+      </div>
 
       {/* Error */}
       {error && (

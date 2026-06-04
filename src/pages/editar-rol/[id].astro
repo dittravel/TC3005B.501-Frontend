@@ -28,6 +28,7 @@ const roleDetails = await apiRequest(`/admin/roles/${id}`, { cookies: Astro.cook
   <TextHeader
     title="Editar Rol"
     subtitle="Modifica el nombre y permisos del rol"
+    backHref="/roles"
   />
   <main>
     <CreateRoleForm
