@@ -35,6 +35,16 @@ const FlightSearchForm = ({ token, route, routeIndex, tripType, ticketType }: Fl
   const [selectedFlight, setSelectedFlight] = useState<any>(null);
   const [airports, setAirports] = useState<{ city_id: number; city_name: string; iata_code: string | null }[]>([]);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' } | null>(null);
+  const destinationCity = route.destination_city;
+  const originCity = route.origin_city;
+
+  const findAirportCodeByCityName = (cityName?: string) => {
+    if (!cityName) {
+      return '';
+    }
+    const airport = airports.find((item) => item.city_name.trim().toLowerCase() === cityName.trim().toLowerCase());
+    return airport?.iata_code ?? '';
+  };
 
   useEffect(() => {
     apiRequest('/travel-agent/cities', {
@@ -49,6 +59,22 @@ const FlightSearchForm = ({ token, route, routeIndex, tripType, ticketType }: Fl
         console.error('Error loading airports:', err);
       });
   }, [token]);
+
+  useEffect(() => {
+    if (!selectedDepartureAirport && originCity) {
+      const originAirportCode = findAirportCodeByCityName(originCity);
+      if (originAirportCode) {
+        setSelectedDepartureAirport(originAirportCode);
+      }
+    }
+
+    if (!selectedArrivalAirport && destinationCity) {
+      const destinationAirportCode = findAirportCodeByCityName(destinationCity);
+      if (destinationAirportCode) {
+        setSelectedArrivalAirport(destinationAirportCode);
+      }
+    }
+  }, [airports, destinationCity, originCity, selectedArrivalAirport, selectedDepartureAirport]);
 
   // Handle trip type change
   const handleTripTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {

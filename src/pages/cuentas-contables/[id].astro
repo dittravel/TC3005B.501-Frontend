@@ -1,0 +1,89 @@
+---
+/**
+ * Generic page for creating or editing an accounting account
+ * - /cuentas-contables/nueva - Create new account
+ * - /cuentas-contables/123 - Edit account with ID 123
+ */
+
+import TextHeader from "@components/Layout/TextHeader.astro";
+import MainLayout from "@layouts/MainLayout.astro";
+import AccountForm from "@components/Forms/AccountForm";
+import { getCookie } from "@data/cookies";
+import { roleLabels } from "@config/role-labels";
+import type { UserRole } from "@type/roles";
+import { apiRequest } from "@/utils/apiClient";
+
+const role: UserRole = getCookie("role", Astro.cookies) as UserRole;
+const buttonLabel = roleLabels[role];
+const userName = getCookie("username", Astro.cookies) || "";
+const token = getCookie("token", Astro.cookies) || "";
+const { id } = Astro.params;
+
+function parseJwtPayload(jwtToken: string): Record<string, unknown> | null {
+  try {
+    const parts = jwtToken.split('.');
+    if (parts.length < 2) return null;
+    const base64 = parts[1].replaceAll('-', '+').replaceAll('_', '/');
+    const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '=');
+    return JSON.parse(Buffer.from(padded, 'base64').toString('utf8'));
+  } catch {
+    return null;
+  }
+}
+
+const tokenPayload = parseJwtPayload(token);
+const permissionKeys = Array.isArray(tokenPayload?.permissions)
+  ? tokenPayload.permissions.map((permission: unknown) => String(permission).trim()).filter(Boolean)
+  : [];
+
+const canCreateAccounts = permissionKeys.includes('accounts:create');
+const canEditAccounts = permissionKeys.includes('accounts:edit');
+
+// Determine if we're creating or editing
+const isCreating = id === "nueva";
+const isEditing = id && id !== "nueva";
+
+if ((isCreating && !canCreateAccounts) || (isEditing && !canEditAccounts)) {
+  return Astro.redirect('/404');
+}
+
+let data = null;
+if (isEditing) {
+  try {
+    data = await apiRequest(`/accounts/${id}`, { cookies: Astro.cookies });
+  } catch (error) {
+    console.error(`Failed to fetch account ${id}:`, error);
+    return Astro.redirect('/404');
+  }
+}
+
+let costCenters = [];
+try {
+  const response = await apiRequest(`/accounts/cost-centers`, { cookies: Astro.cookies });
+  costCenters = Array.isArray(response) ? response : (response?.data || []);
+} catch (error) {
+  console.error('Failed to fetch cost centers:', error);
+}
+---
+
+<MainLayout title={isCreating ? "Crear Cuenta Contable" : "Editar Cuenta Contable"} data={{userName, buttonLabel, role}}>
+  <div>
+    <TextHeader
+      title={isCreating ? "Crear Cuenta Contable" : "Editar Cuenta Contable"}
+      subtitle={isCreating ? "Complete el formulario con los datos de la nueva cuenta contable" : "Modifica los campos necesarios para actualizar la información de la cuenta"}
+      backHref="/cuentas-contables"
+    />
+    {(isCreating && canCreateAccounts) || (isEditing && canEditAccounts) ? (
+      <AccountForm
+        client:load
+        mode={isCreating ? "create" : "edit"}
+        data={data}
+        costCenters={costCenters}
+        token={token}
+        redirectTo="/cuentas-contables"
+      />
+    ) : (
+      null
+    )}
+  </div>
+</MainLayout>

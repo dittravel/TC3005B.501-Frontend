@@ -27,6 +27,7 @@ export const SIDEBAR_CONFIG: MenuItem[] = [
   { label: 'Roles', route: '/roles', icon: 'admin_panel_settings', category: 'Gestión', requiredAnyPermissions: ['roles:manage'] },
   { label: 'Reglas de Autorización', route: '/reglas-autorizacion', icon: 'gavel', category: 'Gestión', requiredAnyPermissions: ['auth_rules:manage'] },
   { label: 'Políticas de Reembolsos', route: '/politicas-reembolso', icon: 'receipt_long', category: 'Gestión', requiredAnyPermissions: ['refund_policies:manage'] },
+  { label: 'Cuentas Contables', route: '/cuentas-contables', icon: 'account_balance', category: 'Gestión', requiredAnyPermissions: ['accounts:view'] },
   { label: 'Importar Datos', route: '/importar-datos', icon: 'file_upload', category: 'Sistema', requiredAnyPermissions: ['system:import_data'] },
   { label: 'Exportar datos contables', route: '/exportar-datos-contables', icon: 'draft', category: 'Sistema', requiredAnyPermissions: ['system:export_accounting'] },
   { label: 'Bitácora', route: '/bitacora', icon: 'history', category: 'Sistema', requiredAnyPermissions: ['system:audit_log'] },

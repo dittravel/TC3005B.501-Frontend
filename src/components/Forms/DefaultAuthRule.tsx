@@ -134,6 +134,7 @@ export default function DefaultAuthRule({ defaultRule, token }: Props) {
           name="num_levels"
           type="number"
           placeholder="1-10"
+          min="1"
           altText="Ingresa un valor entre 1 y 10"
           required
           value={formData.num_levels}

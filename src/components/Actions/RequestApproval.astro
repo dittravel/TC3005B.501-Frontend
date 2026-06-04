@@ -27,8 +27,9 @@ const id = request.request_id;
   <div>
     <RequestDetail
       request={request}
-      title={`Solicitud #${request.request_id}`}
-      subtitle="Detalles de la solicitud"
+      title={`Autorizar solicitud #${request.request_id}`}
+      subtitle="Revisa los detalles de la solicitud antes de autorizar o rechazar."
+      backHref="/autorizaciones"
     />
     <div class="flex justify-end gap-4 mt-8">
       <TravelRequestActionWrapper

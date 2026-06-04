@@ -37,6 +37,21 @@ const { title, data, showMessages = false } = Astro.props;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+
+    <script is:inline>
+      // Get html document element
+      const html = document.documentElement;
+
+      // Load accessibility settings from localStorage
+      const savedFont = localStorage.getItem('fontFamily') || 'roboto';
+      const savedSize = localStorage.getItem('textSize') || 'mediano';
+      const savedContrast = localStorage.getItem('contrast') || 'normal';
+
+      // Apply saved settings
+      html.classList.add(`font-${savedFont}`);
+      html.classList.add(`text-${savedSize}`);
+      html.classList.add(`contrast-${savedContrast}`);
+    </script>
   </head>
   <body>
     <div id="app" class={`${showMessages ? 'list-messages' : ''}`}>

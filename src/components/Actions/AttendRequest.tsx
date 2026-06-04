@@ -70,6 +70,7 @@ export default function AttendRequest({ request_id, token, currency = 'MXN' }: P
         name="imposedFee"
         label="Presupuesto impuesto"
         placeholder={`0.00 ${currency}`}
+        min="0"
         value={imposedFee}
         onChange={(e) => setImposedFee(e.target.value)}
         error={errorMessage}

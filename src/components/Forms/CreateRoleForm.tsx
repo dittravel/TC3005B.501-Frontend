@@ -11,6 +11,7 @@ import Button from "@/components/Buttons/Button";
 import Select from "@/components/Utils/Select";
 import { apiRequest } from "@/utils/apiClient";
 import Toast from "@/components/Utils/Toast";
+import Accordion from "@/components/Utils/Accordion";
 import { permissionLabelToKey, permissionsByCategory } from "@/config/permissionCatalog";
 
 const roleTemplates = [
@@ -35,6 +36,10 @@ const roleTemplates = [
       "system:audit_log",
       "auth_rules:manage",
       "refund_policies:manage",
+      "accounts:view",
+      "accounts:create",
+      "accounts:edit",
+      "accounts:delete",
     ],
   },
   {
@@ -85,6 +90,40 @@ const roleTemplates = [
     ],
   },
 ];
+
+// Icons for each permissions category (matching sidebar icons)
+const categoryIcons: Record<string, string> = {
+  "Usuarios": "person",
+  "Sociedades": "domain",
+  "Solicitudes de viaje": "airplane_ticket",
+  "Autorizaciones": "check_box",
+  "Cotizaciones": "price_change",
+  "Agencia de viajes": "luggage",
+  "Comprobantes": "receipt",
+  "Roles": "admin_panel_settings",
+  "Configuración": "gavel",
+  "Reembolsos": "currency_exchange",
+  "Sistema": "history",
+  "Superadmin": "hub",
+  "Cuentas Contables": "account_balance",
+};
+
+// Group categories into broader sections
+const categoryGrouping: Record<string, string> = {
+  "Usuarios": "Gestión",
+  "Sociedades": "Gestión",
+  "Roles": "Gestión",
+  "Configuración": "Gestión",
+  "Sistema": "Gestión",
+  "Superadmin": "Gestión",
+  "Cuentas Contables": "Gestión",
+  "Solicitudes de viaje": "Viajes y Gastos",
+  "Autorizaciones": "Viajes y Gastos",
+  "Cotizaciones": "Viajes y Gastos",
+  "Agencia de viajes": "Viajes y Gastos",
+  "Comprobantes": "Viajes y Gastos",
+  "Reembolsos": "Viajes y Gastos",
+};
 
 interface Props {
   token: string;
@@ -237,20 +276,42 @@ export default function CreateRoleForm({ token, mode, data }: Readonly<Props>) {
             <option key={t.label} value={t.label}>{t.label}</option>
           ))}
         </Select>
+        {/* Permissions accordions */}
         <div className="space-y-6 mt-4">
-          {visiblePermissionsByCategory.map(({ category, permissions }) => (
-            <div key={category} className="card-secondary p-4 rounded-lg">
-              <p className="text-sm font-semibold text-accent-primary mb-3">{category}</p>
-              <div className="flex flex-col gap-1">
-                {permissions.map((permission) => (
-                  <Checkbox
-                    key={permission.key}
-                    label={permission.label}
-                    name={permission.key}
-                    value={permission.key}
-                    checked={selectedPermissions.has(permission.key)}
-                    onChange={() => togglePermission(permission.key)}
-                  />
+          {/* From the visible permissions, group them by category */}
+          {Array.from(
+            new Map(
+              visiblePermissionsByCategory.map(item => [
+                categoryGrouping[item.category],
+                { category: categoryGrouping[item.category], items: visiblePermissionsByCategory.filter(p => categoryGrouping[p.category] === categoryGrouping[item.category]) }
+              ])
+            ).values()
+          ).map(({ category, items }) => (
+            <div key={category}>
+              <h3 className="text-base font-semibold text-text-primary mb-3">{category}</h3>
+              <div className="space-y-2">
+                {items.map(({ category: subCategory, permissions }) => (
+                  <Accordion
+                    key={subCategory}
+                    title={subCategory}
+                    icon={categoryIcons[subCategory]}
+                    tag={`${permissions.length} ${permissions.length > 1 ? 'permisos' : 'permiso'}`}
+                  >
+                    <div className="border border-border rounded-md p-4 bg-card">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                        {permissions.map((permission) => (
+                          <Checkbox
+                            key={permission.key}
+                            label={permission.label}
+                            name={permission.key}
+                            value={permission.key}
+                            checked={selectedPermissions.has(permission.key)}
+                            onChange={() => togglePermission(permission.key)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </Accordion>
                 ))}
               </div>
             </div>
