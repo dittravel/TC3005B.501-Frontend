@@ -91,7 +91,7 @@ export default function Requests({
 }: RequestsProps) {
   // State for filters, sorting, and pagination
   const [statusFilter, setStatusFilter] = useState('all');
-  const [dateField, setDateField] = useState('beginning_date');
+  const [dateField, setDateField] = useState('creation_date');
   const [sort, setSort] = useState('desc');
   const [currentPage, setCurrentPage] = useState(1);
   const [countryFilter, setCountryFilter] = useState('');
@@ -178,7 +178,7 @@ export default function Requests({
 
   const resetFilters = () => {
     setStatusFilter('all');
-    setDateField('beginning_date');
+    setDateField('creation_date');
     setSort('desc');
     setCountryFilter('');
     setCurrentPage(1);
