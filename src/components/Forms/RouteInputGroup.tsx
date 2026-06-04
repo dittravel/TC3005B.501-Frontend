@@ -123,7 +123,7 @@ const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, inde
               required
             >
               <option value="">Selecciona un país</option>
-              {(countries ?? []).map(c => (
+              {(countries ?? []).filter(c => c.country_name && c.country_name !== 'notSelected').map(c => (
                 <option key={c.country_id} value={c.country_id}>{c.country_name}</option>
               ))}
             </Select>
@@ -138,7 +138,7 @@ const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, inde
               required
             >
               <option value="">Selecciona una ciudad</option>
-              {originCities.map(c => (
+              {originCities.filter(c => c.city_name && c.city_name !== 'notSelected').map(c => (
                 <option key={c.city_id} value={c.city_name}>{c.city_name}</option>
               ))}
             </Select>
@@ -152,7 +152,7 @@ const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, inde
               required
             >
               <option value="">Selecciona un país</option>
-              {(countries ?? []).map(c => (
+              {(countries ?? []).filter(c => c.country_name && c.country_name !== 'notSelected').map(c => (
                 <option key={c.country_id} value={c.country_id}>{c.country_name}</option>
               ))}
             </Select>
@@ -167,7 +167,7 @@ const RouteInputGroup: React.FC<RouteInputGroupProps> = ({ route, onChange, inde
               required
             >
               <option value="">Selecciona una ciudad</option>
-              {destCities.map(c => (
+              {destCities.filter(c => c.city_name && c.city_name !== 'notSelected').map(c => (
                 <option key={c.city_id} value={c.city_name}>{c.city_name}</option>
               ))}
             </Select>
