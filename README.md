@@ -1,6 +1,10 @@
 # TC3005B.501-Frontend
 Web Application of the travel management system portal developed during course TC3005B by group 501.
 
+This repository contains the frontend application, shared UI components, Cypress end-to-end tests, Astro configuration, and the deployment switchers used to run the app in local and Docker-based modes.
+
+The frontend is configuration-driven. In practice, that means most environment-specific behavior is controlled by `.env`, especially the backend API base URL and the helper values used by Docker and test runs.
+
 ## Project Structure
 
 ```
@@ -60,9 +64,90 @@ TC3005B.501-Frontend/
 
 ## Getting Started
 
-In order to run this Frontend, the following steps are required.
+In order to run this Frontend, follow the steps below in this order:
 
-## Quick Guides (from `git pull`)
+1. Clone the repository.
+2. Install dependencies.
+3. Create and configure `.env`.
+4. Start the app in the mode you need.
+5. Verify the API connection and, if needed, use the Docker or cloud variants.
+
+## Quick Orientation
+
+The frontend does not host its own business API. It consumes the backend API through `PUBLIC_API_BASE_URL` and renders the travel management workflows on top of that data.
+
+Important integration points:
+
+- Authentication and session flow come from the backend.
+- Request, receipt, travel, and backup admin views all depend on the backend API being reachable.
+- Cypress test users are loaded from `.env` so that local and CI test runs can use deterministic accounts.
+
+If you are running the app against the local Docker stack, the usual backend target is `https://localhost:3000/api`.
+If you are running against a remote backend container, update the base URL accordingly.
+
+## Installation and First Run
+
+### 1. Clone the repository
+
+#### Using `git`
+
+```sh
+git clone https://github.com/dittravel/TC3005B.501-Frontend.git
+cd TC3005B.501-Frontend
+```
+
+#### Using `gh` (GitHub CLI)
+
+```sh
+gh repo clone dittravel/TC3005B.501-Frontend
+cd TC3005B.501-Frontend
+```
+
+### 2. Install dependencies
+
+Use pnpm when possible.
+
+```sh
+pnpm install
+```
+
+If you prefer npm:
+
+```sh
+npm install
+```
+
+### 3. Configure `.env`
+
+Create the file from the example and verify the API base URL:
+
+```sh
+cp .env.example .env
+```
+
+Required values to verify:
+
+```env
+PUBLIC_API_BASE_URL=https://localhost:3000/api
+PUBLIC_IS_DEV=true
+SERVER_DOCKER_BACKEND_IP=172.16.60.186
+```
+
+The `CYPRESS_*` accounts in `.env` are for automated tests and local QA runs.
+
+### 4. Start the app
+
+Choose the path that matches your environment:
+
+- Native local frontend: `pnpm up:devLocal`
+- Local Docker frontend: `pnpm up:devDocker`
+- Server/frontend container: `pnpm up:serverDocker`
+
+The `up:*` commands auto-create `.env` if missing, switch the environment, rebuild when needed, and start the container flow for that mode.
+
+If you only want to switch files without starting services, use the older `env:*` commands.
+
+## Quick Guides (reference)
 
 ### Environment Modes (current)
 
@@ -74,9 +159,12 @@ In order to run this Frontend, the following steps are required.
 
 ### Configure Once (recommended)
 
-Set this once in frontend `.env`:
+Set these once in frontend `.env`:
 
+- `PUBLIC_API_BASE_URL` - backend API base path used by the app
+- `PUBLIC_IS_DEV` - enables development-friendly UI behavior
 - `SERVER_DOCKER_BACKEND_IP`
+- `CYPRESS_*` test accounts - used by automated end-to-end tests
 
 Then use mode commands without passing IP via CLI.
 
@@ -98,38 +186,6 @@ docker compose ps
 ```
 
 For full 3-VM cloud workflow (DB + backend + frontend), see [../TC3005B.501-Backend/CLOUD_DEPLOYMENT.md](../TC3005B.501-Backend/CLOUD_DEPLOYMENT.md).
-
-### Installing
-
-The only option currently is to clone the repository locally from GitHub.
-
-#### Using `git`
-
-```sh
-git clone https://github.com/dittravel/TC3005B.501-Frontend.git
-```
-
-#### Using `gh` (GitHub CLI)
-
-```sh
-gh repo clone dittravel/TC3005B.501-Frontend
-```
-
-### Dependencies
-
-The dependencies for this project are managed using [the pnpm package manager](https://pnpm.io/), so it is recommended to use this. However, [npm](https://www.npmjs.com/) can also be used. The dependencies are automatically managed by `pnpm` in the `package.json` file, so they are installed automatically when issuing the install command.
-
-#### Using `pnpm`
-
-```sh
-pnpm install
-```
-
-#### Using `npm`
-
-```sh
-npm install
-```
 
 ### Dockerized Setup (Recommended)
 
@@ -231,6 +287,8 @@ The application is fully integrated with the backend API. To start using the app
 
 ```env
 PUBLIC_API_BASE_URL=https://localhost:3000/api
+PUBLIC_IS_DEV=true
+SERVER_DOCKER_BACKEND_IP=172.16.60.186
 ```
 
 3. **Login**: Use the login interface to authenticate with your credentials. The available roles are:
@@ -240,6 +298,31 @@ PUBLIC_API_BASE_URL=https://localhost:3000/api
 - **Accounts Payable (Cuentas por pagar)** - Reviews and approves/rejects receipts
 - **Authorizer (Autorizador)** - Requester capabilities + request approval/rejection
 - **Administrator (Administrador)** - Full system management
+
+### API Integration Notes
+
+The frontend commonly calls these backend endpoints:
+
+- `GET /api/system/health` and `GET /api/system/version` for operational checks.
+- `GET /api/exchange-rate` for Banxico exchange-rate lookups.
+- `POST /api/files/parse-xml-preview` to preview CFDI XML files.
+- `POST /api/cfdi/validate` to validate CFDI payloads.
+- `GET` and `PUT /api/admin/backup-automation-config` for backup automation administration.
+
+The frontend does not hardcode a separate API server. It always builds requests from `PUBLIC_API_BASE_URL`.
+
+### Field Limits and Validation
+
+Several forms enforce numeric ranges in the UI before the backend ever sees the request:
+
+- Expense amounts and local currency equivalents are numeric fields and cannot be negative in the input UI.
+- Backup retention days are limited to the range `1` to `3650`.
+- Backup schedule UI limits minutes to `0`-`59`, hours to `0`-`23`, weekly day to `0`-`6`, and monthly day to `1`-`28`.
+- Auth-rule and policy forms also constrain minimum values, durations, and amounts with explicit lower bounds.
+
+For Banxico exchange rates, the local currency equivalent becomes editable when the receipt date is newer than the latest published exchange rate date. If the Banxico lookup fails completely, the field is also editable so the user can enter a manual value.
+
+That means the UI intentionally blocks some invalid or risky states early, but the backend still validates the final payload.
 
 ### Default role permissions (base and dummy)
 
