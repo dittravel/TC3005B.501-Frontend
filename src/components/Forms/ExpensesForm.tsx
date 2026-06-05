@@ -42,6 +42,24 @@ interface Props {
   redirectTo: string;
 }
 
+function parseDateValue(value: string | null): Date | null {
+  if (!value) return null;
+
+  // Input date from the form uses yyyy-mm-dd.
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const [year, month, day] = value.split("-").map(Number);
+    return new Date(year, month - 1, day);
+  }
+
+  // Banxico effective date usually arrives as dd/mm/yyyy.
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(value)) {
+    const [day, month, year] = value.split("/").map(Number);
+    return new Date(year, month - 1, day);
+  }
+
+  return null;
+}
+
 /**
  * Expenses Form Component
  * Used to create, edit, or resubmit travel expense receipts
@@ -199,6 +217,13 @@ export default function ExpensesForm({
       return () => clearTimeout(timer);
     }
   }, [toast]);
+
+  const receiptDateObj = parseDateValue(formData.receiptDate || null);
+  const rateDateObj = parseDateValue(rateFecha);
+  const banxicoRateIsOlderThanReceipt = Boolean(
+    receiptDateObj && rateDateObj && receiptDateObj.getTime() > rateDateObj.getTime(),
+  );
+  const localAmountIsEditable = apiFailedEquivalent || banxicoRateIsOlderThanReceipt;
 
   // Handle form field changes
   const handleChange = (field: keyof typeof formData, value: any) => {
@@ -666,11 +691,19 @@ export default function ExpensesForm({
                   value={localAmount}
                   onChange={(e) => setLocalAmount(e.target.value)}
                   min={0}
-                  disabled={!apiFailedEquivalent}
+                  disabled={!localAmountIsEditable}
                   altText={
-                    apiFailedEquivalent ? "Captura manual" : "Dato oficial Banxico -- no editable"
+                    localAmountIsEditable
+                      ? "Captura manual"
+                      : "Dato oficial Banxico -- no editable"
                   }
                 />
+                {banxicoRateIsOlderThanReceipt && !apiFailedEquivalent && (
+                  <p className="text-xs text-amber-700 mt-1">
+                    La fecha del comprobante es posterior al ultimo tipo de cambio publicado por Banxico.
+                    Puedes ajustar manualmente el equivalente en {societyCurrency}.
+                  </p>
+                )}
                 {!apiFailedEquivalent && rateFecha && (
                   <p className="text-xs text-gray-500 mt-1">
                     Dato oficial Banxico -- no editable. Último tipo de cambio publicado por Banxico: <strong>{rateFecha}</strong>.
