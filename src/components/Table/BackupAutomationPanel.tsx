@@ -151,6 +151,31 @@ function parseCronToUi(cronExpression: string): ScheduleUiState {
   };
 }
 
+function buildBackupSaveNotice(response: {
+  cronApplied?: boolean;
+  cronInstallTarget?: string;
+  cronInstallationAttempted?: boolean;
+  cronInstallError?: string | null;
+}) {
+  if (response.cronApplied === true) {
+    if (response.cronInstallTarget === 'remote-db-vm') {
+      return ' La tarea cron del servidor de base de datos también se actualizó.';
+    }
+
+    return ' La tarea cron del servidor backend también se actualizó.';
+  }
+
+  if (response.cronInstallationAttempted === false) {
+    return ' La configuración queda guardada en backup.env; el cron se aplica manualmente en el servidor de base de datos.';
+  }
+
+  if (response.cronInstallError) {
+    return ` No se pudo actualizar el cron automáticamente: ${response.cronInstallError}`;
+  }
+
+  return '';
+}
+
 export default function BackupAutomationPanel({ token, role }: Readonly<Props>) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -239,15 +264,7 @@ export default function BackupAutomationPanel({ token, role }: Readonly<Props>) 
         configFile: config.configFile,
       }));
       setScheduleUi(parseCronToUi(config.schedule));
-      let noticeMessage = '';
-      if (response?.cronApplied === true) {
-        noticeMessage = ' La tarea cron del servidor backend también se actualizó.';
-      } else if (response?.cronInstallationAttempted === false) {
-        noticeMessage =
-          ' La configuración queda guardada en backup.env; el cron lo lee directamente el servidor de base de datos (no se aplica desde aquí).';
-      } else if (response?.cronInstallError) {
-        noticeMessage = ` No se pudo actualizar el cron automáticamente: ${response.cronInstallError}`;
-      }
+      const noticeMessage = buildBackupSaveNotice(response ?? {});
       setSuccess(`Configuración de automatización de respaldos actualizada.${noticeMessage}`);
     } catch (requestError: any) {
       setError(requestError?.message || 'No fue posible actualizar la configuración.');
