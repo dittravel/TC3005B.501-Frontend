@@ -72,6 +72,9 @@ const ACTION_TYPE_LABELS: Record<string, string> = {
   SOCIETY_GROUP_UPDATED: "Grupo de sociedad editado",
   SOCIETY_GROUP_DELETED: "Grupo de sociedad eliminado",
   SOCIETY_TRANSFERRED_TO_GROUP: "Sociedad transferida a grupo",
+  ACCOUNT_CREATED: "Cuenta creada",
+  ACCOUNT_UPDATED: "Cuenta editada",
+  ACCOUNT_DELETED: "Cuenta eliminada",
 };
 
 // Mapping of entities
@@ -83,6 +86,7 @@ const ENTITY_TYPES: Record<string, string> = {
   Policy: "Políticas",
   Society: "Sociedades",
   SocietyGroup: "Grupos de Sociedades",
+  Account: "Cuentas Contables",
 };
 
 // Columns to display in the table
@@ -220,6 +224,7 @@ export default function BitacoraTable({
 
   // Reset filters
   const resetFilters = () => {
+    setSelectedSocietyGroupId("");
     setFilterEntity("");
     setFilterName("");
     setFilterStartDate("");
