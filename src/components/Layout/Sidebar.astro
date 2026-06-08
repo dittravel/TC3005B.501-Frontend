@@ -66,13 +66,8 @@ const groupedItems = items.reduce((acc: Record<string, MenuItem[]>, item: MenuIt
 }, {} as Record<string, MenuItem[]>);
 ---
 
-<aside class="
-    w-full md:w-64 h-full
-    border-r border-border bg-sidebar
-    lg:relative fixed lg:z-auto z-50
-    bg-card
-  ">
-  <div class="h-full px-4 py-6 overflow-auto">
+<aside class="w-full min-h-full border-r border-border bg-card">
+  <div class="px-4 py-6">
     {
       Object.entries(groupedItems).map(([category, categoryItems]: [string, MenuItem[]]) => (
         <div class="mb-4">
@@ -98,42 +93,3 @@ const groupedItems = items.reduce((acc: Record<string, MenuItem[]>, item: MenuIt
     }
   </div>
 </aside>
-
-<script is:inline>
-  const currentPath = window.location.pathname;
-  const activeItem = document.querySelector(`[data-sidebar-path="${currentPath}"]`);
-
-  if (activeItem) {
-    const startY = window.scrollY;
-
-    const targetY =
-      activeItem.getBoundingClientRect().top +
-      window.scrollY -
-      window.innerHeight / 2;
-
-    const distance = targetY - startY;
-
-    const duration = 1200; // slower (try 1200–1800)
-
-    let startTime;
-
-    function easeInOutSine(t) {
-      return -(Math.cos(Math.PI * t) - 1) / 2;
-    }
-
-    function animate(time) {
-      if (!startTime) startTime = time;
-
-      const progress = Math.min((time - startTime) / duration, 1);
-      const eased = easeInOutSine(progress);
-
-      window.scrollTo(0, startY + distance * eased);
-
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      }
-    }
-
-    requestAnimationFrame(animate);
-  }
-</script>
