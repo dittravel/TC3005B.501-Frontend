@@ -24,6 +24,7 @@ export interface BaseInputProps {
   max?: string | number;
   altText?: string;
   accept?: string;
+  onWheel?: (e: React.WheelEvent<HTMLInputElement>) => void;
 }
 
 export type InputTypes =
@@ -41,12 +42,12 @@ export type InputTypes =
 export const InputPatterns: Record<InputTypes, string | undefined> = {
   text: undefined,
   checkbox: undefined,
-  email: '^[^ @]+@[^ @]+\\.[^ @]+$',
-  tel: '^\\+?[0-9 \\-]{7,15}$',
+  email: String.raw`^[^ @]+@[^ @]+\.[^ @]+$`,
+  tel: String.raw`^\+?[0-9 \-]{7,15}$`,
   url: 'https?://.+',
   password: undefined,
-  number: '^\\d+$',
-  date: '^\\d{4}-\\d{2}-\\d{2}$',
+  number: String.raw`^\d+$`,
+  date: String.raw`^\d{4}-\d{2}-\d{2}$`,
   time: undefined,
   file: undefined,
 };  

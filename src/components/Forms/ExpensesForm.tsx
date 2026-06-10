@@ -42,6 +42,24 @@ interface Props {
   redirectTo: string;
 }
 
+function parseDateValue(value: string | null): Date | null {
+  if (!value) return null;
+
+  // Input date from the form uses yyyy-mm-dd.
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const [year, month, day] = value.split("-").map(Number);
+    return new Date(year, month - 1, day);
+  }
+
+  // Banxico effective date usually arrives as dd/mm/yyyy.
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(value)) {
+    const [day, month, year] = value.split("/").map(Number);
+    return new Date(year, month - 1, day);
+  }
+
+  return null;
+}
+
 /**
  * Expenses Form Component
  * Used to create, edit, or resubmit travel expense receipts
@@ -91,18 +109,22 @@ export default function ExpensesForm({
   // Local currency equivalent state
   const [localAmount, setLocalAmount] = useState<string>("");
   const [apiFailedEquivalent, setApiFailedEquivalent] = useState(false);
+  // Effective date (dd/mm/yyyy) reported by Banxico for the rate currently shown
+  const [rateFecha, setRateFecha] = useState<string | null>(null);
 
   // Calculate local currency equivalent when amount, currency, or receipt date changes
   useEffect(() => {
     if (!formData.monto || isNaN(parseFloat(formData.monto))) {
       setLocalAmount("");
       setApiFailedEquivalent(false);
+      setRateFecha(null);
       return;
     }
 
     if (formData.currency === societyCurrency) {
       setLocalAmount("");
       setApiFailedEquivalent(false);
+      setRateFecha(null);
       return;
     }
 
@@ -116,7 +138,7 @@ export default function ExpensesForm({
         // Fetch exchange rate for a given currency and date (if provided)
         const fetchCurrencyRate = async (curr: string) => {
           // If currency is MXN, the rate is 1. No need to call API.
-          if (curr === "MXN") return 1;
+          if (curr === "MXN") return { rate: 1, fecha: null as string | null };
 
           // Find the corresponding Banxico series ID for the currency
           const series = currencies.find(
@@ -136,27 +158,31 @@ export default function ExpensesForm({
           });
           const json = await res.json();
           return json.success && json.data?.rate
-            ? parseFloat(json.data.rate)
+            ? { rate: parseFloat(json.data.rate), fecha: json.data.fecha ?? null }
             : null;
         };
 
-        const fromRate = await fetchCurrencyRate(formData.currency);
-        const toRate = await fetchCurrencyRate(societyCurrency);
+        const from = await fetchCurrencyRate(formData.currency);
+        const to = await fetchCurrencyRate(societyCurrency);
 
-        if (fromRate !== null && toRate !== null) {
+        if (from !== null && to !== null) {
           // Calculate equivalent amount in local currency
-          const finalRate = fromRate / toRate;
+          const finalRate = from.rate / to.rate;
           const equivalent = parseFloat(formData.monto) * finalRate;
           setLocalAmount(equivalent.toFixed(2));
           setApiFailedEquivalent(false);
-          formData.exch_rate = fromRate.toString();
+          // Prefer the from-currency fecha; fall back to to-currency if needed
+          setRateFecha(from.fecha ?? to.fecha ?? null);
+          formData.exch_rate = from.rate.toString();
         } else {
           setLocalAmount("");
           setApiFailedEquivalent(true);
+          setRateFecha(null);
         }
       } catch {
         setLocalAmount("");
         setApiFailedEquivalent(true);
+        setRateFecha(null);
       }
     }, 500);
 
@@ -191,6 +217,13 @@ export default function ExpensesForm({
       return () => clearTimeout(timer);
     }
   }, [toast]);
+
+  const receiptDateObj = parseDateValue(formData.receiptDate || null);
+  const rateDateObj = parseDateValue(rateFecha);
+  const banxicoRateIsOlderThanReceipt = Boolean(
+    receiptDateObj && rateDateObj && receiptDateObj.getTime() > rateDateObj.getTime(),
+  );
+  const localAmountIsEditable = apiFailedEquivalent || banxicoRateIsOlderThanReceipt;
 
   // Handle form field changes
   const handleChange = (field: keyof typeof formData, value: any) => {
@@ -646,7 +679,7 @@ export default function ExpensesForm({
               <div>
                 {apiFailedEquivalent && (
                   <Reminder
-                    text="No se pudo obtener la conversión automática. Ingresa el monto en moneda local manualmente."
+                    text="No se pudo obtener la conversión automática (la API de Banxico no respondió). Ingresa el monto en moneda local manualmente."
                     type="warning"
                   />
                 )}
@@ -657,9 +690,25 @@ export default function ExpensesForm({
                   placeholder="Ej. 800.00"
                   value={localAmount}
                   onChange={(e) => setLocalAmount(e.target.value)}
-                  disabled={!apiFailedEquivalent}
-                  altText={!apiFailedEquivalent ? "Cálculo automático" : ""}
+                  min={0}
+                  disabled={!localAmountIsEditable}
+                  altText={
+                    localAmountIsEditable
+                      ? "Captura manual"
+                      : "Dato oficial Banxico -- no editable"
+                  }
                 />
+                {banxicoRateIsOlderThanReceipt && !apiFailedEquivalent && (
+                  <p className="text-xs text-amber-700 mt-1">
+                    La fecha del comprobante es posterior al ultimo tipo de cambio publicado por Banxico.
+                    Puedes ajustar manualmente el equivalente en {societyCurrency}.
+                  </p>
+                )}
+                {!apiFailedEquivalent && rateFecha && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Dato oficial Banxico -- no editable. Último tipo de cambio publicado por Banxico: <strong>{rateFecha}</strong>.
+                  </p>
+                )}
               </div>
             )}
         </div>

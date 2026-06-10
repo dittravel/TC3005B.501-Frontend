@@ -64,14 +64,16 @@ export default function ForgotPasswordForm() {
       <div className="w-full md:w-100">
         <div className="p-2 md:p-8 flex flex-col justify-center items-center rounded-xl gap-8 md:shadow-lg md:bg-card md:border-border md:border-1">
 
-          <div className="w-full flex flex-col gap-1">
-            <h2 className="text-3xl font-bold text-text-primary">
-              Recuperar contraseña
-            </h2>
-            <p className="text-sm text-text-secondary">
-              Ingresa tu correo electrónico y te enviaremos un enlace de recuperación.
-            </p>
-          </div>
+          {!submitted && (
+            <div className="w-full flex flex-col gap-1">
+              <h2 className="text-3xl font-bold text-text-primary">
+                Recuperar contraseña
+              </h2>
+              <p className="text-sm text-text-secondary">
+                Ingresa tu correo electrónico y te enviaremos un enlace de recuperación.
+              </p>
+            </div>
+          )}
 
           {submitted ? (
             <div className="w-full flex flex-col gap-4">

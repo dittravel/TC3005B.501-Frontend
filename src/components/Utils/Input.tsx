@@ -14,10 +14,8 @@ import { InputPatterns } from '@type/input.ts';
  * @param {BaseInputProps} props - The properties for the input component
  * @returns {JSX.Element} The rendered input component
  */
-export default function Input(props: BaseInputProps) {
-	// Reference to the input element for handling date/time picker
+export default function Input(props: Readonly<BaseInputProps>) {
 	const inputRef = useRef<HTMLInputElement>(null);
-
   // Default props for the input component
 	const {
 		label,
@@ -37,18 +35,16 @@ export default function Input(props: BaseInputProps) {
 		max,
 		altText,
 		accept,
+		onWheel,
 	} = props;
 
-	// Handle click for date and time inputs to show the picker
+	const finalPattern = pattern ?? InputPatterns[type];
+
 	const handleDateTimeClick = () => {
-		// Only trigger the picker for date and time types
 		if (inputRef.current && (type === 'date' || type === 'time')) {
-			// Focus the input and show the picker
 			inputRef.current.showPicker();
 		}
 	};
-
-	const finalPattern = pattern ?? InputPatterns[type as keyof typeof InputPatterns];
 
   	// Styles for the input component
 	const base = `
@@ -88,6 +84,7 @@ export default function Input(props: BaseInputProps) {
 				value={value}
 				defaultValue={defaultValue}
 				onChange={onChange}
+				onWheel={type === 'number' ? (event) => event.currentTarget.blur() : onWheel}
 				autoComplete={autoComplete}
 				min={min}
 				max={max}

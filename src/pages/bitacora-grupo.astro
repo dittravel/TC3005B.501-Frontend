@@ -6,6 +6,7 @@
 import TextHeader from '@components/Layout/TextHeader.astro';
 import MainLayout from '@layouts/MainLayout.astro';
 import BitacoraTable from '@components/Table/BitacoraTable';
+import BackupAutomationPanel from '@components/Table/BackupAutomationPanel';
 
 import { getCookie } from '@data/cookies';
 import { roleLabels } from '@config/role-labels';
@@ -51,6 +52,8 @@ try {
   />
 
   <main>
+    <BackupAutomationPanel client:load token={token} role={role} />
+
     <BitacoraTable
       client:only="react"
       initialData={initialData}
